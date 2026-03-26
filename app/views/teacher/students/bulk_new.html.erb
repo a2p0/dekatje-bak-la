@@ -1,0 +1,17 @@
+<h1>Ajouter des élèves en masse — <%= @classroom.name %></h1>
+
+<p>Saisissez un élève par ligne, au format : <strong>Prénom Nom</strong></p>
+
+<%= form_with url: bulk_create_teacher_classroom_students_path(@classroom), method: :post do |f| %>
+  <div>
+    <%= f.label :students_list, "Liste des élèves" %>
+    <%= f.text_area :students_list,
+        rows: 15,
+        cols: 40,
+        placeholder: "Jean Dupont\nMarie Martin\nPaul Bernard" %>
+  </div>
+
+  <%= f.submit "Créer les comptes" %>
+<% end %>
+
+<%= link_to "Retour à la classe", teacher_classroom_path(@classroom) %>
