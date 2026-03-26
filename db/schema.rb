@@ -10,9 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_26_032212) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_26_144710) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "classrooms", force: :cascade do |t|
+    t.string "access_code", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "owner_id", null: false
+    t.string "school_year", null: false
+    t.string "specialty"
+    t.datetime "updated_at", null: false
+    t.index ["access_code"], name: "index_classrooms_on_access_code", unique: true
+    t.index ["owner_id"], name: "index_classrooms_on_owner_id"
+  end
+
+  create_table "students", force: :cascade do |t|
+    t.integer "api_provider", default: 0, null: false
+    t.bigint "classroom_id", null: false
+    t.datetime "created_at", null: false
+    t.string "encrypted_api_key"
+    t.string "encrypted_api_key_iv"
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.string "username", null: false
+    t.index ["classroom_id"], name: "index_students_on_classroom_id"
+    t.index ["username", "classroom_id"], name: "index_students_on_username_and_classroom_id", unique: true
+  end
 
   create_table "users", force: :cascade do |t|
     t.integer "api_provider", default: 0, null: false
@@ -30,4 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_032212) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "classrooms", "users", column: "owner_id"
+  add_foreign_key "students", "classrooms"
 end

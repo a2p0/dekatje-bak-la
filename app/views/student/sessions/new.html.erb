@@ -1,0 +1,19 @@
+<h1>Connexion — <%= @classroom.name %></h1>
+
+<%= form_with url: student_session_path(access_code: @classroom.access_code), method: :post do |f| %>
+  <% if flash[:alert] %>
+    <p style="color: red;"><%= flash[:alert] %></p>
+  <% end %>
+
+  <div>
+    <%= f.label :username, "Identifiant" %>
+    <%= f.text_field :username, autocomplete: "username", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :password, "Mot de passe" %>
+    <%= f.password_field :password, autocomplete: "current-password", required: true %>
+  </div>
+
+  <%= f.submit "Se connecter" %>
+<% end %>
