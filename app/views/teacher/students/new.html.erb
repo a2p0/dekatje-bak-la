@@ -1,0 +1,17 @@
+<h1>Ajouter un élève — <%= @classroom.name %></h1>
+
+<%= form_with model: [:teacher, @classroom, @student] do |f| %>
+  <div>
+    <%= f.label :first_name, "Prénom" %>
+    <%= f.text_field :first_name, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :last_name, "Nom" %>
+    <%= f.text_field :last_name, required: true %>
+  </div>
+
+  <%= f.submit "Ajouter l'élève" %>
+<% end %>
+
+<%= link_to "Retour à la classe", teacher_classroom_path(@classroom) %>

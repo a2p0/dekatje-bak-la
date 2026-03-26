@@ -1,0 +1,17 @@
+<h1>Mes classes</h1>
+
+<%= link_to "Nouvelle classe", new_teacher_classroom_path %>
+
+<% if @classrooms.empty? %>
+  <p>Vous n'avez pas encore de classe.</p>
+<% else %>
+  <ul>
+    <% @classrooms.each do |classroom| %>
+      <li>
+        <%= link_to classroom.name, teacher_classroom_path(classroom) %>
+        — <%= classroom.school_year %>
+        (<%= classroom.students.count %> élèves)
+      </li>
+    <% end %>
+  </ul>
+<% end %>
