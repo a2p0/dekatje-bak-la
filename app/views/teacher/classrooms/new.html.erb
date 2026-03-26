@@ -1,0 +1,20 @@
+<h1>Nouvelle classe</h1>
+
+<%= form_with model: [:teacher, @classroom] do |f| %>
+  <div>
+    <%= f.label :name, "Nom de la classe" %>
+    <%= f.text_field :name, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :school_year, "Année scolaire" %>
+    <%= f.text_field :school_year, placeholder: "2026", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :specialty, "Spécialité" %>
+    <%= f.text_field :specialty, placeholder: "SIN, ITEC, EC..." %>
+  </div>
+
+  <%= f.submit "Créer la classe" %>
+<% end %>

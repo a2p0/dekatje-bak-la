@@ -1,0 +1,51 @@
+<h1><%= @classroom.name %></h1>
+<p>Année : <%= @classroom.school_year %> | Spécialité : <%= @classroom.specialty %></p>
+<p>Code d'accès élèves : <strong><%= @classroom.access_code %></strong></p>
+
+<p>
+  <%= link_to "Ajouter un élève", new_teacher_classroom_student_path(@classroom) %> |
+  <%= link_to "Ajouter en masse", bulk_new_teacher_classroom_students_path(@classroom) %> |
+  <%= link_to "Export PDF", export_pdf_teacher_classroom_path(@classroom) %> |
+  <%= link_to "Export Markdown", export_markdown_teacher_classroom_path(@classroom) %>
+</p>
+
+<% if @generated_credentials.present? %>
+  <div id="generated-credentials">
+    <h2>Identifiants générés — à noter maintenant !</h2>
+    <table>
+      <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th></tr></thead>
+      <tbody>
+        <% @generated_credentials.each do |cred| %>
+          <tr>
+            <td><%= cred["name"] %></td>
+            <td><%= cred["username"] %></td>
+            <td><%= cred["password"] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<h2>Élèves (<%= @students.count %>)</h2>
+<% if @students.empty? %>
+  <p>Aucun élève dans cette classe.</p>
+<% else %>
+  <table id="students-table">
+    <thead><tr><th>Nom</th><th>Identifiant</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% @students.each do |student| %>
+        <tr id="student-<%= student.id %>">
+          <td><%= student.last_name %> <%= student.first_name %></td>
+          <td><%= student.username %></td>
+          <td>
+            <%= button_to "Réinitialiser mot de passe",
+                reset_password_teacher_classroom_student_path(@classroom, student),
+                method: :post,
+                data: { confirm: "Réinitialiser le mot de passe de #{student.first_name} #{student.last_name} ?" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
