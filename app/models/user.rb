@@ -1,10 +1,11 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable,
+         :confirmable
 
   enum :api_provider, { anthropic: 0, openrouter: 1, openai: 2, google: 3 }
+
+  has_many :classrooms, foreign_key: :owner_id, dependent: :destroy
 
   validates :first_name, :last_name, presence: true
 end
