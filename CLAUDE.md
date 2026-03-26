@@ -325,3 +325,10 @@ SECRET_KEY_BASE            # rails secret
 - Mode examen chronométré
 - Import CSV élèves
 - Fiches de révision persistées et exportables
+
+## Active Technologies
+- Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage (001-bac-training-app)
+- PostgreSQL via Neon (poolée app + directe migrations), Redis (Sidekiq), ActiveStorage (PDFs locaux) (001-bac-training-app)
+
+## Recent Changes
+- 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
