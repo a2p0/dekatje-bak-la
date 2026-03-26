@@ -1,0 +1,35 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL local — optionnel si tu travailles hors ligne
+  # En dev normal, pointe DATABASE_URL vers Neon directement dans .env
+  # Décommenter ce bloc et utiliser DATABASE_URL_LOCAL si besoin offline
+  # postgres:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_USER: dekatje
+  #     POSTGRES_PASSWORD: dekatje_dev
+  #     POSTGRES_DB: dekatje_bak_la_development
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U dekatje"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+volumes:
+  redis_data:
+  # pgdata:

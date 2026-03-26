@@ -1,0 +1,285 @@
+# Product Requirements Document
+# DekatjeBakLa — Application d'entraînement aux examens BAC
+
+> "Décrocher le bac" en créole martiniquais.
+> Multi-matières, multi-bac, agent IA tutorat.
+
+---
+
+## Utilisateurs
+
+**Enseignant (teacher)**
+Crée les classes et comptes élèves. Configure sa clé API.
+Uploade sujets, DT/DR, corrigés. Valide les questions extraites.
+
+**Élève (student)**
+Se connecte avec identifiant fourni par l'enseignant (sans email).
+S'entraîne sur les sujets assignés. Configure sa clé API IA.
+
+---
+
+## F1 — Authentification double
+
+### Teacher (Devise)
+Login email + mot de passe. Accès routes `/teacher/...`.
+
+### Student (custom bcrypt)
+Login via URL `/{access_code}` (slug de la classe).
+Formulaire : username + password uniquement. Aucun email collecté.
+L'enseignant réinitialise les mots de passe.
+
+Critères d'acceptance :
+- Teacher login/logout Devise fonctionnel
+- Student login via `/{access_code}` avec username + password
+- Student ne peut pas accéder aux routes teacher
+- Teacher peut réinitialiser le mot de passe d'un student
+- Session student isolée à sa classroom
+
+---
+
+## F2 — Gestion des classes et comptes élèves
+
+L'enseignant crée des classes (nom, année, spécialité).
+Chaque classe a un `access_code` unique lisible (ex: `terminale-sin-2026`).
+L'enseignant crée les comptes élèves : prénom + nom → username auto-généré.
+Mot de passe temporaire généré, affiché une seule fois.
+Export PDF A4 imprimable des fiches de connexion (username + password par élève).
+
+Critères d'acceptance :
+- Création classe + `access_code` auto-généré
+- Username généré : `prenom.nom`, suffixe numérique si doublon
+- Mot de passe temporaire visible une seule fois à la création
+- Export PDF fiches connexion, mise en page A4 imprimable
+- Désactivation soft d'un compte élève possible
+- Aucun email élève collecté
+
+---
+
+## F3 — Upload sujets et documents (DT/DR)
+
+L'enseignant uploade un PDF de sujet natif (texte extractible) et optionnellement
+un PDF de corrigé. Métadonnées : titre, année, type examen, spécialité.
+
+Il uploade aussi les DT et DR associés au sujet :
+- Pour chaque document : type (DT ou DR), numéro, titre, fichier PDF
+- Pour les DR : deux fichiers possibles — vierge (pour l'élève) + corrigé (correction)
+
+Les fichiers PDF sont stockés via ActiveStorage.
+Ils sont affichables dans un viewer iframe et téléchargeables.
+Aucune extraction d'images dans le MVP — le PDF est la source de vérité.
+
+Critères d'acceptance :
+- Upload PDF jusqu'à 20 MB (sujets), 50 MB (leçons)
+- DT/DR associés au sujet avec numéro et titre
+- DR : deux fichiers distincts (vierge + corrigé)
+- Viewer PDF intégré (iframe) + lien téléchargement
+- Sujet créé en statut `draft`
+
+---
+
+## F4 — Pipeline d'extraction automatique (IA)
+
+Après upload d'un PDF natif, un job Sidekiq démarre.
+Résolution clé : `teacher.api_key` si configurée, sinon `ANTHROPIC_API_KEY` serveur.
+Extraction texte → appel Claude API → JSON structuré → persistence en base.
+
+Le JSON extrait capture la structure complète :
+- `presentation_text` : mise en situation générale du sujet
+- `parts` : parties numérotées avec `title`, `objective_text`, `section_type`
+  (common/specific)
+- `questions` : numéro, label, `context_text`, barème, `answer_type`,
+  références DT/DR, correction, `data_hints`, `key_concepts`
+
+**`data_hints`** (critique) : pour chaque question, Claude identifie précisément
+où se trouvaient les données utiles à la résolution :
+```json
+[
+  {"source": "DT1", "location": "tableau, ligne Consommation moyenne 30,5 l/100km"},
+  {"source": "enonce", "location": "distance Troyes-Le Bourget : 186 km"},
+  {"source": "question_context", "location": "valeur F = 19600 N"}
+]
+```
+Ces hints sont affichés à l'élève après la correction.
+
+Notification Turbo Stream à l'enseignant en fin de traitement.
+
+Critères d'acceptance :
+- Job démarre dans les 5 secondes après upload
+- Statut visible en temps réel (Turbo Stream)
+- Structure hiérarchique : Subject → Parts → Questions → Answers
+- `data_hints` générés pour chaque question avec réponse
+- `section_type` détecté (common / specific)
+- `answer_type` détecté (text, calculation, dr_reference, argumentation, choice, completion)
+- En cas d'échec : message explicite + retry possible
+- `provider_used` loggé (teacher / server)
+
+---
+
+## F5 — Interface de validation enseignant
+
+Après extraction, l'enseignant révise les questions extraites.
+Vue question par question avec le texte original en regard (iframe PDF).
+Actions disponibles : modifier label/correction, supprimer, ajouter manuellement,
+réordonner, valider.
+
+Deux modes de publication :
+- **Validation manuelle** (défaut) : validation question par question puis publication
+- **Publication automatique** : one-click avec modale de confirmation
+
+Attribution du sujet publié à une ou plusieurs classes.
+
+Critères d'acceptance :
+- Vue côte-à-côte : données extraites + iframe PDF original
+- Auto-save ou sauvegarde explicite
+- Bouton "Publier" inactif si 0 questions validées
+- Modale de confirmation pour publication automatique
+- Après publication : assignation aux classes
+- Dépublication possible (retour draft)
+
+---
+
+## F6 — Upload leçons (MVP light)
+
+PDF de leçons uploadés par l'enseignant (scannés ou natifs).
+Champs : titre, spécialité/matière, chapitre.
+Pas d'extraction automatique dans le MVP.
+Affichage et téléchargement dans l'espace élève.
+Référençables par l'agent tutorat.
+
+Critères d'acceptance :
+- Upload PDF jusqu'à 50 MB
+- Filtrage par spécialité et chapitre
+- Viewer + téléchargement pour l'élève
+- L'agent tutorat peut les citer
+
+---
+
+## F7 — Espace élève : Mode 0 (navigation et consultation)
+
+Structure de navigation : Sujets → Parties → Questions.
+Sur chaque écran, **sticky panel** accessible à tout moment exposant :
+- La mise en situation générale du sujet (`presentation_text`)
+- L'objectif de la partie courante (`objective_text`)
+
+Sur chaque question, l'élève voit :
+- L'énoncé complet et le `context_text`
+- Les DT/DR associés à cette question (PDF viewer/download)
+- Indicateur de progression (question N/total)
+
+Navigation : suivant, précédent, accès direct par numéro.
+Progression persistée (reprise possible).
+
+Critères d'acceptance :
+- Sticky panel mis en situation + objectif partie accessible à tout moment
+- Viewer DT/DR PDF intégré (iframe) + téléchargement
+- DR vierge téléchargeable par l'élève
+- Progression persistée en base
+- Navigation précédent/suivant + indicateur N/total
+
+---
+
+## F8 — Espace élève : Mode 1 (révision autonome)
+
+Sur chaque question :
+1. L'élève peut saisir sa réponse (zone texte, optionnel)
+2. Il peut afficher la correction officielle (toggle, masquée par défaut)
+3. Il voit les `data_hints` : "Les données étaient dans DT1, tableau..."
+4. Il peut demander un feedback IA sur sa réponse (clé API requise)
+5. Si question de type `dr_reference` : le DR corrigé (`filled_file`) s'affiche
+
+Le feedback IA compare la réponse élève à la correction et identifie
+les éléments justes, manquants ou erronés.
+
+Critères d'acceptance :
+- Zone texte avec sauvegarde automatique
+- Toggle correction masquée par défaut
+- `data_hints` affichés sous la correction en encadré distinct
+- DR corrigé affiché pour les questions de type `dr_reference`
+- Feedback IA : actif si clé configurée, sinon message + lien config
+- Sticky panel toujours accessible
+
+---
+
+## F9 — Configuration clé API élève
+
+Champ api_key masqué (type password), sélecteur de provider.
+Bouton "Tester la clé" : appel minimal → succès ou message d'erreur explicite.
+Clé chiffrée avec `encrypts :api_key` (Rails natif).
+Jamais dans les logs.
+
+Providers supportés : OpenRouter, Anthropic, OpenAI, Google Gemini.
+
+Critères d'acceptance :
+- Champ masqué avec toggle afficher/masquer
+- Test de clé avant sauvegarde
+- Message clair si clé invalide ou quota dépassé
+- Suppression de clé possible
+
+---
+
+## F10 — Espace élève : Mode 2 (tutorat IA streaming)
+
+Panneau de conversation sur chaque question.
+Le system prompt inclut : spécialité, objectif de la partie, énoncé,
+`context_text`, correction (confidentielle), leçons disponibles.
+
+Capacités agent :
+- Expliquer un concept ou une notion
+- Détailler les étapes d'un calcul ou raisonnement
+- Renvoyer vers une leçon pertinente avec lien
+- Générer une fiche de révision sur le concept clé
+- Ne donne JAMAIS la réponse directement
+
+Réponses streamées (SSE → Turbo Streams).
+Conversation persistée pour la session.
+
+Critères d'acceptance :
+- Streaming démarre dans les 2 secondes
+- Réponses en français, niveau lycée
+- Bouton "Générer fiche de révision" comme action rapide
+- Citation des leçons disponibles avec lien
+- Erreur IA : message clair (clé invalide, quota, timeout)
+- Clé API requise (redirect F9 si absente)
+- Sticky panel toujours accessible
+
+---
+
+## Contraintes techniques
+
+- Ruby 3.3+, Rails 8.0+
+- PostgreSQL via Neon (DATABASE_URL poolée + DATABASE_DIRECT_URL)
+- Redis + Sidekiq pour les jobs d'extraction
+- ActiveStorage pour tous les fichiers (PDF stockés tels quels)
+- `pdf-reader` pour extraction texte brut
+- `faraday` pour appels IA multi-provider
+- Turbo Streams + SSE pour streaming et notifications
+- Devise pour auth enseignant
+- Bcrypt custom pour auth élève
+- Nixpacks sur Coolify
+
+## Contraintes non-fonctionnelles
+
+- Interface en français, code en anglais
+- Assets locaux (pas de CDN externe)
+- Timeout appels IA : 60 secondes
+- Conformité RGPD : aucun email élève, politique de confidentialité obligatoire
+
+---
+
+## Ordre d'implémentation (dépendances respectées)
+
+F1 → F2 → F3 → F4 → F5 → F6 → F7 → F8 → F9 → F10
+
+---
+
+## Post-MVP
+
+- Surlignage texte élève (Stimulus + champ `annotations` déjà prévu en base)
+- Extraction images brutes des PDFs (Poppler/pdfimages)
+- Co-enseignants sur une classe (ClassroomMembership)
+- OCR leçons scannées
+- Stats progression par classe
+- Mode examen chronométré
+- Import CSV élèves
+- Fiches de révision persistées et exportables
+- Notifications email enseignant (fin extraction)

@@ -1,0 +1,146 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "dekatje-bak-la",
+  "elements": [
+
+    {"id":"label-desktop","type":"text","x":60,"y":20,"width":200,"height":20,"text":"DESKTOP — Écran question élève","fontSize":14,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"desktop-frame","type":"rectangle","x":60,"y":50,"width":760,"height":560,"strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":2,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"sidebar-bg","type":"rectangle","x":60,"y":50,"width":220,"height":560,"strokeColor":"#333333","backgroundColor":"#f5f5f5","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"sidebar-label-ctx","type":"text","x":72,"y":62,"width":180,"height":16,"text":"MISE EN SITUATION","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"sidebar-title","type":"text","x":72,"y":80,"width":196,"height":18,"text":"CIME — Complexe sportif","fontSize":12,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"sidebar-text1","type":"text","x":72,"y":100,"width":196,"height":48,"text":"Délégation 91 personnes.\nTroyes → Le Bourget, 186 km.\nComparaison modes transport.","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"sidebar-div1","type":"line","x":60,"y":158,"points":[[0,0],[220,0]],"strokeColor":"#cccccc","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"sidebar-label-part","type":"text","x":72,"y":166,"width":180,"height":16,"text":"PARTIE 1 — OBJECTIF","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"sidebar-part-text","type":"text","x":72,"y":184,"width":196,"height":48,"text":"Comparer les impacts\nenvironnementaux et économiques\nde plusieurs modes de transport.","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"sidebar-div2","type":"line","x":60,"y":240,"points":[[0,0],[220,0]],"strokeColor":"#cccccc","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"sidebar-label-docs","type":"text","x":72,"y":248,"width":180,"height":16,"text":"DOCUMENTS","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"dt1-box","type":"rectangle","x":72,"y":268,"width":196,"height":30,"strokeColor":"#aaaaaa","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dt1-badge","type":"rectangle","x":78,"y":275,"width":28,"height":16,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dt1-badge-text","type":"text","x":79,"y":277,"width":26,"height":12,"text":"DT1","fontSize":9,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dt1-name","type":"text","x":112,"y":278,"width":140,"height":14,"text":"Diagrammes SysML  ↗","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"dt2-box","type":"rectangle","x":72,"y":304,"width":196,"height":30,"strokeColor":"#aaaaaa","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dt2-badge","type":"rectangle","x":78,"y":311,"width":28,"height":16,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dt2-badge-text","type":"text","x":79,"y":313,"width":26,"height":12,"text":"DT2","fontSize":9,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dt2-name","type":"text","x":112,"y":314,"width":140,"height":14,"text":"Bois massif vs lamellé  ↗","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"dr1-box","type":"rectangle","x":72,"y":340,"width":196,"height":30,"strokeColor":"#aaaaaa","backgroundColor":"#fafafa","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":60,"groupIds":["desktop"]},
+    {"id":"dr1-badge","type":"rectangle","x":78,"y":347,"width":28,"height":16,"strokeColor":"#d4a040","backgroundColor":"#faeeda","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dr1-badge-text","type":"text","x":79,"y":349,"width":26,"height":12,"text":"DR1","fontSize":9,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#7a4a00","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"dr1-name","type":"text","x":112,"y":350,"width":140,"height":14,"text":"Tableau matériaux  ↗","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#999999","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"main-topbar","type":"rectangle","x":280,"y":50,"width":540,"height":44,"strokeColor":"#333333","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"progress-text","type":"text","x":292,"y":60,"width":200,"height":16,"text":"Question 3 / 18   ● ● ◉ ○ ○","fontSize":12,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#555555","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-prev","type":"rectangle","x":668,"y":60,"width":60,"height":24,"strokeColor":"#aaaaaa","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-prev-text","type":"text","x":669,"y":65,"width":58,"height":14,"text":"← Préc.","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-next","type":"rectangle","x":734,"y":60,"width":60,"height":24,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-next-text","type":"text","x":735,"y":65,"width":58,"height":14,"text":"Suiv. →","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"main-content","type":"rectangle","x":280,"y":94,"width":540,"height":416,"strokeColor":"transparent","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"part-tag","type":"rectangle","x":292,"y":106,"width":210,"height":20,"strokeColor":"#7ab648","backgroundColor":"#eaf3de","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"part-tag-text","type":"text","x":298,"y":110,"width":200,"height":12,"text":"Partie 1 — Développement durable","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#3b6d11","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"q-number","type":"text","x":292,"y":132,"width":300,"height":16,"text":"Question 1.3 — 2 pts","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"q-label","type":"text","x":292,"y":150,"width":510,"height":36,"text":"Calculer le nombre de car(s) et de van(s) électrique(s) pour effectuer\nle trajet entre Troyes et Le Bourget pour une délégation.","fontSize":13,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#222222","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"q-ctx-bar","type":"rectangle","x":292,"y":194,"width":3,"height":52,"strokeColor":"#aaaaaa","backgroundColor":"#aaaaaa","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"q-ctx-bg","type":"rectangle","x":295,"y":194,"width":508,"height":52,"strokeColor":"transparent","backgroundColor":"#f7f7f7","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"q-ctx-text","type":"text","x":302,"y":200,"width":494,"height":36,"text":"Délégation de 91 personnes. Car : 61 places. Van électrique : 7 places.\nArrondir à l'unité supérieure.","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"refs-label","type":"text","x":292,"y":254,"width":60,"height":14,"text":"Voir :","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"ref1","type":"rectangle","x":336,"y":250,"width":64,"height":22,"strokeColor":"#aaaaaa","backgroundColor":"#f0f0f0","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"ref1-text","type":"text","x":337,"y":255,"width":62,"height":12,"text":"DT1 ↗","fontSize":10,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#555555","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"ref2","type":"rectangle","x":408,"y":250,"width":100,"height":22,"strokeColor":"#aaaaaa","backgroundColor":"#f0f0f0","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"ref2-text","type":"text","x":409,"y":255,"width":98,"height":12,"text":"Mise en situation ↗","fontSize":10,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#555555","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"mode-tabs-bg","type":"rectangle","x":292,"y":282,"width":510,"height":30,"strokeColor":"#aaaaaa","backgroundColor":"#f0f0f0","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"mode-tab0","type":"rectangle","x":292,"y":282,"width":170,"height":30,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"mode-tab0-text","type":"text","x":292,"y":291,"width":170,"height":14,"text":"Lecture","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"mode-tab1-text","type":"text","x":462,"y":291,"width":170,"height":14,"text":"Ma réponse","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"mode-tab2-text","type":"text","x":632,"y":291,"width":170,"height":14,"text":"Tutorat IA","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"mode1-area","type":"rectangle","x":292,"y":322,"width":510,"height":80,"strokeColor":"#cccccc","backgroundColor":"#fafafa","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"mode1-placeholder","type":"text","x":302,"y":338,"width":400,"height":16,"text":"[Mode 1] Zone saisie réponse élève","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#aaaaaa","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-submit","type":"rectangle","x":292,"y":412,"width":100,"height":28,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-submit-text","type":"text","x":293,"y":419,"width":98,"height":14,"text":"Soumettre","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-corr","type":"rectangle","x":402,"y":412,"width":130,"height":28,"strokeColor":"#7ab648","backgroundColor":"#eaf3de","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"btn-corr-text","type":"text","x":403,"y":419,"width":128,"height":14,"text":"Voir la correction","fontSize":11,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#3b6d11","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"corr-box","type":"rectangle","x":292,"y":450,"width":510,"height":100,"strokeColor":"#7ab648","backgroundColor":"#f4faf0","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["desktop"]},
+    {"id":"corr-label","type":"text","x":302,"y":460,"width":200,"height":14,"text":"Correction officielle","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#3b6d11","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"corr-text","type":"text","x":302,"y":476,"width":490,"height":30,"text":"2 cars · 13 vans · Cars : 215,46 € · Vans : 103,68 €","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"hints-label","type":"text","x":302,"y":510,"width":200,"height":14,"text":"Données utiles dans :","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+    {"id":"hint1","type":"text","x":302,"y":526,"width":490,"height":14,"text":"→ Mise en situation (91 personnes, 186 km) · → Tableau capacités véhicules","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["desktop"]},
+
+    {"id":"label-mobile","type":"text","x":920,"y":20,"width":200,"height":20,"text":"MOBILE — Écran question élève","fontSize":14,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"mobile-frame","type":"rectangle","x":920,"y":50,"width":300,"height":600,"strokeColor":"#333333","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":2,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-topbar","type":"rectangle","x":920,"y":50,"width":300,"height":44,"strokeColor":"#333333","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-progress","type":"text","x":960,"y":63,"width":100,"height":18,"text":"3 / 18","fontSize":13,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-btn-prev","type":"rectangle","x":1118,"y":60,"width":44,"height":24,"strokeColor":"#aaaaaa","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-btn-prev-t","type":"text","x":1119,"y":65,"width":42,"height":14,"text":"←","fontSize":12,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#333333","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-btn-next","type":"rectangle","x":1168,"y":60,"width":44,"height":24,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-btn-next-t","type":"text","x":1169,"y":65,"width":42,"height":14,"text":"→","fontSize":12,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-banner","type":"rectangle","x":920,"y":94,"width":300,"height":40,"strokeColor":"#7ab648","backgroundColor":"#eaf3de","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-banner-title","type":"text","x":930,"y":101,"width":220,"height":14,"text":"Partie 1 — Développement durable","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#3b6d11","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-banner-sub","type":"text","x":930,"y":116,"width":220,"height":12,"text":"CIME — délégation 91 personnes","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#639922","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"straddle-btn","type":"rectangle","x":1010,"y":126,"width":120,"height":26,"strokeColor":"#ffffff","backgroundColor":"#3b6d11","fillStyle":"solid","strokeWidth":2,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"straddle-btn-text","type":"text","x":1011,"y":132,"width":118,"height":14,"text":"▾ Contexte complet","fontSize":10,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#ffffff","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-content-area","type":"rectangle","x":920,"y":152,"width":300,"height":388,"strokeColor":"transparent","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-part-tag","type":"rectangle","x":930,"y":160,"width":70,"height":18,"strokeColor":"#7ab648","backgroundColor":"#eaf3de","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-part-tag-text","type":"text","x":931,"y":164,"width":68,"height":10,"text":"Partie 1","fontSize":9,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#3b6d11","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-q-number","type":"text","x":930,"y":182,"width":280,"height":14,"text":"Question 1.3 — 2 pts","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-q-label","type":"text","x":930,"y":198,"width":278,"height":40,"text":"Calculer le nombre de car(s) et de\nvan(s) pour le trajet Troyes → Le Bourget.","fontSize":12,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#222222","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-ctx-bar","type":"rectangle","x":930,"y":244,"width":3,"height":44,"strokeColor":"#aaaaaa","backgroundColor":"#aaaaaa","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-ctx-bg","type":"rectangle","x":933,"y":244,"width":278,"height":44,"strokeColor":"transparent","backgroundColor":"#f7f7f7","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-ctx-text","type":"text","x":940,"y":250,"width":264,"height":30,"text":"91 personnes. Car : 61 places.\nVan : 7 places. Arrondir ↑.","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-refs","type":"text","x":930,"y":296,"width":280,"height":14,"text":"Voir : [DT1 ↗]  [Mise en situation ↗]","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#666666","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-mode-tabs","type":"rectangle","x":930,"y":318,"width":278,"height":28,"strokeColor":"#aaaaaa","backgroundColor":"#f0f0f0","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-tab0","type":"rectangle","x":930,"y":318,"width":92,"height":28,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-tab0-text","type":"text","x":930,"y":326,"width":92,"height":12,"text":"Lecture","fontSize":10,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-tab1-text","type":"text","x":1022,"y":326,"width":93,"height":12,"text":"Réponse","fontSize":10,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-tab2-text","type":"text","x":1115,"y":326,"width":93,"height":12,"text":"Tutorat","fontSize":10,"fontFamily":1,"textAlign":"center","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-answer-area","type":"rectangle","x":930,"y":356,"width":278,"height":60,"strokeColor":"#cccccc","backgroundColor":"#fafafa","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-answer-ph","type":"text","x":940,"y":372,"width":240,"height":14,"text":"[Mode 1] Zone saisie réponse","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#aaaaaa","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"m-bottombar","type":"rectangle","x":920,"y":540,"width":300,"height":110,"strokeColor":"#333333","backgroundColor":"#ffffff","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-agent-btn","type":"rectangle","x":930,"y":556,"width":190,"height":32,"strokeColor":"#4a90d9","backgroundColor":"#deeeff","fillStyle":"solid","strokeWidth":10,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-agent-dot","type":"ellipse","x":942,"y":568,"width":8,"height":8,"strokeColor":"#4a90d9","backgroundColor":"#378add","fillStyle":"solid","strokeWidth":1,"roughness":0,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-agent-text","type":"text","x":956,"y":562,"width":158,"height":14,"text":"Demander à l'agent","fontSize":11,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#1a5fa0","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+    {"id":"m-pts","type":"text","x":1152,"y":564,"width":58,"height":14,"text":"2 pts","fontSize":11,"fontFamily":1,"textAlign":"right","verticalAlign":"top","strokeColor":"#888888","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["mobile"]},
+
+    {"id":"annot-sidebar","type":"text","x":60,"y":620,"width":220,"height":30,"text":"← Sidebar fixe : contexte toujours\n   visible (mise en sit. + objectif + docs)","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#e06b2b","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["annotations"]},
+    {"id":"annot-straddle","type":"text","x":920,"y":162,"width":280,"height":20,"text":"↑ Bouton à cheval — option B validée","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#e06b2b","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["annotations"]},
+    {"id":"annot-modes","type":"text","x":292,"y":620,"width":300,"height":20,"text":"↑ Tabs modes 0/1/2 — lecture / réponse / tutorat","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#e06b2b","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["annotations"]},
+    {"id":"annot-hints","type":"text","x":292,"y":556,"width":300,"height":14,"text":"↑ data_hints : où étaient les données utiles","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#e06b2b","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["annotations"]},
+    {"id":"annot-agent","type":"text","x":920,"y":596,"width":280,"height":14,"text":"↑ Bouton agent fixe en bas (mobile)","fontSize":10,"fontFamily":1,"textAlign":"left","verticalAlign":"top","strokeColor":"#e06b2b","backgroundColor":"transparent","fillStyle":"hachure","strokeWidth":1,"roughness":1,"opacity":100,"groupIds":["annotations"]}
+
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": null,
+    "zoom": {"value": 0.8},
+    "scrollX": -20,
+    "scrollY": -10
+  }
+}
