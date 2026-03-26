@@ -1,6 +1,6 @@
 class GenerateStudentCredentials
   # Alphanumeric sans caractères ambigus (0/O, 1/l/I)
-  CHARSET = ("a".."z").to_a - ["l", "o"] + ("2".."9").to_a
+  CHARSET = ("a".."z").to_a - [ "l", "o" ] + ("2".."9").to_a
 
   def self.call(first_name:, last_name:, classroom:)
     base = "#{first_name}.#{last_name}".parameterize(separator: ".")

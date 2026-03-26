@@ -1,6 +1,6 @@
 class GenerateAccessCode
   def self.call(specialty:, school_year:)
-    base = [specialty, school_year].compact.join("-").parameterize
+    base = [ specialty, school_year ].compact.join("-").parameterize
     candidate = base
     counter = 2
 
