@@ -1,0 +1,140 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Rails 8 application with PostgreSQL, Redis, and authentication foundations",
+        "description": "Initialize Rails 8.0+ application with PostgreSQL (Neon), Redis, Sidekiq, and dual authentication system (Devise for teachers, custom bcrypt for students)",
+        "details": "1. Initialize Rails 8.0+ app with PostgreSQL adapter\n2. Configure database.yml with DATABASE_URL (pooled) and DATABASE_DIRECT_URL from Neon\n3. Add gems: devise, bcrypt, sidekiq, redis, pg, pdf-reader, faraday\n4. Setup Redis connection for Sidekiq and ActionCable\n5. Configure Sidekiq with config/sidekiq.yml\n6. Install and configure Devise for Teacher model with email/password\n7. Generate Teacher model with devise modules: database_authenticatable, recoverable, rememberable, validatable\n8. Add api_key:string (encrypted) and provider:string to teachers table\n9. Create custom Student model with username:string, password_digest:string, classroom_id:integer\n10. Implement bcrypt password hashing for Student model\n11. Create sessions controller for student authentication via /{access_code}\n12. Setup namespace routing: /teacher/* for teachers, /{access_code} for student login\n13. Add before_action filters to enforce authentication boundaries\n14. Configure ActiveStorage with local storage\n15. Setup Turbo and Stimulus in application\n16. Configure French locale as default (config.i18n.default_locale = :fr)\n17. Add ANTHROPIC_API_KEY to credentials\n18. Setup Nixpacks configuration for Coolify deployment",
+        "testStrategy": "- Verify Rails 8.0+ boots successfully\n- Test PostgreSQL connection with both pooled and direct URLs\n- Verify Redis and Sidekiq connectivity\n- Test teacher registration/login/logout via Devise\n- Test student cannot access /teacher/* routes\n- Test teacher cannot access student routes without proper classroom context\n- Verify bcrypt password hashing works for students\n- Test ActiveStorage file upload/retrieval\n- Verify French locale is active\n- Test Turbo Streams basic functionality",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implement Classroom and Student management with access codes",
+        "description": "Create Classroom model with unique access_code generation, student account creation with auto-generated usernames, and PDF export of login credentials",
+        "details": "1. Generate Classroom model: name:string, year:integer, specialty:string, access_code:string (unique index), teacher_id:integer, active:boolean\n2. Add before_create callback to generate readable access_code (e.g., 'terminale-sin-2026') using parameterize\n3. Ensure access_code uniqueness with validation and database constraint\n4. Generate Student model: first_name:string, last_name:string, username:string (unique within classroom), password_digest:string, classroom_id:integer, active:boolean, temporary_password:string (virtual attribute)\n5. Add username generation logic: 'prenom.nom'.parameterize, append numeric suffix if duplicate within classroom\n6. Generate secure temporary password (12 chars, alphanumeric)\n7. Add soft delete via active:boolean flag\n8. Create ClassroomsController under teacher namespace with CRUD actions\n9. Create StudentsController under teacher namespace nested under classrooms\n10. Implement student bulk creation interface\n11. Add Prawn gem for PDF generation\n12. Create PDF service to generate A4 printable login sheets with classroom info, student username/password in table format\n13. Display temporary password only once after creation (flash message or modal)\n14. Add teacher password reset action for students\n15. Create views for classroom management and student listing",
+        "testStrategy": "- Test access_code generation is unique and readable\n- Verify username auto-generation with 'prenom.nom' format\n- Test numeric suffix appended for duplicate names\n- Verify temporary password is generated and displayed once\n- Test PDF export generates valid A4 document with all student credentials\n- Verify soft delete sets active=false without destroying record\n- Test teacher can reset student password\n- Verify student cannot be created without classroom\n- Test access_code uniqueness constraint at database level",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Implement Subject upload with DT/DR document management",
+        "description": "Create Subject model with PDF upload via ActiveStorage, metadata fields, and associated DT/DR document management with dual files for DR (blank and corrected)",
+        "details": "1. Generate Subject model: title:string, year:integer, exam_type:string, specialty:string, status:string (draft/published), teacher_id:integer, presentation_text:text\n2. Add has_one_attached :subject_pdf and has_one_attached :correction_pdf via ActiveStorage\n3. Configure ActiveStorage validation: max 20MB for subjects, content_type: application/pdf\n4. Generate Document model: subject_id:integer, document_type:string (dt/dr), number:integer, title:string\n5. Add has_one_attached :file to Document (for DT or DR blank)\n6. Add has_one_attached :filled_file to Document (for DR corrected version)\n7. Configure ActiveStorage validation: max 50MB for documents\n8. Create SubjectsController under teacher namespace with upload form\n9. Implement nested attributes for documents (accepts_nested_attributes_for :documents)\n10. Create upload form with fields: title, year, exam_type, specialty, subject_pdf, correction_pdf\n11. Add dynamic form fields for DT/DR with type selector, number, title, file upload\n12. For DR type: show two file inputs (blank + corrected)\n13. Create PDF viewer partial using iframe with pdf.js or browser native viewer\n14. Add download links for all PDFs\n15. Set default status to 'draft' on creation\n16. Create subject show page with PDF viewer and document list",
+        "testStrategy": "- Test subject creation with all metadata fields\n- Verify PDF upload up to 20MB for subjects\n- Verify PDF upload up to 50MB for documents\n- Test rejection of files exceeding size limits\n- Test rejection of non-PDF files\n- Verify DT can have one file, DR can have two files\n- Test PDF viewer displays uploaded files correctly\n- Test download links work for all PDFs\n- Verify subject defaults to 'draft' status\n- Test nested document creation with subject",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Build AI extraction pipeline with Claude API integration",
+        "description": "Implement Sidekiq job to extract text from PDF, call Claude API with structured prompt, parse JSON response with complete subject structure including data_hints, and persist to database",
+        "details": "1. Generate Part model: subject_id:integer, number:integer, title:string, objective_text:text, section_type:string (common/specific)\n2. Generate Question model: part_id:integer, number:string, label:string, context_text:text, points:decimal, answer_type:string (text/calculation/dr_reference/argumentation/choice/completion), validated:boolean\n3. Generate Answer model: question_id:integer, content:text, data_hints:jsonb (array of {source, location}), key_concepts:text[]\n4. Generate DocumentReference model: question_id:integer, document_id:integer, reference_type:string\n5. Create ExtractionJob (Sidekiq): accepts subject_id\n6. In job: extract text from subject_pdf using pdf-reader gem\n7. Build system prompt for Claude with instructions to extract: presentation_text, parts (title, objective_text, section_type), questions (number, label, context_text, points, answer_type, document references), answers (content, data_hints with source/location, key_concepts)\n8. Emphasize data_hints extraction: identify precise location of data needed (DT/DR table/line, enonce paragraph, question context)\n9. Use Faraday to call Anthropic API (claude-3-5-sonnet-20241022) with teacher.api_key or ENV['ANTHROPIC_API_KEY']\n10. Set timeout to 60 seconds\n11. Parse JSON response and validate against expected schema\n12. Wrap in transaction: create Parts, Questions, Answers, DocumentReferences\n13. Log provider_used (teacher/server) in subject metadata\n14. Broadcast Turbo Stream notification to teacher on completion/failure\n15. Handle errors: API failures, timeout, invalid JSON, save failures\n16. Add retry logic (3 attempts with exponential backoff)\n17. Update subject status to 'extracted' on success",
+        "testStrategy": "- Test job enqueues within 5 seconds of subject creation\n- Verify text extraction from native PDF works correctly\n- Test Claude API call with valid API key returns structured JSON\n- Verify fallback to server API key if teacher key missing\n- Test JSON parsing creates correct hierarchy: Subject → Parts → Questions → Answers\n- Verify data_hints array contains source and location for each hint\n- Test section_type detection (common/specific)\n- Test answer_type detection for all types\n- Verify DocumentReferences created for questions referencing DT/DR\n- Test Turbo Stream notification broadcasts to teacher\n- Test error handling: invalid API key, timeout, malformed JSON\n- Verify retry logic executes on transient failures\n- Test provider_used is logged correctly",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Create teacher validation interface for extracted questions",
+        "description": "Build question-by-question validation interface with side-by-side PDF viewer, editing capabilities, manual question management, and publication workflow with classroom assignment",
+        "details": "1. Create QuestionsController under teacher namespace nested under subjects\n2. Build validation view: split layout with extracted data (left) and PDF iframe (right)\n3. Display questions sequentially with navigation (previous/next)\n4. Show for each question: number, label, context_text, points, answer_type, correction, data_hints, document references\n5. Implement inline editing for: label, context_text, points, correction content, data_hints\n6. Add auto-save with Stimulus controller (debounced, 2 second delay)\n7. Add manual save button as fallback\n8. Implement question actions: validate (toggle), delete (soft), reorder (drag-drop with Stimulus Sortable)\n9. Add manual question creation form\n10. Show validation progress: X/Y questions validated\n11. Implement two publication modes:\n    - Manual: validate each question, then publish button\n    - Auto: one-click publish with confirmation modal\n12. Disable publish button if 0 questions validated\n13. Create publication modal with classroom multi-select checkboxes\n14. Generate SubjectAssignment model: subject_id:integer, classroom_id:integer\n15. On publish: update subject.status to 'published', create SubjectAssignments\n16. Add unpublish action: revert to 'draft', keep assignments\n17. Sync PDF scroll position with question number (Stimulus)\n18. Add keyboard shortcuts: n (next), p (previous), v (validate)",
+        "testStrategy": "- Test side-by-side layout displays correctly on desktop\n- Verify PDF viewer loads and displays subject PDF\n- Test inline editing saves changes via auto-save\n- Verify manual save button works when auto-save disabled\n- Test question validation toggle updates validated flag\n- Test question deletion soft-deletes record\n- Test drag-drop reordering updates question.number\n- Verify manual question creation adds to list\n- Test publish button disabled when 0 questions validated\n- Test auto-publish modal shows confirmation with classroom list\n- Verify publication creates SubjectAssignments for selected classrooms\n- Test unpublish reverts status to draft\n- Test PDF scroll syncs with question navigation\n- Verify keyboard shortcuts work",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement lesson upload and management system",
+        "description": "Create Lesson model with PDF upload, metadata fields (title, specialty, chapter), and basic viewing/download functionality for students",
+        "details": "1. Generate Lesson model: title:string, specialty:string, chapter:string, teacher_id:integer, active:boolean\n2. Add has_one_attached :lesson_pdf via ActiveStorage\n3. Configure ActiveStorage validation: max 50MB, content_type: application/pdf\n4. Create LessonsController under teacher namespace with CRUD actions\n5. Build lesson upload form: title, specialty, chapter, lesson_pdf\n6. Create lesson index with filtering by specialty and chapter\n7. Add search/filter functionality using scopes\n8. Create lesson show page with PDF viewer (iframe) and download link\n9. Add soft delete via active:boolean flag\n10. Create student-facing lessons index under student namespace\n11. Filter lessons by student's classroom specialty\n12. Display lessons grouped by chapter\n13. Implement PDF viewer for students with download option\n14. Add lesson metadata to be referenced by AI tutor (lesson_id, title, chapter)\n15. Create LessonReference model: question_id:integer, lesson_id:integer (for AI citations)",
+        "testStrategy": "- Test lesson creation with PDF upload up to 50MB\n- Verify PDF upload rejects files over 50MB or non-PDF\n- Test filtering by specialty and chapter works correctly\n- Verify PDF viewer displays lesson correctly\n- Test download link provides correct file\n- Test soft delete sets active=false\n- Verify students see only lessons matching their classroom specialty\n- Test lessons grouped by chapter in student view\n- Verify lesson metadata accessible for AI tutor context",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Build student workspace Mode 0: navigation and consultation",
+        "description": "Create student subject navigation interface with sticky context panel, question browsing, DT/DR viewer integration, and progress persistence",
+        "details": "1. Create StudentsController with dashboard showing assigned subjects\n2. Generate SubjectProgress model: student_id:integer, subject_id:integer, current_question_id:integer, started_at:datetime, last_accessed_at:datetime\n3. Create subject show page for students with three-level navigation: Subject → Parts → Questions\n4. Implement sticky panel (position: sticky, top: 0) containing:\n   - presentation_text (subject context)\n   - objective_text (current part objective)\n   - Toggle to show/hide panel\n5. Create question show page displaying:\n   - Question number and label\n   - Full context_text\n   - Points/barème\n   - Progress indicator (Question N of Total)\n6. Query and display associated DT/DR documents for current question via DocumentReferences\n7. Implement PDF viewer (iframe) for each DT/DR with tabs if multiple\n8. Add download buttons for each DT/DR\n9. For DR type documents: show blank_file (file) for download, not filled_file\n10. Implement navigation: Previous/Next buttons, direct question number links\n11. Update SubjectProgress on each question view (current_question_id, last_accessed_at)\n12. Add breadcrumb navigation: Subject > Part > Question\n13. Implement responsive design for sticky panel (collapse on mobile)\n14. Add keyboard shortcuts: arrow keys for navigation\n15. Cache DT/DR PDFs with appropriate headers",
+        "testStrategy": "- Test student can access assigned subjects only\n- Verify sticky panel remains visible during scroll\n- Test presentation_text and objective_text display correctly\n- Verify sticky panel toggle shows/hides content\n- Test question displays all required fields\n- Verify DT/DR viewer shows correct documents for each question\n- Test DR shows blank file for student download, not corrected\n- Test download links work for all documents\n- Verify progress persists: returning shows last viewed question\n- Test Previous/Next navigation works correctly\n- Test direct question number navigation\n- Verify progress indicator shows correct N/Total\n- Test breadcrumb navigation links work\n- Verify keyboard shortcuts function correctly",
+        "priority": "high",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement student Mode 1: autonomous revision with AI feedback",
+        "description": "Add student answer input, correction toggle, data hints display, DR corrected file viewing, and AI feedback on student responses",
+        "details": "1. Generate StudentAnswer model: student_id:integer, question_id:integer, content:text, submitted_at:datetime, ai_feedback:text\n2. Add textarea for student answer input on question page\n3. Implement auto-save with Stimulus (debounced, 3 seconds)\n4. Add toggle button for correction display (hidden by default)\n5. Display official correction (Answer.content) when toggled\n6. Display data_hints below correction in distinct bordered box:\n   - Format: 'Les données étaient dans [source]: [location]'\n   - Style with icon and light background\n7. For questions with answer_type='dr_reference':\n   - Display filled_file (corrected DR) when correction toggled\n   - Show side-by-side: blank DR (student's) vs filled DR (corrected)\n8. Add 'Get AI Feedback' button below student answer\n9. Check if student.api_key configured, else show message + link to config\n10. Create FeedbackJob (Sidekiq): accepts student_answer_id\n11. Build prompt for AI: compare student answer to official correction, identify correct elements, missing elements, errors\n12. Call appropriate API based on student.provider (OpenRouter/Anthropic/OpenAI/Gemini)\n13. Use Faraday with 60 second timeout\n14. Store feedback in student_answer.ai_feedback\n15. Display feedback below student answer with formatting\n16. Add loading state during feedback generation\n17. Handle errors: invalid key, quota exceeded, timeout\n18. Ensure sticky panel remains accessible throughout",
+        "testStrategy": "- Test student answer auto-saves after 3 seconds of inactivity\n- Verify correction toggle shows/hides official answer\n- Test data_hints display with correct formatting and styling\n- Verify DR corrected file displays for dr_reference questions\n- Test side-by-side DR comparison (blank vs corrected)\n- Test 'Get AI Feedback' button disabled if no API key configured\n- Verify redirect to config page if API key missing\n- Test AI feedback generation completes within reasonable time\n- Verify feedback compares student answer to correction accurately\n- Test feedback displays with proper formatting\n- Test error handling: invalid key shows clear message\n- Test error handling: quota exceeded shows actionable message\n- Test error handling: timeout shows retry option\n- Verify sticky panel remains accessible during all interactions",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Create student API key configuration with multi-provider support",
+        "description": "Build secure API key management interface with encryption, provider selection, key validation, and test functionality",
+        "details": "1. Add to Student model: api_key:string, provider:string\n2. Configure Rails encryption: encrypts :api_key\n3. Ensure api_key never logged (filter_parameters in config)\n4. Create API configuration page under student settings\n5. Add provider selector: OpenRouter, Anthropic, OpenAI, Google Gemini\n6. Implement password-type input field for api_key with show/hide toggle (Stimulus)\n7. Add 'Test Key' button that makes minimal API call to validate\n8. Create ApiKeyValidationService:\n   - For each provider, make minimal test call (e.g., list models or simple completion)\n   - Return success/failure with specific error message\n9. Display validation result: success (green checkmark) or error (red X with message)\n10. Handle specific errors:\n    - Invalid key format\n    - Authentication failed\n    - Quota exceeded\n    - Network timeout\n11. Save key only after successful validation (optional: allow save without test)\n12. Add delete key functionality with confirmation\n13. Show last validated timestamp\n14. Add help text with links to get API keys for each provider\n15. Implement rate limiting on test endpoint (max 5 tests per minute)\n16. Log API key changes (without key value) for audit",
+        "testStrategy": "- Test api_key field is encrypted in database\n- Verify api_key not present in logs or error messages\n- Test show/hide toggle reveals/masks API key\n- Test provider selector shows all supported providers\n- Verify 'Test Key' makes appropriate API call for each provider\n- Test validation success shows green confirmation\n- Test validation failure shows specific error message\n- Test invalid key format detected before API call\n- Test authentication failure handled gracefully\n- Test quota exceeded error shows clear message\n- Test network timeout handled with retry suggestion\n- Verify key saves after successful validation\n- Test delete key removes from database and clears form\n- Test rate limiting prevents excessive test calls\n- Verify audit log records key changes without exposing key value",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement student Mode 2: AI tutoring with streaming responses",
+        "description": "Create conversational AI tutor interface with streaming responses via SSE, context-aware prompting, lesson citations, and revision sheet generation",
+        "details": "1. Generate Conversation model: student_id:integer, question_id:integer, messages:jsonb (array of {role, content, timestamp})\n2. Create chat interface on question page (collapsible panel or modal)\n3. Add message input and send button\n4. Create TutorJob (Sidekiq): accepts conversation_id, message_content\n5. Build comprehensive system prompt including:\n   - Student's specialty from classroom\n   - Current part objective_text\n   - Question number, label, context_text\n   - Official correction (marked confidential - never reveal directly)\n   - Available lessons (titles, chapters) for citation\n   - Tutor capabilities and constraints\n6. Define tutor capabilities in prompt:\n   - Explain concepts and notions\n   - Detail calculation steps and reasoning\n   - Reference relevant lessons with links\n   - Generate revision sheets on key concepts\n   - NEVER give direct answer\n   - Respond in French at high school level\n7. Implement streaming response using Server-Sent Events (SSE):\n   - Create streaming endpoint in controller\n   - Use Faraday with streaming: true for API calls\n   - Yield chunks as they arrive\n   - Broadcast via Turbo Stream to update chat UI\n8. Add 'Generate Revision Sheet' quick action button\n9. When clicked, send specific prompt to generate structured revision sheet on current concept\n10. Implement lesson citation: when AI mentions lesson, create clickable link to lesson viewer\n11. Persist conversation messages in jsonb array\n12. Add conversation history display (scrollable)\n13. Handle streaming errors: show message, allow retry\n14. Require API key: redirect to config if missing\n15. Add loading indicator during streaming\n16. Implement streaming timeout (60 seconds)\n17. Ensure sticky panel remains accessible\n18. Add conversation reset button",
+        "testStrategy": "- Test chat interface opens and displays correctly\n- Verify message input and send button functional\n- Test streaming starts within 2 seconds of send\n- Verify responses stream in real-time via SSE\n- Test responses in French at appropriate level\n- Verify AI explains concepts without giving direct answers\n- Test AI details calculation steps when asked\n- Verify lesson citations create clickable links\n- Test 'Generate Revision Sheet' produces structured content\n- Test conversation persists across page reloads\n- Verify conversation history displays all messages\n- Test error handling: invalid API key shows clear message\n- Test error handling: quota exceeded shows actionable message\n- Test error handling: timeout shows retry option\n- Verify redirect to config page if API key missing\n- Test streaming timeout after 60 seconds\n- Verify sticky panel remains accessible during chat\n- Test conversation reset clears messages",
+        "priority": "high",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2026-03-26T12:22:56.804Z",
+      "updated": "2026-03-26T12:22:56.804Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
