@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_014730) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_131851) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -64,6 +64,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_014730) do
     t.datetime "updated_at", null: false
     t.index ["status"], name: "index_extraction_jobs_on_status"
     t.index ["subject_id"], name: "index_extraction_jobs_on_subject_id"
+  end
+
+  create_table "parts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "number", null: false
+    t.text "objective_text"
+    t.integer "position", default: 0, null: false
+    t.integer "section_type", default: 0, null: false
+    t.bigint "subject_id", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["subject_id", "position"], name: "index_parts_on_subject_id_and_position"
+    t.index ["subject_id"], name: "index_parts_on_subject_id"
   end
 
   create_table "students", force: :cascade do |t|
@@ -124,6 +137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_014730) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "classrooms", "users", column: "owner_id"
   add_foreign_key "extraction_jobs", "subjects"
+  add_foreign_key "parts", "subjects"
   add_foreign_key "students", "classrooms"
   add_foreign_key "subjects", "users", column: "owner_id"
 end
