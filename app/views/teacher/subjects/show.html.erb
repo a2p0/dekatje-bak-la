@@ -1,0 +1,49 @@
+<h1><%= @subject.title %></h1>
+
+<p>
+  Spécialité : <%= @subject.specialty %> |
+  Région : <%= @subject.region %> |
+  Année : <%= @subject.year %> |
+  Type : <%= @subject.exam_type %> |
+  Statut : <strong><%= @subject.status %></strong>
+</p>
+
+<h2>Documents PDF</h2>
+<ul>
+  <% if @subject.enonce_file.attached? %>
+    <li><%= link_to "Énoncé", rails_blob_path(@subject.enonce_file, disposition: "attachment") %></li>
+  <% end %>
+  <% if @subject.dt_file.attached? %>
+    <li><%= link_to "Documents Techniques (DT)", rails_blob_path(@subject.dt_file, disposition: "attachment") %></li>
+  <% end %>
+  <% if @subject.dr_vierge_file.attached? %>
+    <li><%= link_to "Document Réponse vierge", rails_blob_path(@subject.dr_vierge_file, disposition: "attachment") %></li>
+  <% end %>
+  <% if @subject.dr_corrige_file.attached? %>
+    <li><%= link_to "Document Réponse corrigé", rails_blob_path(@subject.dr_corrige_file, disposition: "attachment") %></li>
+  <% end %>
+  <% if @subject.questions_corrigees_file.attached? %>
+    <li><%= link_to "Questions corrigées", rails_blob_path(@subject.questions_corrigees_file, disposition: "attachment") %></li>
+  <% end %>
+</ul>
+
+<h2>Extraction</h2>
+<% if @extraction_job %>
+  <p>Statut : <strong><%= @extraction_job.status %></strong></p>
+  <% if @extraction_job.failed? %>
+    <p style="color: red;">Erreur : <%= @extraction_job.error_message %></p>
+  <% end %>
+<% else %>
+  <p>Aucun job d'extraction.</p>
+<% end %>
+
+<div>
+  <% if @subject.pending_validation? %>
+    <%= button_to "Publier", publish_teacher_subject_path(@subject), method: :patch %>
+  <% end %>
+  <% if @subject.published? %>
+    <%= button_to "Archiver", archive_teacher_subject_path(@subject), method: :patch %>
+  <% end %>
+</div>
+
+<%= link_to "Retour aux sujets", teacher_subjects_path %>
