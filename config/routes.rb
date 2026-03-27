@@ -19,6 +19,13 @@ Rails.application.routes.draw do
         get :export_markdown
       end
     end
+
+    resources :subjects, only: [ :index, :new, :create, :show ] do
+      member do
+        patch :publish
+        patch :archive
+      end
+    end
   end
 
   # Auth élève via access_code

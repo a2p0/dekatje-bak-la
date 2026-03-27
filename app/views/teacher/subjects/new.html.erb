@@ -1,0 +1,74 @@
+<h1>Nouveau sujet</h1>
+
+<%= form_with model: [:teacher, @subject], multipart: true do |f| %>
+  <% if @subject.errors.any? %>
+    <div>
+      <ul>
+        <% @subject.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <h2>Informations</h2>
+
+  <div>
+    <%= f.label :title, "Titre" %>
+    <%= f.text_field :title, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :year, "Année" %>
+    <%= f.text_field :year, placeholder: "2026", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :exam_type, "Type d'examen" %>
+    <%= f.select :exam_type, Subject.exam_types.keys.map { |k| [k.humanize, k] }, {}, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :specialty, "Spécialité" %>
+    <%= f.select :specialty, Subject.specialties.keys.map { |k| [k, k] }, {}, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :region, "Région" %>
+    <%= f.select :region, [
+      ["Métropole", "metropole"],
+      ["DROM-COM", "drom_com"],
+      ["Polynésie", "polynesie"],
+      ["Candidat libre", "candidat_libre"]
+    ], {}, required: true %>
+  </div>
+
+  <h2>Documents PDF</h2>
+
+  <div>
+    <%= f.label :enonce_file, "Énoncé du sujet (PDF, max 20 MB)" %>
+    <%= f.file_field :enonce_file, accept: "application/pdf", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :dt_file, "Documents Techniques — DT (PDF, max 20 MB)" %>
+    <%= f.file_field :dt_file, accept: "application/pdf", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :dr_vierge_file, "Document Réponse vierge — DR (PDF, max 20 MB)" %>
+    <%= f.file_field :dr_vierge_file, accept: "application/pdf", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :dr_corrige_file, "Document Réponse corrigé (PDF, max 20 MB)" %>
+    <%= f.file_field :dr_corrige_file, accept: "application/pdf", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :questions_corrigees_file, "Questions corrigées (PDF, max 20 MB)" %>
+    <%= f.file_field :questions_corrigees_file, accept: "application/pdf", required: true %>
+  </div>
+
+  <%= f.submit "Créer le sujet" %>
+<% end %>

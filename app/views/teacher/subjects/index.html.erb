@@ -1,0 +1,32 @@
+<h1>Mes sujets</h1>
+
+<%= link_to "Nouveau sujet", new_teacher_subject_path %>
+
+<% if @subjects.empty? %>
+  <p>Aucun sujet pour l'instant.</p>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th>Titre</th>
+        <th>Spécialité</th>
+        <th>Région</th>
+        <th>Année</th>
+        <th>Statut</th>
+        <th>Créé le</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @subjects.each do |subject| %>
+        <tr>
+          <td><%= link_to subject.title, teacher_subject_path(subject) %></td>
+          <td><%= subject.specialty %></td>
+          <td><%= subject.region %></td>
+          <td><%= subject.year %></td>
+          <td><span><%= subject.status %></span></td>
+          <td><%= subject.created_at.strftime("%d/%m/%Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
