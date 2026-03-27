@@ -29,7 +29,7 @@ RSpec.describe "Teacher::Subjects", type: :request do
 
   describe "POST /teacher/subjects" do
     def pdf_upload(filename)
-      fixture_file = Tempfile.new([filename, ".pdf"])
+      fixture_file = Tempfile.new([ filename, ".pdf" ])
       fixture_file.write("%PDF-1.4 fake content")
       fixture_file.rewind
       Rack::Test::UploadedFile.new(fixture_file, "application/pdf", original_filename: filename)
