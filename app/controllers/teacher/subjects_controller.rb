@@ -1,5 +1,5 @@
 class Teacher::SubjectsController < Teacher::BaseController
-  before_action :set_subject, only: [ :show, :publish, :archive ]
+  before_action :set_subject, only: [ :show, :publish, :archive, :retry_extraction ]
 
   def index
     @subjects = current_teacher.subjects.kept.order(created_at: :desc)
@@ -14,6 +14,7 @@ class Teacher::SubjectsController < Teacher::BaseController
 
     if @subject.save
       @subject.create_extraction_job!(status: :pending, provider_used: :server)
+      ExtractQuestionsJob.perform_later(@subject.id)
       redirect_to teacher_subject_path(@subject),
                   notice: "Sujet créé. L'extraction démarrera automatiquement."
     else
@@ -33,6 +34,19 @@ class Teacher::SubjectsController < Teacher::BaseController
 
     @subject.update!(status: :published)
     redirect_to teacher_subject_path(@subject), notice: "Sujet publié."
+  end
+
+  def retry_extraction
+    job = @subject.extraction_job
+    unless job&.failed?
+      return redirect_to teacher_subject_path(@subject),
+                         alert: "L'extraction ne peut être relancée que si elle a échoué."
+    end
+
+    job.update!(status: :pending, error_message: nil)
+    ExtractQuestionsJob.perform_later(@subject.id)
+    redirect_to teacher_subject_path(@subject),
+                notice: "Extraction relancée."
   end
 
   def archive

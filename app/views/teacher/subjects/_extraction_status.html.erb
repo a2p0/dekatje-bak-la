@@ -1,0 +1,23 @@
+<div id="extraction-status">
+  <% job = subject.extraction_job %>
+  <% if job %>
+    <p>
+      Statut extraction :
+      <strong><%= job.status %></strong>
+      <% if job.provider_used %>
+        (via <%= job.provider_used %>)
+      <% end %>
+    </p>
+    <% if job.failed? %>
+      <p style="color: red;">Erreur : <%= job.error_message %></p>
+      <%= button_to "Relancer l'extraction",
+          retry_extraction_teacher_subject_path(subject),
+          method: :post %>
+    <% end %>
+    <% if job.processing? %>
+      <p>Extraction en cours... <em>(la page se mettra à jour automatiquement)</em></p>
+    <% end %>
+  <% else %>
+    <p>Aucun job d'extraction.</p>
+  <% end %>
+</div>

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       member do
         patch :publish
         patch :archive
+        post  :retry_extraction
       end
     end
   end

@@ -27,15 +27,10 @@
   <% end %>
 </ul>
 
+<%= turbo_stream_from "subject_#{@subject.id}" %>
+
 <h2>Extraction</h2>
-<% if @extraction_job %>
-  <p>Statut : <strong><%= @extraction_job.status %></strong></p>
-  <% if @extraction_job.failed? %>
-    <p style="color: red;">Erreur : <%= @extraction_job.error_message %></p>
-  <% end %>
-<% else %>
-  <p>Aucun job d'extraction.</p>
-<% end %>
+<%= render "extraction_status", subject: @subject %>
 
 <div>
   <% if @subject.pending_validation? %>
