@@ -1,0 +1,25 @@
+<div id="subject-stats">
+  <p>
+    Questions validées : <strong><%= subject.validated_questions_count %></strong>
+    / <%= subject.parts.joins(:questions).merge(Question.kept).count %>
+  </p>
+
+  <% if subject.draft? || subject.pending_validation? %>
+    <% if subject.publishable? %>
+      <%= button_to "Publier le sujet",
+          publish_teacher_subject_path(subject),
+          method: :patch,
+          data: { turbo_confirm: "Publier ce sujet ?" } %>
+    <% else %>
+      <button disabled>Publier le sujet (validez au moins une question)</button>
+    <% end %>
+  <% end %>
+
+  <% if subject.published? %>
+    <%= button_to "Dépublier",
+        unpublish_teacher_subject_path(subject),
+        method: :patch,
+        data: { turbo_confirm: "Dépublier ce sujet ?" } %>
+    <%= link_to "Gérer l'assignation", assign_teacher_subject_path(subject) %>
+  <% end %>
+</div>

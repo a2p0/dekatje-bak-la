@@ -32,13 +32,18 @@
 <h2>Extraction</h2>
 <%= render "extraction_status", subject: @subject %>
 
-<div>
-  <% if @subject.pending_validation? %>
-    <%= button_to "Publier", publish_teacher_subject_path(@subject), method: :patch %>
-  <% end %>
-  <% if @subject.published? %>
-    <%= button_to "Archiver", archive_teacher_subject_path(@subject), method: :patch %>
-  <% end %>
-</div>
+<% if @subject.parts.any? %>
+  <h2>Valider par partie</h2>
+  <ul>
+    <% @subject.parts.order(:position).each do |part| %>
+      <li>
+        <%= link_to part.title, teacher_subject_part_path(@subject, part) %>
+        (section <%= part.section_type %>)
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<%= render "stats", subject: @subject %>
 
 <%= link_to "Retour aux sujets", teacher_subjects_path %>

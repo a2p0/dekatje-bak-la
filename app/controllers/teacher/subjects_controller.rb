@@ -1,5 +1,5 @@
 class Teacher::SubjectsController < Teacher::BaseController
-  before_action :set_subject, only: [ :show, :publish, :archive, :retry_extraction ]
+  before_action :set_subject, only: [ :show, :publish, :archive, :unpublish, :retry_extraction, :assign ]
 
   def index
     @subjects = current_teacher.subjects.kept.order(created_at: :desc)
@@ -27,13 +27,35 @@ class Teacher::SubjectsController < Teacher::BaseController
   end
 
   def publish
-    unless @subject.draft? || @subject.pending_validation?
+    unless @subject.publishable?
       return redirect_to teacher_subject_path(@subject),
-                         alert: "Ce sujet ne peut pas être publié."
+                         alert: "Publiez au moins une question validée avant de publier."
     end
 
     @subject.update!(status: :published)
-    redirect_to teacher_subject_path(@subject), notice: "Sujet publié."
+    redirect_to assign_teacher_subject_path(@subject),
+                notice: "Sujet publié. Assignez-le maintenant aux classes."
+  end
+
+  def unpublish
+    unless @subject.published?
+      return redirect_to teacher_subject_path(@subject),
+                         alert: "Seul un sujet publié peut être dépublié."
+    end
+
+    @subject.update!(status: :draft)
+    redirect_to teacher_subject_path(@subject), notice: "Sujet dépublié."
+  end
+
+  def assign
+    @classrooms = current_teacher.classrooms.order(:name)
+    @assigned_ids = @subject.classroom_ids
+
+    if request.patch?
+      selected_ids = Array(params[:classroom_ids]).map(&:to_i)
+      @subject.classroom_ids = selected_ids
+      redirect_to teacher_subject_path(@subject), notice: "Assignation mise à jour."
+    end
   end
 
   def retry_extraction
