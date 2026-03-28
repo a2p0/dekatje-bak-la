@@ -2,6 +2,8 @@ class Subject < ApplicationRecord
   belongs_to :owner, class_name: "User"
   has_one :extraction_job, dependent: :destroy
   has_many :parts, dependent: :destroy
+  has_many :classroom_subjects, dependent: :destroy
+  has_many :classrooms, through: :classroom_subjects
 
   has_one_attached :enonce_file
   has_one_attached :dt_file
@@ -19,6 +21,14 @@ class Subject < ApplicationRecord
   validate :all_files_attached
 
   scope :kept, -> { where(discarded_at: nil) }
+
+  def validated_questions_count
+    parts.joins(:questions).merge(Question.where(status: :validated).kept).count
+  end
+
+  def publishable?
+    validated_questions_count > 0
+  end
 
   private
 
