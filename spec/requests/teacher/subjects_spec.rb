@@ -85,8 +85,10 @@ RSpec.describe "Teacher::Subjects", type: :request do
   end
 
   describe "PATCH /teacher/subjects/:id/publish" do
-    it "publishes a pending_validation subject" do
+    it "publishes a pending_validation subject with validated questions" do
       subject = create(:subject, owner: user, status: :pending_validation)
+      part = create(:part, subject: subject)
+      create(:question, part: part, status: :validated)
       patch publish_teacher_subject_path(subject)
       expect(subject.reload.status).to eq("published")
     end
