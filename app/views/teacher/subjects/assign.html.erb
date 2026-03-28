@@ -1,0 +1,23 @@
+<h1>Assigner "<%= @subject.title %>" aux classes</h1>
+
+<%= form_with url: assign_teacher_subject_path(@subject), method: :patch do |f| %>
+  <% if @classrooms.empty? %>
+    <p>Vous n'avez pas encore de classe.</p>
+  <% else %>
+    <% @classrooms.each do |classroom| %>
+      <div>
+        <label>
+          <input type="checkbox"
+                 name="classroom_ids[]"
+                 value="<%= classroom.id %>"
+                 <%= "checked" if @assigned_ids.include?(classroom.id) %>>
+          <%= classroom.name %> (<%= classroom.school_year %>)
+        </label>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= f.submit "Enregistrer" %>
+<% end %>
+
+<%= link_to "Retour au sujet", teacher_subject_path(@subject) %>

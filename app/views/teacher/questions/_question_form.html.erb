@@ -1,0 +1,28 @@
+<%= form_with url: teacher_subject_part_question_path(subject, part, question),
+              method: :patch,
+              data: { turbo_frame: dom_id(question) } do |f| %>
+  <div>
+    <%= f.label :label, "Énoncé" %>
+    <%= f.text_area :label, value: question.label, rows: 3, style: "width:100%" %>
+  </div>
+
+  <div>
+    <%= f.label :points, "Points" %>
+    <%= f.number_field :points, value: question.points, step: 0.5 %>
+  </div>
+
+  <% if question.answer %>
+    <%= fields_for :answer, question.answer do |af| %>
+      <div>
+        <%= af.label :correction_text, "Correction" %>
+        <%= af.text_area :correction_text, rows: 3, style: "width:100%" %>
+      </div>
+      <div>
+        <%= af.label :explanation_text, "Explication" %>
+        <%= af.text_area :explanation_text, rows: 2, style: "width:100%" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= f.submit "Sauvegarder" %>
+<% end %>

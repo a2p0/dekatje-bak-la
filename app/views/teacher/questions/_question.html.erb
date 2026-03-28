@@ -1,0 +1,38 @@
+<%= turbo_frame_tag dom_id(question) do %>
+  <div style="border: 1px solid <%= question.validated? ? '#28a745' : '#ccc' %>; padding: 10px; margin: 8px 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span>
+        <strong>Q<%= question.number %></strong>
+        <span style="color: <%= question.validated? ? 'green' : 'gray' %>;">
+          [<%= question.status %>]
+        </span>
+        (<%= question.points %> pts)
+      </span>
+      <span>
+        <% if question.validated? %>
+          <%= button_to "Invalider",
+              invalidate_teacher_subject_part_question_path(subject, part, question),
+              method: :patch, form: { data: { turbo_frame: dom_id(question) } } %>
+        <% else %>
+          <%= button_to "Valider",
+              validate_teacher_subject_part_question_path(subject, part, question),
+              method: :patch, form: { data: { turbo_frame: dom_id(question) } } %>
+        <% end %>
+        <%= button_to "Supprimer",
+            teacher_subject_part_question_path(subject, part, question),
+            method: :delete,
+            data: { turbo_confirm: "Supprimer cette question ?" },
+            form: { data: { turbo_frame: "_top" } } %>
+      </span>
+    </div>
+
+    <p><%= question.label %></p>
+    <% if question.answer&.correction_text.present? %>
+      <p><em>Correction : <%= question.answer.correction_text %></em></p>
+    <% end %>
+
+    <%= turbo_frame_tag "#{dom_id(question)}_form" do %>
+      <%= render "teacher/questions/question_form", question: question, subject: subject, part: part %>
+    <% end %>
+  </div>
+<% end %>

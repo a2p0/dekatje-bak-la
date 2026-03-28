@@ -1,0 +1,39 @@
+<h1><%= @subject.title %> — <%= @part.title %></h1>
+
+<p>Objectif : <%= @part.objective_text %></p>
+
+<nav>
+  <% @parts.each do |part| %>
+    <%= link_to part.title,
+        teacher_subject_part_path(@subject, part),
+        style: part == @part ? "font-weight: bold" : "" %>
+  <% end %>
+</nav>
+
+<div style="display: flex; gap: 20px;">
+  <div style="flex: 1;">
+    <h2>Questions (<%= @questions.count %>)</h2>
+
+    <% if @questions.empty? %>
+      <p>Aucune question dans cette partie.</p>
+    <% else %>
+      <% @questions.each do |question| %>
+        <%= render "teacher/questions/question", question: question, subject: @subject, part: @part %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div style="flex: 1;">
+    <h2>PDF Énoncé</h2>
+    <% if @subject.enonce_file.attached? %>
+      <iframe
+        src="<%= rails_blob_path(@subject.enonce_file) %>"
+        width="100%"
+        height="800px"
+        style="border: 1px solid #ccc;">
+      </iframe>
+    <% end %>
+  </div>
+</div>
+
+<%= link_to "Retour au sujet", teacher_subject_path(@subject) %>

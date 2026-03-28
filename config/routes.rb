@@ -21,10 +21,21 @@ Rails.application.routes.draw do
     end
 
     resources :subjects, only: [ :index, :new, :create, :show ] do
+      resources :parts, only: [ :show ] do
+        resources :questions, only: [ :update, :destroy ] do
+          member do
+            patch :validate
+            patch :invalidate
+          end
+        end
+      end
       member do
         patch :publish
         patch :archive
+        patch :unpublish
         post  :retry_extraction
+        get   :assign
+        patch :assign
       end
     end
   end
