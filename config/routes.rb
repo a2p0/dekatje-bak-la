@@ -45,7 +45,10 @@ Rails.application.routes.draw do
     get    "/",        to: "student/sessions#new",     as: :login
     post   "/session", to: "student/sessions#create",  as: :session
     delete "/session", to: "student/sessions#destroy"
-    get "/subjects", to: "student/subjects#index", as: :root
+    get "/subjects",                                to: "student/subjects#index",    as: :root
+    get "/subjects/:id",                            to: "student/subjects#show",     as: :subject
+    get "/subjects/:subject_id/questions/:id",      to: "student/questions#show",    as: :question
+    patch "/subjects/:subject_id/questions/:id/reveal", to: "student/questions#reveal", as: :reveal_question
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

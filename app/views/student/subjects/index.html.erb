@@ -1,0 +1,33 @@
+<h1>Mes sujets — <%= @classroom.name %></h1>
+
+<% if @subjects.empty? %>
+  <p>Aucun sujet n'a encore été assigné à votre classe.</p>
+<% else %>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+    <% @subjects.each do |subject| %>
+      <%
+        session_record = current_student.student_sessions.find_by(subject: subject)
+        total = subject.parts.joins(:questions).merge(Question.kept).count
+        answered = session_record ? session_record.progression.count { |_k, v| v["answered"] } : 0
+        progress = total > 0 ? (answered * 100.0 / total).round : 0
+      %>
+      <div style="border: 1px solid #334155; border-radius: 8px; padding: 16px; background: #1e293b;">
+        <h3 style="margin: 0 0 8px;"><%= subject.title %></h3>
+        <p style="color: #94a3b8; margin: 0 0 8px;">
+          <%= subject.specialty %> — <%= subject.year %> — <%= subject.region %>
+        </p>
+        <div style="background: #0f172a; border-radius: 4px; height: 8px; margin-bottom: 12px;">
+          <div style="background: #7c3aed; height: 100%; border-radius: 4px; width: <%= progress %>%;"></div>
+        </div>
+        <p style="color: #94a3b8; font-size: 13px; margin: 0 0 12px;">
+          <%= answered %>/<%= total %> questions — <%= progress %>%
+        </p>
+        <%= link_to(session_record ? "Continuer" : "Commencer",
+            student_subject_path(access_code: params[:access_code], id: subject.id),
+            style: "display: inline-block; padding: 8px 20px; background: #7c3aed; color: white; border-radius: 6px; text-decoration: none;") %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%= link_to "Se déconnecter", student_session_path(access_code: params[:access_code]), data: { turbo_method: :delete } %>
