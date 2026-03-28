@@ -1,4 +1,6 @@
 class Teacher::QuestionsController < Teacher::BaseController
+  include ActionView::RecordIdentifier
+
   before_action :set_subject
   before_action :set_part
   before_action :set_question
