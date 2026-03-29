@@ -1,0 +1,89 @@
+<div style="max-width: 600px; margin: 0 auto; padding: 24px;">
+  <h1 style="margin-bottom: 24px;">Réglages</h1>
+
+  <% if flash[:notice] %>
+    <p style="color: #22c55e; margin-bottom: 16px;"><%= flash[:notice] %></p>
+  <% end %>
+
+  <%= form_with model: current_student, url: student_settings_path(access_code: params[:access_code]),
+                method: :patch, data: { controller: "settings", settings_models_value: @models_json } do |f| %>
+
+    <fieldset style="border: 1px solid #374151; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <legend style="color: #9ca3af; font-size: 13px; text-transform: uppercase; padding: 0 8px;">Mode par défaut</legend>
+
+      <div style="margin-bottom: 8px;">
+        <label style="display: flex; align-items: center; gap: 8px; color: #e2e8f0; cursor: pointer;">
+          <%= f.radio_button :default_mode, "revision", style: "accent-color: #7c3aed;" %>
+          Révision autonome (correction seule)
+        </label>
+      </div>
+      <div>
+        <label style="display: flex; align-items: center; gap: 8px; color: #e2e8f0; cursor: pointer;">
+          <%= f.radio_button :default_mode, "tutored", style: "accent-color: #7c3aed;" %>
+          Tutorat IA (nécessite une clé API)
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset style="border: 1px solid #374151; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <legend style="color: #9ca3af; font-size: 13px; text-transform: uppercase; padding: 0 8px;">Configuration IA</legend>
+
+      <div style="margin-bottom: 16px;">
+        <%= f.label :api_provider, "Provider", style: "display: block; color: #9ca3af; font-size: 13px; margin-bottom: 4px;" %>
+        <%= f.select :api_provider,
+            Student.api_providers.keys.map { |k| [k.capitalize, k] },
+            {},
+            style: "width: 100%; padding: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #374151; border-radius: 6px;",
+            data: { action: "change->settings#providerChanged", settings_target: "provider" } %>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <%= f.label :api_model, "Modèle", style: "display: block; color: #9ca3af; font-size: 13px; margin-bottom: 4px;" %>
+        <select name="student[api_model]"
+                data-settings-target="model"
+                style="width: 100%; padding: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #374151; border-radius: 6px;">
+          <% models = Student::AVAILABLE_MODELS[current_student.api_provider] || [] %>
+          <% models.each do |m| %>
+            <option value="<%= m[:id] %>" <%= "selected" if current_student.api_model == m[:id] || (current_student.api_model.blank? && m == models.first) %>>
+              <%= m[:cost] %> <%= m[:label] %><%= " — #{m[:note]}" if m[:note] %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <%= f.label :api_key, "Clé API", style: "display: block; color: #9ca3af; font-size: 13px; margin-bottom: 4px;" %>
+        <div style="display: flex; gap: 8px;">
+          <%= f.password_field :api_key,
+              value: current_student.api_key,
+              placeholder: "sk-...",
+              style: "flex: 1; padding: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #374151; border-radius: 6px;",
+              data: { settings_target: "apiKey" } %>
+          <button type="button"
+                  data-action="click->settings#toggleApiKey"
+                  style="padding: 8px 12px; background: #1e293b; color: #9ca3af; border: 1px solid #374151; border-radius: 6px; cursor: pointer;">
+            👁
+          </button>
+        </div>
+      </div>
+
+      <button type="button"
+              data-action="click->settings#testKey"
+              data-settings-target="testButton"
+              style="padding: 8px 16px; background: #374151; color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+        Tester la clé
+      </button>
+
+      <%= turbo_frame_tag "test_key_result" do %>
+        <p id="test_key_result"></p>
+      <% end %>
+    </fieldset>
+
+    <%= f.submit "Enregistrer",
+        style: "padding: 12px 32px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" %>
+  <% end %>
+
+  <%= link_to "← Retour aux sujets",
+      student_root_path(access_code: params[:access_code]),
+      style: "display: inline-block; margin-top: 16px; color: #7c3aed; text-decoration: none; font-size: 13px;" %>
+</div>

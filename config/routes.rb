@@ -49,6 +49,9 @@ Rails.application.routes.draw do
     get "/subjects/:id",                            to: "student/subjects#show",     as: :subject
     get "/subjects/:subject_id/questions/:id",      to: "student/questions#show",    as: :question
     patch "/subjects/:subject_id/questions/:id/reveal", to: "student/questions#reveal", as: :reveal_question
+    get   "/settings",          to: "student/settings#show",     as: :settings
+    patch "/settings",          to: "student/settings#update"
+    post  "/settings/test_key", to: "student/settings#test_key", as: :test_key
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
