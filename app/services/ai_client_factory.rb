@@ -46,6 +46,29 @@ class AiClientFactory
     extract_text(response.body)
   end
 
+  def stream(messages:, system:, max_tokens: 4096, temperature: 0.7, &block)
+    raise ArgumentError, "Block required for streaming" unless block_given?
+
+    connection = Faraday.new(url: @config[:base_url]) do |f|
+      f.request :json
+      f.options.timeout = 120
+    end
+
+    headers = build_headers
+    body    = build_stream_body(messages: messages, system: system, max_tokens: max_tokens, temperature: temperature)
+    path    = stream_endpoint_path
+    buffer  = ""
+
+    response = connection.post(path, body.to_json, headers) do |req|
+      req.options.on_data = proc do |chunk, _overall_received_bytes, _env|
+        buffer += chunk
+        buffer = parse_stream_buffer(buffer, &block)
+      end
+    end
+
+    raise "API error #{response.status}: #{response.body}" unless response.status == 200
+  end
+
   private
 
   def build_headers
@@ -93,5 +116,84 @@ class AiClientFactory
     when :google
       body.dig("candidates", 0, "content", "parts", 0, "text")
     end
+  end
+
+  def build_stream_body(messages:, system:, max_tokens:, temperature:)
+    body = build_body(messages: messages, system: system, max_tokens: max_tokens, temperature: temperature)
+    case @provider
+    when :anthropic
+      body.merge(stream: true)
+    when :openrouter, :openai
+      body.merge(stream: true)
+    when :google
+      body
+    end
+  end
+
+  def stream_endpoint_path
+    case @provider
+    when :anthropic then "/v1/messages"
+    when :openrouter, :openai then "/api/v1/chat/completions"
+    when :google then "/v1beta/models/#{@model}:streamGenerateContent?alt=sse"
+    end
+  end
+
+  def parse_stream_buffer(buffer, &block)
+    while (line_end = buffer.index("\n"))
+      line = buffer.slice!(0, line_end + 1).strip
+      next if line.empty?
+
+      parse_stream_line(line, &block)
+    end
+    buffer
+  end
+
+  def parse_stream_line(line, &block)
+    case @provider
+    when :anthropic
+      parse_anthropic_stream_line(line, &block)
+    when :openrouter, :openai
+      parse_openai_stream_line(line, &block)
+    when :google
+      parse_google_stream_line(line, &block)
+    end
+  end
+
+  def parse_anthropic_stream_line(line, &block)
+    return unless line.start_with?("data: ")
+
+    json_str = line.sub("data: ", "")
+    return if json_str == "[DONE]"
+
+    data = JSON.parse(json_str)
+    if data["type"] == "content_block_delta" && data.dig("delta", "text")
+      yield data["delta"]["text"]
+    end
+  rescue JSON::ParserError
+    # Skip malformed lines
+  end
+
+  def parse_openai_stream_line(line, &block)
+    return unless line.start_with?("data: ")
+
+    json_str = line.sub("data: ", "")
+    return if json_str == "[DONE]"
+
+    data = JSON.parse(json_str)
+    content = data.dig("choices", 0, "delta", "content")
+    yield content if content
+  rescue JSON::ParserError
+    # Skip malformed lines
+  end
+
+  def parse_google_stream_line(line, &block)
+    return unless line.start_with?("data: ")
+
+    json_str = line.sub("data: ", "")
+    data = JSON.parse(json_str)
+    text = data.dig("candidates", 0, "content", "parts", 0, "text")
+    yield text if text
+  rescue JSON::ParserError
+    # Skip malformed lines
   end
 end

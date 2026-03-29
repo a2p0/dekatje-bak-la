@@ -98,4 +98,92 @@ RSpec.describe AiClientFactory do
       expect(stub).to have_been_requested
     end
   end
+
+  describe "#stream" do
+    it "raises ArgumentError without a block" do
+      client = described_class.build(provider: :anthropic, api_key: "sk-test")
+      expect {
+        client.stream(messages: [{ role: "user", content: "test" }], system: "sys")
+      }.to raise_error(ArgumentError, "Block required for streaming")
+    end
+
+    it "streams tokens from anthropic" do
+      sse_chunks = [
+        "event: content_block_start\ndata: {\"type\":\"content_block_start\"}\n\n",
+        "event: content_block_delta\ndata: {\"type\":\"content_block_delta\",\"delta\":{\"text\":\"Bonjour\"}}\n\n",
+        "event: content_block_delta\ndata: {\"type\":\"content_block_delta\",\"delta\":{\"text\":\" !\"}}\n\n",
+        "event: message_stop\ndata: {\"type\":\"message_stop\"}\n\n"
+      ]
+
+      stub_request(:post, "https://api.anthropic.com/v1/messages")
+        .to_return(
+          status: 200,
+          body: sse_chunks.join,
+          headers: { "Content-Type" => "text/event-stream" }
+        )
+
+      tokens = []
+      client = described_class.build(provider: :anthropic, api_key: "sk-test")
+      client.stream(messages: [{ role: "user", content: "test" }], system: "sys") do |token|
+        tokens << token
+      end
+
+      expect(tokens).to eq(["Bonjour", " !"])
+    end
+
+    it "streams tokens from openai" do
+      sse_chunks = [
+        "data: {\"choices\":[{\"delta\":{\"content\":\"Hello\"}}]}\n\n",
+        "data: {\"choices\":[{\"delta\":{\"content\":\" world\"}}]}\n\n",
+        "data: [DONE]\n\n"
+      ]
+
+      stub_request(:post, "https://api.openai.com/api/v1/chat/completions")
+        .to_return(
+          status: 200,
+          body: sse_chunks.join,
+          headers: { "Content-Type" => "text/event-stream" }
+        )
+
+      tokens = []
+      client = described_class.build(provider: :openai, api_key: "sk-test")
+      client.stream(messages: [{ role: "user", content: "test" }], system: "sys") do |token|
+        tokens << token
+      end
+
+      expect(tokens).to eq(["Hello", " world"])
+    end
+
+    it "streams tokens from google" do
+      sse_chunks = [
+        "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Salut\"}]}}]}\n\n",
+        "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\" toi\"}]}}]}\n\n"
+      ]
+
+      stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse")
+        .to_return(
+          status: 200,
+          body: sse_chunks.join,
+          headers: { "Content-Type" => "text/event-stream" }
+        )
+
+      tokens = []
+      client = described_class.build(provider: :google, api_key: "gk-test")
+      client.stream(messages: [{ role: "user", content: "test" }], system: "sys") do |token|
+        tokens << token
+      end
+
+      expect(tokens).to eq(["Salut", " toi"])
+    end
+
+    it "raises on API error" do
+      stub_request(:post, "https://api.anthropic.com/v1/messages")
+        .to_return(status: 401, body: "Unauthorized")
+
+      client = described_class.build(provider: :anthropic, api_key: "bad-key")
+      expect {
+        client.stream(messages: [{ role: "user", content: "test" }], system: "sys") { |_t| }
+      }.to raise_error(/API error 401/)
+    end
+  end
 end
