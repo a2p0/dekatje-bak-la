@@ -2,6 +2,8 @@ class Student < ApplicationRecord
   belongs_to :classroom
   has_secure_password
   has_many :student_sessions, dependent: :destroy
+  has_many :conversations, dependent: :destroy
+  has_many :student_insights, dependent: :destroy
 
   encrypts :api_key
 
