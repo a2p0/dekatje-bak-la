@@ -30,4 +30,12 @@
   </div>
 <% end %>
 
-<%= link_to "Se déconnecter", student_session_path(access_code: params[:access_code]), data: { turbo_method: :delete } %>
+<div style="display: flex; gap: 16px; margin-top: 24px;">
+  <%= link_to "⚙ Réglages",
+      student_settings_path(access_code: params[:access_code]),
+      style: "color: #9ca3af; text-decoration: none;" %>
+  <%= link_to "Se déconnecter",
+      student_session_path(access_code: params[:access_code]),
+      data: { turbo_method: :delete },
+      style: "color: #9ca3af; text-decoration: none;" %>
+</div>
