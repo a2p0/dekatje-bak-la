@@ -38,13 +38,13 @@ RSpec.describe AiClientFactory do
         .with(headers: { "x-api-key" => "sk-ant-test" })
         .to_return(
           status: 200,
-          body: { content: [{ text: '{"parts":[]}' }] }.to_json,
+          body: { content: [ { text: '{"parts":[]}' } ] }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
 
       client = described_class.build(provider: :anthropic, api_key: "sk-ant-test")
       result = client.call(
-        messages: [{ role: "user", content: "test" }],
+        messages: [ { role: "user", content: "test" } ],
         system: "system prompt",
         max_tokens: 100,
         temperature: 0.1
@@ -59,12 +59,12 @@ RSpec.describe AiClientFactory do
         .with(body: hash_including("model" => "claude-haiku-4-5-20251001"))
         .to_return(
           status: 200,
-          body: { content: [{ text: "hello" }] }.to_json,
+          body: { content: [ { text: "hello" } ] }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
 
       client = described_class.build(provider: :anthropic, api_key: "sk-test", model: "claude-haiku-4-5-20251001")
-      client.call(messages: [{ role: "user", content: "test" }], system: "sys", max_tokens: 100)
+      client.call(messages: [ { role: "user", content: "test" } ], system: "sys", max_tokens: 100)
 
       expect(stub).to have_been_requested
     end
@@ -73,12 +73,12 @@ RSpec.describe AiClientFactory do
       stub = stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-06-05:generateContent")
         .to_return(
           status: 200,
-          body: { candidates: [{ content: { parts: [{ text: "hello" }] } }] }.to_json,
+          body: { candidates: [ { content: { parts: [ { text: "hello" } ] } } ] }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
 
       client = described_class.build(provider: :google, api_key: "gk-test", model: "gemini-2.5-pro-preview-06-05")
-      client.call(messages: [{ role: "user", content: "test" }], system: "sys", max_tokens: 100)
+      client.call(messages: [ { role: "user", content: "test" } ], system: "sys", max_tokens: 100)
 
       expect(stub).to have_been_requested
     end
@@ -88,12 +88,12 @@ RSpec.describe AiClientFactory do
         .with(body: hash_including("model" => "claude-sonnet-4-5-20251001"))
         .to_return(
           status: 200,
-          body: { content: [{ text: "hello" }] }.to_json,
+          body: { content: [ { text: "hello" } ] }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
 
       client = described_class.build(provider: :anthropic, api_key: "sk-test")
-      client.call(messages: [{ role: "user", content: "test" }], system: "sys", max_tokens: 100)
+      client.call(messages: [ { role: "user", content: "test" } ], system: "sys", max_tokens: 100)
 
       expect(stub).to have_been_requested
     end
@@ -103,7 +103,7 @@ RSpec.describe AiClientFactory do
     it "raises ArgumentError without a block" do
       client = described_class.build(provider: :anthropic, api_key: "sk-test")
       expect {
-        client.stream(messages: [{ role: "user", content: "test" }], system: "sys")
+        client.stream(messages: [ { role: "user", content: "test" } ], system: "sys")
       }.to raise_error(ArgumentError, "Block required for streaming")
     end
 
@@ -124,11 +124,11 @@ RSpec.describe AiClientFactory do
 
       tokens = []
       client = described_class.build(provider: :anthropic, api_key: "sk-test")
-      client.stream(messages: [{ role: "user", content: "test" }], system: "sys") do |token|
+      client.stream(messages: [ { role: "user", content: "test" } ], system: "sys") do |token|
         tokens << token
       end
 
-      expect(tokens).to eq(["Bonjour", " !"])
+      expect(tokens).to eq([ "Bonjour", " !" ])
     end
 
     it "streams tokens from openai" do
@@ -147,11 +147,11 @@ RSpec.describe AiClientFactory do
 
       tokens = []
       client = described_class.build(provider: :openai, api_key: "sk-test")
-      client.stream(messages: [{ role: "user", content: "test" }], system: "sys") do |token|
+      client.stream(messages: [ { role: "user", content: "test" } ], system: "sys") do |token|
         tokens << token
       end
 
-      expect(tokens).to eq(["Hello", " world"])
+      expect(tokens).to eq([ "Hello", " world" ])
     end
 
     it "streams tokens from google" do
@@ -169,11 +169,11 @@ RSpec.describe AiClientFactory do
 
       tokens = []
       client = described_class.build(provider: :google, api_key: "gk-test")
-      client.stream(messages: [{ role: "user", content: "test" }], system: "sys") do |token|
+      client.stream(messages: [ { role: "user", content: "test" } ], system: "sys") do |token|
         tokens << token
       end
 
-      expect(tokens).to eq(["Salut", " toi"])
+      expect(tokens).to eq([ "Salut", " toi" ])
     end
 
     it "raises on API error" do
@@ -182,7 +182,7 @@ RSpec.describe AiClientFactory do
 
       client = described_class.build(provider: :anthropic, api_key: "bad-key")
       expect {
-        client.stream(messages: [{ role: "user", content: "test" }], system: "sys") { |_t| }
+        client.stream(messages: [ { role: "user", content: "test" } ], system: "sys") { |_t| }
       }.to raise_error(/API error 401/)
     end
   end

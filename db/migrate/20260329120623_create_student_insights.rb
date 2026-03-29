@@ -10,6 +10,6 @@ class CreateStudentInsights < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :student_insights, [:student_id, :subject_id]
+    add_index :student_insights, [ :student_id, :subject_id ]
   end
 end

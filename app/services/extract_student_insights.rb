@@ -43,7 +43,7 @@ class ExtractStudentInsights
     messages_text = @conversation.messages.map { |m| "#{m['role']}: #{m['content']}" }.join("\n\n")
 
     client.call(
-      messages: [{ role: "user", content: messages_text }],
+      messages: [ { role: "user", content: messages_text } ],
       system: EXTRACTION_PROMPT,
       max_tokens: 1024,
       temperature: 0.1

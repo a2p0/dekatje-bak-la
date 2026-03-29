@@ -1,7 +1,7 @@
 # app/controllers/student/conversations_controller.rb
 class Student::ConversationsController < Student::BaseController
-  before_action :require_api_key, only: [:create, :message]
-  before_action :set_conversation, only: [:message]
+  before_action :require_api_key, only: [ :create, :message ]
+  before_action :set_conversation, only: [ :message ]
 
   def create
     question = Question.kept.find(params[:question_id])

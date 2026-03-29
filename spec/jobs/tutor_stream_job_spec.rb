@@ -10,7 +10,7 @@ RSpec.describe TutorStreamJob, type: :job do
     create(:conversation,
       student: student,
       question: question,
-      messages: [{ "role" => "user", "content" => "Bonjour, aide-moi" }]
+      messages: [ { "role" => "user", "content" => "Bonjour, aide-moi" } ]
     )
   end
 

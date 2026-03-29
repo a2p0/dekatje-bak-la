@@ -91,11 +91,11 @@ class AiClientFactory
     when :anthropic
       { model: @model, system: system, messages: messages, max_tokens: max_tokens, temperature: temperature }
     when :openrouter
-      { model: @model, messages: [{ role: "system", content: system }] + messages, max_tokens: max_tokens, temperature: temperature }
+      { model: @model, messages: [ { role: "system", content: system } ] + messages, max_tokens: max_tokens, temperature: temperature }
     when :openai
-      { model: @model, messages: [{ role: "system", content: system }] + messages, max_tokens: max_tokens, temperature: temperature }
+      { model: @model, messages: [ { role: "system", content: system } ] + messages, max_tokens: max_tokens, temperature: temperature }
     when :google
-      { contents: messages.map { |m| { role: m[:role], parts: [{ text: m[:content] }] } }, system_instruction: { parts: [{ text: system }] }, generationConfig: { maxOutputTokens: max_tokens, temperature: temperature } }
+      { contents: messages.map { |m| { role: m[:role], parts: [ { text: m[:content] } ] } }, system_instruction: { parts: [ { text: system } ] }, generationConfig: { maxOutputTokens: max_tokens, temperature: temperature } }
     end
   end
 

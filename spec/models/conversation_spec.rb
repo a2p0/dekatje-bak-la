@@ -43,7 +43,7 @@ RSpec.describe Conversation, type: :model do
     end
 
     it "appends to existing messages" do
-      conversation = create(:conversation, messages: [{ "role" => "user", "content" => "Hello", "at" => Time.current.iso8601 }])
+      conversation = create(:conversation, messages: [ { "role" => "user", "content" => "Hello", "at" => Time.current.iso8601 } ])
       conversation.add_message!(role: "assistant", content: "Bonjour !")
 
       expect(conversation.messages.size).to eq(2)

@@ -64,7 +64,7 @@ class BuildTutorPrompt
   end
 
   def insights_section
-    lines = ["\n\n--- Historique de l'eleve ---"]
+    lines = [ "\n\n--- Historique de l'eleve ---" ]
     insights.each do |insight|
       lines << "- [#{insight.insight_type}] #{insight.concept}: #{insight.text}"
     end
