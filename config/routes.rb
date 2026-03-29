@@ -52,6 +52,11 @@ Rails.application.routes.draw do
     get   "/settings",          to: "student/settings#show",     as: :settings
     patch "/settings",          to: "student/settings#update"
     post  "/settings/test_key", to: "student/settings#test_key", as: :test_key
+    resources :conversations, only: [ :create ], controller: "student/conversations" do
+      member do
+        post :message
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

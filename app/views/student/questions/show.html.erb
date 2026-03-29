@@ -1,5 +1,13 @@
-<div data-controller="sidebar" style="display: flex; min-height: 100vh;">
-  <%# Backdrop (mobile only) %>
+<div data-controller="sidebar chat"
+     data-chat-create-url-value="<%= student_conversations_path(access_code: params[:access_code]) %>"
+     data-chat-message-url-value=""
+     data-chat-question-id-value="<%= @question.id %>"
+     data-chat-has-api-key-value="<%= current_student.api_key.present? %>"
+     data-chat-settings-url-value="<%= student_settings_path(access_code: params[:access_code]) %>"
+     data-chat-conversation-id-value="<%= @conversation&.id %>"
+     style="display: flex; min-height: 100vh;">
+
+  <%# Backdrop sidebar (mobile only) %>
   <div data-sidebar-target="backdrop"
        data-action="click->sidebar#close"
        class="hidden"
@@ -53,6 +61,11 @@
         %>
         <div style="width: <%= pct %>%; height: 100%; background: #7c3aed; border-radius: 2px;"></div>
       </div>
+      <%# Tutor button %>
+      <button data-action="click->chat#open"
+              style="padding: 6px 14px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap;">
+        Tutorat
+      </button>
     </div>
 
     <%# Question card %>
@@ -109,4 +122,7 @@
       <% end %>
     </div>
   </div>
+
+  <%# Chat drawer %>
+  <%= render "student/questions/chat_drawer", conversation: @conversation %>
 </div>
