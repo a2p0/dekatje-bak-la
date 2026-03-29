@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_031316) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_29_120628) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_031316) do
     t.index ["owner_id"], name: "index_classrooms_on_owner_id"
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "messages", default: [], null: false
+    t.string "provider_used"
+    t.bigint "question_id", null: false
+    t.boolean "streaming", default: false, null: false
+    t.bigint "student_id", null: false
+    t.integer "tokens_used", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_conversations_on_question_id"
+    t.index ["student_id", "question_id"], name: "index_conversations_on_student_id_and_question_id"
+    t.index ["student_id"], name: "index_conversations_on_student_id"
+  end
+
   create_table "extraction_jobs", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error_message"
@@ -115,6 +129,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_031316) do
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
     t.index ["part_id", "position"], name: "index_questions_on_part_id_and_position"
     t.index ["part_id"], name: "index_questions_on_part_id"
+  end
+
+  create_table "student_insights", force: :cascade do |t|
+    t.string "concept", null: false
+    t.datetime "created_at", null: false
+    t.string "insight_type", null: false
+    t.bigint "question_id"
+    t.bigint "student_id", null: false
+    t.bigint "subject_id", null: false
+    t.text "text"
+    t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_student_insights_on_question_id"
+    t.index ["student_id", "subject_id"], name: "index_student_insights_on_student_id_and_subject_id"
+    t.index ["student_id"], name: "index_student_insights_on_student_id"
+    t.index ["subject_id"], name: "index_student_insights_on_subject_id"
   end
 
   create_table "student_sessions", force: :cascade do |t|
@@ -178,6 +207,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_031316) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.text "tutor_prompt_template"
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
@@ -191,9 +221,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_031316) do
   add_foreign_key "classroom_subjects", "classrooms"
   add_foreign_key "classroom_subjects", "subjects"
   add_foreign_key "classrooms", "users", column: "owner_id"
+  add_foreign_key "conversations", "questions"
+  add_foreign_key "conversations", "students"
   add_foreign_key "extraction_jobs", "subjects"
   add_foreign_key "parts", "subjects"
   add_foreign_key "questions", "parts"
+  add_foreign_key "student_insights", "questions"
+  add_foreign_key "student_insights", "students"
+  add_foreign_key "student_insights", "subjects"
   add_foreign_key "student_sessions", "students"
   add_foreign_key "student_sessions", "subjects"
   add_foreign_key "students", "classrooms"
