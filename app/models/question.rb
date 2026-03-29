@@ -1,6 +1,7 @@
 class Question < ApplicationRecord
   belongs_to :part
   has_one :answer, dependent: :destroy
+  has_many :conversations, dependent: :destroy
 
   enum :answer_type, {
     text: 0, calculation: 1, argumentation: 2,

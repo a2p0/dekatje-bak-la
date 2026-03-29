@@ -1,3 +1,4 @@
+# app/controllers/student/questions_controller.rb
 class Student::QuestionsController < Student::BaseController
   before_action :set_subject
   before_action :set_question
@@ -8,6 +9,12 @@ class Student::QuestionsController < Student::BaseController
     @parts = @subject.parts.order(:position)
     @questions_in_part = @part.questions.kept.order(:position)
     @session_record.mark_seen!(@question.id)
+
+    # Load existing conversation for this question (if any)
+    @conversation = current_student.conversations.find_by(question: @question)
+
+    # Trigger insight extraction for the previous conversation (if any)
+    extract_previous_insights
   end
 
   def reveal
@@ -45,5 +52,16 @@ class Student::QuestionsController < Student::BaseController
       ss.started_at = Time.current
       ss.last_activity_at = Time.current
     end
+  end
+
+  def extract_previous_insights
+    last_id = session[:last_conversation_id]
+    return unless last_id
+
+    session.delete(:last_conversation_id)
+    conversation = current_student.conversations.find_by(id: last_id)
+    return unless conversation && conversation.question_id != @question.id
+
+    ExtractStudentInsightsJob.perform_later(conversation.id)
   end
 end

@@ -2,7 +2,7 @@
   "models": {
     "main": {
       "provider": "openrouter",
-      "modelId": "deepseek/deepseek-chat-v3-5",
+      "modelId": "deepseek/deepseek-chat-v3-0324",
       "maxTokens": 64000,
       "temperature": 0.2
     },
