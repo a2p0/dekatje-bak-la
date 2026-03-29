@@ -207,12 +207,19 @@ L'application dispose d'une home page, d'une navigation cohérente entre toutes 
 
 ### Edge Cases
 
-- Que se passe-t-il quand un sujet assigné est dépublié pendant qu'un élève y travaille ?
-- Comment le système gère un élève qui tente d'accéder au sujet d'une autre classe ?
-- Que se passe-t-il quand l'extraction IA retourne un JSON invalide ou incomplet ?
-- Comment le système gère la perte de connexion pendant le streaming du tutorat ?
-- Que se passe-t-il si deux enseignants créent des classes avec des paramètres identiques ?
-- Comment le système gère un mot de passe étudiant vide ou trop court ?
+- **Sujet dépublié en cours de travail** : L'élève qui a déjà commencé continue normalement. La dépublication n'affecte que les nouvelles assignations — les élèves ayant déjà accès conservent le sujet.
+- **Accès interdit sujet autre classe** : L'élève est redirigé vers sa liste de sujets. Le scoping par classe empêche l'accès.
+- **Extraction IA retourne JSON invalide** : Le job d'extraction passe en statut "échoué" avec le message d'erreur. L'enseignant peut relancer.
+- **Perte de connexion pendant le streaming** : Le message partiel déjà reçu est affiché avec une mention "Interrompu" et un bouton "Réessayer" permet de relancer la génération.
+- **Classes avec paramètres identiques** : Pas de conflit — le code d'accès est unique par construction (slug déterministe + suffixe numérique si collision).
+- **Mot de passe étudiant** : Généré automatiquement (8 caractères, pas de caractères ambigus). L'élève ne choisit pas son mot de passe — seul l'enseignant peut le réinitialiser.
+
+## Clarifications
+
+### Session 2026-03-29
+
+- Q: Que se passe-t-il quand un sujet assigné est dépublié pendant qu'un élève y travaille ? → A: L'élève continue normalement, la dépublication n'affecte que les nouvelles assignations.
+- Q: Comment le système gère la perte de connexion pendant le streaming du tutorat ? → A: Le message partiel est affiché avec mention "Interrompu" + bouton "Réessayer".
 
 ## Requirements *(mandatory)*
 
