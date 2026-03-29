@@ -4,6 +4,7 @@ class Subject < ApplicationRecord
   has_many :parts, dependent: :destroy
   has_many :classroom_subjects, dependent: :destroy
   has_many :classrooms, through: :classroom_subjects
+  has_many :student_sessions, dependent: :destroy
 
   has_one_attached :enonce_file
   has_one_attached :dt_file
