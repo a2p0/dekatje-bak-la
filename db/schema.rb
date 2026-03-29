@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_172333) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_220745) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -117,6 +117,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_172333) do
     t.index ["part_id"], name: "index_questions_on_part_id"
   end
 
+  create_table "student_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "last_activity_at"
+    t.integer "mode", default: 0, null: false
+    t.jsonb "progression", default: {}, null: false
+    t.datetime "started_at"
+    t.bigint "student_id", null: false
+    t.bigint "subject_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["student_id", "subject_id"], name: "index_student_sessions_on_student_id_and_subject_id", unique: true
+    t.index ["student_id"], name: "index_student_sessions_on_student_id"
+    t.index ["subject_id"], name: "index_student_sessions_on_subject_id"
+  end
+
   create_table "students", force: :cascade do |t|
     t.integer "api_provider", default: 0, null: false
     t.bigint "classroom_id", null: false
@@ -179,6 +193,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_172333) do
   add_foreign_key "extraction_jobs", "subjects"
   add_foreign_key "parts", "subjects"
   add_foreign_key "questions", "parts"
+  add_foreign_key "student_sessions", "students"
+  add_foreign_key "student_sessions", "subjects"
   add_foreign_key "students", "classrooms"
   add_foreign_key "subjects", "users", column: "owner_id"
 end

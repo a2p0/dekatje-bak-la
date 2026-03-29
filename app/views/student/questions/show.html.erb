@@ -1,0 +1,112 @@
+<div data-controller="sidebar" style="display: flex; min-height: 100vh;">
+  <%# Backdrop (mobile only) %>
+  <div data-sidebar-target="backdrop"
+       data-action="click->sidebar#close"
+       class="hidden"
+       style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; display: none;">
+  </div>
+  <style>
+    [data-sidebar-target="backdrop"]:not(.hidden) { display: block !important; }
+    @media (min-width: 1024px) {
+      [data-sidebar-target="backdrop"] { display: none !important; }
+      [data-sidebar-target="drawer"] {
+        transform: none !important;
+        position: relative !important;
+        z-index: auto !important;
+      }
+    }
+  </style>
+
+  <%# Sidebar / Drawer %>
+  <div data-sidebar-target="drawer"
+       style="width: 300px; background: #111827; border-right: 1px solid #374151; flex-shrink: 0;
+              position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+              transform: translateX(-100%); transition: transform 0.2s ease-in-out;
+              overflow-y: auto;">
+    <%= render "student/questions/sidebar",
+        subject: @subject,
+        current_part: @part,
+        current_question: @question,
+        parts: @parts,
+        questions_in_part: @questions_in_part,
+        session_record: @session_record,
+        access_code: params[:access_code] %>
+  </div>
+
+  <%# Main content %>
+  <div style="flex: 1; padding: 16px; max-width: 800px; margin: 0 auto;">
+    <%# Top bar %>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+      <button data-action="click->sidebar#open"
+              style="width: 36px; height: 36px; background: #1e293b; border: none; border-radius: 6px; color: #94a3b8; font-size: 18px; cursor: pointer;">
+        ☰
+      </button>
+      <span style="color: #94a3b8; font-size: 13px;">
+        <%= @part.title %> — Q<%= @question.number %>
+        (<%= @questions_in_part.index(@question).to_i + 1 %>/<%= @questions_in_part.size %>)
+      </span>
+      <div style="flex: 1; height: 4px; background: #1e293b; border-radius: 2px;">
+        <%
+          total = @questions_in_part.size
+          answered = @questions_in_part.count { |q| @session_record.answered?(q.id) }
+          pct = total > 0 ? (answered * 100.0 / total).round : 0
+        %>
+        <div style="width: <%= pct %>%; height: 100%; background: #7c3aed; border-radius: 2px;"></div>
+      </div>
+    </div>
+
+    <%# Question card %>
+    <div style="background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <span style="color: #7c3aed; font-weight: 600; font-size: 14px;">Question <%= @question.number %></span>
+        <span style="background: #7c3aed33; color: #a78bfa; font-size: 11px; padding: 2px 8px; border-radius: 10px;"><%= @question.points %> pts</span>
+      </div>
+      <p style="color: #e2e8f0; font-size: 14px; line-height: 1.5; margin: 0 0 8px;"><%= @question.label %></p>
+      <% if @question.context_text.present? %>
+        <p style="color: #94a3b8; font-size: 13px; line-height: 1.4; margin: 0; font-style: italic;"><%= @question.context_text %></p>
+      <% end %>
+    </div>
+
+    <%# Correction area %>
+    <%= turbo_frame_tag "question_#{@question.id}_correction" do %>
+      <% if @session_record.answered?(@question.id) %>
+        <%= render "student/questions/correction",
+            question: @question, subject: @subject, session_record: @session_record %>
+      <% elsif @question.answer %>
+        <div style="text-align: center; margin-bottom: 16px;">
+          <%= button_to "Voir la correction",
+              student_reveal_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @question.id),
+              method: :patch,
+              data: { turbo_frame: "question_#{@question.id}_correction" },
+              style: "padding: 12px 32px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%# Navigation %>
+    <%
+      idx = @questions_in_part.index(@question).to_i
+      prev_q = idx > 0 ? @questions_in_part[idx - 1] : nil
+      next_q = idx < @questions_in_part.size - 1 ? @questions_in_part[idx + 1] : nil
+    %>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #1e293b;">
+      <% if prev_q %>
+        <%= link_to "← Q#{prev_q.number}",
+            student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: prev_q.id),
+            style: "color: #7c3aed; font-size: 13px; text-decoration: none;" %>
+      <% else %>
+        <span></span>
+      <% end %>
+
+      <% if next_q %>
+        <%= link_to "Question suivante →",
+            student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_q.id),
+            style: "display: inline-block; padding: 10px 24px; background: #22c55e; color: white; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;" %>
+      <% else %>
+        <%= link_to "Retour aux sujets",
+            student_root_path(access_code: params[:access_code]),
+            style: "display: inline-block; padding: 10px 24px; background: #22c55e; color: white; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;" %>
+      <% end %>
+    </div>
+  </div>
+</div>
