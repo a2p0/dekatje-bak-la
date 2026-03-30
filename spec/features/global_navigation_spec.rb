@@ -25,32 +25,34 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
 
   scenario "un enseignant voit un bouton Nouveau sujet et des liens vers chaque sujet sur la liste des sujets" do
     teacher = create(:user, confirmed_at: Time.current)
-    subject = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025")
+    subject_record = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025")
 
     visit new_user_session_path
     fill_in "Email", with: teacher.email
     fill_in "Password", with: "password123"
     click_button "Log in"
+    expect(page).to have_content("Mes classes")
 
-    visit teacher_subjects_path
+    click_link "Mes sujets"
 
     expect(page).to have_link("Nouveau sujet")
-    expect(page).to have_link("BAC STI2D Metropole 2025", href: teacher_subject_path(subject))
+    expect(page).to have_link("BAC STI2D Metropole 2025", href: teacher_subject_path(subject_record))
   end
 
   scenario "un enseignant voit les PDFs, le statut d'extraction, les parties et les stats sur la page d'un sujet" do
     teacher = create(:user, confirmed_at: Time.current)
-    subject = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025", status: :pending_validation)
-    extraction_job = create(:extraction_job, subject: subject, status: :done)
-    part = create(:part, subject: subject, title: "Analyse du système CIME", position: 1)
-    question = create(:question, part: part, position: 1, status: :validated)
+    subject_record = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025", status: :pending_validation)
+    create(:extraction_job, subject: subject_record, status: :done)
+    part = create(:part, subject: subject_record, title: "Analyse du système CIME", position: 1)
+    create(:question, part: part, position: 1, status: :validated)
 
     visit new_user_session_path
     fill_in "Email", with: teacher.email
     fill_in "Password", with: "password123"
     click_button "Log in"
+    expect(page).to have_content("Mes classes")
 
-    visit teacher_subject_path(subject)
+    visit teacher_subject_path(subject_record)
 
     # PDFs section
     expect(page).to have_content("Documents PDF")
@@ -61,7 +63,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     expect(page).to have_content("done")
 
     # Parts with links
-    expect(page).to have_link("Analyse du système CIME", href: teacher_subject_part_path(subject, part))
+    expect(page).to have_link("Analyse du système CIME", href: teacher_subject_part_path(subject_record, part))
 
     # Validation stats
     expect(page).to have_content("Questions validées")
