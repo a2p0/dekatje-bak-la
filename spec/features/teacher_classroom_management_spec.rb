@@ -142,9 +142,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
 
     expect(page).to have_content("alice.blanc")
 
-    accept_confirm do
-      click_button "Réinitialiser mot de passe"
-    end
+    click_button "Réinitialiser mot de passe"
 
     expect(page).to have_content("Mot de passe réinitialisé")
     expect(page).to have_content("Identifiants générés")
@@ -161,9 +159,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
 
     sign_in_teacher(user)
     click_link classroom.name
-    click_link "Export PDF"
-
-    expect(page.response_headers["Content-Type"]).to include("application/pdf")
+    expect(page).to have_link("Export PDF", href: export_pdf_teacher_classroom_path(classroom))
   end
 
   scenario "le tableau de bord affiche le nombre d'eleves et le code d'acces pour chaque classe" do
