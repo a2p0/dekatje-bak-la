@@ -51,13 +51,6 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject) }
 
-  def login_as_student
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
-  end
-
   def visit_question(question)
     visit student_question_path(
       access_code: classroom.access_code,
@@ -67,7 +60,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "cliquer 'Voir la correction' affiche la correction sous la question" do
-    login_as_student
+    login_as_student(student, classroom)
     visit_question(q1)
 
     expect(page).to have_button("Voir la correction")
@@ -77,7 +70,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "la correction affiche le texte, l'explication, les données utiles et les concepts clés" do
-    login_as_student
+    login_as_student(student, classroom)
     visit_question(q1)
     click_button "Voir la correction"
 
@@ -103,7 +96,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "la correction reste visible quand l'élève revient sur la question" do
-    login_as_student
+    login_as_student(student, classroom)
     visit_question(q1)
     click_button "Voir la correction"
 
@@ -119,7 +112,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "après révélation, les documents DR corrigé et questions corrigées apparaissent dans la sidebar" do
-    login_as_student
+    login_as_student(student, classroom)
     visit_question(q1)
 
     # Before reveal: no correction documents
@@ -136,18 +129,18 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "le bouton 'Voir la correction' n'apparaît pas si la question n'a pas de réponse" do
-    login_as_student
+    login_as_student(student, classroom)
     visit_question(q2) # q2 has no answer
 
     expect(page).not_to have_button("Voir la correction")
   end
 
   scenario "après révélation, la question est marquée comme terminée (✓) dans la sidebar" do
-    login_as_student
+    login_as_student(student, classroom)
     visit_question(q1)
 
     # Before reveal: question shown with ○
-    expect(page).to have_link("○ Q1.1 (2 pts)")
+    expect(page).to have_link("○ Q1.1 (2.0 pts)")
 
     click_button "Voir la correction"
 
@@ -155,6 +148,6 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     visit_question(q1)
 
     # After reveal: question shown with ✓
-    expect(page).to have_link("✓ Q1.1 (2 pts)")
+    expect(page).to have_link("✓ Q1.1 (2.0 pts)")
   end
 end
