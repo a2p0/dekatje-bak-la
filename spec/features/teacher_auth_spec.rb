@@ -48,9 +48,7 @@ RSpec.describe "Story 1: Inscription et connexion enseignant", type: :feature do
     expect(page).to have_content("Mes classes")
     click_link "Déconnexion"
 
-    expect(page).to have_current_path(new_user_session_path)
-
-    expect(page).to have_current_path(new_user_session_path)
+    expect(page).to have_current_path(root_path)
   end
 
   scenario "un visiteur non connecté est redirigé vers le login" do
