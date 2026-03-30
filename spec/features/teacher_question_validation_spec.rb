@@ -87,7 +87,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Question à garder")
 
       accept_confirm("Supprimer cette question ?") do
-        first("input[value='Supprimer']").click
+        first("button", text: "Supprimer").click
       end
 
       expect(page).not_to have_content("Question à supprimer")
