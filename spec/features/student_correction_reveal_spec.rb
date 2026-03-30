@@ -74,8 +74,8 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     visit_question(q1)
     click_button "Voir la correction"
 
-    # Correction text (green section)
-    expect(page).to have_content("Correction")
+    # Correction text (green section, rendered uppercase via CSS)
+    expect(page).to have_content(/correction/i)
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
 
     # Explication pédagogique
@@ -115,17 +115,25 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # Before reveal: no correction documents
-    expect(page).not_to have_link("DR corrigé")
-    expect(page).not_to have_link("Questions corrigées")
+    find("[data-action='click->sidebar#open']").click
+
+    # Before reveal: no correction documents in sidebar
+    within("[data-sidebar-target='drawer']") do
+      expect(page).not_to have_link("DR corrigé")
+      expect(page).not_to have_link("Questions corrigées")
+    end
 
     click_button "Voir la correction"
 
     # Reload the page to get the full sidebar with correction documents
     visit_question(q1)
 
-    expect(page).to have_link("DR corrigé")
-    expect(page).to have_link("Questions corrigées")
+    find("[data-action='click->sidebar#open']").click
+
+    within("[data-sidebar-target='drawer']") do
+      expect(page).to have_link("DR corrigé")
+      expect(page).to have_link("Questions corrigées")
+    end
   end
 
   scenario "le bouton 'Voir la correction' n'apparaît pas si la question n'a pas de réponse" do
@@ -139,6 +147,8 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     login_as_student(student, classroom)
     visit_question(q1)
 
+    find("[data-action='click->sidebar#open']").click
+
     # Before reveal: question shown with ○
     expect(page).to have_link("○ Q1.1 (2.0 pts)")
 
@@ -146,6 +156,8 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
     # Reload to see updated sidebar
     visit_question(q1)
+
+    find("[data-action='click->sidebar#open']").click
 
     # After reveal: question shown with ✓
     expect(page).to have_link("✓ Q1.1 (2.0 pts)")
