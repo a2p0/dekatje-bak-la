@@ -60,3 +60,4 @@ node_modules/
 # tasks.json
 # tasks/ 
 .superpowers/
+spec/examples.txt
