@@ -39,8 +39,11 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
 
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
 
-  def do_login
-    login_as_student(student, classroom)
+  def login_as_student
+    visit student_login_path(access_code: classroom.access_code)
+    fill_in "Identifiant", with: student.username
+    fill_in "Mot de passe", with: "password123"
+    click_button "Se connecter"
   end
 
   def visit_question_page
@@ -53,7 +56,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
 
   # Scenario 1: Chat drawer opens on click
   scenario "le chat s'ouvre dans un drawer quand l'eleve clique Tutorat", js: true do
-    do_login
+    login_as_student
     visit_question_page
 
     # Drawer should initially not be visible (off-screen)
@@ -75,7 +78,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
 
   # Scenario 1 (close): Chat drawer closes on close button click
   scenario "le chat se ferme au clic sur le bouton fermer", js: true do
-    do_login
+    login_as_student
     visit_question_page
 
     click_button "Tutorat"
@@ -92,7 +95,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
 
   # Scenario 2: Message is sent and TutorStreamJob is enqueued
   scenario "envoyer un message cree la conversation et enqueue le job de streaming", js: true do
-    do_login
+    login_as_student
     visit_question_page
 
     click_button "Tutorat"
@@ -145,7 +148,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
       ]
     )
 
-    do_login
+    login_as_student
     visit_question_page
 
     click_button "Tutorat"
@@ -190,7 +193,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
 
   # Scenario 7: Input is disabled during streaming
   scenario "l'input est desactive pendant le streaming", js: true do
-    do_login
+    login_as_student
     visit_question_page
 
     click_button "Tutorat"

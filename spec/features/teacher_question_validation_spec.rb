@@ -47,9 +47,6 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       click_button "Valider"
 
-      # Reload the page since the response is a turbo stream (not processed without JS)
-      visit teacher_subject_part_path(subject_record, part)
-
       expect(page).to have_content("[validated]")
       expect(page).to have_button("Invalider")
       expect(page).not_to have_button("Valider")
@@ -70,9 +67,6 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       fill_in "Points", with: "4.5"
       click_button "Sauvegarder"
 
-      # Reload the page since the response is a turbo stream (not processed without JS)
-      visit teacher_subject_part_path(subject_record, part)
-
       expect(page).to have_content("Nouvel énoncé modifié")
       expect(page).to have_content("4.5 pts")
       expect(question.reload.label).to eq("Nouvel énoncé modifié")
@@ -92,10 +86,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Question à supprimer")
       expect(page).to have_content("Question à garder")
 
-      first("button", text: "Supprimer").click
-
-      # Reload the page since the response is a turbo stream (not processed without JS)
-      visit teacher_subject_part_path(subject_record, part)
+      accept_confirm("Supprimer cette question ?") do
+        first("input[value='Supprimer']").click
+      end
 
       expect(page).not_to have_content("Question à supprimer")
       expect(page).to have_content("Question à garder")
@@ -112,7 +105,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       visit teacher_subject_path(subject_record)
 
-      click_button "Publier le sujet"
+      accept_confirm("Publier ce sujet ?") do
+        click_button "Publier le sujet"
+      end
 
       expect(page).to have_content("Sujet publié")
       expect(page).to have_content("Assigner")
@@ -164,7 +159,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       expect(page).to have_content("published")
 
-      click_button "Dépublier"
+      accept_confirm("Dépublier ce sujet ?") do
+        click_button "Dépublier"
+      end
 
       expect(page).to have_content("Sujet dépublié")
       expect(subject_record.reload.status).to eq("draft")

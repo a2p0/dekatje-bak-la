@@ -60,8 +60,11 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
 
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject) }
 
-  def do_login
-    login_as_student(student, classroom)
+  def login_as_student
+    visit student_login_path(access_code: classroom.access_code)
+    fill_in "Identifiant", with: student.username
+    fill_in "Mot de passe", with: "password123"
+    click_button "Se connecter"
   end
 
   def visit_question(question)
@@ -73,7 +76,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "la sidebar affiche la mise en situation, l'objectif et les documents" do
-    do_login
+    login_as_student
     visit_question(q1)
 
     expect(page).to have_content("La société CIME fabrique des véhicules électriques.")
@@ -83,17 +86,17 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "sur desktop la sidebar est visible en permanence", js: true do
-    do_login
+    login_as_student
     page.driver.browser.manage.window.resize_to(1400, 900)
     visit_question(q1)
 
     sidebar = find("[data-sidebar-target='drawer']")
-    expect(sidebar).to have_content(/mise en situation/i)
+    expect(sidebar).to have_content("Mise en situation")
     expect(sidebar).to have_content("La société CIME fabrique des véhicules électriques.")
   end
 
   scenario "sur mobile la sidebar s'ouvre via le menu hamburger", js: true do
-    do_login
+    login_as_student
     page.driver.browser.manage.window.resize_to(375, 812)
     visit_question(q1)
 
@@ -104,12 +107,12 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     find("[data-action='click->sidebar#open']").click
 
     # After opening, sidebar should contain context
-    expect(sidebar).to have_content(/mise en situation/i)
+    expect(sidebar).to have_content("Mise en situation")
     expect(sidebar).to have_content("La société CIME fabrique des véhicules électriques.")
   end
 
   scenario "cliquer Question suivante affiche la question suivante" do
-    do_login
+    login_as_student
     visit_question(q1)
 
     expect(page).to have_content("Calculer la consommation en litres pour 186 km.")
@@ -120,7 +123,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "sur la dernière question de la partie, le bouton redirige vers les sujets" do
-    do_login
+    login_as_student
     visit_question(q2)
 
     expect(page).not_to have_link("Question suivante")
@@ -130,7 +133,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "cliquer sur une autre question dans la sidebar redirige vers cette question" do
-    do_login
+    login_as_student
     visit_question(q1)
 
     click_link "Q1.2 (3 pts)"
@@ -139,7 +142,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "cliquer sur une autre partie redirige vers le subject show" do
-    do_login
+    login_as_student
     visit_question(q1)
 
     click_link(/Analyse fonctionnelle/)
@@ -148,7 +151,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "un lien DT s'ouvre dans un nouvel onglet" do
-    do_login
+    login_as_student
     visit_question(q1)
 
     dt_link = find_link("Documents Techniques (DT)")
@@ -156,7 +159,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   scenario "avant correction, le DR corrigé et les questions corrigées ne sont pas visibles" do
-    do_login
+    login_as_student
     visit_question(q1)
 
     expect(page).to have_link("Documents Techniques (DT)")
