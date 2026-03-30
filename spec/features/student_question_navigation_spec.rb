@@ -72,10 +72,14 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
-    expect(page).to have_content("La société CIME fabrique des véhicules électriques.")
-    expect(page).to have_content("Comparer les modes de transport en termes d'impact environnemental.")
-    expect(page).to have_link("Documents Techniques (DT)")
-    expect(page).to have_link("DR vierge")
+    find("[data-action='click->sidebar#open']").click
+
+    within("[data-sidebar-target='drawer']") do
+      expect(page).to have_content("La société CIME fabrique des véhicules électriques.")
+      expect(page).to have_content("Comparer les modes de transport en termes d'impact environnemental.")
+      expect(page).to have_link("Documents Techniques (DT)")
+      expect(page).to have_link("DR vierge")
+    end
   end
 
   scenario "sur desktop la sidebar est visible en permanence", js: true do
@@ -83,9 +87,9 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     page.driver.browser.manage.window.resize_to(1400, 900)
     visit_question(q1)
 
-    sidebar = find("[data-sidebar-target='drawer']")
-    expect(sidebar).to have_content(/mise en situation/i)
-    expect(sidebar).to have_content("La société CIME fabrique des véhicules électriques.")
+    sidebar = find("[data-sidebar-target='drawer']", visible: :all)
+    expect(sidebar).to have_content(/mise en situation/i, visible: :all)
+    expect(sidebar).to have_content("La société CIME fabrique des véhicules électriques.", visible: :all)
   end
 
   scenario "sur mobile la sidebar s'ouvre via le menu hamburger", js: true do
@@ -94,10 +98,11 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     visit_question(q1)
 
     # Sidebar drawer should be hidden (translated offscreen) on mobile
-    sidebar = find("[data-sidebar-target='drawer']")
+    sidebar = find("[data-sidebar-target='drawer']", visible: :all)
 
     # Click hamburger to open
     find("[data-action='click->sidebar#open']").click
+    sleep 0.3
 
     # After opening, sidebar should contain context
     expect(sidebar).to have_content(/mise en situation/i)
@@ -129,6 +134,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
+    find("[data-action='click->sidebar#open']").click
     click_link "○ Q1.2 (3.0 pts)"
 
     expect(page).to have_content("Comparer les émissions de CO2 des deux véhicules.")
@@ -138,6 +144,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
+    find("[data-action='click->sidebar#open']").click
     click_link "Analyse fonctionnelle (0/1)"
 
     expect(page).to have_content("Identifier les fonctions du système CIME.")
@@ -147,6 +154,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
+    find("[data-action='click->sidebar#open']").click
     dt_link = find_link("📄 Documents Techniques (DT)")
     expect(dt_link[:target]).to eq("_blank")
   end
@@ -155,9 +163,13 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
-    expect(page).to have_link("Documents Techniques (DT)")
-    expect(page).to have_link("DR vierge")
-    expect(page).not_to have_link("DR corrigé")
-    expect(page).not_to have_link("Questions corrigées")
+    find("[data-action='click->sidebar#open']").click
+
+    within("[data-sidebar-target='drawer']") do
+      expect(page).to have_link("Documents Techniques (DT)")
+      expect(page).to have_link("DR vierge")
+      expect(page).not_to have_link("DR corrigé")
+      expect(page).not_to have_link("Questions corrigées")
+    end
   end
 end
