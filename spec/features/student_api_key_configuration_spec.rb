@@ -37,15 +37,12 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
 
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
 
-  def login_as_student
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
+  def do_login
+    login_as_student(student, classroom)
   end
 
   scenario "l'élève accède aux réglages via le lien dans la liste des sujets" do
-    login_as_student
+    do_login
 
     click_link "Réglages"
 
@@ -55,7 +52,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   end
 
   scenario "l'élève accède aux réglages via le lien dans la sidebar de la question", js: true do
-    login_as_student
+    do_login
     visit student_question_path(
       access_code: classroom.access_code,
       subject_id: subject_record.id,
@@ -69,7 +66,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   end
 
   scenario "changer le provider met à jour la liste des modèles", js: true do
-    login_as_student
+    do_login
     visit student_settings_path(access_code: classroom.access_code)
 
     # Default provider is openrouter (api_provider: 0)
@@ -98,7 +95,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   scenario "tester une clé API valide affiche un message de succès vert", js: true do
     allow(ValidateStudentApiKey).to receive(:call).and_return({ valid: true })
 
-    login_as_student
+    do_login
     visit student_settings_path(access_code: classroom.access_code)
 
     fill_in "Clé API", with: "sk-test-valid-key-123"
@@ -111,7 +108,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   scenario "tester une clé API invalide affiche un message d'erreur rouge", js: true do
     allow(ValidateStudentApiKey).to receive(:call).and_return({ valid: false, error: "Clé API invalide ou expirée." })
 
-    login_as_student
+    do_login
     visit student_settings_path(access_code: classroom.access_code)
 
     fill_in "Clé API", with: "sk-invalid-key"
@@ -121,7 +118,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   end
 
   scenario "enregistrer les réglages sauvegarde et affiche une confirmation" do
-    login_as_student
+    do_login
     visit student_settings_path(access_code: classroom.access_code)
 
     select "Anthropic", from: "Provider"
@@ -136,7 +133,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   end
 
   scenario "le champ clé API bascule entre masqué et visible au clic sur l'icône oeil", js: true do
-    login_as_student
+    do_login
     visit student_settings_path(access_code: classroom.access_code)
 
     fill_in "Clé API", with: "sk-secret-key"
@@ -161,7 +158,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
     # Student has no api_key configured
     expect(student.api_key).to be_blank
 
-    login_as_student
+    do_login
     visit student_question_path(
       access_code: classroom.access_code,
       subject_id: subject_record.id,

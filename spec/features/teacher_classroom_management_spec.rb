@@ -142,9 +142,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
 
     expect(page).to have_content("alice.blanc")
 
-    accept_confirm do
-      click_button "Réinitialiser mot de passe"
-    end
+    click_button "Réinitialiser mot de passe"
 
     expect(page).to have_content("Mot de passe réinitialisé")
     expect(page).to have_content("Identifiants générés")

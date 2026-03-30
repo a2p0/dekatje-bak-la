@@ -90,10 +90,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     part = create(:part, subject: subject, position: 1)
     question = create(:question, part: part, position: 1, label: "Calculer la consommation")
 
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
+    login_as_student(student, classroom)
 
     # On the subjects index page
     expect(page).to have_link(text: /Réglages/)

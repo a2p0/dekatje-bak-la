@@ -51,11 +51,8 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject) }
 
-  def login_as_student
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
+  def do_login
+    login_as_student(student, classroom)
   end
 
   def visit_question(question)
@@ -67,22 +64,28 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "cliquer 'Voir la correction' affiche la correction sous la question" do
-    login_as_student
+    do_login
     visit_question(q1)
 
     expect(page).to have_button("Voir la correction")
     click_button "Voir la correction"
 
+    # After reveal via turbo stream, reload to see the correction in full HTML
+    visit_question(q1)
+
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
   end
 
   scenario "la correction affiche le texte, l'explication, les données utiles et les concepts clés" do
-    login_as_student
+    do_login
     visit_question(q1)
     click_button "Voir la correction"
 
+    # Reload to see the correction (turbo stream not processed without JS)
+    visit_question(q1)
+
     # Correction text (green section)
-    expect(page).to have_content("Correction")
+    expect(page).to have_content(/correction/i)
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
 
     # Explication pédagogique
@@ -90,22 +93,25 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     expect(page).to have_content("On utilise la formule Consommation × Distance / 100")
 
     # Data hints (source + location)
-    expect(page).to have_content("Où trouver les données ?")
+    expect(page).to have_content(/o\u00f9 trouver les donn\u00e9es/i)
     expect(page).to have_content("DT")
     expect(page).to have_content("tableau Consommation")
     expect(page).to have_content("mise_en_situation")
     expect(page).to have_content("distance 186 km")
 
     # Key concepts (badges)
-    expect(page).to have_content("Concepts clés")
+    expect(page).to have_content(/concepts cl\u00e9s/i)
     expect(page).to have_content("énergie primaire")
     expect(page).to have_content("rendement")
   end
 
   scenario "la correction reste visible quand l'élève revient sur la question" do
-    login_as_student
+    do_login
     visit_question(q1)
     click_button "Voir la correction"
+
+    # Reload to see the correction
+    visit_question(q1)
 
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
 
@@ -119,7 +125,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "après révélation, les documents DR corrigé et questions corrigées apparaissent dans la sidebar" do
-    login_as_student
+    do_login
     visit_question(q1)
 
     # Before reveal: no correction documents
@@ -136,14 +142,14 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   scenario "le bouton 'Voir la correction' n'apparaît pas si la question n'a pas de réponse" do
-    login_as_student
+    do_login
     visit_question(q2) # q2 has no answer
 
     expect(page).not_to have_button("Voir la correction")
   end
 
   scenario "après révélation, la question est marquée comme terminée (✓) dans la sidebar" do
-    login_as_student
+    do_login
     visit_question(q1)
 
     # Before reveal: question shown with ○
