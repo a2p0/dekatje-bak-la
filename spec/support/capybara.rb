@@ -8,16 +8,19 @@ Capybara.server = :puma, { Threads: "4:4", Silent: true }
 
 Capybara.register_driver :headless_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.binary = "/usr/bin/chromium-browser"
+  chrome_binary = ["/usr/bin/chromium-browser", "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable"].find { |p| File.exist?(p) }
+  options.binary = chrome_binary if chrome_binary
   options.add_argument("--headless=new")
   options.add_argument("--no-sandbox")
   options.add_argument("--disable-gpu")
   options.add_argument("--disable-dev-shm-usage")
   options.add_argument("--window-size=1400,900")
 
-  # Use local chromedriver directly — bypass Selenium Manager network calls
-  service = Selenium::WebDriver::Service.chrome(path: "/usr/bin/chromedriver")
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options, service: service)
+  # Use local chromedriver if available — bypass Selenium Manager network calls
+  chromedriver_path = ["/usr/bin/chromedriver", "/usr/local/bin/chromedriver"].find { |p| File.exist?(p) }
+  driver_opts = { browser: :chrome, options: options }
+  driver_opts[:service] = Selenium::WebDriver::Service.chrome(path: chromedriver_path) if chromedriver_path
+  Capybara::Selenium::Driver.new(app, **driver_opts)
 end
 
 Capybara.default_driver = :rack_test
