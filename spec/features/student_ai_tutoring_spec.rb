@@ -82,8 +82,9 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
       find("button", text: "\u2715").click
     end
 
-    # Drawer should be hidden again
-    expect(page).to have_no_css("[data-chat-target='drawer']", visible: true, wait: 2)
+    # Drawer should be translated offscreen again
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer[:style]).to include("translateX(100%)")
   end
 
   # Scenario 2: Message is sent and TutorStreamJob is enqueued
