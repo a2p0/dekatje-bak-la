@@ -14,6 +14,7 @@ development:
 
 test:
   <<: *default
+  url: <%= ENV.fetch("DATABASE_TEST_URL", "postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test") %>
 
 production:
   primary: &primary_production
