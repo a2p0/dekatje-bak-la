@@ -59,7 +59,7 @@ Rails.application.routes.draw do
     end
   end
 
-  root to: redirect("/teacher")
+  root to: "pages#home"
 
   get "up" => "rails/health#show", as: :rails_health_check
 end

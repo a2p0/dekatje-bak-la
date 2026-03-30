@@ -1,0 +1,35 @@
+<div style="max-width: 600px; margin: 80px auto; text-align: center; padding: 24px;">
+  <h1>DekatjeBakLa</h1>
+  <p style="color: #94a3b8; margin-bottom: 32px;">Entraînement aux examens BAC</p>
+
+  <div style="margin-bottom: 32px;">
+    <%= link_to "Connexion enseignant", new_user_session_path,
+        style: "display: inline-block; padding: 12px 32px; background: #7c3aed; color: white; border-radius: 6px; text-decoration: none; font-size: 14px;" %>
+  </div>
+
+  <hr style="border-color: #374151; margin: 32px 0;">
+
+  <h2 style="font-size: 18px; margin-bottom: 16px;">Espace élève</h2>
+
+  <%= form_tag nil, method: :get, id: "student-access-form", data: { controller: "access-code" } do %>
+    <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+      <label for="access_code" style="font-size: 14px;">Code d'accès</label>
+      <%= text_field_tag :access_code, nil,
+          placeholder: "ex: terminale-sin-2026",
+          id: "access_code",
+          style: "padding: 10px 14px; border: 1px solid #374151; border-radius: 6px; font-size: 14px;" %>
+      <%= submit_tag "Accéder",
+          style: "padding: 10px 24px; background: #22c55e; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" %>
+    </div>
+  <% end %>
+
+  <script>
+    document.getElementById("student-access-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var code = this.querySelector("[name='access_code']").value.trim();
+      if (code) {
+        window.location.href = "/" + encodeURIComponent(code);
+      }
+    });
+  </script>
+</div>
