@@ -6,7 +6,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
   scenario "un élève accède au formulaire de connexion via le code d'accès" do
     visit student_login_path(access_code: classroom.access_code)
 
-    expect(page).to have_content("Connexion — Terminale SIN 2026")
+    expect(page).to have_content("Terminale SIN 2026")
     expect(page).to have_field("Identifiant")
     expect(page).to have_field("Mot de passe")
     expect(page).to have_button("Se connecter")
@@ -57,8 +57,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     click_button "Se connecter"
 
     expect(page).to have_content("BAC STI2D Metropole 2025")
-    expect(page).to have_content("0/2 questions")
-    expect(page).to have_content("0%")
+    expect(page).to have_content("0/2 — 0%")
     expect(page).not_to have_content("Sujet Brouillon")
     expect(page).not_to have_content("Sujet Autre Classe")
   end
@@ -117,9 +116,9 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
 
     expect(page).to have_content("Mes sujets")
 
-    click_link "Se déconnecter"
+    click_link "Déconnexion"
 
     expect(page).to have_content("Vous êtes déconnecté")
-    expect(page).to have_content("Connexion — Terminale SIN 2026")
+    expect(page).to have_content("Terminale SIN 2026")
   end
 end
