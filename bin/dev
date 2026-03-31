@@ -5,4 +5,9 @@ if ! command -v foreman &> /dev/null; then
   gem install foreman
 fi
 
+# Start Docker services (Redis + PostgreSQL) if not already running
+if command -v docker &> /dev/null; then
+  docker compose up -d 2>/dev/null
+fi
+
 exec foreman start -f Procfile.dev "$@"
