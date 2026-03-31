@@ -85,7 +85,7 @@ RSpec.describe AiClientFactory do
 
     it "uses default model when none specified" do
       stub = stub_request(:post, "https://api.anthropic.com/v1/messages")
-        .with(body: hash_including("model" => "claude-sonnet-4-5-20251001"))
+        .with(body: hash_including("model" => "claude-sonnet-4-6"))
         .to_return(
           status: 200,
           body: { content: [ { text: "hello" } ] }.to_json,
