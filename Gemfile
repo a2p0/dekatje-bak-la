@@ -22,6 +22,7 @@ gem "jbuilder"
 gem "devise"
 
 gem "sidekiq"
+gem "redis"
 
 gem "pdf-reader"
 
