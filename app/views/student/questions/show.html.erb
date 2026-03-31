@@ -5,32 +5,19 @@
      data-chat-has-api-key-value="<%= current_student.api_key.present? %>"
      data-chat-settings-url-value="<%= student_settings_path(access_code: params[:access_code]) %>"
      data-chat-conversation-id-value="<%= @conversation&.id %>"
-     style="display: flex; min-height: 100vh;">
+     class="flex min-h-screen">
 
-  <%# Backdrop sidebar (mobile only) %>
+  <%# Backdrop (mobile only) %>
   <div data-sidebar-target="backdrop"
        data-action="click->sidebar#close"
-       class="hidden"
-       style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; display: none;">
+       class="hidden fixed inset-0 bg-black/50 z-40 lg:hidden">
   </div>
-  <style>
-    [data-sidebar-target="backdrop"]:not(.hidden) { display: block !important; }
-    @media (min-width: 1024px) {
-      [data-sidebar-target="backdrop"] { display: none !important; }
-      [data-sidebar-target="drawer"] {
-        transform: none !important;
-        position: relative !important;
-        z-index: auto !important;
-      }
-    }
-  </style>
 
-  <%# Sidebar / Drawer %>
-  <div data-sidebar-target="drawer"
-       style="width: 300px; background: #111827; border-right: 1px solid #374151; flex-shrink: 0;
-              position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
-              transform: translateX(-100%); transition: transform 0.2s ease-in-out;
-              overflow-y: auto;">
+  <%# Sidebar as aside %>
+  <aside data-sidebar-target="drawer"
+         class="w-[260px] bg-slate-900 border-r border-slate-800 flex-shrink-0 overflow-y-auto
+                fixed top-0 left-0 bottom-0 z-50 -translate-x-full transition-transform duration-200
+                lg:relative lg:translate-x-0 lg:z-auto">
     <%= render "student/questions/sidebar",
         subject: @subject,
         current_part: @part,
@@ -39,44 +26,44 @@
         questions_in_part: @questions_in_part,
         session_record: @session_record,
         access_code: params[:access_code] %>
-  </div>
+  </aside>
 
   <%# Main content %>
-  <div style="flex: 1; padding: 16px; max-width: 800px; margin: 0 auto;">
+  <div class="flex-1 px-4 py-5 max-w-3xl mx-auto w-full">
+
     <%# Top bar %>
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+    <div class="flex items-center gap-2.5 mb-5">
       <button data-action="click->sidebar#open"
-              style="width: 36px; height: 36px; background: #1e293b; border: none; border-radius: 6px; color: #94a3b8; font-size: 18px; cursor: pointer;">
+              class="w-9 h-9 flex items-center justify-center bg-slate-800 border-0 rounded-md text-slate-400 text-lg cursor-pointer hover:bg-slate-700 transition-colors lg:hidden">
         ☰
       </button>
-      <span style="color: #94a3b8; font-size: 13px;">
+      <span class="text-slate-400 text-[13px]">
         <%= @part.title %> — Q<%= @question.number %>
         (<%= @questions_in_part.index(@question).to_i + 1 %>/<%= @questions_in_part.size %>)
       </span>
-      <div style="flex: 1; height: 4px; background: #1e293b; border-radius: 2px;">
-        <%
-          total = @questions_in_part.size
-          answered = @questions_in_part.count { |q| @session_record.answered?(q.id) }
-          pct = total > 0 ? (answered * 100.0 / total).round : 0
-        %>
-        <div style="width: <%= pct %>%; height: 100%; background: #7c3aed; border-radius: 2px;"></div>
+      <%
+        total = @questions_in_part.size
+        answered = @questions_in_part.count { |q| @session_record.answered?(q.id) }
+      %>
+      <div class="flex-1">
+        <%= render(ProgressBarComponent.new(current: answered, total: total, color: :indigo)) %>
       </div>
       <%# Tutor button %>
       <button data-action="click->chat#open"
-              style="padding: 6px 14px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; white-space: nowrap;">
+              class="px-3.5 py-1.5 bg-indigo-600 text-white border-0 rounded-md text-[13px] cursor-pointer whitespace-nowrap hover:bg-indigo-700 transition-colors">
         Tutorat
       </button>
     </div>
 
     <%# Question card %>
-    <div style="background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="color: #7c3aed; font-weight: 600; font-size: 14px;">Question <%= @question.number %></span>
-        <span style="background: #7c3aed33; color: #a78bfa; font-size: 11px; padding: 2px 8px; border-radius: 10px;"><%= @question.points %> pts</span>
+    <div class="bg-slate-800 dark:bg-slate-800 rounded-lg p-4 mb-4 border border-slate-700">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-indigo-400 font-semibold text-sm">Question <%= @question.number %></span>
+        <%= render(BadgeComponent.new(color: :indigo, label: "#{@question.points} pts")) %>
       </div>
-      <p style="color: #e2e8f0; font-size: 14px; line-height: 1.5; margin: 0 0 8px;"><%= @question.label %></p>
+      <p class="text-slate-200 text-sm leading-relaxed mb-2"><%= @question.label %></p>
       <% if @question.context_text.present? %>
-        <p style="color: #94a3b8; font-size: 13px; line-height: 1.4; margin: 0; font-style: italic;"><%= @question.context_text %></p>
+        <p class="text-slate-400 text-[13px] leading-snug italic"><%= @question.context_text %></p>
       <% end %>
     </div>
 
@@ -86,12 +73,12 @@
         <%= render "student/questions/correction",
             question: @question, subject: @subject, session_record: @session_record %>
       <% elsif @question.answer %>
-        <div style="text-align: center; margin-bottom: 16px;">
+        <div class="text-center mb-4">
           <%= button_to "Voir la correction",
               student_reveal_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @question.id),
               method: :patch,
               data: { turbo_frame: "question_#{@question.id}_correction" },
-              style: "padding: 12px 32px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" %>
+              class: "px-8 py-3 bg-indigo-600 text-white border-0 rounded-lg text-sm cursor-pointer hover:bg-indigo-700 transition-colors font-semibold" %>
         </div>
       <% end %>
     <% end %>
@@ -102,11 +89,11 @@
       prev_q = idx > 0 ? @questions_in_part[idx - 1] : nil
       next_q = idx < @questions_in_part.size - 1 ? @questions_in_part[idx + 1] : nil
     %>
-    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #1e293b;">
+    <div class="flex justify-between items-center pt-4 border-t border-slate-800 mt-2">
       <% if prev_q %>
         <%= link_to "← Q#{prev_q.number}",
             student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: prev_q.id),
-            style: "color: #7c3aed; font-size: 13px; text-decoration: none;" %>
+            class: "text-indigo-400 text-[13px] no-underline hover:text-indigo-300 transition-colors" %>
       <% else %>
         <span></span>
       <% end %>
@@ -114,11 +101,11 @@
       <% if next_q %>
         <%= link_to "Question suivante →",
             student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_q.id),
-            style: "display: inline-block; padding: 10px 24px; background: #22c55e; color: white; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
       <% else %>
         <%= link_to "Retour aux sujets",
             student_root_path(access_code: params[:access_code]),
-            style: "display: inline-block; padding: 10px 24px; background: #22c55e; color: white; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
       <% end %>
     </div>
   </div>

@@ -1,28 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html class="dark">
   <head>
     <title>DekatjeBakLa — Espace enseignant</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <script>
+      (function() {
+        var stored = localStorage.getItem('theme');
+        if (stored === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else if (!stored && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
-  <body>
-    <nav>
-      <strong>DekatjeBakLa</strong>
-      <%= link_to "Mes classes", teacher_root_path %>
-      <%= link_to "Mes sujets", teacher_subjects_path %>
-      <%= link_to "Déconnexion", destroy_user_session_path, data: { turbo_method: :delete } %>
-    </nav>
 
-    <% if notice %>
-      <p style="color: green;"><%= notice %></p>
-    <% end %>
-    <% if alert %>
-      <p style="color: red;"><%= alert %></p>
-    <% end %>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen"
+        data-controller="theme">
+    <%= render(NavBarComponent.new) do |nav|
+      nav.with_brand { link_to "DekatjeBakLa", teacher_root_path, class: "text-base font-semibold text-slate-800 dark:text-slate-200 no-underline" }
+      nav.with_link(href: teacher_root_path, label: "Mes classes")
+      nav.with_link(href: teacher_subjects_path, label: "Mes sujets")
+      nav.with_actions do
+        render(ThemeToggleComponent.new) +
+        link_to("Déconnexion", destroy_user_session_path, data: { turbo_method: :delete },
+          class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
+      end
+    end %>
 
-    <%= yield %>
+    <main class="max-w-6xl mx-auto px-4 py-6">
+      <% if notice.present? %>
+        <div class="mb-4">
+          <%= render(FlashComponent.new(type: :notice, message: notice)) %>
+        </div>
+      <% end %>
+      <% if alert.present? %>
+        <div class="mb-4">
+          <%= render(FlashComponent.new(type: :alert, message: alert)) %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
   </body>
 </html>

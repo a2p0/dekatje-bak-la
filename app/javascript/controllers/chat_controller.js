@@ -35,8 +35,9 @@ export default class extends Controller {
       return
     }
 
-    this.drawerTarget.style.transform = "translateX(0)"
-    this.backdropTarget.style.display = "block"
+    this.drawerTarget.classList.remove("translate-x-full")
+    this.drawerTarget.classList.add("translate-x-0")
+    this.backdropTarget.classList.remove("hidden")
 
     if (!this.conversationIdValue) {
       this.createConversation()
@@ -47,8 +48,9 @@ export default class extends Controller {
   }
 
   close() {
-    this.drawerTarget.style.transform = "translateX(100%)"
-    this.backdropTarget.style.display = "none"
+    this.drawerTarget.classList.add("translate-x-full")
+    this.drawerTarget.classList.remove("translate-x-0")
+    this.backdropTarget.classList.add("hidden")
   }
 
   async createConversation() {
@@ -144,7 +146,7 @@ export default class extends Controller {
   }
 
   onToken(token) {
-    this.streamingTarget.style.display = "block"
+    this.streamingTarget.classList.remove("hidden")
     this.streamingTarget.textContent += token
     this.scrollToBottom()
   }
@@ -155,20 +157,24 @@ export default class extends Controller {
       this.appendAssistantMessage(content)
     }
     this.streamingTarget.textContent = ""
-    this.streamingTarget.style.display = "none"
+    this.streamingTarget.classList.add("hidden")
     this.setStreaming(false)
   }
 
   onError(message) {
     this.streamingTarget.textContent = ""
-    this.streamingTarget.style.display = "none"
+    this.streamingTarget.classList.add("hidden")
     this.showError(message)
     this.setStreaming(false)
   }
 
   appendUserMessage(content) {
     const div = document.createElement("div")
-    div.style.cssText = "align-self: flex-end; background: #7c3aed; color: white; padding: 8px 12px; border-radius: 12px 12px 2px 12px; max-width: 85%; font-size: 13px; line-height: 1.4; word-break: break-word;"
+    div.classList.add(
+      "self-end", "bg-indigo-500", "text-white",
+      "px-3", "py-2", "rounded-xl", "rounded-br-sm",
+      "max-w-[85%]", "text-sm", "leading-relaxed", "break-words"
+    )
     div.textContent = content
     this.messagesTarget.appendChild(div)
     this.scrollToBottom()
@@ -176,7 +182,12 @@ export default class extends Controller {
 
   appendAssistantMessage(content) {
     const div = document.createElement("div")
-    div.style.cssText = "align-self: flex-start; background: #1e293b; color: #e2e8f0; padding: 8px 12px; border-radius: 12px 12px 12px 2px; max-width: 85%; font-size: 13px; line-height: 1.4; word-break: break-word;"
+    div.classList.add(
+      "self-start", "bg-slate-100", "dark:bg-slate-800",
+      "text-slate-800", "dark:text-slate-200",
+      "px-3", "py-2", "rounded-xl", "rounded-bl-sm",
+      "max-w-[85%]", "text-sm", "leading-relaxed", "break-words"
+    )
     div.textContent = content
     this.messagesTarget.appendChild(div)
     this.scrollToBottom()
@@ -186,17 +197,21 @@ export default class extends Controller {
     this.isStreaming = value
     this.inputTarget.disabled = value
     this.sendButtonTarget.disabled = value
-    this.sendButtonTarget.style.opacity = value ? "0.5" : "1"
+    if (value) {
+      this.sendButtonTarget.classList.add("opacity-50")
+    } else {
+      this.sendButtonTarget.classList.remove("opacity-50")
+    }
   }
 
   showError(message) {
     this.errorTarget.textContent = message
-    this.errorTarget.style.display = "block"
+    this.errorTarget.classList.remove("hidden")
   }
 
   hideError() {
     this.errorTarget.textContent = ""
-    this.errorTarget.style.display = "none"
+    this.errorTarget.classList.add("hidden")
   }
 
   scrollToBottom() {

@@ -2,28 +2,41 @@
               scope: :question,
               method: :patch,
               data: { turbo_frame: dom_id(question) } do |f| %>
-  <div>
-    <%= f.label :label, "Énoncé" %>
-    <%= f.text_area :label, value: question.label, rows: 3, style: "width:100%" %>
-  </div>
+  <div class="mt-4 space-y-3 border-t border-slate-100 dark:border-slate-700 pt-4">
+    <div>
+      <%= f.label :label, "Énoncé",
+          class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
+      <%= f.text_area :label, value: question.label, rows: 3,
+          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+    </div>
 
-  <div>
-    <%= f.label :points, "Points" %>
-    <%= f.number_field :points, value: question.points, step: 0.5 %>
-  </div>
+    <div>
+      <%= f.label :points, "Points",
+          class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
+      <%= f.number_field :points, value: question.points, step: 0.5,
+          class: "rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 w-24 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+    </div>
 
-  <% if question.answer %>
-    <%= fields_for :answer, question.answer do |af| %>
-      <div>
-        <%= af.label :correction_text, "Correction" %>
-        <%= af.text_area :correction_text, rows: 3, style: "width:100%" %>
-      </div>
-      <div>
-        <%= af.label :explanation_text, "Explication" %>
-        <%= af.text_area :explanation_text, rows: 2, style: "width:100%" %>
-      </div>
+    <% if question.answer %>
+      <%= fields_for :answer, question.answer do |af| %>
+        <div>
+          <%= af.label :correction_text, "Correction",
+              class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
+          <%= af.text_area :correction_text, rows: 3,
+              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+        <div>
+          <%= af.label :explanation_text, "Explication",
+              class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
+          <%= af.text_area :explanation_text, rows: 2,
+              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+      <% end %>
     <% end %>
-  <% end %>
 
-  <%= f.submit "Sauvegarder" %>
+    <div class="flex items-center gap-3">
+      <%= f.submit "Sauvegarder",
+          class: "inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition-colors cursor-pointer" %>
+    </div>
+  </div>
 <% end %>

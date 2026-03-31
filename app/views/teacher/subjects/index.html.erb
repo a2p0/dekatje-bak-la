@@ -1,32 +1,59 @@
-<h1>Mes sujets</h1>
-
-<%= link_to "Nouveau sujet", new_teacher_subject_path %>
+<%# Mes sujets — index %>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Mes sujets</h1>
+  <%= render ButtonComponent.new(href: new_teacher_subject_path, variant: :primary, pill: true) do %>
+    Nouveau sujet
+  <% end %>
+</div>
 
 <% if @subjects.empty? %>
-  <p>Aucun sujet pour l'instant.</p>
+  <p class="text-slate-500 dark:text-slate-400">Aucun sujet pour l'instant.</p>
 <% else %>
-  <table>
-    <thead>
-      <tr>
-        <th>Titre</th>
-        <th>Spécialité</th>
-        <th>Région</th>
-        <th>Année</th>
-        <th>Statut</th>
-        <th>Créé le</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @subjects.each do |subject| %>
+  <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 dark:bg-slate-800">
         <tr>
-          <td><%= link_to subject.title, teacher_subject_path(subject) %></td>
-          <td><%= subject.specialty %></td>
-          <td><%= subject.region %></td>
-          <td><%= subject.year %></td>
-          <td><span><%= subject.status %></span></td>
-          <td><%= subject.created_at.strftime("%d/%m/%Y") %></td>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Titre</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Spécialité</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Région</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Année</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Statut</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Créé le</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
+        <% @subjects.each do |subject| %>
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <td class="px-4 py-3">
+              <%= link_to subject.title, teacher_subject_path(subject),
+                    class: "font-medium text-indigo-600 dark:text-indigo-400 hover:underline" %>
+            </td>
+            <td class="px-4 py-3">
+              <% if subject.specialty.present? %>
+                <%= render BadgeComponent.new(color: :indigo, label: subject.specialty) %>
+              <% end %>
+            </td>
+            <td class="px-4 py-3 text-slate-600 dark:text-slate-300"><%= subject.region %></td>
+            <td class="px-4 py-3">
+              <%= render BadgeComponent.new(color: :emerald, label: subject.year.to_s) %>
+            </td>
+            <td class="px-4 py-3">
+              <%
+                status_color = case subject.status
+                               when "draft"               then :slate
+                               when "pending_validation"  then :amber
+                               when "published"           then :emerald
+                               else :slate
+                               end
+              %>
+              <%= render BadgeComponent.new(color: status_color, label: subject.status) %>
+            </td>
+            <td class="px-4 py-3 text-slate-500 dark:text-slate-400">
+              <%= subject.created_at.strftime("%d/%m/%Y") %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>

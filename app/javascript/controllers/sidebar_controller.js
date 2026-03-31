@@ -4,14 +4,14 @@ export default class extends Controller {
   static targets = ["drawer", "backdrop"]
 
   open() {
-    this.drawerTarget.style.transform = "translateX(0)"
+    this.drawerTarget.classList.remove("-translate-x-full")
+    this.drawerTarget.classList.add("translate-x-0")
     this.backdropTarget.classList.remove("hidden")
-    this.backdropTarget.style.display = "block"
   }
 
   close() {
-    this.drawerTarget.style.transform = "translateX(-100%)"
+    this.drawerTarget.classList.add("-translate-x-full")
+    this.drawerTarget.classList.remove("translate-x-0")
     this.backdropTarget.classList.add("hidden")
-    this.backdropTarget.style.display = "none"
   }
 }

@@ -1,47 +1,63 @@
-<div style="max-width: 600px; margin: 0 auto; padding: 24px;">
-  <h1 style="margin-bottom: 24px;">Réglages</h1>
+<%= render(NavBarComponent.new) do |nav|
+  nav.with_brand { "DekatjeBakLa" }
+  nav.with_actions do
+    render(ThemeToggleComponent.new) +
+    link_to("← Mes sujets", student_root_path(access_code: params[:access_code]),
+      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5")
+  end
+end %>
+
+<main class="max-w-xl mx-auto px-4 py-6">
+  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Réglages</h1>
 
   <% if flash[:notice] %>
-    <p style="color: #22c55e; margin-bottom: 16px;"><%= flash[:notice] %></p>
+    <p class="text-emerald-500 mb-4"><%= flash[:notice] %></p>
   <% end %>
 
   <%= form_with model: current_student, url: student_settings_path(access_code: params[:access_code]),
                 method: :patch, data: { controller: "settings", settings_models_value: @models_json } do |f| %>
 
-    <fieldset style="border: 1px solid #374151; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-      <legend style="color: #9ca3af; font-size: 13px; text-transform: uppercase; padding: 0 8px;">Mode par défaut</legend>
+    <%# Mode section %>
+    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-5">
+      <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">Mode par défaut</p>
 
-      <div style="margin-bottom: 8px;">
-        <label style="display: flex; align-items: center; gap: 8px; color: #e2e8f0; cursor: pointer;">
-          <%= f.radio_button :default_mode, "revision", style: "accent-color: #7c3aed;" %>
-          Révision autonome (correction seule)
+      <div class="space-y-3">
+        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-500/10 transition-colors">
+          <%= f.radio_button :default_mode, "revision", class: "accent-indigo-500 w-4 h-4 shrink-0" %>
+          <div>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Révision autonome</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Correction seule, sans IA</p>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-500/10 transition-colors">
+          <%= f.radio_button :default_mode, "tutored", class: "accent-indigo-500 w-4 h-4 shrink-0" %>
+          <div>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Tutorat IA</span>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Nécessite une clé API</p>
+          </div>
         </label>
       </div>
-      <div>
-        <label style="display: flex; align-items: center; gap: 8px; color: #e2e8f0; cursor: pointer;">
-          <%= f.radio_button :default_mode, "tutored", style: "accent-color: #7c3aed;" %>
-          Tutorat IA (nécessite une clé API)
-        </label>
-      </div>
-    </fieldset>
+    </div>
 
-    <fieldset style="border: 1px solid #374151; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-      <legend style="color: #9ca3af; font-size: 13px; text-transform: uppercase; padding: 0 8px;">Configuration IA</legend>
+    <%# AI config section %>
+    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-5">
+      <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">Configuration IA</p>
 
-      <div style="margin-bottom: 16px;">
-        <%= f.label :api_provider, "Provider", style: "display: block; color: #9ca3af; font-size: 13px; margin-bottom: 4px;" %>
+      <div class="mb-4">
+        <%= f.label :api_provider, "Provider", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
         <%= f.select :api_provider,
             Student.api_providers.keys.map { |k| [k.capitalize, k] },
             {},
-            style: "width: 100%; padding: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #374151; border-radius: 6px;",
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500",
             data: { action: "change->settings#providerChanged", settings_target: "provider" } %>
       </div>
 
-      <div style="margin-bottom: 16px;">
-        <%= f.label :api_model, "Modèle", style: "display: block; color: #9ca3af; font-size: 13px; margin-bottom: 4px;" %>
+      <div class="mb-4">
+        <%= f.label :api_model, "Modèle", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
         <select name="student[api_model]"
                 data-settings-target="model"
-                style="width: 100%; padding: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #374151; border-radius: 6px;">
+                class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <% models = Student::AVAILABLE_MODELS[current_student.api_provider] || [] %>
           <% models.each do |m| %>
             <option value="<%= m[:id] %>" <%= "selected" if current_student.api_model == m[:id] || (current_student.api_model.blank? && m == models.first) %>>
@@ -51,39 +67,31 @@
         </select>
       </div>
 
-      <div style="margin-bottom: 16px;">
-        <%= f.label :api_key, "Clé API", style: "display: block; color: #9ca3af; font-size: 13px; margin-bottom: 4px;" %>
-        <div style="display: flex; gap: 8px;">
+      <div class="mb-5">
+        <%= f.label :api_key, "Clé API", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
+        <div class="flex gap-2">
           <%= f.password_field :api_key,
               value: current_student.api_key,
               placeholder: "sk-...",
-              style: "flex: 1; padding: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #374151; border-radius: 6px;",
+              class: "flex-1 px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500",
               data: { settings_target: "apiKey" } %>
           <button type="button"
                   data-action="click->settings#toggleApiKey"
-                  style="padding: 8px 12px; background: #1e293b; color: #9ca3af; border: 1px solid #374151; border-radius: 6px; cursor: pointer;">
+                  class="px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">
             👁
           </button>
         </div>
       </div>
 
-      <button type="button"
-              data-action="click->settings#testKey"
-              data-settings-target="testButton"
-              style="padding: 8px 16px; background: #374151; color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
-        Tester la clé
-      </button>
+      <%= render(ButtonComponent.new(variant: :ghost, size: :sm,
+            data: { action: "click->settings#testKey", settings_target: "testButton" },
+            type: "button")) { "Tester la clé" } %>
 
       <%= turbo_frame_tag "test_key_result" do %>
-        <p id="test_key_result"></p>
+        <p id="test_key_result" class="mt-3 text-sm"></p>
       <% end %>
-    </fieldset>
+    </div>
 
-    <%= f.submit "Enregistrer",
-        style: "padding: 12px 32px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 14px; cursor: pointer;" %>
+    <%= render(ButtonComponent.new(variant: :primary, size: :md, type: "submit")) { "Enregistrer" } %>
   <% end %>
-
-  <%= link_to "← Retour aux sujets",
-      student_root_path(access_code: params[:access_code]),
-      style: "display: inline-block; margin-top: 16px; color: #7c3aed; text-decoration: none; font-size: 13px;" %>
-</div>
+</main>

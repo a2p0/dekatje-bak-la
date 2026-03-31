@@ -4,7 +4,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
   scenario "un visiteur voit un lien connexion enseignant et un champ code d'accès élève sur la page d'accueil" do
     visit root_path
 
-    expect(page).to have_link("Connexion enseignant")
+    expect(page).to have_link("Espace enseignant →")
     expect(page).to have_field("Code d'accès")
   end
 
@@ -19,7 +19,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     click_button "Log in"
 
     expect(page).to have_content("Mes classes")
-    expect(page).to have_link("Terminale SIN 2026", href: teacher_classroom_path(classroom))
+    expect(page).to have_content("Terminale SIN 2026")
     expect(page).to have_link("Nouvelle classe")
   end
 
@@ -62,8 +62,8 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     expect(page).to have_content("Extraction")
     expect(page).to have_content("done")
 
-    # Parts with links
-    expect(page).to have_link("Analyse du système CIME", href: teacher_subject_part_path(subject_record, part))
+    # Parts listed in accordion (title is not a direct link)
+    expect(page).to have_content("Analyse du système CIME")
 
     # Validation stats
     expect(page).to have_content("Questions validées")
@@ -99,11 +99,14 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
 
     # On the subjects index page
     expect(page).to have_link(text: /Réglages/)
-    expect(page).to have_link("Se déconnecter")
+    expect(page).to have_link("Déconnexion")
 
     # Navigate to a question page and check settings link is still present
     click_link "Commencer"
 
-    expect(page).to have_link(text: /Réglages/)
+    # On desktop viewport (1400px), sidebar is always visible (lg:translate-x-0)
+    within("aside") do
+      expect(page).to have_link(text: /Réglages/)
+    end
   end
 end

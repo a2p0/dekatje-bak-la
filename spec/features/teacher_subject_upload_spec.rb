@@ -69,7 +69,7 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
 
     visit teacher_subject_path(subject)
 
-    expect(page).to have_content("Extraction en cours...")
+    expect(page).to have_content("Extraction en cours…")
   end
 
   scenario "l'enseignant voit les parties et questions extraites quand l'extraction est terminée" do

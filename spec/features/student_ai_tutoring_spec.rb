@@ -84,7 +84,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
 
     # Drawer should be translated offscreen again
     drawer = find("[data-chat-target='drawer']", visible: :all)
-    expect(drawer[:style]).to include("translateX(100%)")
+    expect(drawer[:class]).to include("translate-x-full")
   end
 
   # Scenario 2: Message is sent and TutorStreamJob is enqueued

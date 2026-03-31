@@ -1,35 +1,73 @@
-<h1>Mes classes</h1>
-
-<%= link_to "Nouvelle classe", new_teacher_classroom_path %>
+<%# Mes classes — index %>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Mes classes</h1>
+  <%= render ButtonComponent.new(href: new_teacher_classroom_path, variant: :primary, pill: true) do %>
+    Nouvelle classe
+  <% end %>
+</div>
 
 <% if @classrooms.empty? %>
-  <p>Vous n'avez pas encore de classe.</p>
+  <p class="text-slate-500 dark:text-slate-400">Vous n'avez pas encore de classe.</p>
 <% else %>
-  <ul>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
     <% @classrooms.each do |classroom| %>
-      <li>
-        <%= link_to classroom.name, teacher_classroom_path(classroom) %>
-        — <%= classroom.school_year %>
-        (<%= classroom.students.count %> élèves)
-      </li>
+      <%= render CardComponent.new do |c| %>
+        <% c.with_body do %>
+          <p class="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+            <%= classroom.name %>
+          </p>
+          <div class="flex flex-wrap gap-1 mb-3">
+            <% if classroom.specialty.present? %>
+              <%= render BadgeComponent.new(color: :indigo, label: classroom.specialty) %>
+            <% end %>
+            <%= render BadgeComponent.new(color: :slate, label: classroom.school_year) %>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            <%= classroom.students.count %> élève<%= classroom.students.count == 1 ? "" : "s" %>
+          </p>
+        <% end %>
+        <% c.with_footer do %>
+          <a href="<%= teacher_classroom_path(classroom) %>"
+             class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+            Voir →
+          </a>
+        <% end %>
+      <% end %>
     <% end %>
-  </ul>
+  </div>
 <% end %>
 
-<h2>Sujets récents</h2>
-
-<%= link_to "Nouveau sujet", new_teacher_subject_path %> |
-<%= link_to "Voir tous les sujets", teacher_subjects_path %>
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Sujets récents</h2>
+  <div class="flex items-center gap-2">
+    <%= render ButtonComponent.new(href: new_teacher_subject_path, variant: :primary, size: :sm) do %>
+      Nouveau sujet
+    <% end %>
+    <%= render ButtonComponent.new(href: teacher_subjects_path, variant: :ghost, size: :sm) do %>
+      Voir tous les sujets
+    <% end %>
+  </div>
+</div>
 
 <% if @recent_subjects.empty? %>
-  <p>Aucun sujet pour l'instant.</p>
+  <p class="text-slate-500 dark:text-slate-400">Aucun sujet pour l'instant.</p>
 <% else %>
-  <ul>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <% @recent_subjects.each do |subject| %>
-      <li>
-        <%= link_to subject.title, teacher_subject_path(subject) %>
-        — <%= subject.specialty %> — <strong><%= subject.status %></strong>
-      </li>
+      <%= render CardComponent.new do |c| %>
+        <% c.with_body do %>
+          <p class="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+            <%= link_to subject.title, teacher_subject_path(subject),
+                class: "hover:underline" %>
+          </p>
+          <div class="flex flex-wrap gap-1">
+            <% if subject.specialty.present? %>
+              <%= render BadgeComponent.new(color: :indigo, label: subject.specialty) %>
+            <% end %>
+            <%= render BadgeComponent.new(color: :amber, label: subject.status) %>
+          </div>
+        <% end %>
+      <% end %>
     <% end %>
-  </ul>
+  </div>
 <% end %>

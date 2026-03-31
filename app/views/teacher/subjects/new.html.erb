@@ -1,74 +1,108 @@
-<h1>Nouveau sujet</h1>
+<%# Nouveau sujet — new %>
+<div class="max-w-lg mx-auto">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Nouveau sujet</h1>
 
-<%= form_with model: [:teacher, @subject], multipart: true do |f| %>
-  <% if @subject.errors.any? %>
+  <%= form_with model: [:teacher, @subject], multipart: true, class: "space-y-5" do |f| %>
+    <% if @subject.errors.any? %>
+      <div class="rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 px-4 py-3">
+        <p class="text-sm font-semibold text-rose-700 dark:text-rose-400 mb-1">
+          <%= pluralize(@subject.errors.count, "erreur") %> :
+        </p>
+        <ul class="list-disc list-inside space-y-0.5">
+          <% @subject.errors.full_messages.each do |msg| %>
+            <li class="text-sm text-rose-600 dark:text-rose-300"><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2">
+      Informations
+    </h2>
+
     <div>
-      <ul>
-        <% @subject.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
+      <%= f.label :title, "Titre",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.text_field :title,
+            required: true,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    </div>
+
+    <div>
+      <%= f.label :year, "Année",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.text_field :year,
+            placeholder: "2026",
+            required: true,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    </div>
+
+    <div>
+      <%= f.label :exam_type, "Type d'examen",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.select :exam_type,
+            Subject.exam_types.keys.map { |k| [k.humanize, k] },
+            {},
+            required: true,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    </div>
+
+    <div>
+      <%= f.label :specialty, "Spécialité",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.select :specialty,
+            Subject.specialties.keys.map { |k| [k, k] },
+            {},
+            required: true,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    </div>
+
+    <div>
+      <%= f.label :region, "Région",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.select :region,
+            [
+              ["Métropole", "metropole"],
+              ["DROM-COM", "drom_com"],
+              ["Polynésie", "polynesie"],
+              ["Candidat libre", "candidat_libre"]
+            ],
+            {},
+            required: true,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    </div>
+
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2 pt-2">
+      Documents PDF
+    </h2>
+
+    <% file_fields = [
+         [:enonce_file, "Énoncé du sujet (PDF, max 20 MB)", true],
+         [:dt_file, "Documents Techniques — DT (PDF, max 20 MB)", true],
+         [:dr_vierge_file, "Document Réponse vierge — DR (PDF, max 20 MB)", true],
+         [:dr_corrige_file, "Document Réponse corrigé (PDF, max 20 MB)", true],
+         [:questions_corrigees_file, "Questions corrigées (PDF, max 20 MB)", true]
+       ] %>
+    <% file_fields.each do |field_name, label_text, required| %>
+      <div>
+        <%= f.label field_name, label_text,
+              class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+        <%= f.file_field field_name,
+              accept: "application/pdf",
+              required: required,
+              class: "w-full text-sm text-slate-600 dark:text-slate-300
+                      file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                      file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
+                      dark:file:bg-indigo-900/30 dark:file:text-indigo-300
+                      hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
+                      focus:outline-none" %>
+      </div>
+    <% end %>
+
+    <div class="pt-2">
+      <%= render ButtonComponent.new(variant: :primary, size: :md, type: :submit) do %>
+        Créer le sujet
+      <% end %>
     </div>
   <% end %>
-
-  <h2>Informations</h2>
-
-  <div>
-    <%= f.label :title, "Titre" %>
-    <%= f.text_field :title, required: true %>
-  </div>
-
-  <div>
-    <%= f.label :year, "Année" %>
-    <%= f.text_field :year, placeholder: "2026", required: true %>
-  </div>
-
-  <div>
-    <%= f.label :exam_type, "Type d'examen" %>
-    <%= f.select :exam_type, Subject.exam_types.keys.map { |k| [k.humanize, k] }, {}, required: true %>
-  </div>
-
-  <div>
-    <%= f.label :specialty, "Spécialité" %>
-    <%= f.select :specialty, Subject.specialties.keys.map { |k| [k, k] }, {}, required: true %>
-  </div>
-
-  <div>
-    <%= f.label :region, "Région" %>
-    <%= f.select :region, [
-      ["Métropole", "metropole"],
-      ["DROM-COM", "drom_com"],
-      ["Polynésie", "polynesie"],
-      ["Candidat libre", "candidat_libre"]
-    ], {}, required: true %>
-  </div>
-
-  <h2>Documents PDF</h2>
-
-  <div>
-    <%= f.label :enonce_file, "Énoncé du sujet (PDF, max 20 MB)" %>
-    <%= f.file_field :enonce_file, accept: "application/pdf", required: true %>
-  </div>
-
-  <div>
-    <%= f.label :dt_file, "Documents Techniques — DT (PDF, max 20 MB)" %>
-    <%= f.file_field :dt_file, accept: "application/pdf", required: true %>
-  </div>
-
-  <div>
-    <%= f.label :dr_vierge_file, "Document Réponse vierge — DR (PDF, max 20 MB)" %>
-    <%= f.file_field :dr_vierge_file, accept: "application/pdf", required: true %>
-  </div>
-
-  <div>
-    <%= f.label :dr_corrige_file, "Document Réponse corrigé (PDF, max 20 MB)" %>
-    <%= f.file_field :dr_corrige_file, accept: "application/pdf", required: true %>
-  </div>
-
-  <div>
-    <%= f.label :questions_corrigees_file, "Questions corrigées (PDF, max 20 MB)" %>
-    <%= f.file_field :questions_corrigees_file, accept: "application/pdf", required: true %>
-  </div>
-
-  <%= f.submit "Créer le sujet" %>
-<% end %>
+</div>

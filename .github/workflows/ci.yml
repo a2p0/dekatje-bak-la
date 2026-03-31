@@ -107,6 +107,9 @@ jobs:
         with:
           chrome-version: stable
 
+      - name: Build Tailwind CSS
+        run: bin/rails tailwindcss:build
+
       - name: Load schema
         run: bin/rails db:schema:load
 

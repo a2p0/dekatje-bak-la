@@ -1,26 +1,27 @@
-<div style="margin-top: 16px;">
+<div class="mt-4">
+
   <%# Correction %>
-  <div style="border-left: 3px solid #22c55e; background: #14532d22; border-radius: 0 8px 8px 0; padding: 14px; margin-bottom: 12px;">
-    <p style="color: #22c55e; font-weight: 600; font-size: 13px; margin: 0 0 8px; text-transform: uppercase;">✓ Correction</p>
-    <p style="color: #e2e8f0; font-size: 14px; line-height: 1.5; margin: 0;"><%= question.answer&.correction_text %></p>
+  <div class="border-l-4 border-emerald-500 bg-emerald-500/5 rounded-r-lg px-4 py-3.5 mb-3">
+    <p class="text-emerald-400 font-semibold text-[13px] mb-2 uppercase tracking-wide">✓ Correction</p>
+    <p class="text-slate-200 text-sm leading-relaxed"><%= question.answer&.correction_text %></p>
   </div>
 
   <%# Explication %>
   <% if question.answer&.explanation_text.present? %>
-    <div style="background: #1e293b; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-      <p style="color: #60a5fa; font-weight: 600; font-size: 13px; margin: 0 0 8px;">Explication</p>
-      <p style="color: #cbd5e1; font-size: 13px; line-height: 1.5; margin: 0;"><%= question.answer.explanation_text %></p>
+    <div class="bg-slate-800 rounded-lg px-4 py-3.5 mb-3 border border-slate-700">
+      <p class="text-blue-400 font-semibold text-[13px] mb-2">Explication</p>
+      <p class="text-slate-300 text-[13px] leading-relaxed"><%= question.answer.explanation_text %></p>
     </div>
   <% end %>
 
   <%# Data hints %>
   <% if question.answer&.data_hints.present? %>
-    <div style="background: #1e293b; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-      <p style="color: #f59e0b; font-weight: 600; font-size: 13px; margin: 0 0 8px;">Où trouver les données ?</p>
+    <div class="bg-slate-800 rounded-lg px-4 py-3.5 mb-3 border border-slate-700">
+      <p class="text-amber-400 font-semibold text-[13px] mb-2">Où trouver les données ?</p>
       <% question.answer.data_hints.each do |hint| %>
-        <div style="margin-bottom: 6px;">
-          <span style="background: #f59e0b22; color: #fbbf24; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;"><%= hint["source"] %></span>
-          <span style="color: #cbd5e1; font-size: 13px; margin-left: 6px;"><%= hint["location"] %></span>
+        <div class="flex items-baseline gap-2 mb-1.5">
+          <%= render(BadgeComponent.new(color: :amber, label: hint["source"])) %>
+          <span class="text-slate-300 text-[13px]"><%= hint["location"] %></span>
         </div>
       <% end %>
     </div>
@@ -28,11 +29,11 @@
 
   <%# Key concepts %>
   <% if question.answer&.key_concepts.present? %>
-    <div style="background: #1e293b; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-      <p style="color: #a78bfa; font-weight: 600; font-size: 13px; margin: 0 0 8px;">Concepts clés</p>
-      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+    <div class="bg-slate-800 rounded-lg px-4 py-3.5 mb-3 border border-slate-700">
+      <p class="text-violet-400 font-semibold text-[13px] mb-2">Concepts clés</p>
+      <div class="flex flex-wrap gap-1.5">
         <% question.answer.key_concepts.each do |concept| %>
-          <span style="background: #7c3aed33; color: #c4b5fd; font-size: 12px; padding: 4px 10px; border-radius: 12px;"><%= concept %></span>
+          <%= render(BadgeComponent.new(color: :indigo, label: concept)) %>
         <% end %>
       </div>
     </div>
@@ -40,20 +41,21 @@
 
   <%# Documents correction %>
   <% if subject.dr_corrige_file.attached? || subject.questions_corrigees_file.attached? %>
-    <div style="border: 1px solid #334155; border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-      <p style="color: #94a3b8; font-weight: 600; font-size: 13px; margin: 0 0 8px;">Documents correction</p>
+    <div class="border border-slate-700 rounded-lg px-4 py-3.5 mb-3">
+      <p class="text-slate-400 font-semibold text-[13px] mb-2">Documents correction</p>
       <% if subject.dr_corrige_file.attached? %>
         <%= link_to "DR corrigé ↗",
             rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
             target: "_blank",
-            style: "display: block; color: #60a5fa; font-size: 13px; margin: 2px 0; text-decoration: none;" %>
+            class: "block text-blue-400 text-[13px] my-0.5 no-underline hover:text-blue-300 transition-colors" %>
       <% end %>
       <% if subject.questions_corrigees_file.attached? %>
         <%= link_to "Questions corrigées ↗",
             rails_blob_path(subject.questions_corrigees_file, disposition: "inline"),
             target: "_blank",
-            style: "display: block; color: #60a5fa; font-size: 13px; margin: 2px 0; text-decoration: none;" %>
+            class: "block text-blue-400 text-[13px] my-0.5 no-underline hover:text-blue-300 transition-colors" %>
       <% end %>
     </div>
   <% end %>
+
 </div>

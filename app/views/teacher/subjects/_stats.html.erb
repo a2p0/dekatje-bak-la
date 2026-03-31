@@ -1,25 +1,50 @@
+<%# Subject stats + publish actions partial %>
 <div id="subject-stats">
-  <p>
-    Questions validées : <strong><%= subject.validated_questions_count %></strong>
-    / <%= subject.parts.joins(:questions).merge(Question.kept).count %>
-  </p>
+  <% total_questions = subject.parts.joins(:questions).merge(Question.kept).count %>
+  <% validated_count = subject.validated_questions_count %>
 
-  <% if subject.draft? || subject.pending_validation? %>
-    <% if subject.publishable? %>
-      <%= button_to "Publier le sujet",
-          publish_teacher_subject_path(subject),
-          method: :patch,
-          data: { turbo_confirm: "Publier ce sujet ?" } %>
-    <% else %>
-      <button disabled>Publier le sujet (validez au moins une question)</button>
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-1.5">
+      <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
+        Questions validées
+      </span>
+      <span class="text-sm text-slate-500 dark:text-slate-400">
+        <%= validated_count %> / <%= total_questions %>
+      </span>
+    </div>
+    <%= render ProgressBarComponent.new(
+          current: validated_count,
+          total: total_questions.zero? ? 1 : total_questions,
+          color: :emerald,
+          show_text: false) %>
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <% if subject.draft? || subject.pending_validation? %>
+      <% if subject.publishable? %>
+        <%= button_to "Publier le sujet",
+              publish_teacher_subject_path(subject),
+              method: :patch,
+              data: { turbo_confirm: "Publier ce sujet ?" },
+              class: "inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
+      <% else %>
+        <button disabled
+                class="inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg
+                       bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed">
+          Publier le sujet (validez au moins une question)
+        </button>
+      <% end %>
     <% end %>
-  <% end %>
 
-  <% if subject.published? %>
-    <%= button_to "Dépublier",
-        unpublish_teacher_subject_path(subject),
-        method: :patch,
-        data: { turbo_confirm: "Dépublier ce sujet ?" } %>
-    <%= link_to "Gérer l'assignation", assign_teacher_subject_path(subject) %>
-  <% end %>
+    <% if subject.published? %>
+      <%= button_to "Dépublier",
+            unpublish_teacher_subject_path(subject),
+            method: :patch,
+            data: { turbo_confirm: "Dépublier ce sujet ?" },
+            class: "inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" %>
+      <%= render ButtonComponent.new(href: assign_teacher_subject_path(subject), variant: :ghost, size: :sm) do %>
+        Gérer l'assignation
+      <% end %>
+    <% end %>
+  </div>
 </div>
