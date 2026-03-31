@@ -16,13 +16,17 @@ class Student::SubjectsController < Student::BaseController
       ss.last_activity_at = Time.current
     end
 
-    first_part = @subject.parts.order(:position).first
-    unless first_part
+    part = if params[:part_id]
+              @subject.parts.find_by(id: params[:part_id])
+            end
+    part ||= @subject.parts.order(:position).first
+
+    unless part
       return redirect_to student_root_path(access_code: params[:access_code]),
                          alert: "Ce sujet n'a pas encore de questions."
     end
 
-    question = session_record.first_undone_question(first_part)
+    question = session_record.first_undone_question(part)
     redirect_to student_question_path(
       access_code: params[:access_code],
       subject_id: @subject.id,

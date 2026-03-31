@@ -3,6 +3,7 @@ class Teacher::ClassroomsController < Teacher::BaseController
 
   def index
     @classrooms = current_teacher.classrooms.order(created_at: :desc)
+    @recent_subjects = current_teacher.subjects.kept.order(created_at: :desc).limit(5)
   end
 
   def new

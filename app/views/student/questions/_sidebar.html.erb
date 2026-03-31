@@ -38,7 +38,7 @@
     <% next if p == current_part %>
     <% part_questions = p.questions.kept %>
     <% part_answered = part_questions.count { |q| session_record.answered?(q.id) } %>
-    <%= link_to student_subject_path(access_code: access_code, id: subject.id),
+    <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: p.id),
         style: "display: block; padding: 6px 8px; margin: 2px 0; color: #d1d5db; font-size: 13px; text-decoration: none;" do %>
       <%= p.title %> (<%= part_answered %>/<%= part_questions.size %>)
     <% end %>

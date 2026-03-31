@@ -15,3 +15,21 @@
     <% end %>
   </ul>
 <% end %>
+
+<h2>Sujets récents</h2>
+
+<%= link_to "Nouveau sujet", new_teacher_subject_path %> |
+<%= link_to "Voir tous les sujets", teacher_subjects_path %>
+
+<% if @recent_subjects.empty? %>
+  <p>Aucun sujet pour l'instant.</p>
+<% else %>
+  <ul>
+    <% @recent_subjects.each do |subject| %>
+      <li>
+        <%= link_to subject.title, teacher_subject_path(subject) %>
+        — <%= subject.specialty %> — <strong><%= subject.status %></strong>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

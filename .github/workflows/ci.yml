@@ -65,3 +65,51 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: dekatje
+          POSTGRES_PASSWORD: dekatje_dev
+          POSTGRES_DB: dekatje_bak_la_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    env:
+      DATABASE_TEST_URL: postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test
+      DATABASE_URL: postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test
+      RAILS_ENV: test
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
+
+      - name: Load schema
+        run: bin/rails db:schema:load
+
+      - name: Run feature specs
+        run: bundle exec rspec spec/features/ --format progress --no-color
+
