@@ -123,6 +123,10 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
       expect(page).not_to have_link("Questions corrigées")
     end
 
+    # Close sidebar before clicking the correction button
+    find("[data-action='click->sidebar#close']", visible: :all).click
+    sleep 0.3
+
     click_button "Voir la correction"
 
     # Reload the page to get the full sidebar with correction documents
@@ -151,6 +155,10 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
     # Before reveal: question shown with ○
     expect(page).to have_link("○ Q1.1 (2.0 pts)")
+
+    # Close sidebar before clicking correction button
+    find("[data-action='click->sidebar#close']", visible: :all).click
+    sleep 0.3
 
     click_button "Voir la correction"
 
