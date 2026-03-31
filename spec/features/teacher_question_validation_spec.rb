@@ -42,12 +42,12 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       visit teacher_subject_part_path(subject_record, part)
 
-      expect(page).to have_content("[draft]")
+      expect(page).to have_content("brouillon")
       expect(page).to have_button("Valider")
 
       click_button "Valider"
 
-      expect(page).to have_content("[validated]")
+      expect(page).to have_content("validée")
       expect(page).to have_button("Invalider")
       expect(page).not_to have_button("Valider")
       expect(question.reload.status).to eq("validated")
@@ -139,8 +139,8 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Terminale SIN A")
       expect(page).to have_content("Terminale ITEC B")
 
-      check "Terminale SIN A (#{classroom1.school_year})"
-      check "Terminale ITEC B (#{classroom2.school_year})"
+      check "Terminale SIN A"
+      check "Terminale ITEC B"
       click_button "Enregistrer"
 
       expect(page).to have_content("Assignation mise à jour")

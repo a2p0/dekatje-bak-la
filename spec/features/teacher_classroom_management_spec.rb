@@ -24,7 +24,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     expect(page).to have_content("Classe créée avec succès")
     expect(page).to have_content("Terminale ITEC")
     expect(page).to have_content("2026")
-    expect(page).to have_content("Code d'accès élèves")
+    expect(page).to have_content("Code d'accès")
 
     classroom = Classroom.last
     expect(classroom.access_code).to be_present
@@ -46,7 +46,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     classroom = create(:classroom, owner: user)
 
     sign_in_teacher(user)
-    click_link classroom.name
+    click_link "Voir →"
 
     click_link "Ajouter un élève"
 
@@ -72,7 +72,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     classroom = create(:classroom, owner: user)
 
     sign_in_teacher(user)
-    click_link classroom.name
+    click_link "Voir →"
     click_link "Ajouter un élève"
 
     fill_in "Prénom", with: "Marie"
@@ -92,7 +92,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     create(:student, classroom: classroom, first_name: "Jean", last_name: "Dupont", username: "jean.dupont")
 
     sign_in_teacher(user)
-    click_link classroom.name
+    click_link "Voir →"
     click_link "Ajouter un élève"
 
     fill_in "Prénom", with: "Jean"
@@ -112,8 +112,8 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     classroom = create(:classroom, owner: user)
 
     sign_in_teacher(user)
-    click_link classroom.name
-    click_link "Ajouter en masse"
+    click_link "Voir →"
+    click_link "Ajout en lot"
 
     fill_in "Liste des élèves", with: "Pierre Bernard\nSophie Leroy\nLuc Moreau"
     click_button "Créer les comptes"
@@ -138,7 +138,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     student = create(:student, classroom: classroom, first_name: "Alice", last_name: "Blanc", username: "alice.blanc")
 
     sign_in_teacher(user)
-    click_link classroom.name
+    click_link "Voir →"
 
     expect(page).to have_content("alice.blanc")
 
@@ -158,8 +158,8 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     create(:student, classroom: classroom, first_name: "Emma", last_name: "Duval", username: "emma.duval")
 
     sign_in_teacher(user)
-    click_link classroom.name
-    expect(page).to have_link("Export PDF", href: export_pdf_teacher_classroom_path(classroom))
+    click_link "Voir →"
+    expect(page).to have_link("Exporter fiches PDF", href: export_pdf_teacher_classroom_path(classroom))
   end
 
   scenario "le tableau de bord affiche le nombre d'eleves et le code d'acces pour chaque classe" do
@@ -176,8 +176,8 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     expect(page).to have_content("2 élèves")
 
     # Verify access codes are visible on each classroom's show page
-    click_link "Terminale SIN"
-    expect(page).to have_content("Code d'accès élèves")
+    within(find(".rounded-lg.overflow-hidden", text: "Terminale SIN")) { click_link "Voir →" }
+    expect(page).to have_content("Code d'accès")
     expect(page).to have_content(classroom1.access_code)
   end
 end
