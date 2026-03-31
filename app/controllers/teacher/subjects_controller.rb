@@ -65,7 +65,7 @@ class Teacher::SubjectsController < Teacher::BaseController
                          alert: "L'extraction ne peut être relancée que si elle a échoué."
     end
 
-    job.update!(status: :pending, error_message: nil)
+    job.update!(status: :processing, error_message: nil)
     ExtractQuestionsJob.perform_later(@subject.id)
     redirect_to teacher_subject_path(@subject),
                 notice: "Extraction relancée."
