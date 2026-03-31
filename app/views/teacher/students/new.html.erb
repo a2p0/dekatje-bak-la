@@ -1,17 +1,38 @@
-<h1>Ajouter un élève — <%= @classroom.name %></h1>
-
-<%= form_with model: [:teacher, @classroom, @student] do |f| %>
-  <div>
-    <%= f.label :first_name, "Prénom" %>
-    <%= f.text_field :first_name, required: true %>
+<div class="max-w-md mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
+      Ajouter un élève
+    </h1>
+    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= @classroom.name %></p>
   </div>
 
-  <div>
-    <%= f.label :last_name, "Nom" %>
-    <%= f.text_field :last_name, required: true %>
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6">
+    <%= form_with model: [:teacher, @classroom, @student] do |f| %>
+      <div class="space-y-4">
+        <div>
+          <%= f.label :first_name, "Prénom",
+              class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+          <%= f.text_field :first_name, required: true,
+              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+
+        <div>
+          <%= f.label :last_name, "Nom",
+              class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+          <%= f.text_field :last_name, required: true,
+              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+        </div>
+
+        <div class="pt-2">
+          <%= f.submit "Ajouter l'élève",
+              class: "w-full inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition-colors cursor-pointer" %>
+        </div>
+      </div>
+    <% end %>
   </div>
 
-  <%= f.submit "Ajouter l'élève" %>
-<% end %>
-
-<%= link_to "Retour à la classe", teacher_classroom_path(@classroom) %>
+  <div class="mt-4 text-center">
+    <%= link_to "Retour à la classe", teacher_classroom_path(@classroom),
+        class: "text-sm text-indigo-500 hover:text-indigo-400" %>
+  </div>
+</div>

@@ -1,34 +1,46 @@
 <%= turbo_frame_tag dom_id(question) do %>
-  <div style="border: 1px solid <%= question.validated? ? '#28a745' : '#ccc' %>; padding: 10px; margin: 8px 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <span>
-        <strong>Q<%= question.number %></strong>
-        <span style="color: <%= question.validated? ? 'green' : 'gray' %>;">
-          [<%= question.status %>]
+  <div class="<%= question.validated? ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-slate-300 dark:border-l-slate-600' %> bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+          Q<%= question.number %>
         </span>
-        (<%= question.points %> pts)
-      </span>
-      <span>
+        <%= render BadgeComponent.new(
+              color: question.validated? ? :emerald : :slate,
+              label: question.validated? ? "validée" : "brouillon"
+            ) %>
+        <%= render BadgeComponent.new(color: :indigo, label: "#{question.points} pts") %>
+      </div>
+
+      <div class="flex items-center gap-2">
         <% if question.validated? %>
           <%= button_to "Invalider",
               invalidate_teacher_subject_part_question_path(subject, part, question),
-              method: :patch, form: { data: { turbo_frame: dom_id(question) } } %>
+              method: :patch,
+              form: { data: { turbo_frame: dom_id(question) } },
+              class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" %>
         <% else %>
           <%= button_to "Valider",
               validate_teacher_subject_part_question_path(subject, part, question),
-              method: :patch, form: { data: { turbo_frame: dom_id(question) } } %>
+              method: :patch,
+              form: { data: { turbo_frame: dom_id(question) } },
+              class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
         <% end %>
         <%= button_to "Supprimer",
             teacher_subject_part_question_path(subject, part, question),
             method: :delete,
             data: { turbo_confirm: "Supprimer cette question ?" },
-            form: { data: { turbo_frame: "_top" } } %>
-      </span>
+            form: { data: { turbo_frame: "_top" } },
+            class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors cursor-pointer" %>
+      </div>
     </div>
 
-    <p><%= question.label %></p>
+    <p class="mt-2 text-sm text-slate-700 dark:text-slate-300 line-clamp-3"><%= question.label %></p>
+
     <% if question.answer&.correction_text.present? %>
-      <p><em>Correction : <%= question.answer.correction_text %></em></p>
+      <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 italic">
+        Correction : <%= question.answer.correction_text.truncate(120) %>
+      </p>
     <% end %>
 
     <%= turbo_frame_tag "#{dom_id(question)}_form" do %>
