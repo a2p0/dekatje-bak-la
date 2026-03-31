@@ -1,49 +1,127 @@
-<h1><%= @subject.title %></h1>
+<%# Sujet — show %>
 
-<p>
-  Spécialité : <%= @subject.specialty %> |
-  Région : <%= @subject.region %> |
-  Année : <%= @subject.year %> |
-  Type : <%= @subject.exam_type %> |
-  Statut : <strong><%= @subject.status %></strong>
-</p>
-
-<h2>Documents PDF</h2>
-<ul>
-  <% if @subject.enonce_file.attached? %>
-    <li><%= link_to "Énoncé", rails_blob_path(@subject.enonce_file, disposition: "attachment") %></li>
-  <% end %>
-  <% if @subject.dt_file.attached? %>
-    <li><%= link_to "Documents Techniques (DT)", rails_blob_path(@subject.dt_file, disposition: "attachment") %></li>
-  <% end %>
-  <% if @subject.dr_vierge_file.attached? %>
-    <li><%= link_to "Document Réponse vierge", rails_blob_path(@subject.dr_vierge_file, disposition: "attachment") %></li>
-  <% end %>
-  <% if @subject.dr_corrige_file.attached? %>
-    <li><%= link_to "Document Réponse corrigé", rails_blob_path(@subject.dr_corrige_file, disposition: "attachment") %></li>
-  <% end %>
-  <% if @subject.questions_corrigees_file.attached? %>
-    <li><%= link_to "Questions corrigées", rails_blob_path(@subject.questions_corrigees_file, disposition: "attachment") %></li>
-  <% end %>
-</ul>
+<%# Header %>
+<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+  <div class="flex-1 min-w-0">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2 truncate">
+      <%= @subject.title %>
+    </h1>
+    <div class="flex flex-wrap gap-1.5">
+      <%
+        status_color = case @subject.status
+                       when "draft"               then :slate
+                       when "pending_validation"  then :amber
+                       when "published"           then :emerald
+                       else :slate
+                       end
+      %>
+      <%= render BadgeComponent.new(color: status_color, label: @subject.status) %>
+      <% if @subject.specialty.present? %>
+        <%= render BadgeComponent.new(color: :indigo, label: @subject.specialty) %>
+      <% end %>
+      <%= render BadgeComponent.new(color: :blue, label: @subject.exam_type) %>
+      <%= render BadgeComponent.new(color: :emerald, label: @subject.year.to_s) %>
+      <% if @subject.region.present? %>
+        <%= render BadgeComponent.new(color: :slate, label: @subject.region) %>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex flex-wrap gap-2 shrink-0">
+    <%= render ButtonComponent.new(href: assign_teacher_subject_path(@subject), variant: :ghost, size: :sm) do %>
+      Assigner aux classes
+    <% end %>
+  </div>
+</div>
 
 <%= turbo_stream_from "subject_#{@subject.id}" %>
 
-<h2>Extraction</h2>
-<%= render "extraction_status", subject: @subject %>
+<%# Documents PDF %>
+<div class="mb-6">
+  <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Documents PDF</h2>
+  <% attached_files = [
+       [@subject.enonce_file, "Énoncé"],
+       [@subject.dt_file, "Documents Techniques (DT)"],
+       [@subject.dr_vierge_file, "Document Réponse vierge"],
+       [@subject.dr_corrige_file, "Document Réponse corrigé"],
+       [@subject.questions_corrigees_file, "Questions corrigées"]
+     ].select { |file, _| file.attached? }
+  %>
+  <% if attached_files.any? %>
+    <ul class="space-y-1">
+      <% attached_files.each do |file, label| %>
+        <li>
+          <%= link_to label,
+                rails_blob_path(file, disposition: "attachment"),
+                class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-sm text-slate-500 dark:text-slate-400">Aucun document attaché.</p>
+  <% end %>
+</div>
 
+<%# Extraction %>
+<div class="mb-6">
+  <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Extraction</h2>
+  <%= render "extraction_status", subject: @subject %>
+</div>
+
+<%# Parts accordion %>
 <% if @subject.parts.any? %>
-  <h2>Valider par partie</h2>
-  <ul>
-    <% @subject.parts.order(:position).each do |part| %>
-      <li>
-        <%= link_to part.title, teacher_subject_part_path(@subject, part) %>
-        (section <%= part.section_type %>)
-      </li>
-    <% end %>
-  </ul>
+  <div class="mb-6">
+    <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Valider par partie</h2>
+    <div class="space-y-2">
+      <% @subject.parts.order(:position).each do |part| %>
+        <details class="group rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+          <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none
+                          hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors list-none">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-slate-900 dark:text-white text-sm">
+                Partie <%= part.number %> — <%= part.title %>
+              </span>
+              <%= render BadgeComponent.new(color: :slate, label: part.section_type) %>
+            </div>
+            <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </summary>
+          <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-3">
+            <% questions = part.questions.kept.order(:position) %>
+            <% if questions.any? %>
+              <ul class="space-y-1 mb-3">
+                <% questions.each do |question| %>
+                  <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                    <% if question.validated? %>
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <% else %>
+                      <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>
+                    <% end %>
+                    Q<%= question.number %> — <%= truncate(question.label, length: 80) %>
+                    (<%= question.points %> pts)
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Aucune question.</p>
+            <% end %>
+            <%= render ButtonComponent.new(href: teacher_subject_part_path(@subject, part), variant: :ghost, size: :sm) do %>
+              Voir / valider cette partie →
+            <% end %>
+          </div>
+        </details>
+      <% end %>
+    </div>
+  </div>
 <% end %>
 
+<%# Stats + publish actions %>
 <%= render "stats", subject: @subject %>
 
-<%= link_to "Retour aux sujets", teacher_subjects_path %>
+<%# Back link %>
+<div class="mt-6">
+  <%= render ButtonComponent.new(href: teacher_subjects_path, variant: :ghost, size: :sm) do %>
+    ← Retour aux sujets
+  <% end %>
+</div>
