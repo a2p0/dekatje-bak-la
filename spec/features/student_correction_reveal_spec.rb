@@ -115,26 +115,18 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    find("[data-action='click->sidebar#open']").click
-
-    # Before reveal: no correction documents in sidebar
-    within("[data-sidebar-target='drawer']") do
+    # On desktop (1400x900), sidebar is always visible — no hamburger click needed
+    within("aside[data-sidebar-target='drawer']") do
       expect(page).not_to have_link("DR corrigé")
       expect(page).not_to have_link("Questions corrigées")
     end
-
-    # Close sidebar before clicking the correction button
-    find("[data-sidebar-target='backdrop']").click
-    sleep 0.3
 
     click_button "Voir la correction"
 
     # Reload the page to get the full sidebar with correction documents
     visit_question(q1)
 
-    find("[data-action='click->sidebar#open']").click
-
-    within("[data-sidebar-target='drawer']") do
+    within("aside[data-sidebar-target='drawer']") do
       expect(page).to have_link("DR corrigé")
       expect(page).to have_link("Questions corrigées")
     end
@@ -151,23 +143,20 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    find("[data-action='click->sidebar#open']").click
-
-    # Before reveal: question shown with ○
-    expect(page).to have_link("○ Q1.1 (2.0 pts)")
-
-    # Close sidebar before clicking correction button
-    find("[data-sidebar-target='backdrop']").click
-    sleep 0.3
+    # On desktop, sidebar is always visible
+    # q1 is the current question, so it shows ◉ (current indicator), not ○
+    within("aside[data-sidebar-target='drawer']") do
+      expect(page).to have_link("◉ Q1.1 (2.0 pts)")
+    end
 
     click_button "Voir la correction"
 
     # Reload to see updated sidebar
     visit_question(q1)
 
-    find("[data-action='click->sidebar#open']").click
-
     # After reveal: question shown with ✓
-    expect(page).to have_link("✓ Q1.1 (2.0 pts)")
+    within("aside[data-sidebar-target='drawer']") do
+      expect(page).to have_link("✓ Q1.1 (2.0 pts)")
+    end
   end
 end
