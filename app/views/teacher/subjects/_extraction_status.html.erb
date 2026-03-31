@@ -25,13 +25,10 @@
           <span class="font-semibold">Erreur :</span> <%= job.error_message %>
         </p>
       </div>
-      <%= button_to retry_extraction_teacher_subject_path(subject),
+      <%= button_to "Relancer l'extraction",
+            retry_extraction_teacher_subject_path(subject),
             method: :post,
-            class: "inline-flex" do %>
-        <%= render ButtonComponent.new(variant: :primary, size: :sm) do %>
-          Relancer l'extraction
-        <% end %>
-      <% end %>
+            class: "inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition-colors cursor-pointer" %>
     <% end %>
 
     <% if job.processing? %>
