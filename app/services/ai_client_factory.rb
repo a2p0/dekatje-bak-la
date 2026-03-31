@@ -29,6 +29,9 @@ class AiClientFactory
     @model    = model || DEFAULT_MODELS[@provider]
   end
 
+  RETRYABLE_STATUSES = [ 429, 529, 503 ].freeze
+  MAX_RETRIES = 3
+
   def call(messages:, system:, max_tokens: 4096, temperature: 0.2)
     connection = Faraday.new(url: @config[:base_url]) do |f|
       f.request :json
@@ -39,11 +42,24 @@ class AiClientFactory
     headers = build_headers
     body    = build_body(messages: messages, system: system, max_tokens: max_tokens, temperature: temperature)
 
-    response = connection.post(endpoint_path, body, headers)
+    retries = 0
+    begin
+      response = connection.post(endpoint_path, body, headers)
 
-    raise "API error #{response.status}: #{response.body}" unless response.success?
+      if RETRYABLE_STATUSES.include?(response.status)
+        raise "API error #{response.status}: #{response.body}"
+      end
 
-    extract_text(response.body)
+      raise "API error #{response.status}: #{response.body}" unless response.success?
+
+      extract_text(response.body)
+    rescue Faraday::TimeoutError, RuntimeError => e
+      raise unless retries < MAX_RETRIES && (e.is_a?(Faraday::TimeoutError) || RETRYABLE_STATUSES.any? { |s| e.message.include?("API error #{s}") })
+
+      retries += 1
+      sleep(retries * 5)
+      retry
+    end
   end
 
   def stream(messages:, system:, max_tokens: 4096, temperature: 0.7, &block)
