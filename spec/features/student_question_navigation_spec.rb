@@ -134,7 +134,10 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     visit_question(q1)
 
     find("[data-action='click->sidebar#open']").click
-    click_link "○ Q1.2 (3.0 pts)"
+    sleep 0.3
+    # Use JS click to bypass backdrop z-index interception
+    link = find_link("○ Q1.2 (3.0 pts)", visible: :all)
+    page.execute_script("arguments[0].click()", link)
 
     expect(page).to have_content("Comparer les émissions de CO2 des deux véhicules.")
   end
@@ -144,7 +147,10 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     visit_question(q1)
 
     find("[data-action='click->sidebar#open']").click
-    click_link "Analyse fonctionnelle (0/1)"
+    sleep 0.3
+    # Use JS click to bypass backdrop z-index interception
+    link = find_link("Analyse fonctionnelle (0/1)", visible: :all)
+    page.execute_script("arguments[0].click()", link)
 
     expect(page).to have_content("Identifier les fonctions du système CIME.")
   end

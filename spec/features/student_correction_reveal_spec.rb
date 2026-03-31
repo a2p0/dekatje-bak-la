@@ -124,7 +124,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     end
 
     # Close sidebar before clicking the correction button
-    find("[data-action='click->sidebar#close']", visible: :all).click
+    find("[data-sidebar-target='backdrop']").click
     sleep 0.3
 
     click_button "Voir la correction"
@@ -157,7 +157,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     expect(page).to have_link("○ Q1.1 (2.0 pts)")
 
     # Close sidebar before clicking correction button
-    find("[data-action='click->sidebar#close']", visible: :all).click
+    find("[data-sidebar-target='backdrop']").click
     sleep 0.3
 
     click_button "Voir la correction"
