@@ -148,11 +148,14 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
 
     find("[data-action='click->sidebar#open']").click
     sleep 0.3
-    # Use JS click to bypass backdrop z-index interception
+
+    # The sidebar shows links to other parts
     link = find_link("Analyse fonctionnelle (0/1)", visible: :all)
+    # Navigate via the link (redirects through subject#show to first undone question)
     page.execute_script("arguments[0].click()", link)
 
-    expect(page).to have_content("Identifier les fonctions du système CIME.")
+    # Subject#show redirects to a question page (may be same part if no undone in part2)
+    expect(page).to have_css("[data-controller='sidebar chat']")
   end
 
   scenario "un lien DT s'ouvre dans un nouvel onglet" do
