@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="dark">
   <head>
     <title><%= content_for(:title) || "Dekatje Bak La" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -11,22 +11,38 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <script>
+      (function() {
+        var stored = localStorage.getItem('theme');
+        if (stored === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else if (!stored && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
 
-  <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen"
+        data-controller="theme">
+    <% if notice.present? %>
+      <div class="max-w-4xl mx-auto mt-4 px-4">
+        <%= render(FlashComponent.new(type: :notice, message: notice)) %>
+      </div>
+    <% end %>
+    <% if alert.present? %>
+      <div class="max-w-4xl mx-auto mt-4 px-4">
+        <%= render(FlashComponent.new(type: :alert, message: alert)) %>
+      </div>
+    <% end %>
     <%= yield %>
   </body>
 </html>
