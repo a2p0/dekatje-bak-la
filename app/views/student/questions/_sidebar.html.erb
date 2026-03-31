@@ -1,81 +1,110 @@
 <%# Sidebar content — used in both persistent desktop sidebar and mobile drawer %>
-<div style="padding: 16px;">
-  <details open style="margin-bottom: 12px;">
-    <summary style="color: #9ca3af; font-size: 12px; text-transform: uppercase; cursor: pointer;">
+<div class="p-4">
+
+  <%# Mise en situation %>
+  <details open class="mb-3">
+    <summary class="text-slate-400 text-[10px] uppercase tracking-wide cursor-pointer select-none">
       Mise en situation
     </summary>
-    <p style="color: #d1d5db; font-size: 13px; line-height: 1.5; margin-top: 6px;">
+    <p class="text-slate-300 text-xs leading-relaxed mt-1.5">
       <%= subject.presentation_text %>
     </p>
   </details>
 
-  <div style="margin-bottom: 16px;">
-    <p style="color: #9ca3af; font-size: 12px; text-transform: uppercase; margin-bottom: 4px;">Objectif</p>
-    <p style="color: #d1d5db; font-size: 13px; line-height: 1.5;">
+  <%# Objectif %>
+  <div class="mb-4">
+    <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-1">Objectif</p>
+    <p class="text-slate-300 text-xs leading-relaxed">
       <%= current_part.objective_text %>
     </p>
   </div>
 
-  <hr style="border-color: #374151; margin: 12px 0;">
+  <hr class="border-slate-700 my-3">
 
-  <p style="color: #9ca3af; font-size: 12px; text-transform: uppercase; margin-bottom: 8px;">
+  <%# Current part questions %>
+  <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-2">
     <%= current_part.title %>
   </p>
   <% questions_in_part.each do |q| %>
     <% answered = session_record.answered?(q.id) %>
+    <% is_current = q == current_question %>
     <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: q.id),
-        style: "display: block; padding: 6px 8px; margin: 2px 0; border-radius: 4px; text-decoration: none; color: #{q == current_question ? 'white' : '#9ca3af'}; background: #{q == current_question ? '#7c3aed33' : 'transparent'}; font-size: 13px;",
+        class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
         data: { action: "click->sidebar#close" } do %>
-      <%= answered ? "✓" : "○" %>
+      <% if answered %>
+        <span class="text-emerald-400 text-[10px]">✓</span>
+      <% elsif is_current %>
+        <span class="text-indigo-400 text-[10px]">◉</span>
+      <% else %>
+        <span class="text-slate-600 text-[10px]">○</span>
+      <% end %>
       Q<%= q.number %> (<%= q.points %> pts)
     <% end %>
   <% end %>
 
-  <hr style="border-color: #374151; margin: 12px 0;">
+  <hr class="border-slate-700 my-3">
 
-  <p style="color: #9ca3af; font-size: 12px; text-transform: uppercase; margin-bottom: 8px;">Autres parties</p>
+  <%# Other parts %>
+  <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-2">Autres parties</p>
   <% parts.each do |p| %>
     <% next if p == current_part %>
     <% part_questions = p.questions.kept %>
     <% part_answered = part_questions.count { |q| session_record.answered?(q.id) } %>
     <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: p.id),
-        style: "display: block; padding: 6px 8px; margin: 2px 0; color: #d1d5db; font-size: 13px; text-decoration: none;" do %>
-      <%= p.title %> (<%= part_answered %>/<%= part_questions.size %>)
+        class: "flex items-center justify-between px-2 py-1.5 my-0.5 rounded text-xs text-slate-300 no-underline hover:bg-slate-800 hover:text-slate-100 transition-colors" do %>
+      <span><%= p.title %></span>
+      <span class="text-slate-500 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
     <% end %>
   <% end %>
 
-  <hr style="border-color: #374151; margin: 12px 0;">
+  <hr class="border-slate-700 my-3">
 
-  <p style="color: #9ca3af; font-size: 12px; text-transform: uppercase; margin-bottom: 8px;">Documents</p>
+  <%# Documents %>
+  <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-2">Documents</p>
   <% if subject.dt_file.attached? %>
-    <%= link_to "📄 Documents Techniques (DT)",
-        rails_blob_path(subject.dt_file, disposition: "inline"),
+    <%= link_to rails_blob_path(subject.dt_file, disposition: "inline"),
         target: "_blank",
-        style: "display: block; color: #60a5fa; font-size: 13px; margin: 4px 0; text-decoration: none;" %>
+        class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+      <span>📄</span>
+      <span>Documents Techniques (DT)</span>
+      <%= render(BadgeComponent.new(color: :blue, label: "DT")) %>
+    <% end %>
   <% end %>
   <% if subject.dr_vierge_file.attached? %>
-    <%= link_to "📄 DR vierge",
-        rails_blob_path(subject.dr_vierge_file, disposition: "attachment"),
-        style: "display: block; color: #60a5fa; font-size: 13px; margin: 4px 0; text-decoration: none;" %>
+    <%= link_to rails_blob_path(subject.dr_vierge_file, disposition: "attachment"),
+        class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+      <span>📄</span>
+      <span>DR vierge</span>
+      <%= render(BadgeComponent.new(color: :slate, label: "DR")) %>
+    <% end %>
   <% end %>
   <% if session_record.answered?(current_question.id) %>
     <% if subject.dr_corrige_file.attached? %>
-      <%= link_to "📄 DR corrigé",
-          rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
+      <%= link_to rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
           target: "_blank",
-          style: "display: block; color: #60a5fa; font-size: 13px; margin: 4px 0; text-decoration: none;" %>
+          class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+        <span>📄</span>
+        <span>DR corrigé</span>
+        <%= render(BadgeComponent.new(color: :emerald, label: "DR")) %>
+      <% end %>
     <% end %>
     <% if subject.questions_corrigees_file.attached? %>
-      <%= link_to "📄 Questions corrigées",
-          rails_blob_path(subject.questions_corrigees_file, disposition: "inline"),
+      <%= link_to rails_blob_path(subject.questions_corrigees_file, disposition: "inline"),
           target: "_blank",
-          style: "display: block; color: #60a5fa; font-size: 13px; margin: 4px 0; text-decoration: none;" %>
+          class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+        <span>📄</span>
+        <span>Questions corrigées</span>
+      <% end %>
     <% end %>
   <% end %>
 
-  <hr style="border-color: #374151; margin: 12px 0;">
+  <hr class="border-slate-700 my-3">
 
-  <%= link_to "⚙ Réglages",
-      student_settings_path(access_code: access_code),
-      style: "display: block; color: #9ca3af; font-size: 13px; text-decoration: none; padding: 6px 8px;" %>
+  <%# Settings link %>
+  <%= link_to student_settings_path(access_code: access_code),
+      class: "flex items-center gap-1.5 text-slate-500 text-xs no-underline px-2 py-1.5 rounded hover:text-slate-300 hover:bg-slate-800 transition-colors" do %>
+    <span>⚙</span>
+    <span>Réglages</span>
+  <% end %>
+
 </div>
