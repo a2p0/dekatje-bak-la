@@ -8,7 +8,7 @@ Capybara.server = :puma, { Threads: "4:4", Silent: true }
 
 Capybara.register_driver :headless_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  chrome_binary = ["/usr/bin/chromium-browser", "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable"].find { |p| File.exist?(p) }
+  chrome_binary = [ "/usr/bin/chromium-browser", "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable" ].find { |p| File.exist?(p) }
   options.binary = chrome_binary if chrome_binary
   options.add_argument("--headless=new")
   options.add_argument("--no-sandbox")
@@ -17,7 +17,7 @@ Capybara.register_driver :headless_chrome do |app|
   options.add_argument("--window-size=1400,900")
 
   # Use local chromedriver if available — bypass Selenium Manager network calls
-  chromedriver_path = ["/usr/bin/chromedriver", "/usr/local/bin/chromedriver"].find { |p| File.exist?(p) }
+  chromedriver_path = [ "/usr/bin/chromedriver", "/usr/local/bin/chromedriver" ].find { |p| File.exist?(p) }
   driver_opts = { browser: :chrome, options: options }
   driver_opts[:service] = Selenium::WebDriver::Service.chrome(path: chromedriver_path) if chromedriver_path
   Capybara::Selenium::Driver.new(app, **driver_opts)

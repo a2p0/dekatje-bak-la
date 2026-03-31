@@ -17,8 +17,8 @@ class Student::SubjectsController < Student::BaseController
     end
 
     part = if params[:part_id]
-              @subject.parts.find_by(id: params[:part_id])
-            end
+             @subject.parts.find_by(id: params[:part_id])
+    end
     part ||= @subject.parts.order(:position).first
 
     unless part

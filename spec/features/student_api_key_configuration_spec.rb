@@ -72,20 +72,20 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
     select "Anthropic", from: "Provider"
 
     # Verify anthropic models appear
-    expect(page).to have_select("student[api_model]", with_options: ["$ Claude Haiku 4.5"])
-    expect(page).to have_select("student[api_model]", with_options: ["$$ Claude Sonnet 4.5"])
+    expect(page).to have_select("student[api_model]", with_options: [ "$ Claude Haiku 4.5" ])
+    expect(page).to have_select("student[api_model]", with_options: [ "$$ Claude Sonnet 4.5" ])
 
     # Switch to openai
     select "Openai", from: "Provider"
 
-    expect(page).to have_select("student[api_model]", with_options: ["$ GPT-4o Mini"])
-    expect(page).to have_select("student[api_model]", with_options: ["$$ GPT-4o"])
+    expect(page).to have_select("student[api_model]", with_options: [ "$ GPT-4o Mini" ])
+    expect(page).to have_select("student[api_model]", with_options: [ "$$ GPT-4o" ])
 
     # Switch to google
     select "Google", from: "Provider"
 
-    expect(page).to have_select("student[api_model]", with_options: ["$ Gemini 2.0 Flash"])
-    expect(page).to have_select("student[api_model]", with_options: ["$$$ Gemini 2.5 Pro"])
+    expect(page).to have_select("student[api_model]", with_options: [ "$ Gemini 2.0 Flash" ])
+    expect(page).to have_select("student[api_model]", with_options: [ "$$$ Gemini 2.5 Pro" ])
   end
 
   scenario "tester une clé API valide affiche un message de succès vert", js: true do
