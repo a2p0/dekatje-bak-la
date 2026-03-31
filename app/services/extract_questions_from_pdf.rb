@@ -11,7 +11,7 @@ class ExtractQuestionsFromPdf
       max_tokens: 8192,
       temperature: 0.1
     )
-    parse_json_response(raw_response)
+    [ raw_response, parse_json_response(raw_response) ]
   end
 
   def self.extract_text_from_pdf(attachment)
@@ -26,9 +26,15 @@ class ExtractQuestionsFromPdf
     json_match = raw.to_s.match(/\{.*\}/m)
     raise ParseError, "Réponse IA invalide : JSON introuvable" unless json_match
 
-    JSON.parse(json_match[0])
+    cleaned = sanitize_json(json_match[0])
+    JSON.parse(cleaned)
   rescue JSON::ParserError => e
     raise ParseError, "Impossible de parser le JSON : #{e.message}"
+  end
+
+  def self.sanitize_json(json_str)
+    # Remove trailing commas before ] or } (common LLM mistake)
+    json_str.gsub(/,(\s*[\]\}])/, '\1')
   end
   private_class_method :parse_json_response
 end

@@ -7,7 +7,7 @@ class ExtractQuestionsJob < ApplicationJob
     job.update!(status: :processing)
 
     resolved = ResolveApiKey.call(user: subject.owner)
-    data = ExtractQuestionsFromPdf.call(
+    raw_response, data = ExtractQuestionsFromPdf.call(
       subject: subject,
       api_key: resolved[:api_key],
       provider: resolved[:provider]
@@ -15,11 +15,11 @@ class ExtractQuestionsJob < ApplicationJob
     PersistExtractedData.call(subject: subject, data: data)
 
     provider_used = subject.owner.api_key.present? ? :teacher : :server
-    job.update!(status: :done, provider_used: provider_used)
+    job.update!(status: :done, raw_json: raw_response, provider_used: provider_used)
 
     broadcast_extraction_status(subject)
   rescue => e
-    job&.update!(status: :failed, error_message: e.message)
+    job&.update!(status: :failed, error_message: e.message, raw_json: raw_response)
     broadcast_extraction_status(subject) if subject
   end
 
