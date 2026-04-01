@@ -37,12 +37,19 @@ class TutorStreamJob < ApplicationJob
     )
 
     ActionCable.server.broadcast("conversation_#{conversation.id}", { done: true })
-  rescue Faraday::UnauthorizedError, RuntimeError => e
+  rescue RuntimeError => e
+    if e.message.match?(/429|529|503/) && (@retries ||= 0) < 2
+      @retries += 1
+      sleep(@retries * 3)
+      retry
+    end
+    handle_error(conversation, e)
+  rescue Faraday::UnauthorizedError => e
     handle_error(conversation, e)
   rescue Faraday::TimeoutError => e
-    handle_error(conversation, e, "Le serveur n'a pas repondu. Reessayez.")
+    handle_error(conversation, e, "Le serveur n'a pas répondu. Réessayez.")
   rescue StandardError => e
-    handle_error(conversation, e, "Une erreur est survenue. Reessayez.")
+    handle_error(conversation, e, "Une erreur est survenue. Réessayez.")
   end
 
   private
