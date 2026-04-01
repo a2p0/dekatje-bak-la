@@ -26,10 +26,22 @@ class ExtractQuestionsJob < ApplicationJob
   private
 
   def broadcast_extraction_status(subject)
+    subject.reload
+    stream = "subject_#{subject.id}"
+
     Turbo::StreamsChannel.broadcast_replace_to(
-      "subject_#{subject.id}",
-      target: "extraction-status",
+      stream, target: "extraction-status",
       partial: "teacher/subjects/extraction_status",
+      locals: { subject: subject }
+    )
+    Turbo::StreamsChannel.broadcast_replace_to(
+      stream, target: "parts-list",
+      partial: "teacher/subjects/parts_list",
+      locals: { subject: subject }
+    )
+    Turbo::StreamsChannel.broadcast_replace_to(
+      stream, target: "subject-stats",
+      partial: "teacher/subjects/stats",
       locals: { subject: subject }
     )
   end
