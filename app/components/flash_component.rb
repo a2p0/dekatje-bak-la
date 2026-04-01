@@ -14,7 +14,12 @@ class FlashComponent < ViewComponent::Base
   end
 
   def call
-    content_tag(:div, @message,
-      class: "px-4 py-3 rounded-lg border text-sm #{TYPES[@type]}")
+    content_tag(:div, class: "flex items-center justify-between px-4 py-3 rounded-lg border text-sm #{TYPES[@type]}", data: { controller: "dismissable" }) do
+      content_tag(:span, @message) +
+      content_tag(:button, "×",
+        class: "ml-3 text-current opacity-50 hover:opacity-100 cursor-pointer",
+        data: { action: "click->dismissable#dismiss" },
+        aria: { label: "Fermer" })
+    end
   end
 end

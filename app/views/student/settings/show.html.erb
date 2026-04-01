@@ -10,9 +10,6 @@ end %>
 <main class="max-w-xl mx-auto px-4 py-6">
   <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Réglages</h1>
 
-  <% if flash[:notice] %>
-    <p class="text-emerald-500 mb-4"><%= flash[:notice] %></p>
-  <% end %>
 
   <%= form_with model: current_student, url: student_settings_path(access_code: params[:access_code]),
                 method: :patch, data: { controller: "settings", settings_models_value: @models_json } do |f| %>
