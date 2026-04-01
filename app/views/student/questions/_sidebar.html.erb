@@ -40,45 +40,47 @@
     <hr class="border-slate-700 my-3">
   <% end %>
 
-  <%# Current part — questions with DT/DR tags %>
-  <p class="text-indigo-400 text-[10px] uppercase tracking-wide mb-2 font-semibold">
-    Partie <%= current_part.number %>
-    <span class="text-slate-500 font-normal">(<%= questions_in_part.count { |q| session_record.answered?(q.id) } %>/<%= questions_in_part.size %>)</span>
-  </p>
-  <% questions_in_part.each do |q| %>
-    <% answered = session_record.answered?(q.id) %>
-    <% is_current = q == current_question %>
-    <% doc_refs = q.answer&.data_hints&.select { |h| h["source"].to_s.match?(/\ADT|DR/i) }&.map { |h| h["source"] }&.uniq || [] %>
-    <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: q.id),
-        class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
-        data: { action: "click->sidebar#close" } do %>
-      <% if answered %>
-        <span class="text-emerald-400 text-[10px]">✓</span>
-      <% elsif is_current %>
-        <span class="text-indigo-400 text-[10px]">◉</span>
-      <% else %>
-        <span class="text-slate-600 text-[10px]">○</span>
-      <% end %>
-      <span>Q<%= q.number %></span>
-      <% doc_refs.each do |ref| %>
-        <span class="text-[9px] px-1 py-0.5 rounded bg-<%= ref.start_with?("DT") ? "blue" : "amber" %>-500/15 text-<%= ref.start_with?("DT") ? "blue" : "amber" %>-400"><%= ref %></span>
-      <% end %>
-      <span class="text-slate-600 text-[10px] ml-auto"><%= q.points %> pts</span>
-    <% end %>
-  <% end %>
-
-  <hr class="border-slate-700 my-3">
-
-  <%# Other parts — clickable, no titles, just "Partie N (x/y)" %>
-  <% parts.each do |p| %>
-    <% next if p == current_part %>
-    <% part_questions = p.questions.kept %>
+  <%# All parts in order — active part shows questions %>
+  <% parts.order(:position).each do |p| %>
+    <% is_active = p == current_part %>
+    <% part_questions = p.questions.kept.order(:position) %>
     <% part_answered = part_questions.count { |q| session_record.answered?(q.id) } %>
-    <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: p.id),
-        class: "flex items-center justify-between px-2 py-1.5 my-0.5 rounded text-xs text-slate-400 no-underline hover:bg-slate-800 hover:text-slate-200 transition-colors",
-        data: { action: "click->sidebar#close" } do %>
-      <span>Partie <%= p.number %></span>
-      <span class="text-slate-600 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
+
+    <% if is_active %>
+      <%# Active part — highlighted label + questions below %>
+      <p class="text-indigo-400 text-[10px] uppercase tracking-wide mb-1 mt-2 font-semibold px-2">
+        Partie <%= p.number %>
+        <span class="text-slate-500 font-normal">(<%= part_answered %>/<%= part_questions.size %>)</span>
+      </p>
+      <% part_questions.each do |q| %>
+        <% answered = session_record.answered?(q.id) %>
+        <% is_current = q == current_question %>
+        <% doc_refs = q.answer&.data_hints&.select { |h| h["source"].to_s.match?(/\ADT|DR/i) }&.map { |h| h["source"] }&.uniq || [] %>
+        <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: q.id),
+            class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
+            data: { action: "click->sidebar#close" } do %>
+          <% if answered %>
+            <span class="text-emerald-400 text-[10px]">✓</span>
+          <% elsif is_current %>
+            <span class="text-indigo-400 text-[10px]">◉</span>
+          <% else %>
+            <span class="text-slate-600 text-[10px]">○</span>
+          <% end %>
+          <span>Q<%= q.number %></span>
+          <% doc_refs.each do |ref| %>
+            <span class="text-[9px] px-1 py-0.5 rounded bg-<%= ref.start_with?("DT") ? "blue" : "amber" %>-500/15 text-<%= ref.start_with?("DT") ? "blue" : "amber" %>-400"><%= ref %></span>
+          <% end %>
+          <span class="text-slate-600 text-[10px] ml-auto"><%= q.points %> pts</span>
+        <% end %>
+      <% end %>
+    <% else %>
+      <%# Other part — just a clickable label %>
+      <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: p.id),
+          class: "flex items-center justify-between px-2 py-1.5 mt-2 my-0.5 rounded text-xs text-slate-400 no-underline hover:bg-slate-800 hover:text-slate-200 transition-colors",
+          data: { action: "click->sidebar#close" } do %>
+        <span>Partie <%= p.number %></span>
+        <span class="text-slate-600 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
+      <% end %>
     <% end %>
   <% end %>
 
