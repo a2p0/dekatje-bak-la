@@ -1,14 +1,11 @@
-<div class="mb-6">
+<div class="mb-4">
   <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
-    <%= @subject.title %> — <%= @part.title %>
+    <%= @subject.title %>
   </h1>
-  <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-    Objectif : <%= @part.objective_text %>
-  </p>
 </div>
 
 <%# Parts navigation — clearly labeled %>
-<div class="mb-6">
+<div class="mb-2">
   <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Parties du sujet</p>
   <nav class="flex flex-wrap gap-2">
     <% @parts.each do |part| %>
@@ -23,21 +20,50 @@
   </nav>
 </div>
 
+<%# Selected part title + objective %>
+<div class="mb-6 pl-1">
+  <h2 class="text-base font-semibold text-slate-800 dark:text-slate-200">
+    Partie <%= @part.number %> — <%= @part.title %>
+  </h2>
+  <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+    <%= @part.objective_text %>
+  </p>
+</div>
+
 <%# Two-column layout: questions (scrollable) + sticky PDF %>
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
   <%# Questions column %>
   <div>
-    <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
+    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
       Questions (<%= @questions.count %>)
-    </h2>
+    </h3>
 
     <% if @questions.empty? %>
       <p class="text-sm text-slate-500 dark:text-slate-400">Aucune question dans cette partie.</p>
     <% else %>
-      <div class="space-y-4">
+      <div>
         <% @questions.each do |question| %>
           <%= render "teacher/questions/question", question: question, subject: @subject, part: @part %>
         <% end %>
+      </div>
+    <% end %>
+
+    <%# Publish section — shown when all questions across all parts are validated %>
+    <%
+      all_questions = @subject.parts.joins(:questions).merge(Question.kept).count
+      all_validated = @subject.validated_questions_count
+      all_done = all_questions > 0 && all_validated == all_questions
+    %>
+    <% if all_done && !@subject.published? %>
+      <div class="mt-6 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-lg">
+        <p class="text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-3">
+          Toutes les questions sont validées (<%= all_validated %>/<%= all_questions %>). Prêt à publier !
+        </p>
+        <%= button_to "Publier le sujet",
+              publish_teacher_subject_path(@subject),
+              method: :patch,
+              data: { turbo_confirm: "Publier ce sujet ?" },
+              class: "inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
       </div>
     <% end %>
   </div>
@@ -47,34 +73,55 @@
     <div class="sticky top-4">
       <%# PDF tabs %>
       <% has_enonce = @subject.enonce_file.attached? %>
-      <% has_corrige = @subject.questions_corrigees_file.attached? %>
-      <% if has_enonce || has_corrige %>
+      <% has_corrige = @subject.dr_corrige_file.attached? %>
+      <% has_questions_corrigees = @subject.questions_corrigees_file.attached? %>
+      <% if has_enonce || has_corrige || has_questions_corrigees %>
         <div class="flex border-b border-slate-200 dark:border-slate-700 mb-0" data-controller="pdf-tabs">
+          <% tab_index = 0 %>
           <% if has_enonce %>
             <button data-pdf-tabs-target="tab" data-action="click->pdf-tabs#show"
-                    data-index="0"
+                    data-index="<%= tab_index %>"
                     class="px-4 py-2 text-xs font-semibold border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400">
               Énoncé
             </button>
+            <% tab_index += 1 %>
           <% end %>
           <% if has_corrige %>
             <button data-pdf-tabs-target="tab" data-action="click->pdf-tabs#show"
-                    data-index="1"
+                    data-index="<%= tab_index %>"
                     class="px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
-              Corrigé
+              DR corrigé
+            </button>
+            <% tab_index += 1 %>
+          <% end %>
+          <% if has_questions_corrigees %>
+            <button data-pdf-tabs-target="tab" data-action="click->pdf-tabs#show"
+                    data-index="<%= tab_index %>"
+                    class="px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+              Corrigé questions
             </button>
           <% end %>
         </div>
 
+        <% panel_index = 0 %>
         <% if has_enonce %>
-          <iframe data-pdf-tabs-target="panel" data-index="0"
+          <iframe data-pdf-tabs-target="panel" data-index="<%= panel_index %>"
                   src="<%= rails_blob_path(@subject.enonce_file) %>"
                   class="w-full rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-700"
                   height="700">
           </iframe>
+          <% panel_index += 1 %>
         <% end %>
         <% if has_corrige %>
-          <iframe data-pdf-tabs-target="panel" data-index="1"
+          <iframe data-pdf-tabs-target="panel" data-index="<%= panel_index %>"
+                  src="<%= rails_blob_path(@subject.dr_corrige_file) %>"
+                  class="w-full rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-700 hidden"
+                  height="700">
+          </iframe>
+          <% panel_index += 1 %>
+        <% end %>
+        <% if has_questions_corrigees %>
+          <iframe data-pdf-tabs-target="panel" data-index="<%= panel_index %>"
                   src="<%= rails_blob_path(@subject.questions_corrigees_file) %>"
                   class="w-full rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-700 hidden"
                   height="700">
