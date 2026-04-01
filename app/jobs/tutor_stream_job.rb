@@ -61,13 +61,17 @@ class TutorStreamJob < ApplicationJob
   def error_message_for(error)
     case error.message
     when /401/
-      "Cle API invalide. Verifiez vos reglages."
-    when /402/, /429/
-      "Credits insuffisants sur votre compte."
+      "Clé API invalide. Vérifiez vos réglages."
+    when /402/
+      "Crédits insuffisants sur votre compte."
+    when /429/
+      "Trop de requêtes. Réessayez dans quelques secondes."
+    when /529/, /503/
+      "Le service IA est temporairement surchargé. Réessayez."
     when /timeout/i
-      "Le serveur n'a pas repondu. Reessayez."
+      "Le serveur n'a pas répondu. Réessayez."
     else
-      "Erreur de communication avec l'IA. Reessayez."
+      "Erreur de communication avec l'IA. Réessayez."
     end
   end
 end
