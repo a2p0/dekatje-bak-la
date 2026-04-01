@@ -10,7 +10,7 @@ class Student::SubjectsController < Student::BaseController
                          alert: "Sujet introuvable."
     end
 
-    session_record = current_student.student_sessions.find_or_create_by!(subject: @subject) do |ss|
+    @session_record = current_student.student_sessions.find_or_create_by!(subject: @subject) do |ss|
       ss.mode = :autonomous
       ss.started_at = Time.current
       ss.last_activity_at = Time.current
@@ -26,7 +26,14 @@ class Student::SubjectsController < Student::BaseController
                          alert: "Ce sujet n'a pas encore de questions."
     end
 
-    question = session_record.first_undone_question(part)
+    # Show mise en situation page on first visit (no answers yet), unless explicitly starting
+    if params[:start].blank? && @session_record.answered_count.zero?
+      @parts = @subject.parts.order(:position)
+      @first_question = part.questions.kept.order(:position).first
+      return render :show
+    end
+
+    question = @session_record.first_undone_question(part)
     redirect_to student_question_path(
       access_code: params[:access_code],
       subject_id: @subject.id,

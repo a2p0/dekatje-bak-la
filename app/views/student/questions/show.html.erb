@@ -31,21 +31,20 @@
   <%# Main content %>
   <div class="flex-1 px-4 py-5 max-w-3xl mx-auto w-full">
 
-    <%# Top bar %>
+    <%# Progress bar %>
+    <%
+      total = @questions_in_part.size
+      answered = @questions_in_part.count { |q| @session_record.answered?(q.id) }
+    %>
     <div class="flex items-center gap-2.5 mb-4">
       <button data-action="click->sidebar#open"
               class="w-9 h-9 flex items-center justify-center bg-slate-800 border-0 rounded-md text-slate-400 text-lg cursor-pointer hover:bg-slate-700 transition-colors lg:hidden"
               aria-label="Ouvrir le menu">
         ☰
       </button>
-      <span class="text-slate-400 text-[13px]">
-        Q<%= @question.number %>
-        (<%= @questions_in_part.index(@question).to_i + 1 %>/<%= @questions_in_part.size %>)
+      <span class="text-slate-400 text-[13px] whitespace-nowrap">
+        Q<%= @question.number %> (<%= @questions_in_part.index(@question).to_i + 1 %>/<%= total %>)
       </span>
-      <%
-        total = @questions_in_part.size
-        answered = @questions_in_part.count { |q| @session_record.answered?(q.id) }
-      %>
       <div class="flex-1">
         <%= render(ProgressBarComponent.new(current: answered, total: total, color: :indigo)) %>
       </div>
@@ -62,38 +61,10 @@
       </p>
     </div>
 
-    <%# Collapsible mise en situation + objectif — open on first question if no answers yet %>
-    <% first_visit = @questions_in_part.index(@question).to_i == 0 && @questions_in_part.none? { |q| @session_record.answered?(q.id) } %>
-    <details class="mb-5 bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden" data-context-panel <%= "open" if first_visit %>>
-      <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none hover:bg-slate-800/80 list-none">
-        <span class="text-sm font-medium text-slate-300">Mise en situation & objectif</span>
-        <svg class="w-4 h-4 text-slate-400 transition-transform [details[open]>&]:rotate-180"
-             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-        </svg>
-      </summary>
-      <div class="px-4 pb-4 border-t border-slate-700">
-        <div class="mt-3 mb-3">
-          <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Mise en situation</p>
-          <p class="text-sm text-slate-300 leading-relaxed"><%= @subject.presentation_text %></p>
-        </div>
-        <div>
-          <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Objectif</p>
-          <p class="text-sm text-slate-300 leading-relaxed"><%= @part.objective_text %></p>
-        </div>
-      </div>
-    </details>
-
     <%# Question card %>
     <div class="bg-slate-800 rounded-lg p-4 mb-4 border border-slate-700">
       <div class="flex justify-between items-center mb-2">
-        <div class="flex items-center gap-2">
-          <span class="text-indigo-400 font-semibold text-sm">Question <%= @question.number %></span>
-          <% doc_refs = @question.answer&.data_hints&.select { |h| h["source"].to_s.match?(/\ADT|DR/i) }&.map { |h| h["source"] }&.uniq || [] %>
-          <% doc_refs.each do |ref| %>
-            <%= render(BadgeComponent.new(color: ref.start_with?("DT") ? :blue : :amber, label: ref)) %>
-          <% end %>
-        </div>
+        <span class="text-indigo-400 font-semibold text-sm">Question <%= @question.number %></span>
         <%= render(BadgeComponent.new(color: :indigo, label: "#{@question.points} pts")) %>
       </div>
       <p class="text-slate-200 text-sm leading-relaxed mb-2"><%= @question.label %></p>
@@ -102,19 +73,38 @@
       <% end %>
     </div>
 
-    <%# Correction area %>
+    <%# Correction + data hints area %>
     <%= turbo_frame_tag "question_#{@question.id}_correction" do %>
       <% if @session_record.answered?(@question.id) %>
         <%= render "student/questions/correction",
             question: @question, subject: @subject, session_record: @session_record %>
       <% elsif @question.answer %>
-        <div class="text-center mb-4">
+        <div class="flex items-center justify-center gap-4 mb-4">
           <%= button_to "Voir la correction",
               student_reveal_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @question.id),
               method: :patch,
               data: { turbo_frame: "question_#{@question.id}_correction" },
               class: "px-8 py-3 bg-indigo-600 text-white border-0 rounded-lg text-sm cursor-pointer hover:bg-indigo-700 transition-colors font-semibold" %>
+          <% if @question.answer.data_hints.present? %>
+            <button type="button" class="text-amber-400 text-xs hover:text-amber-300 cursor-pointer underline underline-offset-2"
+                    onclick="document.getElementById('data-hints-<%= @question.id %>').classList.toggle('hidden')">
+              Où trouver les données ?
+            </button>
+          <% end %>
         </div>
+        <% if @question.answer.data_hints.present? %>
+          <div id="data-hints-<%= @question.id %>" class="hidden mb-4 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3">
+            <p class="text-amber-400 font-semibold text-xs mb-2">Où trouver les données ?</p>
+            <div class="space-y-1.5">
+              <% @question.answer.data_hints.each do |hint| %>
+                <div class="flex items-center gap-2">
+                  <%= render(BadgeComponent.new(color: :amber, label: hint["source"])) %>
+                  <span class="text-xs text-slate-400"><%= hint["location"] %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
 

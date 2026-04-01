@@ -24,6 +24,10 @@ class StudentSession < ApplicationRecord
     progression.dig(question_id.to_s, "answered") == true
   end
 
+  def answered_count
+    progression.count { |_k, v| v["answered"] == true }
+  end
+
   def first_undone_question(part)
     questions = part.questions.kept.order(:position)
     questions.detect { |q| !answered?(q.id) } || questions.first

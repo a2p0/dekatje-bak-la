@@ -1,0 +1,52 @@
+<%= render(NavBarComponent.new) do |nav|
+  nav.with_brand { "DekatjeBakLa" }
+  nav.with_actions do
+    render(ThemeToggleComponent.new) +
+    link_to("← Mes sujets", student_root_path(access_code: params[:access_code]),
+      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
+  end
+end %>
+
+<main class="max-w-3xl mx-auto px-4 py-8">
+  <%# Subject title %>
+  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2"><%= @subject.title %></h1>
+  <div class="flex flex-wrap gap-1.5 mb-6">
+    <%= render(BadgeComponent.new(color: :indigo, label: @subject.specialty&.upcase || "—")) %>
+    <%= render(BadgeComponent.new(color: :emerald, label: @subject.year.to_s)) %>
+    <% if @subject.region.present? %>
+      <%= render(BadgeComponent.new(color: :slate, label: @subject.region)) %>
+    <% end %>
+  </div>
+
+  <%# Mise en situation — full text from PDF %>
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-6">
+    <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Mise en situation</h2>
+    <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line"><%= @subject.presentation_text %></div>
+  </div>
+
+  <%# Parts overview %>
+  <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-8">
+    <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Parties du sujet</h2>
+    <div class="space-y-2">
+      <% @parts.each do |part| %>
+        <div class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-700 last:border-0">
+          <div>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Partie <%= part.number %></span>
+            <span class="text-sm text-slate-500 dark:text-slate-400 ml-2">— <%= part.title %></span>
+          </div>
+          <span class="text-xs text-slate-400"><%= part.questions.kept.count %> questions</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Start button %>
+  <div class="text-center">
+    <% if @first_question %>
+      <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @first_question.id),
+          class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" do %>
+        Commencer les questions →
+      <% end %>
+    <% end %>
+  </div>
+</main>
