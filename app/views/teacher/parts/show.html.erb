@@ -7,14 +7,25 @@
   </p>
 </div>
 
-<nav class="flex flex-wrap gap-2 mb-6">
-  <% @parts.each do |part| %>
-    <% tab_class = part == @part ? "px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-500 text-white" : "px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800" %>
-    <%= link_to part.title, teacher_subject_part_path(@subject, part), class: tab_class %>
-  <% end %>
-</nav>
+<%# Parts navigation — clearly labeled %>
+<div class="mb-6">
+  <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Parties du sujet</p>
+  <nav class="flex flex-wrap gap-2">
+    <% @parts.each do |part| %>
+      <% tab_class = part == @part ? "px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-500 text-white" : "px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800" %>
+      <%= link_to teacher_subject_part_path(@subject, part), class: tab_class do %>
+        Partie <%= part.number %>
+        <% part_q = part.questions.kept %>
+        <% part_validated = part_q.select(&:validated?).count %>
+        <span class="text-[10px] opacity-70">(<%= part_validated %>/<%= part_q.count %>)</span>
+      <% end %>
+    <% end %>
+  </nav>
+</div>
 
+<%# Two-column layout: questions (scrollable) + sticky PDF %>
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <%# Questions column %>
   <div>
     <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">
       Questions (<%= @questions.count %>)
@@ -23,7 +34,7 @@
     <% if @questions.empty? %>
       <p class="text-sm text-slate-500 dark:text-slate-400">Aucune question dans cette partie.</p>
     <% else %>
-      <div class="space-y-3">
+      <div class="space-y-4">
         <% @questions.each do |question| %>
           <%= render "teacher/questions/question", question: question, subject: @subject, part: @part %>
         <% end %>
@@ -31,17 +42,48 @@
     <% end %>
   </div>
 
-  <div>
-    <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3">PDF Énoncé</h2>
-    <% if @subject.enonce_file.attached? %>
-      <iframe
-        src="<%= rails_blob_path(@subject.enonce_file) %>"
-        class="w-full rounded-lg border border-slate-200 dark:border-slate-700"
-        height="800">
-      </iframe>
-    <% else %>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Aucun PDF joint à ce sujet.</p>
-    <% end %>
+  <%# Sticky PDF column %>
+  <div class="hidden lg:block">
+    <div class="sticky top-4">
+      <%# PDF tabs %>
+      <% has_enonce = @subject.enonce_file.attached? %>
+      <% has_corrige = @subject.questions_corrigees_file.attached? %>
+      <% if has_enonce || has_corrige %>
+        <div class="flex border-b border-slate-200 dark:border-slate-700 mb-0" data-controller="pdf-tabs">
+          <% if has_enonce %>
+            <button data-pdf-tabs-target="tab" data-action="click->pdf-tabs#show"
+                    data-index="0"
+                    class="px-4 py-2 text-xs font-semibold border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400">
+              Énoncé
+            </button>
+          <% end %>
+          <% if has_corrige %>
+            <button data-pdf-tabs-target="tab" data-action="click->pdf-tabs#show"
+                    data-index="1"
+                    class="px-4 py-2 text-xs font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+              Corrigé
+            </button>
+          <% end %>
+        </div>
+
+        <% if has_enonce %>
+          <iframe data-pdf-tabs-target="panel" data-index="0"
+                  src="<%= rails_blob_path(@subject.enonce_file) %>"
+                  class="w-full rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-700"
+                  height="700">
+          </iframe>
+        <% end %>
+        <% if has_corrige %>
+          <iframe data-pdf-tabs-target="panel" data-index="1"
+                  src="<%= rails_blob_path(@subject.questions_corrigees_file) %>"
+                  class="w-full rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-700 hidden"
+                  height="700">
+          </iframe>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Aucun PDF joint à ce sujet.</p>
+      <% end %>
+    </div>
   </div>
 </div>
 
