@@ -1,33 +1,54 @@
-<%# Sidebar content — used in both persistent desktop sidebar and mobile drawer %>
+<%# Sidebar content — documents first, then parts/questions %>
 <div class="p-4">
 
-  <%# Mise en situation %>
-  <details open class="mb-3">
-    <summary class="text-slate-400 text-[10px] uppercase tracking-wide cursor-pointer select-none">
-      Mise en situation
-    </summary>
-    <p class="text-slate-300 text-xs leading-relaxed mt-1.5">
-      <%= subject.presentation_text %>
-    </p>
-  </details>
+  <%# Documents (DT, DR) — at the top %>
+  <% has_docs = subject.dt_file.attached? || subject.dr_vierge_file.attached? %>
+  <% if has_docs %>
+    <p class="text-slate-500 text-[10px] uppercase tracking-wide mb-2">Documents</p>
+    <% if subject.dt_file.attached? %>
+      <%= link_to rails_blob_path(subject.dt_file, disposition: "inline"),
+          target: "_blank",
+          class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+        <%= render(BadgeComponent.new(color: :blue, label: "DT")) %>
+        <span>Documents Techniques</span>
+      <% end %>
+    <% end %>
+    <% if subject.dr_vierge_file.attached? %>
+      <%= link_to rails_blob_path(subject.dr_vierge_file, disposition: "attachment"),
+          class: "flex items-center gap-1.5 text-amber-400 text-xs my-1 no-underline hover:text-amber-300 transition-colors" do %>
+        <%= render(BadgeComponent.new(color: :amber, label: "DR")) %>
+        <span>DR vierge</span>
+      <% end %>
+    <% end %>
+    <% if session_record.answered?(current_question.id) %>
+      <% if subject.dr_corrige_file.attached? %>
+        <%= link_to rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
+            target: "_blank",
+            class: "flex items-center gap-1.5 text-emerald-400 text-xs my-1 no-underline hover:text-emerald-300 transition-colors" do %>
+          <%= render(BadgeComponent.new(color: :emerald, label: "DR")) %>
+          <span>DR corrigé</span>
+        <% end %>
+      <% end %>
+      <% if subject.questions_corrigees_file.attached? %>
+        <%= link_to rails_blob_path(subject.questions_corrigees_file, disposition: "inline"),
+            target: "_blank",
+            class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+          <span>Questions corrigées</span>
+        <% end %>
+      <% end %>
+    <% end %>
+    <hr class="border-slate-700 my-3">
+  <% end %>
 
-  <%# Objectif %>
-  <div class="mb-4">
-    <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-1">Objectif</p>
-    <p class="text-slate-300 text-xs leading-relaxed">
-      <%= current_part.objective_text %>
-    </p>
-  </div>
-
-  <hr class="border-slate-700 my-3">
-
-  <%# Current part questions %>
-  <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-2">
-    <%= current_part.title %>
+  <%# Current part — questions with DT/DR tags %>
+  <p class="text-indigo-400 text-[10px] uppercase tracking-wide mb-2 font-semibold">
+    Partie <%= current_part.number %>
+    <span class="text-slate-500 font-normal">(<%= questions_in_part.count { |q| session_record.answered?(q.id) } %>/<%= questions_in_part.size %>)</span>
   </p>
   <% questions_in_part.each do |q| %>
     <% answered = session_record.answered?(q.id) %>
     <% is_current = q == current_question %>
+    <% doc_refs = q.answer&.data_hints&.select { |h| h["source"].to_s.match?(/\ADT|DR/i) }&.map { |h| h["source"] }&.uniq || [] %>
     <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: q.id),
         class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
         data: { action: "click->sidebar#close" } do %>
@@ -38,63 +59,26 @@
       <% else %>
         <span class="text-slate-600 text-[10px]">○</span>
       <% end %>
-      Q<%= q.number %> (<%= q.points %> pts)
+      <span>Q<%= q.number %></span>
+      <% doc_refs.each do |ref| %>
+        <span class="text-[9px] px-1 py-0.5 rounded bg-<%= ref.start_with?("DT") ? "blue" : "amber" %>-500/15 text-<%= ref.start_with?("DT") ? "blue" : "amber" %>-400"><%= ref %></span>
+      <% end %>
+      <span class="text-slate-600 text-[10px] ml-auto"><%= q.points %> pts</span>
     <% end %>
   <% end %>
 
   <hr class="border-slate-700 my-3">
 
-  <%# Other parts %>
-  <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-2">Autres parties</p>
+  <%# Other parts — clickable, no titles, just "Partie N (x/y)" %>
   <% parts.each do |p| %>
     <% next if p == current_part %>
     <% part_questions = p.questions.kept %>
     <% part_answered = part_questions.count { |q| session_record.answered?(q.id) } %>
     <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: p.id),
-        class: "flex items-center justify-between px-2 py-1.5 my-0.5 rounded text-xs text-slate-300 no-underline hover:bg-slate-800 hover:text-slate-100 transition-colors" do %>
-      <span><%= p.title %></span>
-      <span class="text-slate-500 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
-    <% end %>
-  <% end %>
-
-  <hr class="border-slate-700 my-3">
-
-  <%# Documents %>
-  <p class="text-slate-400 text-[10px] uppercase tracking-wide mb-2">Documents</p>
-  <% if subject.dt_file.attached? %>
-    <%= link_to rails_blob_path(subject.dt_file, disposition: "inline"),
-        target: "_blank",
-        class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
-      <span>📄</span>
-      <span>Documents Techniques (DT)</span>
-      <%= render(BadgeComponent.new(color: :blue, label: "DT")) %>
-    <% end %>
-  <% end %>
-  <% if subject.dr_vierge_file.attached? %>
-    <%= link_to rails_blob_path(subject.dr_vierge_file, disposition: "attachment"),
-        class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
-      <span>📄</span>
-      <span>DR vierge</span>
-      <%= render(BadgeComponent.new(color: :slate, label: "DR")) %>
-    <% end %>
-  <% end %>
-  <% if session_record.answered?(current_question.id) %>
-    <% if subject.dr_corrige_file.attached? %>
-      <%= link_to rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
-          target: "_blank",
-          class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
-        <span>📄</span>
-        <span>DR corrigé</span>
-        <%= render(BadgeComponent.new(color: :emerald, label: "DR")) %>
-      <% end %>
-    <% end %>
-    <% if subject.questions_corrigees_file.attached? %>
-      <%= link_to rails_blob_path(subject.questions_corrigees_file, disposition: "inline"),
-          target: "_blank",
-          class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
-        <span>📄</span>
-        <span>Questions corrigées</span>
-      <% end %>
+        class: "flex items-center justify-between px-2 py-1.5 my-0.5 rounded text-xs text-slate-400 no-underline hover:bg-slate-800 hover:text-slate-200 transition-colors",
+        data: { action: "click->sidebar#close" } do %>
+      <span>Partie <%= p.number %></span>
+      <span class="text-slate-600 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
     <% end %>
   <% end %>
 
