@@ -29,7 +29,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Questions (2)")
       expect(page).to have_content("Q1.1")
       expect(page).to have_content("Q1.2")
-      expect(page).to have_content("PDF Énoncé")
+      expect(page).to have_content("Énoncé")
       expect(page).to have_css("iframe")
     end
   end
@@ -48,7 +48,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       click_button "Valider"
 
       expect(page).to have_content("validée")
-      expect(page).to have_button("Invalider")
+      expect(page).to have_button("Invalider", visible: :all)
       expect(page).not_to have_button("Valider")
       expect(question.reload.status).to eq("validated")
     end
@@ -86,8 +86,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Question à supprimer")
       expect(page).to have_content("Question à garder")
 
-      accept_confirm("Supprimer cette question ?") do
-        first("button", text: "Supprimer").click
+      first("button", text: "Supprimer").click
+      within("dialog") do
+        click_button "Confirmer"
       end
 
       expect(page).not_to have_content("Question à supprimer")
@@ -105,8 +106,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       visit teacher_subject_path(subject_record)
 
-      accept_confirm("Publier ce sujet ?") do
-        click_button "Publier le sujet"
+      click_button "Publier le sujet"
+      within("dialog") do
+        click_button "Confirmer"
       end
 
       expect(page).to have_content("Sujet publié")
@@ -159,8 +161,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       expect(page).to have_content("published")
 
-      accept_confirm("Dépublier ce sujet ?") do
-        click_button "Dépublier"
+      click_button "Dépublier"
+      within("dialog") do
+        click_button "Confirmer"
       end
 
       expect(page).to have_content("Sujet dépublié")
