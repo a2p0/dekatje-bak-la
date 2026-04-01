@@ -10,7 +10,7 @@ class AiClientFactory
 
   DEFAULT_MODELS = {
     anthropic:  "claude-sonnet-4-6",
-    openrouter: "anthropic/claude-haiku-4-5",
+    openrouter: "mistralai/mistral-large-2512",
     openai:     "gpt-4o-mini",
     google:     "gemini-2.0-flash"
   }.freeze
