@@ -15,13 +15,14 @@ class Student < ApplicationRecord
 
   AVAILABLE_MODELS = {
     "openrouter" => [
-      { id: "qwen/qwen3-next-80b-a3b-instruct:free", label: "Qwen3 80B (gratuit)", cost: "🆓", note: "Lent, rate limit bas" },
-      { id: "deepseek/deepseek-chat-v3-0324", label: "DeepSeek V3", cost: "$" },
-      { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5", cost: "$$" }
+      { id: "mistralai/mistral-small-2603", label: "Mistral Small 4", cost: "$", note: "Recommandé" },
+      { id: "google/gemini-2.0-flash-001", label: "Gemini 2.0 Flash", cost: "$" },
+      { id: "anthropic/claude-haiku-4-5", label: "Claude Haiku 4.5", cost: "$$" },
+      { id: "anthropic/claude-sonnet-4-6", label: "Claude Sonnet 4.6", cost: "$$$" }
     ],
     "anthropic" => [
       { id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5", cost: "$" },
-      { id: "claude-sonnet-4-5-20250514", label: "Claude Sonnet 4.5", cost: "$$" }
+      { id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6", cost: "$$" }
     ],
     "openai" => [
       { id: "gpt-4o-mini", label: "GPT-4o Mini", cost: "$" },
