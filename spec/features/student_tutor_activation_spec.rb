@@ -37,6 +37,8 @@ RSpec.describe "Student tutor activation banner", type: :feature do
     it "activates tutored mode when clicking the button" do
       click_button "Activer le mode tuteur"
 
+      # Wait for redirect to complete
+      expect(page).not_to have_css("[data-testid='tutor-banner']")
       student_session.reload
       expect(student_session.mode).to eq("tutored")
     end
