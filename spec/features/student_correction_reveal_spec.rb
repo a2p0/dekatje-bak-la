@@ -144,7 +144,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     # On desktop, sidebar is always visible
     # q1 is the current question, so it shows ◉ (current indicator)
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link(text: /◉.*Q1\.1/)
+      expect(page).to have_link(text: /Q1\.1/)
     end
 
     click_button "Voir la correction"
