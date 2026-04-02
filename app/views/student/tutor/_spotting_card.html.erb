@@ -1,8 +1,8 @@
 <%= turbo_frame_tag "spotting_question_#{question.id}" do %>
   <div class="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-500/30 rounded-lg p-5 mb-4"
        data-controller="spotting"
-       data-spotting-verify-url-value="<%= student_tutor_verify_spotting_path(access_code: access_code, subject_id: subject.id, question_id: question.id) %>"
-       data-spotting-skip-url-value="<%= student_tutor_skip_spotting_path(access_code: access_code, subject_id: subject.id, question_id: question.id) %>">
+       data-spotting-verify-url-value="<%= student_tutor_question_verify_spotting_path(access_code: access_code, subject_id: subject.id, question_id: question.id) %>"
+       data-spotting-skip-url-value="<%= student_tutor_question_skip_spotting_path(access_code: access_code, subject_id: subject.id, question_id: question.id) %>">
 
     <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-4">Avant de répondre</p>
 

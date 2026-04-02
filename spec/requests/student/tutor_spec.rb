@@ -27,7 +27,7 @@ RSpec.describe "Student::Tutor", type: :request do
   let(:turbo_headers) { { "Accept" => "text/vnd.turbo-stream.html" } }
 
   def verify_path
-    student_tutor_verify_spotting_path(
+    student_tutor_question_verify_spotting_path(
       access_code: classroom.access_code,
       subject_id: subject_obj.id,
       question_id: question.id
@@ -35,11 +35,42 @@ RSpec.describe "Student::Tutor", type: :request do
   end
 
   def skip_path
-    student_tutor_skip_spotting_path(
+    student_tutor_question_skip_spotting_path(
       access_code: classroom.access_code,
       subject_id: subject_obj.id,
       question_id: question.id
     )
+  end
+
+  describe "POST activate" do
+    def activate_path
+      student_tutor_activate_path(
+        access_code: classroom.access_code,
+        subject_id: subject_obj.id
+      )
+    end
+
+    context "when student is in autonomous mode" do
+      before { student_session.update!(mode: :autonomous) }
+
+      it "switches mode to tutored and redirects back" do
+        post activate_path
+
+        student_session.reload
+        expect(student_session.mode).to eq("tutored")
+        expect(response).to redirect_to(student_subject_path(access_code: classroom.access_code, id: subject_obj.id))
+      end
+    end
+
+    context "when student is already in tutored mode" do
+      it "stays tutored without error and redirects" do
+        post activate_path
+
+        student_session.reload
+        expect(student_session.mode).to eq("tutored")
+        expect(response).to redirect_to(student_subject_path(access_code: classroom.access_code, id: subject_obj.id))
+      end
+    end
   end
 
   describe "POST verify_spotting" do
