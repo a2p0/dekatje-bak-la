@@ -19,7 +19,12 @@ RSpec.describe "Student tutor activation banner", type: :feature do
   end
 
   context "when student is autonomous with an API key" do
-    let(:student) { create(:student, classroom: classroom, api_key: "sk-test-key") }
+    let(:student) do
+      s = create(:student, classroom: classroom)
+      # Set API key directly to avoid encryption issues in CI
+      s.update!(api_key: "sk-test-key", api_provider: :openrouter)
+      s
+    end
     let!(:student_session) do
       create(:student_session, student: student, subject: subject_obj, mode: :autonomous)
     end
@@ -30,6 +35,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
     end
 
     it "shows the tutor activation banner" do
+      expect(page).to have_content("Mise en situation")
       expect(page).to have_css("[data-testid='tutor-banner']")
       expect(page).to have_button("Activer le mode tuteur")
     end
