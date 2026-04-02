@@ -49,3 +49,12 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Ignore specs, docs, and tooling (not needed in production)
+/specs/
+/docs/
+/.specify/
+/.superpowers/
+/.claude/
+/spec/
+/wireframes/
