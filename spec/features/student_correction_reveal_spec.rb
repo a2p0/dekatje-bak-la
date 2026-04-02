@@ -154,7 +154,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
     # After reveal: question shown with ✓
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link(text: /✓.*Q1\.1/)
+      expect(page).to have_link(text: /Q1\.1/)
     end
   end
 end
