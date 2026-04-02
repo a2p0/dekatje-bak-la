@@ -63,14 +63,16 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       visit teacher_subject_part_path(subject_record, part)
 
-      fill_in "Énoncé", with: "Nouvel énoncé modifié"
-      fill_in "Points", with: "4.5"
-      click_button "Sauvegarder"
+      within("#question_#{question.id}") do
+        fill_in "Énoncé", with: "Nouvel énoncé modifié"
+        fill_in "Points", with: "4.5"
+        click_button "Sauvegarder"
+      end
 
+      expect(page).to have_content("Nouvel énoncé modifié", wait: 5)
+      expect(page).to have_content("4.5 pts")
       expect(question.reload.label).to eq("Nouvel énoncé modifié")
       expect(question.reload.points).to eq(4.5)
-      expect(page).to have_content("Nouvel énoncé modifié")
-      expect(page).to have_content("4.5 pts", wait: 5)
     end
   end
 
