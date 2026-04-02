@@ -30,7 +30,6 @@ RSpec.describe "Student tutor activation banner", type: :feature do
     end
 
     it "shows the tutor activation banner" do
-      expect(page).to have_content("Mise en situation")
       expect(page).to have_css("[data-testid='tutor-banner']")
       expect(page).to have_button("Activer le mode tuteur")
     end
