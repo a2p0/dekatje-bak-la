@@ -53,6 +53,18 @@ export default class extends Controller {
     this.backdropTarget.classList.add("hidden")
   }
 
+  openWithMessage(event) {
+    const message = event.params.message || event.currentTarget.dataset.chatMessageParam
+    this.open()
+    // Wait for drawer to open and conversation to be ready
+    setTimeout(() => {
+      if (this.hasInputTarget) {
+        this.inputTarget.value = message
+        this.send()
+      }
+    }, 500)
+  }
+
   async createConversation() {
     try {
       const response = await fetch(this.createUrlValue, {

@@ -58,4 +58,16 @@
     </div>
   <% end %>
 
+  <%# Expliquer la correction (tutored mode only) %>
+  <% if defined?(session_record) && session_record&.tutored? %>
+    <div class="text-center mt-3">
+      <button type="button"
+              class="text-indigo-500 dark:text-indigo-400 text-sm underline underline-offset-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-300"
+              data-action="click->chat#openWithMessage"
+              data-chat-message-param="Peux-tu m'expliquer cette correction ?">
+        Expliquer la correction
+      </button>
+    </div>
+  <% end %>
+
 </div>

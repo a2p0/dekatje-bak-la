@@ -60,5 +60,110 @@ RSpec.describe BuildTutorPrompt do
 
       expect(result).to include("Question sans reponse")
     end
+
+    context "spotting context" do
+      let(:classroom) { create(:classroom, owner: user) }
+      let(:student_with_session) { create(:student, classroom: classroom) }
+
+      let(:tutored_session) do
+        create(:student_session,
+          student: student_with_session,
+          subject: subject_record,
+          mode: :tutored,
+          tutor_state: {
+            "question_states" => {
+              question.id.to_s => {
+                "step" => "feedback",
+                "spotting" => {
+                  "task_type_correct" => false,
+                  "task_type_answer" => "text",
+                  "sources_missed" => [
+                    { "source" => "DT2", "location" => "tableau des caracteristiques" }
+                  ]
+                }
+              }
+            }
+          }
+        )
+      end
+
+      it "includes missed sources and guidance when student missed sources" do
+        tutored_session
+
+        result = described_class.call(question: question, student: student_with_session)
+
+        expect(result).to include("Sources manquee")
+        expect(result).to include("DT2")
+        expect(result).to include("Guide l'eleve vers cette source")
+      end
+
+      it "includes task type mismatch guidance when student got task type wrong" do
+        tutored_session
+
+        result = described_class.call(question: question, student: student_with_session)
+
+        expect(result).to include("Rediger une reponse")
+        expect(result).to include("Guide-le sur ce point")
+      end
+
+      it "includes positive message when student identified all sources correctly" do
+        create(:student_session,
+          student: student_with_session,
+          subject: subject_record,
+          mode: :tutored,
+          tutor_state: {
+            "question_states" => {
+              question.id.to_s => {
+                "step" => "feedback",
+                "spotting" => {
+                  "task_type_correct" => true,
+                  "task_type_answer" => "calculation",
+                  "sources_missed" => []
+                }
+              }
+            }
+          }
+        )
+
+        result = described_class.call(question: question, student: student_with_session)
+
+        expect(result).to include("correctement identifie toutes les sources de donnees")
+      end
+
+      it "does not include spotting context section when no spotting data exists" do
+        create(:student_session,
+          student: student_with_session,
+          subject: subject_record,
+          mode: :tutored,
+          tutor_state: {}
+        )
+
+        result = described_class.call(question: question, student: student_with_session)
+
+        expect(result).not_to include("Resultat du reperage")
+      end
+
+      it "does not include spotting context section in autonomous mode" do
+        create(:student_session,
+          student: student_with_session,
+          subject: subject_record,
+          mode: :autonomous,
+          tutor_state: {
+            "question_states" => {
+              question.id.to_s => {
+                "spotting" => {
+                  "task_type_correct" => true,
+                  "sources_missed" => []
+                }
+              }
+            }
+          }
+        )
+
+        result = described_class.call(question: question, student: student_with_session)
+
+        expect(result).not_to include("Resultat du reperage")
+      end
+    end
   end
 end
