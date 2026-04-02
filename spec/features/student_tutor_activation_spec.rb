@@ -9,7 +9,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
 
   def login_student(student)
     visit student_login_path(access_code: classroom.access_code)
-    fill_in "Nom d'utilisateur", with: student.username
+    fill_in "Identifiant", with: student.username
     fill_in "Mot de passe", with: "password123"
     click_button "Se connecter"
   end
