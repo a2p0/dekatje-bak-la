@@ -86,12 +86,30 @@ end %>
       <% end %>
     </div>
 
+    <%# Spotting card (tutored mode only) %>
+    <% if @session_record.tutored? && @question.answer %>
+      <% if !@session_record.spotting_completed?(@question.id) %>
+        <%# Show spotting form %>
+        <%= render "student/tutor/spotting_card",
+            question: @question, subject: @subject,
+            session_record: @session_record, access_code: params[:access_code] %>
+      <% else %>
+        <%# Show feedback (read-only) %>
+        <% spotting = @session_record.spotting_data(@question.id) %>
+        <% if spotting %>
+          <%= render "student/tutor/spotting_feedback",
+              question: @question, spotting: spotting %>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <%# Correction + data hints area %>
     <%= turbo_frame_tag "question_#{@question.id}_correction" do %>
       <% if @session_record.answered?(@question.id) %>
         <%= render "student/questions/correction",
             question: @question, subject: @subject, session_record: @session_record %>
-      <% elsif @question.answer %>
+      <% elsif @question.answer && (!@session_record.tutored? || @session_record.spotting_completed?(@question.id)) %>
+        <%# Show correction button only if spotting is done (or autonomous mode) %>
         <div class="flex items-center justify-center gap-4 mb-4">
           <%= button_to "Voir la correction",
               student_reveal_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @question.id),

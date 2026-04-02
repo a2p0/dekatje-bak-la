@@ -1,0 +1,48 @@
+<%= turbo_frame_tag "spotting_question_#{question.id}" do %>
+  <div class="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-500/30 rounded-lg p-5 mb-4"
+       data-controller="spotting"
+       data-spotting-verify-url-value="<%= student_tutor_verify_spotting_path(access_code: access_code, subject_id: subject.id, question_id: question.id) %>"
+       data-spotting-skip-url-value="<%= student_tutor_skip_spotting_path(access_code: access_code, subject_id: subject.id, question_id: question.id) %>">
+
+    <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-4">Avant de répondre</p>
+
+    <%# Task type radio %>
+    <div class="mb-4">
+      <p class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">Cette question te demande de :</p>
+      <div class="space-y-2">
+        <% task_type_options(question.answer_type).each do |value, label| %>
+          <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-500/10">
+            <input type="radio" name="task_type" value="<%= value %>" class="accent-indigo-500" data-spotting-target="taskType">
+            <span class="text-sm text-slate-700 dark:text-slate-300"><%= label %></span>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Sources checkboxes — only if data_hints exist for any question in subject %>
+    <% available_sources = spotting_source_options(subject) %>
+    <% if available_sources.any? %>
+      <div class="mb-4">
+        <p class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">Les données utiles se trouvent dans :</p>
+        <div class="space-y-2">
+          <% available_sources.each do |value, label| %>
+            <label class="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 dark:has-[:checked]:bg-amber-500/10">
+              <input type="checkbox" name="sources[]" value="<%= value %>" class="accent-amber-500 rounded" data-spotting-target="source">
+              <span class="text-sm text-slate-700 dark:text-slate-300"><%= label %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Actions %>
+    <div class="flex items-center gap-3">
+      <button data-action="click->spotting#verify" class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer">
+        Vérifier
+      </button>
+      <button data-action="click->spotting#skip" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer underline underline-offset-2">
+        passer
+      </button>
+    </div>
+  </div>
+<% end %>
