@@ -46,7 +46,7 @@ RSpec.describe "Story 1: Inscription et connexion enseignant", type: :feature do
     click_button "Log in"
 
     expect(page).to have_content("Mes classes")
-    click_link "Déconnexion"
+    first(:link, "Déconnexion").click
 
     expect(page).to have_current_path(root_path)
   end

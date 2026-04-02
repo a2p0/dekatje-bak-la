@@ -68,15 +68,13 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     )
   end
 
-  scenario "la sidebar affiche la mise en situation, l'objectif et les documents" do
+  scenario "la sidebar affiche les documents et les liens de navigation" do
     login_as_student(student, classroom)
     visit_question(q1)
 
     # On desktop (1400x900), sidebar is always visible via lg:relative lg:translate-x-0
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_content("La société CIME fabrique des véhicules électriques.")
-      expect(page).to have_content("Comparer les modes de transport en termes d'impact environnemental.")
-      expect(page).to have_link("Documents Techniques (DT)")
+      expect(page).to have_link("Documents Techniques")
       expect(page).to have_link("DR vierge")
     end
   end
@@ -87,7 +85,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
 
     # On desktop (1400x900), sidebar is always visible — no hamburger click needed
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_content("La société CIME fabrique des véhicules électriques.")
+      expect(page).to have_link(text: /Réglages/)
     end
   end
 
@@ -103,7 +101,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     sleep 0.5
 
     within("[data-sidebar-target='drawer']") do
-      expect(page).to have_content("La société CIME fabrique des véhicules électriques.")
+      expect(page).to have_link(text: /Réglages/)
     end
 
     # Reset to desktop width
@@ -150,8 +148,8 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
 
     # On desktop, sidebar is always visible
     within("aside[data-sidebar-target='drawer']") do
-      # The sidebar shows part title and answered/total in separate spans
-      link = find_link("Analyse fonctionnelle", visible: :all)
+      # Inactive parts show as "Partie N" in the sidebar (not the part title)
+      link = find_link("Partie 2", visible: :all)
       page.execute_script("arguments[0].click()", link)
     end
 
@@ -165,21 +163,20 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
 
     # On desktop, sidebar is always visible
     within("aside[data-sidebar-target='drawer']") do
-      dt_link = find_link("Documents Techniques (DT)")
+      dt_link = find_link("Documents Techniques")
       expect(dt_link[:target]).to eq("_blank")
     end
   end
 
-  scenario "avant correction, le DR corrigé et les questions corrigées ne sont pas visibles" do
+  scenario "avant correction, le DR corrigé n'est pas visible dans la sidebar" do
     login_as_student(student, classroom)
     visit_question(q1)
 
     # On desktop, sidebar is always visible
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link("Documents Techniques (DT)")
+      expect(page).to have_link("Documents Techniques")
       expect(page).to have_link("DR vierge")
       expect(page).not_to have_link("DR corrigé")
-      expect(page).not_to have_link("Questions corrigées")
     end
   end
 end

@@ -104,6 +104,9 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     # Navigate to a question page and check settings link is still present
     click_link "Commencer"
 
+    # "Commencer" leads to the mise en situation page — click through to questions
+    click_link "Commencer les questions"
+
     # On desktop viewport (1400px), sidebar is always visible (lg:translate-x-0)
     within("aside") do
       expect(page).to have_link(text: /Réglages/)

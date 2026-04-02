@@ -1,0 +1,76 @@
+<%= turbo_frame_tag "spotting_question_#{question.id}" do %>
+  <div class="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-500/30 rounded-lg p-5 mb-4">
+    <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-4">Avant de répondre — résultats</p>
+
+    <%# Task type result %>
+    <div class="mb-4">
+      <p class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">Type de tâche :</p>
+      <% if spotting[:task_type_correct] %>
+        <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/40">
+          <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">✓</span>
+          <span class="text-sm text-emerald-700 dark:text-emerald-300">
+            <%= Student::TutorHelper::TASK_TYPE_LABELS[spotting[:task_type_answer]] %>
+          </span>
+        </div>
+      <% else %>
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-300 dark:border-rose-500/40">
+            <span class="text-rose-600 dark:text-rose-400 font-bold text-sm">✗</span>
+            <span class="text-sm text-rose-700 dark:text-rose-300">
+              Ta réponse : <%= Student::TutorHelper::TASK_TYPE_LABELS[spotting[:task_type_answer]] || spotting[:task_type_answer] %>
+            </span>
+          </div>
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/40">
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">✓</span>
+            <span class="text-sm text-emerald-700 dark:text-emerald-300">
+              Bonne réponse : <%= Student::TutorHelper::TASK_TYPE_LABELS[spotting[:task_type_correct]] || spotting[:task_type_correct] %>
+            </span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Sources result %>
+    <% if spotting[:sources_correct].present? || spotting[:sources_missed].present? || spotting[:sources_extra].present? %>
+      <div>
+        <p class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">Sources identifiées :</p>
+        <div class="space-y-1.5">
+
+          <%# Correct sources %>
+          <% Array(spotting[:sources_correct]).each do |source| %>
+            <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/40">
+              <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">✓</span>
+              <%= render(BadgeComponent.new(color: :emerald, label: source)) %>
+            </div>
+          <% end %>
+
+          <%# Missed sources (false negatives) %>
+          <% Array(spotting[:sources_missed]).each do |hint| %>
+            <div class="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/40">
+              <span class="text-amber-600 dark:text-amber-400 font-bold text-sm mt-0.5">⚠</span>
+              <div>
+                <div class="flex items-center gap-1.5 mb-0.5">
+                  <%= render(BadgeComponent.new(color: :amber, label: hint["source"])) %>
+                  <span class="text-xs text-amber-700 dark:text-amber-300">oublié</span>
+                </div>
+                <% if hint["location"].present? %>
+                  <p class="text-xs text-slate-500 dark:text-slate-400"><%= hint["location"] %></p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <%# Extra sources (false positives) %>
+          <% Array(spotting[:sources_extra]).each do |source| %>
+            <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-300 dark:border-rose-500/40">
+              <span class="text-rose-600 dark:text-rose-400 font-bold text-sm">✗</span>
+              <%= render(BadgeComponent.new(color: :rose, label: source)) %>
+              <span class="text-xs text-rose-600 dark:text-rose-400">non nécessaire</span>
+            </div>
+          <% end %>
+
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

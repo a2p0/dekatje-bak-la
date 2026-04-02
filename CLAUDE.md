@@ -329,6 +329,8 @@ SECRET_KEY_BASE            # rails secret
 ## Active Technologies
 - Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage (001-bac-training-app)
 - PostgreSQL via Neon (poolée app + directe migrations), Redis (Sidekiq), ActiveStorage (PDFs locaux) (001-bac-training-app)
+- Ruby 3.3+ / Rails 8.1.3 + Hotwire (Turbo Streams, Stimulus), ViewComponent, Sidekiq, ActionCable (011-guided-tutor-spotting)
+- PostgreSQL via Neon (JSONB pour l'état du tuteur) (011-guided-tutor-spotting)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage

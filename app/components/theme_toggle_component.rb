@@ -4,7 +4,6 @@ class ThemeToggleComponent < ViewComponent::Base
       data: { action: "click->theme#toggle" },
       aria: { label: "Changer de thème" },
       class: "flex items-center gap-1 p-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 cursor-pointer transition-colors") do
-
       # Sun icon — highlighted in light mode
       sun = content_tag(:span, class: "p-1 rounded-full bg-white dark:bg-transparent shadow-sm dark:shadow-none transition-colors") do
         content_tag(:svg, class: "w-4 h-4 text-amber-500 dark:text-slate-500", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", stroke_width: "2") do
