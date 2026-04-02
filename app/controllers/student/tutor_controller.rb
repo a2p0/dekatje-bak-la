@@ -1,8 +1,8 @@
 class Student::TutorController < Student::BaseController
   before_action :set_subject
-  before_action :set_question, except: [:activate]
+  before_action :set_question, except: [ :activate ]
   before_action :set_session_record
-  before_action :require_tutored_mode, only: [:verify_spotting, :skip_spotting]
+  before_action :require_tutored_mode, only: [ :verify_spotting, :skip_spotting ]
 
   def activate
     # TODO: implement in US2

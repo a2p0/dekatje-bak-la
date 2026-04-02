@@ -13,16 +13,16 @@ module Student::TutorHelper
     all_types = TASK_TYPE_LABELS.to_a
     correct = all_types.find { |v, _| v == correct_type }
     distractors = all_types.reject { |v, _| v == correct_type }.sample(3)
-    ([correct] + distractors).compact.shuffle
+    ([ correct ] + distractors).compact.shuffle
   end
 
   # Returns array of [normalized_value, label] for all possible sources in the subject
   def spotting_source_options(subject)
     options = []
-    options << ["dt", "Document Technique (DT)"] if subject.dt_file.attached?
-    options << ["dr", "Document Réponse (DR)"] if subject.dr_vierge_file.attached?
-    options << ["enonce", "Énoncé de la question"]
-    options << ["mise_en_situation", "Mise en situation"] if subject.presentation_text.present?
+    options << [ "dt", "Document Technique (DT)" ] if subject.dt_file.attached?
+    options << [ "dr", "Document Réponse (DR)" ] if subject.dr_vierge_file.attached?
+    options << [ "enonce", "Énoncé de la question" ]
+    options << [ "mise_en_situation", "Mise en situation" ] if subject.presentation_text.present?
     options
   end
 end
