@@ -7,12 +7,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
   let(:part) { create(:part, subject: subject_obj, position: 1) }
   let!(:first_question) { create(:question, part: part, position: 1) }
 
-  def login_student(student)
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
-  end
+  # Uses login_as_student from StudentLoginHelper (included via spec/support/)
 
   def visit_subject
     visit student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
@@ -30,7 +25,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
     end
 
     before do
-      login_student(student)
+      login_as_student(student, classroom)
       visit_subject
     end
 
@@ -61,7 +56,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
     end
 
     before do
-      login_student(student)
+      login_as_student(student, classroom)
       visit_subject
     end
 
@@ -77,7 +72,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
     end
 
     before do
-      login_student(student)
+      login_as_student(student, classroom)
       visit_subject
     end
 
