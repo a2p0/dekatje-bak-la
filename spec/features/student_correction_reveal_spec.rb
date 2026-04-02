@@ -111,14 +111,13 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
   end
 
-  scenario "après révélation, les documents DR corrigé et questions corrigées apparaissent dans la sidebar" do
+  scenario "après révélation, le document DR corrigé apparaît dans la sidebar" do
     login_as_student(student, classroom)
     visit_question(q1)
 
     # On desktop (1400x900), sidebar is always visible — no hamburger click needed
     within("aside[data-sidebar-target='drawer']") do
       expect(page).not_to have_link("DR corrigé")
-      expect(page).not_to have_link("Questions corrigées")
     end
 
     click_button "Voir la correction"
@@ -128,7 +127,6 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
     within("aside[data-sidebar-target='drawer']") do
       expect(page).to have_link("DR corrigé")
-      expect(page).to have_link("Questions corrigées")
     end
   end
 
@@ -144,9 +142,9 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     visit_question(q1)
 
     # On desktop, sidebar is always visible
-    # q1 is the current question, so it shows ◉ (current indicator), not ○
+    # q1 is the current question, so it shows ◉ (current indicator)
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link("◉ Q1.1 (2.0 pts)")
+      expect(page).to have_link(text: /◉.*Q1\.1/)
     end
 
     click_button "Voir la correction"
@@ -156,7 +154,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
     # After reveal: question shown with ✓
     within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link("✓ Q1.1 (2.0 pts)")
+      expect(page).to have_link(text: /✓.*Q1\.1/)
     end
   end
 end

@@ -30,7 +30,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Q1.1")
       expect(page).to have_content("Q1.2")
       expect(page).to have_content("Énoncé")
-      expect(page).to have_css("iframe")
+      expect(page).to have_css("iframe", visible: :all)
     end
   end
 

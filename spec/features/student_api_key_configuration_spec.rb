@@ -55,7 +55,9 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
       id: question.id
     )
 
-    click_link "Réglages"
+    within("aside") do
+      click_link "Réglages"
+    end
 
     expect(page).to have_content("Réglages")
     expect(page).to have_field("Provider")
@@ -73,7 +75,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
 
     # Verify anthropic models appear
     expect(page).to have_select("student[api_model]", with_options: [ "$ Claude Haiku 4.5" ])
-    expect(page).to have_select("student[api_model]", with_options: [ "$$ Claude Sonnet 4.5" ])
+    expect(page).to have_select("student[api_model]", with_options: [ "$$ Claude Sonnet 4.6" ])
 
     # Switch to openai
     select "Openai", from: "Provider"
