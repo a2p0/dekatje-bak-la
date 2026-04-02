@@ -57,8 +57,10 @@ Rails.application.routes.draw do
         post :message
       end
     end
-    scope "/subjects/:subject_id/questions/:question_id/tutor", as: :tutor do
-      post :activate,        to: "student/tutor#activate"
+    scope "/subjects/:subject_id/tutor", as: :tutor do
+      post :activate, to: "student/tutor#activate"
+    end
+    scope "/subjects/:subject_id/questions/:question_id/tutor", as: :tutor_question do
       post :verify_spotting, to: "student/tutor#verify_spotting"
       post :skip_spotting,   to: "student/tutor#skip_spotting"
     end

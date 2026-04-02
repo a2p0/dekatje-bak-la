@@ -18,6 +18,13 @@ end %>
     <% end %>
   </div>
 
+  <%# Tutor activation banner — only for autonomous students with an API key %>
+  <% if @session_record.autonomous? && current_student.api_key.present? %>
+    <%= render "student/tutor/tutor_banner",
+               subject: @subject,
+               access_code: params[:access_code] %>
+  <% end %>
+
   <%# Mise en situation — full text from PDF %>
   <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-6">
     <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Mise en situation</h2>
