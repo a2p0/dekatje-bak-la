@@ -7,6 +7,15 @@ services:
       - "80:80"
     environment:
       - RAILS_ENV=production
+      - RAILS_MASTER_KEY
+      - SECRET_KEY_BASE
+      - DATABASE_URL
+      - DATABASE_DIRECT_URL
+      - REDIS_URL
+      - OPENROUTER_API_KEY
+      - ENCRYPTION_PRIMARY_KEY
+      - ENCRYPTION_DETERMINISTIC_KEY
+      - ENCRYPTION_KEY_DERIVATION_SALT
     volumes:
       - storage:/rails/storage
     healthcheck:
@@ -22,6 +31,14 @@ services:
     command: bundle exec sidekiq
     environment:
       - RAILS_ENV=production
+      - RAILS_MASTER_KEY
+      - SECRET_KEY_BASE
+      - DATABASE_URL
+      - REDIS_URL
+      - OPENROUTER_API_KEY
+      - ENCRYPTION_PRIMARY_KEY
+      - ENCRYPTION_DETERMINISTIC_KEY
+      - ENCRYPTION_KEY_DERIVATION_SALT
     volumes:
       - storage:/rails/storage
 
