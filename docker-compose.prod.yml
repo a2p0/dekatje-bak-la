@@ -7,8 +7,8 @@ services:
       - "80:80"
     environment:
       - RAILS_ENV=production
-    depends_on:
-      - redis
+    volumes:
+      - storage:/rails/storage
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/up"]
       interval: 30s
@@ -22,18 +22,8 @@ services:
     command: bundle exec sidekiq
     environment:
       - RAILS_ENV=production
-    depends_on:
-      - redis
-
-  redis:
-    image: redis:7-alpine
     volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - storage:/rails/storage
 
 volumes:
-  redis_data:
+  storage:
