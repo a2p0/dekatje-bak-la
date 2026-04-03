@@ -85,9 +85,11 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Active Record encryption keys for student/teacher API key storage.
-  config.active_record.encryption.primary_key = ENV.fetch("ENCRYPTION_PRIMARY_KEY")
-  config.active_record.encryption.deterministic_key = ENV.fetch("ENCRYPTION_DETERMINISTIC_KEY")
-  config.active_record.encryption.key_derivation_salt = ENV.fetch("ENCRYPTION_KEY_DERIVATION_SALT")
+  unless ENV["SECRET_KEY_BASE_DUMMY"]
+    config.active_record.encryption.primary_key = ENV.fetch("ENCRYPTION_PRIMARY_KEY")
+    config.active_record.encryption.deterministic_key = ENV.fetch("ENCRYPTION_DETERMINISTIC_KEY")
+    config.active_record.encryption.key_derivation_salt = ENV.fetch("ENCRYPTION_KEY_DERIVATION_SALT")
+  end
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
