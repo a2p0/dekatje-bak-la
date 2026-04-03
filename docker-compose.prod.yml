@@ -17,6 +17,9 @@ services:
       - ENCRYPTION_PRIMARY_KEY=${ENCRYPTION_PRIMARY_KEY}
       - ENCRYPTION_DETERMINISTIC_KEY=${ENCRYPTION_DETERMINISTIC_KEY}
       - ENCRYPTION_KEY_DERIVATION_SALT=${ENCRYPTION_KEY_DERIVATION_SALT}
+    networks:
+      - coolify
+      - default
     volumes:
       - storage:/rails/storage
     healthcheck:
@@ -49,6 +52,9 @@ services:
       - ENCRYPTION_PRIMARY_KEY=${ENCRYPTION_PRIMARY_KEY}
       - ENCRYPTION_DETERMINISTIC_KEY=${ENCRYPTION_DETERMINISTIC_KEY}
       - ENCRYPTION_KEY_DERIVATION_SALT=${ENCRYPTION_KEY_DERIVATION_SALT}
+    networks:
+      - coolify
+      - default
     volumes:
       - storage:/rails/storage
     depends_on:
@@ -64,6 +70,10 @@ services:
       resources:
         limits:
           memory: 512M
+
+networks:
+  coolify:
+    external: true
 
 volumes:
   storage:
