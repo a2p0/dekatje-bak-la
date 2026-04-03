@@ -4,7 +4,7 @@ import "controllers"
 import "@rails/actioncable"
 
 // Custom Turbo confirm dialog — avoids browser showing the page origin (IP/localhost)
-Turbo.setConfirmMethod((message) => {
+Turbo.config.forms.confirm = (message) => {
   return new Promise((resolve) => {
     const dialog = document.createElement("dialog")
     dialog.className = "rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 max-w-sm shadow-xl backdrop:bg-black/50"
