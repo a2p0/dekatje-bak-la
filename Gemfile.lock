@@ -522,6 +522,7 @@ DEPENDENCIES
   jbuilder
   kamal
   letter_opener
+  matrix
   pdf-reader
   pg (~> 1.1)
   prawn

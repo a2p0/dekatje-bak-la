@@ -31,6 +31,7 @@ gem "faraday-multipart"
 
 gem "prawn"
 gem "prawn-table"
+gem "matrix" # required by prawn, removed from Ruby stdlib since 3.1
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
