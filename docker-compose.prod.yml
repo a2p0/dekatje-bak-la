@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     image: dekatje-bak-la:latest
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
       - RAILS_ENV=production
       - RAILS_MASTER_KEY
