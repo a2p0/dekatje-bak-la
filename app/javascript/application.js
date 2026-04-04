@@ -35,4 +35,4 @@ Turbo.config.forms.confirm = (message) => {
       dialog.remove()
     })
   })
-})
+}

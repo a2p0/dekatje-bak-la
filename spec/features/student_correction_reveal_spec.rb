@@ -115,19 +115,18 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop (1400x900), sidebar is always visible — no hamburger click needed
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).not_to have_link("DR corrigé")
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    # Use visible: :all because sidebar content may be off-screen for Selenium
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).not_to have_link("DR corrigé", visible: :all)
 
     click_button "Voir la correction"
 
     # Reload the page to get the full sidebar with correction documents
     visit_question(q1)
 
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link("DR corrigé")
-    end
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).to have_link("DR corrigé", visible: :all)
   end
 
   scenario "le bouton 'Voir la correction' n'apparaît pas si la question n'a pas de réponse" do
@@ -141,11 +140,10 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop, sidebar is always visible
-    # q1 is the current question, so it shows ◉ (current indicator)
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link(text: /Q1\.1/)
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    # Use visible: :all because sidebar content may be off-screen for Selenium
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).to have_link(text: /Q1\.1/, visible: :all)
 
     click_button "Voir la correction"
 
@@ -153,8 +151,9 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     visit_question(q1)
 
     # After reveal: question shown with ✓
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link(text: /Q1\.1/)
-    end
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).to have_link(text: /Q1\.1/, visible: :all)
+    # Verify the checkmark is present
+    expect(sidebar).to have_css("span.text-emerald-400", text: "✓", visible: :all)
   end
 end

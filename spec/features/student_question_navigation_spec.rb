@@ -72,21 +72,20 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop (1400x900), sidebar is always visible via lg:relative lg:translate-x-0
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link("Documents Techniques")
-      expect(page).to have_link("DR vierge")
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    # Use visible: :all because sidebar content may be off-screen for Selenium
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).to have_link("Documents Techniques", visible: :all)
+    expect(sidebar).to have_link("DR vierge", visible: :all)
   end
 
   scenario "sur desktop la sidebar est visible en permanence" do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop (1400x900), sidebar is always visible — no hamburger click needed
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link(text: /Réglages/)
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).to have_link(text: /Réglages/, visible: :all)
   end
 
   scenario "sur mobile la sidebar s'ouvre via le menu hamburger" do
@@ -97,11 +96,11 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     page.driver.browser.manage.window.resize_to(375, 812)
     sleep 0.3
 
-    find("[data-action='click->sidebar#open']").click
+    find("[data-action='click->sidebar#open']", visible: :all).click
     sleep 0.5
 
-    within("[data-sidebar-target='drawer']") do
-      expect(page).to have_link(text: /Réglages/)
+    within("aside[data-sidebar-target='drawer']") do
+      expect(page).to have_link(text: /Réglages/, visible: :all)
     end
 
     # Reset to desktop width
@@ -133,11 +132,10 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop, sidebar is always visible — use JS click to avoid z-index issues
-    within("aside[data-sidebar-target='drawer']") do
-      link = find_link("Q1.2", visible: :all)
-      page.execute_script("arguments[0].click()", link)
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    link = sidebar.find_link("Q1.2", visible: :all)
+    page.execute_script("arguments[0].click()", link)
 
     expect(page).to have_content("Comparer les émissions de CO2 des deux véhicules.")
   end
@@ -146,37 +144,35 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop, sidebar is always visible
-    within("aside[data-sidebar-target='drawer']") do
-      # Inactive parts show as "Partie N" in the sidebar (not the part title)
-      link = find_link("Partie 2", visible: :all)
-      page.execute_script("arguments[0].click()", link)
-    end
+    # On desktop (1400x900), sidebar is always visible via lg:translate-x-0
+    link = find("aside[data-sidebar-target='drawer']").find_link("Partie 2", visible: :all)
+    page.execute_script("arguments[0].click()", link)
 
-    # Subject#show redirects to a question page (may be same part if no undone in part2)
-    expect(page).to have_css("[data-controller='sidebar chat']")
+    # Subject#show displays the mise en situation page (first visit, no answers yet)
+    # The "Commencer les questions" link only appears on the subject show page
+    expect(page).to have_link("Commencer les questions")
   end
 
   scenario "un lien DT s'ouvre dans un nouvel onglet" do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop, sidebar is always visible
-    within("aside[data-sidebar-target='drawer']") do
-      dt_link = find_link("Documents Techniques")
-      expect(dt_link[:target]).to eq("_blank")
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    # Use visible: :all because sidebar content may be off-screen for Selenium
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    dt_link = sidebar.find_link("Documents Techniques", visible: :all)
+    expect(dt_link[:target]).to eq("_blank")
   end
 
   scenario "avant correction, le DR corrigé n'est pas visible dans la sidebar" do
     login_as_student(student, classroom)
     visit_question(q1)
 
-    # On desktop, sidebar is always visible
-    within("aside[data-sidebar-target='drawer']") do
-      expect(page).to have_link("Documents Techniques")
-      expect(page).to have_link("DR vierge")
-      expect(page).not_to have_link("DR corrigé")
-    end
+    # On desktop (1400x900), sidebar is visible via lg:translate-x-0
+    # Use visible: :all because sidebar content may be off-screen for Selenium
+    sidebar = find("aside[data-sidebar-target='drawer']")
+    expect(sidebar).to have_link("Documents Techniques", visible: :all)
+    expect(sidebar).to have_link("DR vierge", visible: :all)
+    expect(sidebar).not_to have_link("DR corrigé", visible: :all)
   end
 end

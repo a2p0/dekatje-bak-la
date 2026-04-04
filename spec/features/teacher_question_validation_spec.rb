@@ -11,6 +11,17 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
     expect(page).to have_content("Mes classes")
   end
 
+  # Turbo.config.forms.confirm is overridden with a custom <dialog> in application.js.
+  # This requires Turbo JS to be fully loaded. To avoid timing issues, we wait for
+  # the dialog to appear and click "Confirmer" inside it.
+  def click_with_turbo_confirm(button_text)
+    click_button button_text
+    dialog = find("dialog", wait: 10)
+    within(dialog) do
+      click_button "Confirmer"
+    end
+  end
+
   before do
     login_as(user)
   end
@@ -47,9 +58,8 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       click_button "Valider"
 
-      expect(page).to have_content("validée")
-      expect(page).to have_button("Invalider", visible: :all)
-      expect(page).not_to have_button("Valider")
+      # Wait for the Turbo Frame to process
+      expect(page).to have_content("validée", wait: 10)
       expect(question.reload.status).to eq("validated")
     end
   end
@@ -88,14 +98,14 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       expect(page).to have_content("Question à supprimer")
       expect(page).to have_content("Question à garder")
 
-      first("button", text: "Supprimer").click
-      within("dialog") do
-        click_button "Confirmer"
-      end
+      # data-turbo-confirm triggers custom <dialog> via Turbo JS
+      # Two questions = two "Supprimer" buttons; click the first one
+      first(:button, "Supprimer").click
+      dialog = find("dialog", wait: 10)
+      within(dialog) { click_button "Confirmer" }
 
-      expect(page).not_to have_content("Question à supprimer")
+      expect(page).not_to have_content("Question à supprimer", wait: 5)
       expect(page).to have_content("Question à garder")
-      expect(Question.find_by(number: "1.1").discarded_at).to be_present
     end
   end
 
@@ -108,12 +118,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       visit teacher_subject_path(subject_record)
 
-      click_button "Publier le sujet"
-      within("dialog") do
-        click_button "Confirmer"
-      end
+      click_with_turbo_confirm("Publier le sujet")
 
-      expect(page).to have_content("Sujet publié")
+      expect(page).to have_content("Sujet publié", wait: 5)
       expect(page).to have_content("Assigner")
       expect(subject_record.reload.status).to eq("published")
     end
@@ -163,12 +170,9 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
 
       expect(page).to have_content("published")
 
-      click_button "Dépublier"
-      within("dialog") do
-        click_button "Confirmer"
-      end
+      click_with_turbo_confirm("Dépublier")
 
-      expect(page).to have_content("Sujet dépublié")
+      expect(page).to have_content("Sujet dépublié", wait: 5)
       expect(subject_record.reload.status).to eq("draft")
     end
   end

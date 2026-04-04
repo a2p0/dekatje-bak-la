@@ -107,12 +107,16 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Build Tailwind CSS
-        run: bin/rails tailwindcss:build
+      - name: Precompile assets (Tailwind CSS + importmap JS)
+        run: bin/rails assets:precompile
+        env:
+          SECRET_KEY_BASE: dummy_key_for_precompile
 
       - name: Load schema
         run: bin/rails db:schema:load
 
       - name: Run feature specs
         run: bundle exec rspec spec/features/ --format progress --no-color
+        env:
+          RAILS_SERVE_STATIC_FILES: "1"
 
