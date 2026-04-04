@@ -38,12 +38,12 @@ RSpec.describe "US2: Teacher uploads second specialty — dedup common parts", t
     visit new_teacher_subject_path
 
     # Select existing session
-    select "BAC 2024 Polynesie", from: "Session existante"
+    select "BAC 2024 Polynesie", from: "Session existante (optionnel)"
     fill_in "Titre", with: "Sujet AC"
-    fill_in "Annee", with: "2024"
-    select "bac", from: "Type d'examen"
-    select "AC", from: "Specialite"
-    select "polynesie", from: "Region"
+    fill_in "Année", with: "2024"
+    select "Bac", from: "Type d'examen"
+    select "AC", from: "Spécialité"
+    select "Polynésie", from: "Région"
 
     attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
     attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s

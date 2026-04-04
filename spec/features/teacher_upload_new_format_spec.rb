@@ -19,10 +19,10 @@ RSpec.describe "US1: Teacher uploads 2-file subject (new format)", type: :featur
     visit new_teacher_subject_path
 
     fill_in "Titre", with: "BAC STI2D Polynesie 2024 CIME"
-    fill_in "Annee", with: "2024"
-    select "bac", from: "Type d'examen"
-    select "SIN", from: "Specialite"
-    select "polynesie", from: "Region"
+    fill_in "Année", with: "2024"
+    select "Bac", from: "Type d'examen"
+    select "SIN", from: "Spécialité"
+    select "Polynésie", from: "Région"
 
     attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
     attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
@@ -45,9 +45,9 @@ RSpec.describe "US1: Teacher uploads 2-file subject (new format)", type: :featur
 
     visit new_teacher_subject_path
 
-    select "Session existante 2024", from: "Session existante"
+    select "Session existante 2024", from: "Session existante (optionnel)"
     fill_in "Titre", with: "Sujet ITEC"
-    fill_in "Annee", with: "2024"
+    fill_in "Année", with: "2024"
     select "bac", from: "Type d'examen"
     select "ITEC", from: "Specialite"
     select "polynesie", from: "Region"

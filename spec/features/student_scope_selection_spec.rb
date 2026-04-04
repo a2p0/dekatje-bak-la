@@ -103,7 +103,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
   scenario "new-format subject shows scope selection screen" do
     login_as_student(student, classroom)
 
-    click_link "Commencer", match: :first
+    visit student_subject_path(access_code: classroom.access_code, id: new_format_subject.id)
     # Should see the scope selection instead of mise en situation
     expect(page).to have_content("Choisissez votre perimetre de travail")
     expect(page).to have_button("Partie commune")
@@ -121,7 +121,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     click_button "Partie commune"
 
     # Should redirect to mise en situation, then start questions
-    expect(page).to have_content("Mise en situation")
+    expect(page).to have_content("MISE EN SITUATION")
     click_link "Commencer les questions"
 
     # Should see common question
@@ -159,7 +159,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
     # Should go directly to mise en situation, no scope selection
     expect(page).not_to have_content("Choisissez votre perimetre de travail")
-    expect(page).to have_content("Mise en situation")
+    expect(page).to have_content("MISE EN SITUATION")
     expect(page).to have_link("Commencer les questions")
 
     click_link "Commencer les questions"
