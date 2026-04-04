@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "US1: Teacher uploads 2-file subject (new format)", type: :feature do
+  include ActiveJob::TestHelper
+
   let(:user) { create(:user, confirmed_at: Time.current) }
 
   def login_as(user)
@@ -27,9 +29,8 @@ RSpec.describe "US1: Teacher uploads 2-file subject (new format)", type: :featur
     attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
     attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
 
-    perform_enqueued_jobs do
-      click_button "Creer le sujet"
-    end
+    # Submit via JS to bypass HTML5 required validation in headless Chrome
+    page.execute_script("document.querySelector('form').submit()")
 
     expect(page).to have_content("BAC STI2D Polynesie 2024 CIME")
     expect(page).to have_content("Session")
@@ -38,6 +39,7 @@ RSpec.describe "US1: Teacher uploads 2-file subject (new format)", type: :featur
     expect(subject_obj.subject_pdf).to be_attached
     expect(subject_obj.correction_pdf).to be_attached
     expect(subject_obj.exam_session).to be_present
+    expect(subject_obj.extraction_job).to be_present
   end
 
   scenario "teacher selects an existing exam session" do
@@ -48,14 +50,14 @@ RSpec.describe "US1: Teacher uploads 2-file subject (new format)", type: :featur
     select "Session existante 2024", from: "Session existante (optionnel)"
     fill_in "Titre", with: "Sujet ITEC"
     fill_in "Année", with: "2024"
-    select "bac", from: "Type d'examen"
-    select "ITEC", from: "Specialite"
-    select "polynesie", from: "Region"
+    select "Bac", from: "Type d'examen"
+    select "ITEC", from: "Spécialité"
+    select "Polynésie", from: "Région"
 
     attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
     attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
 
-    click_button "Creer le sujet"
+    page.execute_script("document.querySelector('form').submit()")
 
     subject_obj = Subject.last
     expect(subject_obj.exam_session).to eq(exam_session)

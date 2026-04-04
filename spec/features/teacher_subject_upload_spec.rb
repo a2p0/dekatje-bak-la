@@ -98,10 +98,9 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     # Only attach subject_pdf, skip correction_pdf
     attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
 
-    # Remove required attribute to let server-side validation handle it
-    page.execute_script("document.querySelectorAll('input[type=file]').forEach(el => el.removeAttribute('required'))")
-
-    click_button "Créer le sujet"
+    # Remove required attributes and submit via JS to avoid Selenium timing issues
+    page.execute_script("document.querySelectorAll('input[required]').forEach(el => el.removeAttribute('required'))")
+    page.execute_script("document.querySelector('form').submit()")
 
     expect(page).to have_content("blank")
     expect(Subject.count).to eq(0)

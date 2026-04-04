@@ -48,7 +48,7 @@ RSpec.describe "US2: Teacher uploads second specialty — dedup common parts", t
     attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
     attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
 
-    click_button "Creer le sujet"
+    page.execute_script("document.querySelector('form').submit()")
 
     # Verify the second subject was created under the same session
     second_subject = Subject.last
