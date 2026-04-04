@@ -60,7 +60,7 @@ module TutorSimulation
       MSG
 
       response = @client.call(
-        messages: [{ role: "user", content: user_message }],
+        messages: [ { role: "user", content: user_message } ],
         system: SYSTEM_PROMPT,
         max_tokens: 1024,
         temperature: 0.1

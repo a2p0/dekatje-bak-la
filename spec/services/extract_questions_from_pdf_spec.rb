@@ -23,14 +23,14 @@ RSpec.describe ExtractQuestionsFromPdf do
               "context" => "",
               "points" => 2,
               "answer_type" => "text",
-              "dt_references" => ["DT1"],
+              "dt_references" => [ "DT1" ],
               "dr_references" => [],
               "correction" => "Le CIME transporte des charges lourdes",
               "explanation" => "Il faut lire le diagramme des exigences",
               "data_hints" => [
                 { "source" => "DT", "location" => "DT1, diagramme des exigences" }
               ],
-              "key_concepts" => ["analyse fonctionnelle", "exigences"]
+              "key_concepts" => [ "analyse fonctionnelle", "exigences" ]
             }
           ]
         }
@@ -47,14 +47,14 @@ RSpec.describe ExtractQuestionsFromPdf do
               "context" => "Le microcontrôleur utilise un bus I2C",
               "points" => 4,
               "answer_type" => "text",
-              "dt_references" => ["DT1"],
-              "dr_references" => ["DR1"],
+              "dt_references" => [ "DT1" ],
+              "dr_references" => [ "DR1" ],
               "correction" => "Algorithme avec boucle while et lecture capteur",
               "explanation" => "L'algorithme doit lire les données du capteur via I2C",
               "data_hints" => [
                 { "source" => "DT", "location" => "DT1, schéma du bus I2C" }
               ],
-              "key_concepts" => ["algorithme", "I2C"]
+              "key_concepts" => [ "algorithme", "I2C" ]
             }
           ]
         }
