@@ -3,6 +3,7 @@ class StudentSession < ApplicationRecord
   belongs_to :subject
 
   enum :mode, { autonomous: 0, tutored: 1 }
+  enum :part_filter, { full: 0, common_only: 1, specific_only: 2 }
 
   validates :student_id, uniqueness: { scope: :subject_id }
 
