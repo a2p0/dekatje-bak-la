@@ -68,4 +68,35 @@ class StudentSession < ApplicationRecord
     return false unless tutored?
     tutor_state.dig("question_states").present?
   end
+
+  # Returns the parts visible to the student based on their scope selection.
+  # For new-format subjects (with exam_session), filters by part_filter.
+  # For legacy subjects, returns all parts.
+  def filtered_parts
+    exam = subject.exam_session
+    unless exam
+      return subject.parts.order(:position)
+    end
+
+    case part_filter
+    when "common_only"
+      exam.common_parts.order(:position)
+    when "specific_only"
+      subject.parts.where(section_type: :specific).order(:position)
+    else # full
+      Part.where(id: exam.common_parts.select(:id))
+          .or(Part.where(id: subject.parts.where(section_type: :specific).select(:id)))
+          .order(:position)
+    end
+  end
+
+  # All questions within the filtered parts scope
+  def filtered_questions
+    Question.kept.where(part: filtered_parts).joins(:part).order("parts.position, questions.position")
+  end
+
+  # Whether this session requires scope selection (new-format subject)
+  def requires_scope_selection?
+    subject.exam_session.present?
+  end
 end

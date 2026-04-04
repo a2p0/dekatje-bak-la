@@ -1,0 +1,63 @@
+<%# Scope selection cards for new-format subjects %>
+<div class="mb-8">
+  <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Choisissez votre perimetre de travail</h2>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+    Selectionnez la partie du sujet sur laquelle vous souhaitez travailler.
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <%# Partie commune %>
+    <%= button_to student_set_scope_subject_path(access_code: access_code, id: subject.id),
+        method: :patch,
+        params: { part_filter: "common_only" },
+        class: "text-left bg-white dark:bg-slate-800 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-5 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all cursor-pointer group" do %>
+      <div class="text-blue-600 dark:text-blue-400 text-2xl mb-2">📘</div>
+      <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+        Partie commune
+      </h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
+        Questions communes a toutes les specialites.
+      </p>
+      <div class="flex items-center gap-3 text-xs text-slate-400">
+        <span class="font-medium text-blue-600 dark:text-blue-400">12 points</span>
+        <span>2h30</span>
+      </div>
+    <% end %>
+
+    <%# Partie specifique %>
+    <%= button_to student_set_scope_subject_path(access_code: access_code, id: subject.id),
+        method: :patch,
+        params: { part_filter: "specific_only" },
+        class: "text-left bg-white dark:bg-slate-800 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-5 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md transition-all cursor-pointer group" do %>
+      <div class="text-amber-600 dark:text-amber-400 text-2xl mb-2">📙</div>
+      <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400">
+        Partie specifique <%= subject.specialty&.upcase %>
+      </h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
+        Questions specifiques a votre specialite.
+      </p>
+      <div class="flex items-center gap-3 text-xs text-slate-400">
+        <span class="font-medium text-amber-600 dark:text-amber-400">8 points</span>
+        <span>1h30</span>
+      </div>
+    <% end %>
+
+    <%# Sujet complet %>
+    <%= button_to student_set_scope_subject_path(access_code: access_code, id: subject.id),
+        method: :patch,
+        params: { part_filter: "full" },
+        class: "text-left bg-white dark:bg-slate-800 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-5 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-md transition-all cursor-pointer group" do %>
+      <div class="text-emerald-600 dark:text-emerald-400 text-2xl mb-2">📗</div>
+      <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+        Sujet complet
+      </h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
+        Toutes les parties du sujet, commune et specifique.
+      </p>
+      <div class="flex items-center gap-3 text-xs text-slate-400">
+        <span class="font-medium text-emerald-600 dark:text-emerald-400">20 points</span>
+        <span>4h</span>
+      </div>
+    <% end %>
+  </div>
+</div>
