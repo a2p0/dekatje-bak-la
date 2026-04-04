@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_04_161116) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -89,36 +89,59 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
     t.index ["student_id"], name: "index_conversations_on_student_id"
   end
 
+  create_table "exam_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "exam_type", default: 0, null: false
+    t.bigint "owner_id", null: false
+    t.text "presentation_text"
+    t.integer "region", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "year", null: false
+    t.index ["owner_id", "year", "region"], name: "idx_exam_sessions_lookup"
+    t.index ["owner_id"], name: "index_exam_sessions_on_owner_id"
+  end
+
   create_table "extraction_jobs", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error_message"
+    t.bigint "exam_session_id"
     t.integer "provider_used", default: 0, null: false
     t.jsonb "raw_json"
     t.integer "status", default: 0, null: false
     t.bigint "subject_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["exam_session_id"], name: "index_extraction_jobs_on_exam_session_id"
     t.index ["status"], name: "index_extraction_jobs_on_status"
     t.index ["subject_id"], name: "index_extraction_jobs_on_subject_id"
   end
 
   create_table "parts", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.jsonb "document_references", default: []
+    t.bigint "exam_session_id"
     t.integer "number", null: false
     t.text "objective_text"
     t.integer "position", default: 0, null: false
     t.integer "section_type", default: 0, null: false
-    t.bigint "subject_id", null: false
+    t.integer "specialty"
+    t.bigint "subject_id"
     t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["exam_session_id"], name: "index_parts_on_exam_session_id"
     t.index ["subject_id", "position"], name: "index_parts_on_subject_id_and_position"
     t.index ["subject_id"], name: "index_parts_on_subject_id"
   end
+
+  add_check_constraint "parts", "exam_session_id IS NOT NULL AND subject_id IS NULL OR exam_session_id IS NULL AND subject_id IS NOT NULL", name: "parts_owner_check", validate: false
 
   create_table "questions", force: :cascade do |t|
     t.integer "answer_type", default: 0, null: false
     t.text "context_text"
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
+    t.jsonb "dr_references", default: []
+    t.jsonb "dt_references", default: []
     t.text "label", null: false
     t.string "number", null: false
     t.bigint "part_id", null: false
@@ -150,6 +173,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
     t.datetime "created_at", null: false
     t.datetime "last_activity_at"
     t.integer "mode", default: 0, null: false
+    t.integer "part_filter", default: 0, null: false
     t.jsonb "progression", default: {}, null: false
     t.datetime "started_at"
     t.bigint "student_id", null: false
@@ -171,6 +195,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
     t.string "first_name", null: false
     t.string "last_name", null: false
     t.string "password_digest", null: false
+    t.integer "specialty"
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.index ["classroom_id"], name: "index_students_on_classroom_id"
@@ -180,6 +205,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
   create_table "subjects", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
+    t.bigint "exam_session_id"
     t.integer "exam_type", default: 0, null: false
     t.bigint "owner_id", null: false
     t.text "presentation_text"
@@ -190,6 +216,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
     t.datetime "updated_at", null: false
     t.string "year", null: false
     t.index ["discarded_at"], name: "index_subjects_on_discarded_at"
+    t.index ["exam_session_id"], name: "index_subjects_on_exam_session_id"
     t.index ["owner_id"], name: "index_subjects_on_owner_id"
     t.index ["status"], name: "index_subjects_on_status"
   end
@@ -224,7 +251,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
   add_foreign_key "classrooms", "users", column: "owner_id"
   add_foreign_key "conversations", "questions"
   add_foreign_key "conversations", "students"
+  add_foreign_key "exam_sessions", "users", column: "owner_id"
+  add_foreign_key "extraction_jobs", "exam_sessions"
   add_foreign_key "extraction_jobs", "subjects"
+  add_foreign_key "parts", "exam_sessions"
   add_foreign_key "parts", "subjects"
   add_foreign_key "questions", "parts"
   add_foreign_key "student_insights", "questions"
@@ -233,5 +263,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_02_034331) do
   add_foreign_key "student_sessions", "students"
   add_foreign_key "student_sessions", "subjects"
   add_foreign_key "students", "classrooms"
+  add_foreign_key "subjects", "exam_sessions"
   add_foreign_key "subjects", "users", column: "owner_id"
 end
