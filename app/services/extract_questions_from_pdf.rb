@@ -1,23 +1,34 @@
 class ExtractQuestionsFromPdf
   class ParseError < StandardError; end
 
-  def self.call(subject:, api_key:, provider:)
-    text = extract_text_from_pdf(subject.enonce_file)
-    prompt = BuildExtractionPrompt.call(text: text)
+  def self.call(subject:, api_key:, provider:, skip_common: false)
+    subject_text = extract_text_from_pdf(subject.subject_pdf)
+    correction_text = extract_text_from_pdf(subject.correction_pdf)
+
+    prompt = BuildExtractionPrompt.call(
+      subject_text: subject_text,
+      correction_text: correction_text,
+      specialty: subject.specialty,
+      skip_common: skip_common
+    )
+
     client = AiClientFactory.build(provider: provider, api_key: api_key)
     raw_response = client.call(
       messages: prompt[:messages],
       system: prompt[:system],
-      max_tokens: 8192,
+      max_tokens: 16_384,
       temperature: 0.1
     )
+
     [ raw_response, parse_json_response(raw_response) ]
   end
 
   def self.extract_text_from_pdf(attachment)
     attachment.blob.open do |file|
       reader = PDF::Reader.new(file)
-      reader.pages.map(&:text).join("\n")
+      reader.pages.each_with_index.map do |page, index|
+        "--- Page #{index + 1} ---\n#{page.text}"
+      end.join("\n")
     end
   end
   private_class_method :extract_text_from_pdf

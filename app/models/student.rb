@@ -9,6 +9,7 @@ class Student < ApplicationRecord
 
   enum :api_provider, { openrouter: 0, anthropic: 1, openai: 2, google: 3 }
   enum :default_mode, { revision: 0, tutored: 1 }
+  enum :specialty, { SIN: 0, ITEC: 1, EE: 2, AC: 3 }, prefix: true
 
   validates :first_name, :last_name, :username, presence: true
   validates :username, uniqueness: { scope: :classroom_id }

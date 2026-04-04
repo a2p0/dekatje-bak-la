@@ -11,15 +11,11 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     expect(page).to have_content("Mes classes")
   end
 
-  def attach_pdf(field_id)
-    attach_file field_id, Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
-  end
-
   before do
     login_as(user)
   end
 
-  scenario "le formulaire 'Nouveau sujet' demande titre, année, type, spécialité, région et 5 fichiers PDF" do
+  scenario "le formulaire 'Nouveau sujet' demande titre, année, type, spécialité, région et 2 fichiers PDF" do
     visit new_teacher_subject_path
 
     expect(page).to have_content("Nouveau sujet")
@@ -28,14 +24,11 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     expect(page).to have_select("Type d'examen")
     expect(page).to have_select("Spécialité")
     expect(page).to have_select("Région")
-    expect(page).to have_field("Énoncé du sujet (PDF, max 20 MB)")
-    expect(page).to have_field("Documents Techniques — DT (PDF, max 20 MB)")
-    expect(page).to have_field("Document Réponse vierge — DR (PDF, max 20 MB)")
-    expect(page).to have_field("Document Réponse corrigé (PDF, max 20 MB)")
-    expect(page).to have_field("Questions corrigées (PDF, max 20 MB)")
+    expect(page).to have_field("Sujet complet (PDF)")
+    expect(page).to have_field("Corrigé complet (PDF)")
   end
 
-  scenario "le sujet est créé et l'extraction démarre quand le formulaire est soumis avec tous les PDFs" do
+  scenario "le sujet est créé et l'extraction démarre quand le formulaire est soumis avec les 2 PDFs" do
     visit new_teacher_subject_path
 
     fill_in "Titre", with: "BAC STI2D Métropole 2026"
@@ -44,11 +37,8 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     select "SIN", from: "Spécialité"
     select "Métropole", from: "Région"
 
-    attach_pdf "subject_enonce_file"
-    attach_pdf "subject_dt_file"
-    attach_pdf "subject_dr_vierge_file"
-    attach_pdf "subject_dr_corrige_file"
-    attach_pdf "subject_questions_corrigees_file"
+    attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
+    attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
 
     # Submit the form via JavaScript to bypass HTML5 validation
     page.execute_script("document.querySelector('form').submit()")
@@ -105,17 +95,12 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     select "SIN", from: "Spécialité"
     select "Métropole", from: "Région"
 
-    # Attach only 4 out of 5 PDFs (missing questions_corrigees_file)
-    attach_pdf "subject_enonce_file"
-    attach_pdf "subject_dt_file"
-    attach_pdf "subject_dr_vierge_file"
-    attach_pdf "subject_dr_corrige_file"
+    # Only attach subject_pdf, skip correction_pdf
+    attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
 
-    # The browser's HTML5 required validation prevents submission when a file is missing.
-    # Remove the required attribute to let the server-side validation handle it.
-    page.execute_script("document.getElementById('subject_questions_corrigees_file').removeAttribute('required')")
-
-    click_button "Créer le sujet"
+    # Remove required attributes and submit via JS to avoid Selenium timing issues
+    page.execute_script("document.querySelectorAll('input[required]').forEach(el => el.removeAttribute('required'))")
+    page.execute_script("document.querySelector('form').submit()")
 
     expect(page).to have_content("blank")
     expect(Subject.count).to eq(0)

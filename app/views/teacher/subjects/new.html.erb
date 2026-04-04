@@ -16,7 +16,25 @@
       </div>
     <% end %>
 
+    <%# Session existante %>
     <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2">
+      Session d'examen
+    </h2>
+
+    <div>
+      <%= f.label :exam_session_id, "Session existante (optionnel)",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.select :exam_session_id,
+            options_from_collection_for_select(@exam_sessions, :id, :title, @subject.exam_session_id),
+            { include_blank: "Nouvelle session" },
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        Si aucune session n'est sélectionnée, une nouvelle sera créée automatiquement.
+      </p>
+    </div>
+
+    <%# Metadata %>
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2 pt-2">
       Informations
     </h2>
 
@@ -51,7 +69,7 @@
       <%= f.label :specialty, "Spécialité",
             class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
       <%= f.select :specialty,
-            Subject.specialties.keys.map { |k| [k, k] },
+            Subject.specialties.except("tronc_commun").keys.map { |k| [k, k] },
             {},
             required: true,
             class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
@@ -72,32 +90,42 @@
             class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
     </div>
 
+    <%# Files %>
     <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2 pt-2">
       Documents PDF
     </h2>
 
-    <% file_fields = [
-         [:enonce_file, "Énoncé du sujet (PDF, max 20 MB)", true],
-         [:dt_file, "Documents Techniques — DT (PDF, max 20 MB)", true],
-         [:dr_vierge_file, "Document Réponse vierge — DR (PDF, max 20 MB)", true],
-         [:dr_corrige_file, "Document Réponse corrigé (PDF, max 20 MB)", true],
-         [:questions_corrigees_file, "Questions corrigées (PDF, max 20 MB)", true]
-       ] %>
-    <% file_fields.each do |field_name, label_text, required| %>
-      <div>
-        <%= f.label field_name, label_text,
-              class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-        <%= f.file_field field_name,
-              accept: "application/pdf",
-              required: required,
-              class: "w-full text-sm text-slate-600 dark:text-slate-300
-                      file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
-                      file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
-                      dark:file:bg-indigo-900/30 dark:file:text-indigo-300
-                      hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
-                      focus:outline-none" %>
-      </div>
-    <% end %>
+    <p class="text-sm text-slate-500 dark:text-slate-400">
+      Les DTs et DRs sont extraits automatiquement du PDF sujet.
+    </p>
+
+    <div>
+      <%= f.label :subject_pdf, "Sujet complet (PDF)",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.file_field :subject_pdf,
+            accept: "application/pdf",
+            required: true,
+            class: "w-full text-sm text-slate-600 dark:text-slate-300
+                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                    file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
+                    dark:file:bg-indigo-900/30 dark:file:text-indigo-300
+                    hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
+                    focus:outline-none" %>
+    </div>
+
+    <div>
+      <%= f.label :correction_pdf, "Corrigé complet (PDF)",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.file_field :correction_pdf,
+            accept: "application/pdf",
+            required: true,
+            class: "w-full text-sm text-slate-600 dark:text-slate-300
+                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                    file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
+                    dark:file:bg-indigo-900/30 dark:file:text-indigo-300
+                    hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
+                    focus:outline-none" %>
+    </div>
 
     <div class="pt-2">
       <%= render ButtonComponent.new(variant: :primary, size: :md, type: :submit) do %>

@@ -25,6 +25,21 @@
         <%= render BadgeComponent.new(color: :slate, label: @subject.region) %>
       <% end %>
     </div>
+    <% if @subject.exam_session.present? %>
+      <div class="mt-2 flex items-center gap-3">
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          Session :
+          <span class="font-medium text-indigo-600 dark:text-indigo-400">
+            <%= @subject.exam_session.title %>
+          </span>
+        </p>
+        <%= button_to "Supprimer la session",
+              teacher_exam_session_path(@subject.exam_session),
+              method: :delete,
+              form: { data: { turbo_confirm: "Supprimer la session « #{@subject.exam_session.title} » et toutes ses parties communes ? Cette action est irréversible." } },
+              class: "text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2" %>
+      </div>
+    <% end %>
   </div>
   <div class="flex flex-wrap gap-2 shrink-0">
     <%= render ButtonComponent.new(href: assign_teacher_subject_path(@subject), variant: :ghost, size: :sm) do %>
@@ -38,26 +53,47 @@
 <%# Documents PDF %>
 <div class="mb-6">
   <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Documents PDF</h2>
-  <% attached_files = [
-       [@subject.enonce_file, "Énoncé"],
-       [@subject.dt_file, "Documents Techniques (DT)"],
-       [@subject.dr_vierge_file, "Document Réponse vierge"],
-       [@subject.dr_corrige_file, "Document Réponse corrigé"],
-       [@subject.questions_corrigees_file, "Questions corrigées"]
-     ].select { |file, _| file.attached? }
-  %>
-  <% if attached_files.any? %>
+  <% if @subject.new_format? %>
+    <%# New format: subject_pdf + correction_pdf %>
     <ul class="space-y-1">
-      <% attached_files.each do |file, label| %>
+      <% if @subject.subject_pdf.attached? %>
         <li>
-          <%= link_to label,
-                rails_blob_path(file, disposition: "attachment"),
+          <%= link_to "Sujet complet",
+                rails_blob_path(@subject.subject_pdf, disposition: "attachment"),
+                class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+        </li>
+      <% end %>
+      <% if @subject.correction_pdf.attached? %>
+        <li>
+          <%= link_to "Corrigé complet",
+                rails_blob_path(@subject.correction_pdf, disposition: "attachment"),
                 class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
         </li>
       <% end %>
     </ul>
   <% else %>
-    <p class="text-sm text-slate-500 dark:text-slate-400">Aucun document attaché.</p>
+    <%# Legacy format: 5 separate files %>
+    <% attached_files = [
+         [@subject.enonce_file, "Énoncé"],
+         [@subject.dt_file, "Documents Techniques (DT)"],
+         [@subject.dr_vierge_file, "Document Réponse vierge"],
+         [@subject.dr_corrige_file, "Document Réponse corrigé"],
+         [@subject.questions_corrigees_file, "Questions corrigées"]
+       ].select { |file, _| file.attached? }
+    %>
+    <% if attached_files.any? %>
+      <ul class="space-y-1">
+        <% attached_files.each do |file, label| %>
+          <li>
+            <%= link_to label,
+                  rails_blob_path(file, disposition: "attachment"),
+                  class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Aucun document attaché.</p>
+    <% end %>
   <% end %>
 </div>
 
@@ -67,8 +103,112 @@
   <%= render "extraction_status", subject: @subject %>
 </div>
 
-<%# Parts accordion %>
-<%= render "parts_list", subject: @subject %>
+<%# Parts — separated by section_type when exam_session exists %>
+<% if @subject.exam_session.present? %>
+  <% common_parts = @subject.exam_session.common_parts.order(:position) %>
+  <% specific_parts = @subject.parts.where(section_type: :specific).order(:position) %>
+
+  <% if common_parts.any? %>
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Partie commune</h2>
+      <div class="space-y-2">
+        <% common_parts.each do |part| %>
+          <details class="group rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+            <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none
+                            hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors list-none">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-slate-900 dark:text-white text-sm">
+                  Partie <%= part.number %> — <%= part.title %>
+                </span>
+                <%= render BadgeComponent.new(color: :blue, label: "commune") %>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-3">
+              <% questions = part.questions.kept.order(:position) %>
+              <% if questions.any? %>
+                <ul class="space-y-1 mb-3">
+                  <% questions.each do |question| %>
+                    <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                      <% if question.validated? %>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                      <% else %>
+                        <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>
+                      <% end %>
+                      Q<%= question.number %> — <%= truncate(question.label, length: 80) %>
+                      (<%= question.points %> pts)
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Aucune question.</p>
+              <% end %>
+              <%# Common parts belong to exam_session, link via subject for validation %>
+              <% subject_for_part = part.subject || @subject %>
+              <%= render ButtonComponent.new(href: teacher_subject_part_path(subject_for_part, part), variant: :ghost, size: :sm) do %>
+                Voir / valider cette partie →
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if specific_parts.any? %>
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Partie spécifique (<%= @subject.specialty %>)</h2>
+      <div class="space-y-2">
+        <% specific_parts.each do |part| %>
+          <details class="group rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+            <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none
+                            hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors list-none">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-slate-900 dark:text-white text-sm">
+                  Partie <%= part.number %> — <%= part.title %>
+                </span>
+                <%= render BadgeComponent.new(color: :indigo, label: "spécifique") %>
+              </div>
+              <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-3">
+              <% questions = part.questions.kept.order(:position) %>
+              <% if questions.any? %>
+                <ul class="space-y-1 mb-3">
+                  <% questions.each do |question| %>
+                    <li class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                      <% if question.validated? %>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                      <% else %>
+                        <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>
+                      <% end %>
+                      Q<%= question.number %> — <%= truncate(question.label, length: 80) %>
+                      (<%= question.points %> pts)
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Aucune question.</p>
+              <% end %>
+              <%= render ButtonComponent.new(href: teacher_subject_part_path(@subject, part), variant: :ghost, size: :sm) do %>
+                Voir / valider cette partie →
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <%# Legacy format: no exam_session, show all parts together %>
+  <%= render "parts_list", subject: @subject %>
+<% end %>
 
 <%# Stats + publish actions %>
 <%= render "stats", subject: @subject %>

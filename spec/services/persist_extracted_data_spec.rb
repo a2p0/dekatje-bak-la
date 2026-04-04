@@ -1,93 +1,230 @@
 require "rails_helper"
 
 RSpec.describe PersistExtractedData do
-  let(:subject_obj) { create(:subject) }
+  let(:exam_session) { create(:exam_session) }
+  let(:subject_obj) { create(:subject, :new_format, exam_session: exam_session) }
 
   let(:data) do
     {
-      "presentation" => "Mise en situation du sujet CIME.",
-      "parts" => [
+      "metadata" => { "title" => "CIME", "year" => "2024", "specialty" => "ITEC" },
+      "presentation" => "Mise en situation...",
+      "common_parts" => [
         {
-          "number" => 1,
-          "title" => "Comment le CIME s'inscrit dans une démarche DD ?",
-          "objective" => "Comparer les modes de transport",
-          "section_type" => "common",
+          "number" => 1, "title" => "Partie 1", "objective" => "Objectif...",
           "questions" => [
-            {
-              "number" => "1.1",
-              "label" => "Calculer la consommation en litres pour 186 km.",
-              "context" => "Données : distance = 186 km",
-              "points" => 2,
-              "answer_type" => "calculation",
-              "correction" => "Car = 56,73 l",
-              "explanation" => "On applique : Conso × Distance / 100",
-              "data_hints" => [ { "source" => "DT", "location" => "tableau Consommation" } ],
-              "key_concepts" => [ "énergie primaire" ]
-            }
+            { "number" => "1.1", "label" => "Calculer...", "context" => "", "points" => 2,
+              "answer_type" => "calculation", "dt_references" => ["DT1"],
+              "dr_references" => [], "correction" => "Result...",
+              "explanation" => "...", "key_concepts" => ["energy"], "data_hints" => [] }
           ]
         }
-      ]
+      ],
+      "specific_parts" => [
+        {
+          "number" => "A", "title" => "Partie A", "objective" => "...",
+          "questions" => [
+            { "number" => "A.1", "label" => "Relever...", "context" => "", "points" => 3,
+              "answer_type" => "text", "dt_references" => ["DTS1"],
+              "dr_references" => ["DRS1"], "correction" => "...",
+              "explanation" => "...", "key_concepts" => [], "data_hints" => [] }
+          ]
+        }
+      ],
+      "document_references" => {
+        "common_dts" => [{ "label" => "DT1", "title" => "Diagrammes", "pages" => [13] }],
+        "common_drs" => [{ "label" => "DR1", "title" => "Tableau", "pages" => [22] }],
+        "specific_dts" => [{ "label" => "DTS1", "title" => "Norme", "pages" => [30] }],
+        "specific_drs" => [{ "label" => "DRS1", "title" => "Sollicitations", "pages" => [34] }]
+      }
     }
   end
 
   describe ".call" do
-    it "updates subject presentation_text" do
-      described_class.call(subject: subject_obj, data: data)
-      expect(subject_obj.reload.presentation_text).to eq("Mise en situation du sujet CIME.")
-    end
-
-    it "sets subject status to pending_validation" do
-      described_class.call(subject: subject_obj, data: data)
-      expect(subject_obj.reload.status).to eq("pending_validation")
-    end
-
-    it "creates parts" do
-      expect {
+    context "first upload (no existing common parts)" do
+      it "sets exam_session presentation_text from data" do
         described_class.call(subject: subject_obj, data: data)
-      }.to change(Part, :count).by(1)
-    end
+        expect(exam_session.reload.presentation_text).to eq("Mise en situation...")
+      end
 
-    it "creates questions" do
-      expect {
+      it "creates common parts on exam_session (not on subject)" do
         described_class.call(subject: subject_obj, data: data)
-      }.to change(Question, :count).by(1)
-    end
 
-    it "creates answers" do
-      expect {
+        common_parts = exam_session.reload.common_parts
+        expect(common_parts.count).to eq(1)
+
+        part = common_parts.first
+        expect(part.number).to eq(1)
+        expect(part.title).to eq("Partie 1")
+        expect(part.objective_text).to eq("Objectif...")
+        expect(part.section_type).to eq("common")
+        expect(part.subject_id).to be_nil
+      end
+
+      it "creates specific parts on subject (not on exam_session)" do
         described_class.call(subject: subject_obj, data: data)
-      }.to change(Answer, :count).by(1)
+
+        specific_parts = subject_obj.reload.parts.where(section_type: :specific)
+        expect(specific_parts.count).to eq(1)
+
+        part = specific_parts.first
+        expect(part.title).to eq("Partie A")
+        expect(part.section_type).to eq("specific")
+        expect(part.exam_session_id).to be_nil
+      end
+
+      it "creates questions with dt_references and dr_references" do
+        described_class.call(subject: subject_obj, data: data)
+
+        common_question = exam_session.common_parts.first.questions.first
+        expect(common_question.number).to eq("1.1")
+        expect(common_question.label).to eq("Calculer...")
+        expect(common_question.points).to eq(2.0)
+        expect(common_question.answer_type).to eq("calculation")
+        expect(common_question.dt_references).to eq(["DT1"])
+        expect(common_question.dr_references).to eq([])
+
+        specific_question = subject_obj.parts.where(section_type: :specific).first.questions.first
+        expect(specific_question.number).to eq("A.1")
+        expect(specific_question.label).to eq("Relever...")
+        expect(specific_question.points).to eq(3.0)
+        expect(specific_question.answer_type).to eq("text")
+        expect(specific_question.dt_references).to eq(["DTS1"])
+        expect(specific_question.dr_references).to eq(["DRS1"])
+      end
+
+      it "creates answers with correction_text, explanation_text, key_concepts, and data_hints" do
+        described_class.call(subject: subject_obj, data: data)
+
+        common_answer = exam_session.common_parts.first.questions.first.answer
+        expect(common_answer.correction_text).to eq("Result...")
+        expect(common_answer.explanation_text).to eq("...")
+        expect(common_answer.key_concepts).to eq(["energy"])
+        expect(common_answer.data_hints).to eq([])
+
+        specific_answer = subject_obj.parts.where(section_type: :specific).first.questions.first.answer
+        expect(specific_answer.correction_text).to eq("...")
+        expect(specific_answer.explanation_text).to eq("...")
+        expect(specific_answer.key_concepts).to eq([])
+        expect(specific_answer.data_hints).to eq([])
+      end
+
+      it "stores document_references on common parts" do
+        described_class.call(subject: subject_obj, data: data)
+
+        common_part = exam_session.common_parts.first
+        expect(common_part.document_references).to include(
+          { "label" => "DT1", "title" => "Diagrammes", "pages" => [13] },
+          { "label" => "DR1", "title" => "Tableau", "pages" => [22] }
+        )
+      end
+
+      it "stores document_references on specific parts" do
+        described_class.call(subject: subject_obj, data: data)
+
+        specific_part = subject_obj.parts.where(section_type: :specific).first
+        expect(specific_part.document_references).to include(
+          { "label" => "DTS1", "title" => "Norme", "pages" => [30] },
+          { "label" => "DRS1", "title" => "Sollicitations", "pages" => [34] }
+        )
+      end
+
+      it "updates subject status to pending_validation" do
+        described_class.call(subject: subject_obj, data: data)
+        expect(subject_obj.reload.status).to eq("pending_validation")
+      end
+
+      it "creates the expected total number of parts, questions, and answers" do
+        expect {
+          described_class.call(subject: subject_obj, data: data)
+        }.to change(Part, :count).by(2)
+          .and change(Question, :count).by(2)
+          .and change(Answer, :count).by(2)
+      end
     end
 
-    it "sets correct part attributes" do
-      described_class.call(subject: subject_obj, data: data)
-      part = subject_obj.reload.parts.first
-      expect(part.number).to eq(1)
-      expect(part.title).to eq("Comment le CIME s'inscrit dans une démarche DD ?")
-      expect(part.section_type).to eq("common")
+    context "second upload (common parts already exist on exam_session)" do
+      before do
+        # Simulate first upload already completed: common parts exist
+        exam_session.update!(presentation_text: "Mise en situation...")
+        common_part = exam_session.common_parts.create!(
+          number: 1, title: "Partie 1", objective_text: "Objectif...",
+          section_type: :common, position: 0, document_references: [
+            { "label" => "DT1", "title" => "Diagrammes", "pages" => [13] },
+            { "label" => "DR1", "title" => "Tableau", "pages" => [22] }
+          ]
+        )
+        question = common_part.questions.create!(
+          number: "1.1", label: "Calculer...", context_text: "",
+          points: 2, answer_type: :calculation, position: 0, status: :draft,
+          dt_references: ["DT1"], dr_references: []
+        )
+        question.create_answer!(
+          correction_text: "Result...", explanation_text: "...",
+          key_concepts: ["energy"], data_hints: []
+        )
+      end
+
+      it "does NOT recreate common parts" do
+        expect {
+          described_class.call(subject: subject_obj, data: data)
+        }.not_to change { exam_session.common_parts.count }
+      end
+
+      it "preserves existing common parts" do
+        described_class.call(subject: subject_obj, data: data)
+
+        expect(exam_session.common_parts.count).to eq(1)
+        expect(exam_session.common_parts.first.title).to eq("Partie 1")
+      end
+
+      it "only creates specific parts for the new specialty" do
+        expect {
+          described_class.call(subject: subject_obj, data: data)
+        }.to change { subject_obj.parts.where(section_type: :specific).count }.by(1)
+      end
+
+      it "still updates subject status to pending_validation" do
+        described_class.call(subject: subject_obj, data: data)
+        expect(subject_obj.reload.status).to eq("pending_validation")
+      end
     end
 
-    it "sets correct question attributes" do
-      described_class.call(subject: subject_obj, data: data)
-      question = subject_obj.parts.first.questions.first
-      expect(question.number).to eq("1.1")
-      expect(question.answer_type).to eq("calculation")
-      expect(question.points).to eq(2.0)
-    end
+    context "transaction rollback on error" do
+      let(:bad_data) do
+        {
+          "metadata" => { "title" => "CIME", "year" => "2024", "specialty" => "ITEC" },
+          "presentation" => "Mise en situation...",
+          "common_parts" => [
+            {
+              "number" => 1, "title" => "Partie 1", "objective" => "Objectif...",
+              "questions" => [
+                { "number" => nil, "label" => nil, "context" => "", "points" => 2,
+                  "answer_type" => "calculation", "dt_references" => [],
+                  "dr_references" => [], "correction" => "...",
+                  "explanation" => "...", "key_concepts" => [], "data_hints" => [] }
+              ]
+            }
+          ],
+          "specific_parts" => [],
+          "document_references" => {}
+        }
+      end
 
-    it "sets correct answer attributes with data_hints" do
-      described_class.call(subject: subject_obj, data: data)
-      answer = subject_obj.parts.first.questions.first.answer
-      expect(answer.correction_text).to eq("Car = 56,73 l")
-      expect(answer.data_hints).to eq([ { "source" => "DT", "location" => "tableau Consommation" } ])
-      expect(answer.key_concepts).to eq([ "énergie primaire" ])
-    end
+      it "rolls back all changes when an error occurs" do
+        expect {
+          described_class.call(subject: subject_obj, data: bad_data) rescue nil
+        }.not_to change(Part, :count)
+      end
 
-    it "rolls back on error" do
-      bad_data = { "presentation" => "test", "parts" => [ { "number" => nil, "title" => nil, "section_type" => "common", "questions" => [] } ] }
-      expect {
+      it "does not update subject status on failure" do
         described_class.call(subject: subject_obj, data: bad_data) rescue nil
-      }.not_to change(Part, :count)
+        expect(subject_obj.reload.status).to eq("draft")
+      end
+
+      it "does not update exam_session presentation_text on failure" do
+        described_class.call(subject: subject_obj, data: bad_data) rescue nil
+        expect(exam_session.reload.presentation_text).to be_nil
+      end
     end
   end
 end

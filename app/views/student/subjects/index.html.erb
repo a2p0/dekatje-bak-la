@@ -27,18 +27,28 @@ end %>
           session_record = current_student.student_sessions.find_by(subject: subject)
           total = subject.parts.joins(:questions).merge(Question.kept).count
           answered = session_record ? session_record.progression.count { |_k, v| v["answered"] } : 0
+          matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
         %>
         <%= render(CardComponent.new) do |card|
           card.with_body do %>
             <div class="flex flex-wrap gap-1.5 mb-3">
-              <%= render(BadgeComponent.new(color: :indigo, label: subject.specialty)) %>
+              <%= render(BadgeComponent.new(
+                color: matches_specialty ? :emerald : :indigo,
+                label: subject.specialty&.upcase || "—"
+              )) %>
+              <% if matches_specialty %>
+                <%= render(BadgeComponent.new(color: :emerald, label: "Ma spe")) %>
+              <% end %>
               <%= render(BadgeComponent.new(color: :slate, label: subject.year.to_s)) %>
+              <% if subject.region.present? %>
+                <%= render(BadgeComponent.new(color: :slate, label: subject.region)) %>
+              <% end %>
             </div>
             <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1">
               <%= subject.title %>
             </h3>
             <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
-              <%= subject.region %>
+              <%= subject.exam_type&.upcase %> <%= subject.year %>
             </p>
             <%= render(ProgressBarComponent.new(current: answered, total: total, show_text: true)) %>
           <% end %>

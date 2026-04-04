@@ -9,6 +9,7 @@ class User < ApplicationRecord
 
   has_many :classrooms, foreign_key: :owner_id, dependent: :destroy
   has_many :subjects, foreign_key: :owner_id, dependent: :destroy
+  has_many :exam_sessions, foreign_key: :owner_id, dependent: :destroy
 
   validates :first_name, :last_name, presence: true
 end

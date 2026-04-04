@@ -20,6 +20,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :exam_sessions, only: [ :destroy ]
+
     resources :subjects, only: [ :index, :new, :create, :show ] do
       resources :parts, only: [ :show ] do
         resources :questions, only: [ :update, :destroy ] do
@@ -46,7 +48,8 @@ Rails.application.routes.draw do
     post   "/session", to: "student/sessions#create",  as: :session
     delete "/session", to: "student/sessions#destroy"
     get "/subjects",                                to: "student/subjects#index",    as: :root
-    get "/subjects/:id",                            to: "student/subjects#show",     as: :subject
+    get   "/subjects/:id",                            to: "student/subjects#show",     as: :subject
+    patch "/subjects/:id/set_scope",                   to: "student/subjects#set_scope", as: :set_scope_subject
     get "/subjects/:subject_id/questions/:id",      to: "student/questions#show",    as: :question
     patch "/subjects/:subject_id/questions/:id/reveal", to: "student/questions#reveal", as: :reveal_question
     get   "/settings",          to: "student/settings#show",     as: :settings

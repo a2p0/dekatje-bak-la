@@ -1,0 +1,101 @@
+name: Tutor Simulation
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject_id:
+        description: "Subject ID to simulate"
+        required: true
+        type: string
+      turns:
+        description: "Max conversation turns per question"
+        required: false
+        default: "5"
+        type: string
+      profiles:
+        description: "Comma-separated profiles (leave empty for all)"
+        required: false
+        default: ""
+        type: string
+      tutor_provider:
+        description: "Tutor AI provider"
+        required: false
+        default: "anthropic"
+        type: choice
+        options:
+          - anthropic
+          - openrouter
+      student_provider:
+        description: "Simulated student AI provider"
+        required: false
+        default: "anthropic"
+        type: choice
+        options:
+          - anthropic
+          - openrouter
+      judge_provider:
+        description: "Judge AI provider"
+        required: false
+        default: "anthropic"
+        type: choice
+        options:
+          - anthropic
+          - openrouter
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: dekatje
+          POSTGRES_PASSWORD: dekatje_dev
+          POSTGRES_DB: dekatje_bak_la_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test
+      RAILS_ENV: test
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Load schema and seed data
+        run: bin/rails db:schema:load
+
+      - name: Run tutor simulation
+        env:
+          TURNS: ${{ inputs.turns }}
+          PROFILES: ${{ inputs.profiles }}
+          TUTOR_PROVIDER: ${{ inputs.tutor_provider }}
+          TUTOR_KEY: ${{ inputs.tutor_provider == 'openrouter' && secrets.OPENROUTER_API_KEY || secrets.ANTHROPIC_API_KEY }}
+          STUDENT_PROVIDER: ${{ inputs.student_provider }}
+          STUDENT_KEY: ${{ inputs.student_provider == 'openrouter' && secrets.OPENROUTER_API_KEY || secrets.ANTHROPIC_API_KEY }}
+          JUDGE_PROVIDER: ${{ inputs.judge_provider }}
+          JUDGE_KEY: ${{ inputs.judge_provider == 'openrouter' && secrets.OPENROUTER_API_KEY || secrets.ANTHROPIC_API_KEY }}
+        run: bundle exec rake "tutor:simulate[${{ inputs.subject_id }}]"
+
+      - name: Upload simulation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tutor-simulation-${{ inputs.subject_id }}-${{ github.run_id }}
+          path: tmp/tutor_simulations/
+          retention-days: 30

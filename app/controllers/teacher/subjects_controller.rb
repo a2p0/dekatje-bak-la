@@ -7,10 +7,13 @@ class Teacher::SubjectsController < Teacher::BaseController
 
   def new
     @subject = Subject.new
+    @exam_sessions = current_teacher.exam_sessions.order(:title)
   end
 
   def create
-    @subject = current_teacher.subjects.build(subject_params)
+    @subject = current_teacher.subjects.build(subject_params.except(:exam_session_id))
+
+    assign_or_create_exam_session
 
     if @subject.save
       @subject.create_extraction_job!(status: :pending, provider_used: :server)
@@ -18,6 +21,7 @@ class Teacher::SubjectsController < Teacher::BaseController
       redirect_to teacher_subject_path(@subject),
                   notice: "Sujet créé. L'extraction démarrera automatiquement."
     else
+      @exam_sessions = current_teacher.exam_sessions.order(:title)
       render :new, status: :unprocessable_entity
     end
   end
@@ -91,7 +95,22 @@ class Teacher::SubjectsController < Teacher::BaseController
   def subject_params
     params.require(:subject).permit(
       :title, :year, :exam_type, :specialty, :region,
-      :enonce_file, :dt_file, :dr_vierge_file, :dr_corrige_file, :questions_corrigees_file
+      :subject_pdf, :correction_pdf, :exam_session_id
     )
+  end
+
+  def assign_or_create_exam_session
+    exam_session_id = params[:subject][:exam_session_id]
+
+    if exam_session_id.present?
+      @subject.exam_session = current_teacher.exam_sessions.find(exam_session_id)
+    else
+      @subject.exam_session = current_teacher.exam_sessions.build(
+        title: @subject.title,
+        year: @subject.year,
+        region: @subject.region,
+        exam_type: @subject.exam_type
+      )
+    end
   end
 end
