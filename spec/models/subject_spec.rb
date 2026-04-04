@@ -149,6 +149,26 @@ RSpec.describe Subject, type: :model do
     end
   end
 
+  describe "deletion behavior (FR-022)" do
+    it "destroying a subject removes only its specific parts, not common parts" do
+      exam_session = create(:exam_session)
+      subject_obj = create(:subject, :new_format, exam_session: exam_session)
+
+      common_part = create(:part,
+        exam_session: exam_session, subject: nil,
+        number: 1, title: "Commune", section_type: :common, position: 0)
+      specific_part = create(:part,
+        subject: subject_obj, exam_session: nil,
+        number: 2, title: "Specifique", section_type: :specific, position: 1)
+
+      subject_obj.destroy!
+
+      expect(Part.find_by(id: specific_part.id)).to be_nil
+      expect(Part.find_by(id: common_part.id)).to be_present
+      expect(exam_session.reload.common_parts).to include(common_part)
+    end
+  end
+
   describe "ActiveStorage attachments" do
     context "legacy format" do
       it "has enonce_file attached" do
