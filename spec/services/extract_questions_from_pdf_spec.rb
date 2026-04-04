@@ -138,7 +138,8 @@ RSpec.describe ExtractQuestionsFromPdf do
       expect(BuildExtractionPrompt).to have_received(:call).with(
         subject_text: a_string_including(subject_page1),
         correction_text: a_string_including(correction_page1),
-        specialty: subject_obj.specialty
+        specialty: subject_obj.specialty,
+        skip_common: false
       )
     end
 

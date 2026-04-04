@@ -7,10 +7,12 @@ class ExtractQuestionsJob < ApplicationJob
     job.update!(status: :processing)
 
     resolved = ResolveApiKey.call(user: subject.owner)
+    skip_common = subject.exam_session&.common_parts&.any? || false
     raw_response, data = ExtractQuestionsFromPdf.call(
       subject: subject,
       api_key: resolved[:api_key],
-      provider: resolved[:provider]
+      provider: resolved[:provider],
+      skip_common: skip_common
     )
     PersistExtractedData.call(subject: subject, data: data)
 

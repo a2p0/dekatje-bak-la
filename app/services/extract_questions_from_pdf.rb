@@ -1,14 +1,15 @@
 class ExtractQuestionsFromPdf
   class ParseError < StandardError; end
 
-  def self.call(subject:, api_key:, provider:)
+  def self.call(subject:, api_key:, provider:, skip_common: false)
     subject_text = extract_text_from_pdf(subject.subject_pdf)
     correction_text = extract_text_from_pdf(subject.correction_pdf)
 
     prompt = BuildExtractionPrompt.call(
       subject_text: subject_text,
       correction_text: correction_text,
-      specialty: subject.specialty
+      specialty: subject.specialty,
+      skip_common: skip_common
     )
 
     client = AiClientFactory.build(provider: provider, api_key: api_key)

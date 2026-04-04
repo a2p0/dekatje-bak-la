@@ -32,7 +32,8 @@ RSpec.describe ExtractQuestionsJob, type: :job do
       expect(ExtractQuestionsFromPdf).to have_received(:call).with(
         subject: subject_obj,
         api_key: "sk-test",
-        provider: :anthropic
+        provider: :anthropic,
+        skip_common: false
       )
     end
 
@@ -61,6 +62,26 @@ RSpec.describe ExtractQuestionsJob, type: :job do
 
     it "has an associated exam_session" do
       expect(subject_obj.exam_session).to be_present
+    end
+
+    context "when exam_session already has common parts" do
+      before do
+        subject_obj.exam_session.common_parts.create!(
+          number: 1, title: "Partie commune existante",
+          objective_text: "Objectif", section_type: :common,
+          position: 0
+        )
+      end
+
+      it "passes skip_common: true to ExtractQuestionsFromPdf" do
+        described_class.perform_now(subject_obj.id)
+        expect(ExtractQuestionsFromPdf).to have_received(:call).with(
+          subject: subject_obj,
+          api_key: "sk-test",
+          provider: :anthropic,
+          skip_common: true
+        )
+      end
     end
 
     context "when an error occurs" do

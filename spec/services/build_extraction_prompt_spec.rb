@@ -140,5 +140,47 @@ RSpec.describe BuildExtractionPrompt do
         expect(user_contents).to include("SIN")
       end
     end
+
+    # --- skip_common mode ---
+
+    context "when skip_common is true" do
+      subject(:result) do
+        described_class.call(
+          subject_text: subject_text,
+          correction_text: correction_text,
+          specialty: specialty,
+          skip_common: true
+        )
+      end
+
+      it "system prompt includes skip common addendum" do
+        expect(result[:system]).to include("La partie commune a déjà été extraite")
+      end
+
+      it "system prompt instructs to return empty common_parts" do
+        expect(result[:system]).to include("Ne retourne PAS de common_parts")
+      end
+
+      it "user message instructs to extract only specific parts" do
+        user_contents = result[:messages].map { |m| m[:content] }.join(" ")
+        expect(user_contents).to include("uniquement les parties spécifiques")
+      end
+
+      it "user message instructs to ignore common part" do
+        user_contents = result[:messages].map { |m| m[:content] }.join(" ")
+        expect(user_contents).to include("Ignore la partie commune")
+      end
+    end
+
+    context "when skip_common is false (default)" do
+      it "system prompt does NOT include skip common addendum" do
+        expect(result[:system]).not_to include("La partie commune a déjà été extraite")
+      end
+
+      it "user message instructs to extract all parts" do
+        user_contents = result[:messages].map { |m| m[:content] }.join(" ")
+        expect(user_contents).to include("toutes les parties communes et spécifiques")
+      end
+    end
   end
 end
