@@ -34,6 +34,13 @@
 
     <%= render(ButtonComponent.new(variant: :ghost, href: new_user_session_path)) { "Espace enseignant →" } %>
 
-    <p class="mt-16 text-xs text-slate-400 dark:text-slate-500">DekatjeBakLa — Martinique</p>
+    <div class="mt-16 text-xs text-slate-400 dark:text-slate-500 space-y-1">
+      <p>DekatjeBakLa — Martinique</p>
+      <p>
+        <%= link_to "Mentions légales", legal_path, class: "hover:text-emerald-600 dark:hover:text-emerald-400 underline" %>
+        ·
+        <%= link_to "Confidentialité", privacy_path, class: "hover:text-emerald-600 dark:hover:text-emerald-400 underline" %>
+      </p>
+    </div>
   </div>
 </div>

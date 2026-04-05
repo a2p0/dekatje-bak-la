@@ -42,6 +42,9 @@ Rails.application.routes.draw do
     end
   end
 
+  get "mentions-legales",            to: "pages#legal",   as: :legal
+  get "politique-de-confidentialite", to: "pages#privacy", as: :privacy
+
   # Auth élève via access_code
   scope "/:access_code", as: :student do
     get    "/",        to: "student/sessions#new",     as: :login

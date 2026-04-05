@@ -1,0 +1,52 @@
+<div class="max-w-3xl mx-auto px-4 py-12">
+  <div class="fixed top-4 right-4">
+    <%= render(ThemeToggleComponent.new) %>
+  </div>
+
+  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-8">Mentions légales</h1>
+
+  <div class="prose dark:prose-invert prose-slate max-w-none space-y-8">
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">Éditeur du site</h2>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-none pl-0">
+        <li><strong>Nom :</strong> [NOM_PRENOM]</li>
+        <li><strong>Qualité :</strong> Enseignant, développeur indépendant</li>
+        <li><strong>Adresse :</strong> [ADRESSE]</li>
+        <li><strong>Email :</strong> <a href="mailto:[EMAIL_CONTACT]" class="text-emerald-600 dark:text-emerald-400 underline">[EMAIL_CONTACT]</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">Directeur de la publication</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">[NOM_PRENOM]</p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">Hébergement</h2>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-none pl-0">
+        <li><strong>Serveur applicatif :</strong> [NOM_HEBERGEUR_VPS], [ADRESSE_HEBERGEUR]</li>
+        <li><strong>Base de données :</strong> Neon Tech Inc., San Francisco, CA — région serveur : [REGION_NEON] (Union européenne)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">Propriété intellectuelle</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        L'ensemble du contenu de ce site (textes, code source, interface) est la propriété de l'éditeur,
+        sauf les sujets d'examens qui restent la propriété du ministère de l'Éducation nationale.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">Données personnelles</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Pour toute information relative au traitement de vos données personnelles, consultez notre
+        <%= link_to "politique de confidentialité", privacy_path, class: "text-emerald-600 dark:text-emerald-400 underline" %>.
+      </p>
+    </section>
+  </div>
+
+  <div class="mt-12 text-center">
+    <%= link_to "← Retour à l'accueil", root_path, class: "text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400" %>
+  </div>
+</div>

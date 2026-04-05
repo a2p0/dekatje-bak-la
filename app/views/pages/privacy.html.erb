@@ -1,0 +1,163 @@
+<div class="max-w-3xl mx-auto px-4 py-12">
+  <div class="fixed top-4 right-4">
+    <%= render(ThemeToggleComponent.new) %>
+  </div>
+
+  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Politique de confidentialité</h1>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Dernière mise à jour : avril 2026</p>
+
+  <div class="prose dark:prose-invert prose-slate max-w-none space-y-8">
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">1. Responsable du traitement</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Le responsable du traitement des données est <strong>[NOM_PRENOM]</strong>, enseignant,
+        joignable à l'adresse <a href="mailto:[EMAIL_CONTACT]" class="text-emerald-600 dark:text-emerald-400 underline">[EMAIL_CONTACT]</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">2. Finalité du traitement</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        DekatjeBakLa est une application d'entraînement aux examens du BAC. Les données sont collectées
+        exclusivement pour permettre :
+      </p>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li>L'identification des élèves au sein de leur classe</li>
+        <li>Le suivi de progression sur les sujets d'examen</li>
+        <li>L'interaction avec un tuteur IA pour l'aide à la révision</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">3. Base légale</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Le traitement est fondé sur l'<strong>exécution d'une mission d'intérêt public</strong>
+        (article 6.1.e du RGPD) — l'accompagnement pédagogique des élèves dans le cadre
+        de la préparation aux examens.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">4. Données collectées</h2>
+
+      <h3 class="text-base font-medium text-slate-700 dark:text-slate-300 mt-4">Enseignants</h3>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li>Nom, prénom, adresse email</li>
+        <li>Mot de passe (hashé, non réversible)</li>
+        <li>Clé API IA (chiffrée en base de données)</li>
+      </ul>
+
+      <h3 class="text-base font-medium text-slate-700 dark:text-slate-300 mt-4">Élèves</h3>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li>Prénom, nom, identifiant généré</li>
+        <li>Mot de passe (hashé, non réversible)</li>
+        <li>Clé API IA optionnelle (chiffrée en base de données)</li>
+        <li>Progression et réponses aux exercices</li>
+        <li>Conversations avec le tuteur IA</li>
+      </ul>
+
+      <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mt-4">
+        <p class="text-sm text-emerald-800 dark:text-emerald-300 font-medium">
+          Aucune adresse email n'est collectée pour les élèves.
+          Aucun cookie de tracking ou d'analyse n'est utilisé.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">5. Services tiers et transferts de données</h2>
+
+      <h3 class="text-base font-medium text-slate-700 dark:text-slate-300 mt-4">Intelligence artificielle</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Lorsqu'un élève utilise le tuteur IA ou qu'un enseignant lance une extraction de sujet,
+        le contenu de la conversation ou du document est transmis au fournisseur d'IA sélectionné.
+        Les fournisseurs possibles sont :
+      </p>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li><strong>Anthropic</strong> (Claude) — États-Unis</li>
+        <li><strong>OpenAI</strong> — États-Unis</li>
+        <li><strong>Google</strong> (Gemini) — États-Unis</li>
+        <li><strong>OpenRouter</strong> — États-Unis</li>
+      </ul>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+        Ces transferts hors Union européenne sont encadrés par les clauses contractuelles types (CCT)
+        de la Commission européenne. Les données envoyées ne sont pas utilisées pour entraîner les
+        modèles d'IA (utilisation via API).
+      </p>
+
+      <h3 class="text-base font-medium text-slate-700 dark:text-slate-300 mt-4">Hébergement</h3>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li><strong>Serveur applicatif :</strong> [NOM_HEBERGEUR_VPS] — [PAYS_HEBERGEUR]</li>
+        <li><strong>Base de données :</strong> Neon Tech Inc. — région [REGION_NEON] (Union européenne)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">6. Durée de conservation</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Les données des élèves (comptes, progression, conversations) sont conservées pendant
+        l'année scolaire en cours. Elles sont supprimées à la fin de chaque année scolaire
+        (août), sauf demande anticipée de l'enseignant ou de l'élève.
+      </p>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+        Les comptes enseignants sont conservés tant que le compte est actif.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">7. Sécurité</h2>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li>Mots de passe hashés avec bcrypt</li>
+        <li>Clés API chiffrées en base de données (Rails ActiveRecord Encryption)</li>
+        <li>Communications chiffrées en transit (TLS/HTTPS)</li>
+        <li>Données élèves isolées par classe</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">8. Vos droits</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Conformément au RGPD et à la loi Informatique et Libertés, vous disposez des droits suivants :
+      </p>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+        <li><strong>Accès</strong> — obtenir une copie de vos données</li>
+        <li><strong>Rectification</strong> — corriger des données inexactes</li>
+        <li><strong>Effacement</strong> — demander la suppression de vos données</li>
+        <li><strong>Limitation</strong> — restreindre le traitement</li>
+        <li><strong>Portabilité</strong> — recevoir vos données dans un format structuré</li>
+      </ul>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+        <strong>Pour les élèves mineurs</strong>, ces droits sont exercés par les représentants légaux
+        (parents ou tuteurs). L'enseignant peut supprimer un compte élève à tout moment.
+      </p>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+        Pour exercer vos droits, contactez <a href="mailto:[EMAIL_CONTACT]" class="text-emerald-600 dark:text-emerald-400 underline">[EMAIL_CONTACT]</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">9. Délégué à la protection des données</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Pour toute question relative à la protection des données dans le cadre scolaire,
+        vous pouvez contacter le Délégué à la Protection des Données de l'académie de Martinique
+        via le rectorat.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300">10. Réclamation</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        Si vous estimez que le traitement de vos données ne respecte pas la réglementation,
+        vous pouvez adresser une réclamation à la
+        <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" class="text-emerald-600 dark:text-emerald-400 underline">
+          Commission Nationale de l'Informatique et des Libertés (CNIL)
+        </a>.
+      </p>
+    </section>
+  </div>
+
+  <div class="mt-12 text-center">
+    <%= link_to "← Retour à l'accueil", root_path, class: "text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400" %>
+  </div>
+</div>
