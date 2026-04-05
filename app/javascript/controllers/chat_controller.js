@@ -17,6 +17,7 @@ export default class extends Controller {
     this.consumer = null
     this.subscription = null
     this.isStreaming = false
+    this.element.dataset.chatConnected = "true"
 
     if (this.conversationIdValue) {
       this.subscribeToConversation(this.conversationIdValue)

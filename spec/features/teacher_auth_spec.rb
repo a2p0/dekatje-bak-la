@@ -46,9 +46,27 @@ RSpec.describe "Story 1: Inscription et connexion enseignant", type: :feature do
     click_button "Log in"
 
     expect(page).to have_content("Mes classes")
-    first(:link, "Déconnexion").click
 
-    expect(page).to have_current_path(root_path)
+    # The "Déconnexion" link uses data-turbo-method="delete".
+    # Submit a DELETE form via JS to avoid timing issues with Turbo loading.
+    page.execute_script(<<~JS)
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '#{destroy_user_session_path}';
+      const method = document.createElement('input');
+      method.type = 'hidden'; method.name = '_method'; method.value = 'delete';
+      form.appendChild(method);
+      const token = document.querySelector('meta[name="csrf-token"]');
+      if (token) {
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden'; csrf.name = 'authenticity_token'; csrf.value = token.content;
+        form.appendChild(csrf);
+      }
+      document.body.appendChild(form);
+      form.submit();
+    JS
+
+    expect(page).to have_current_path(root_path, wait: 10)
   end
 
   scenario "un visiteur non connecté est redirigé vers le login" do

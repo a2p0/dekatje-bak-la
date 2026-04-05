@@ -4,6 +4,10 @@ export default class extends Controller {
   static targets = ["provider", "model", "apiKey", "testButton"]
   static values = { models: Object }
 
+  connect() {
+    this.element.dataset.settingsConnected = "true"
+  }
+
   providerChanged() {
     const provider = this.providerTarget.value
     const models = this.modelsValue[provider] || []

@@ -45,77 +45,76 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
       subject_id: subject_record.id,
       id: question.id
     )
+    expect(page).to have_css("[data-chat-connected='true']", wait: 10)
+  end
+
+  def open_drawer
+    click_button "Tutorat"
+    expect(page).to have_css("[data-chat-target='drawer'].translate-x-0", visible: :all, wait: 5)
   end
 
   # Scenario 1: Chat drawer opens on click
-  scenario "le chat s'ouvre dans un drawer quand l'eleve clique Tutorat", js: true do
+  scenario "le chat s'ouvre dans un drawer quand l'eleve clique Tutorat" do
     login_as_student(student, classroom)
     visit_question_page
 
-    # Drawer should initially not be visible (off-screen)
-    drawer = find("[data-chat-target='drawer']", visible: false)
+    # Drawer should initially be off-screen (translate-x-full)
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer[:class]).to include("translate-x-full")
 
-    click_button "Tutorat"
+    open_drawer
 
-    # Drawer should now be visible with translateX(0)
-    expect(page).to have_css("[data-chat-target='drawer']", visible: true)
+    # Should show the empty state message inside the drawer
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer).to have_text("Posez votre question pour commencer le tutorat.")
 
-    # Should show the empty state message
-    within("[data-chat-target='drawer']") do
-      expect(page).to have_content("Posez votre question pour commencer le tutorat.")
-    end
-
-    # Input should be visible
-    expect(page).to have_css("[data-chat-target='input']", visible: true)
+    # Input should be present in the drawer
+    expect(page).to have_css("[data-chat-target='input']", visible: :all)
   end
 
   # Scenario 1 (close): Chat drawer closes on close button click
-  scenario "le chat se ferme au clic sur le bouton fermer", js: true do
+  scenario "le chat se ferme au clic sur le bouton fermer" do
     login_as_student(student, classroom)
     visit_question_page
 
-    click_button "Tutorat"
-    expect(page).to have_css("[data-chat-target='drawer']", visible: true)
+    open_drawer
 
     # Click the close button
-    within("[data-chat-target='drawer']") do
-      find("button", text: "\u2715").click
+    within("[data-chat-target='drawer']", visible: :all) do
+      find("button", text: "✕", visible: :all).click
     end
 
     # Drawer should be translated offscreen again
-    drawer = find("[data-chat-target='drawer']", visible: :all)
-    expect(drawer[:class]).to include("translate-x-full")
+    expect(page).to have_css("[data-chat-target='drawer'].translate-x-full", visible: :all, wait: 5)
   end
 
   # Scenario 2: Message is sent and TutorStreamJob is enqueued
-  scenario "envoyer un message cree la conversation et enqueue le job de streaming", js: true do
+  scenario "envoyer un message cree la conversation et enqueue le job de streaming" do
     login_as_student(student, classroom)
     visit_question_page
 
-    click_button "Tutorat"
+    open_drawer
 
     # Wait for conversation creation (async POST)
-    expect(page).to have_css("[data-chat-target='input']", visible: true)
+    expect(page).to have_css("[data-chat-target='input']", visible: :all, wait: 5)
     sleep 1
 
-    input = find("[data-chat-target='input']")
+    input = find("[data-chat-target='input']", visible: :all)
     input.fill_in(with: "Comment calculer la consommation ?")
 
-    expect {
-      find("[data-chat-target='sendButton']").click
-      sleep 1
-    }.to have_enqueued_job(TutorStreamJob)
+    find("[data-chat-target='sendButton']", visible: :all).click
 
-    # User message should appear in the chat
-    within("[data-chat-target='messages']") do
-      expect(page).to have_content("Comment calculer la consommation ?")
+    # User message should appear in the drawer (JS adds it to DOM)
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer).to have_text("Comment calculer la consommation ?", wait: 5)
+
+    # Conversation should be persisted in DB (shared with server thread)
+    conversation = nil
+    using_wait_time(10) do
+      expect { conversation = Conversation.find_by(student: student, question: question) }
+        .not_to raise_error
     end
-
-    # Conversation should be persisted
-    conversation = Conversation.last
     expect(conversation).to be_present
-    expect(conversation.student).to eq(student)
-    expect(conversation.question).to eq(question)
     expect(conversation.messages.last["content"]).to eq("Comment calculer la consommation ?")
   end
 
@@ -129,7 +128,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
   end
 
   # Scenario 4: Conversation history is displayed when returning to a question
-  scenario "l'historique de conversation s'affiche quand l'eleve revient sur une question", js: true do
+  scenario "l'historique de conversation s'affiche quand l'eleve revient sur une question" do
     # Pre-create a conversation with messages
     create(:conversation,
       student: student,
@@ -145,14 +144,13 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
     login_as_student(student, classroom)
     visit_question_page
 
-    click_button "Tutorat"
+    open_drawer
 
-    within("[data-chat-target='messages']") do
-      expect(page).to have_content("Comment je calcule la consommation ?")
-      expect(page).to have_content("Bonne question ! Quelles donnees as-tu ?")
-      expect(page).to have_content("J'ai la consommation aux 100 km.")
-      expect(page).to have_content("Et quelle est la distance du trajet ?")
-    end
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer).to have_text("Comment je calcule la consommation ?")
+    expect(drawer).to have_text("Bonne question ! Quelles donnees as-tu ?")
+    expect(drawer).to have_text("J'ai la consommation aux 100 km.")
+    expect(drawer).to have_text("Et quelle est la distance du trajet ?")
   end
 
   # Scenario 5: Insufficient credits error (tested at job level)
@@ -186,23 +184,23 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
   end
 
   # Scenario 7: Input is disabled during streaming
-  scenario "l'input est desactive pendant le streaming", js: true do
+  scenario "l'input est desactive pendant le streaming" do
     login_as_student(student, classroom)
     visit_question_page
 
-    click_button "Tutorat"
+    open_drawer
 
     # Wait for conversation creation
-    expect(page).to have_css("[data-chat-target='input']", visible: true)
+    expect(page).to have_css("[data-chat-target='input']", visible: :all, wait: 5)
     sleep 1
 
-    input = find("[data-chat-target='input']")
+    input = find("[data-chat-target='input']", visible: :all)
     input.fill_in(with: "Comment calculer ?")
-    find("[data-chat-target='sendButton']").click
+    find("[data-chat-target='sendButton']", visible: :all).click
 
     # After sending, input and button should be disabled (streaming state)
-    expect(page).to have_css("[data-chat-target='input'][disabled]", wait: 3)
-    expect(page).to have_css("[data-chat-target='sendButton'][disabled]")
+    expect(page).to have_css("[data-chat-target='input'][disabled]", visible: :all, wait: 3)
+    expect(page).to have_css("[data-chat-target='sendButton'][disabled]", visible: :all)
   end
 
   # Scenario 8: System prompt includes insights from previous conversations

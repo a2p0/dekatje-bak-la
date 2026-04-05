@@ -68,7 +68,7 @@ module TutorSimulation
       messages = conversation_history.map { |m| { role: swap_role(m["role"]), content: m["content"] } }
 
       if messages.empty?
-        messages = [{ role: "user", content: "Voici la question : #{question_label}\nEssaie d'y répondre." }]
+        messages = [ { role: "user", content: "Voici la question : #{question_label}\nEssaie d'y répondre." } ]
       end
 
       @client.call(messages: messages, system: system, max_tokens: 512, temperature: 0.8)

@@ -11,6 +11,6 @@ class CreateExamSessions < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :exam_sessions, [:owner_id, :year, :region], name: "idx_exam_sessions_lookup"
+    add_index :exam_sessions, [ :owner_id, :year, :region ], name: "idx_exam_sessions_lookup"
   end
 end

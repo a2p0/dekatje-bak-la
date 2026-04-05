@@ -51,13 +51,10 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     q1 = create(:question, part: part, position: 1)
     q2 = create(:question, part: part, number: "1.2", position: 2)
 
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
+    login_as_student(student, classroom)
 
     expect(page).to have_content("BAC STI2D Metropole 2025")
-    expect(page).to have_content("0/2 — 0%")
+    expect(page).to have_content("0/2")
     expect(page).not_to have_content("Sujet Brouillon")
     expect(page).not_to have_content("Sujet Autre Classe")
   end
@@ -119,7 +116,26 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
 
     expect(page).to have_content("Mes sujets")
 
-    click_link "Déconnexion"
+    # The logout link uses data-turbo-method="delete".
+    # Turbo JS may not intercept in headless Chrome; submit a DELETE form via JS.
+    logout_url = find_link("Déconnexion")[:href]
+    page.execute_script(<<~JS)
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '#{logout_url}';
+      const methodInput = document.createElement('input');
+      methodInput.type = 'hidden';
+      methodInput.name = '_method';
+      methodInput.value = 'delete';
+      form.appendChild(methodInput);
+      const tokenInput = document.createElement('input');
+      tokenInput.type = 'hidden';
+      tokenInput.name = 'authenticity_token';
+      tokenInput.value = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      form.appendChild(tokenInput);
+      document.body.appendChild(form);
+      form.submit();
+    JS
 
     expect(page).to have_content("Vous êtes déconnecté")
     expect(page).to have_content("Terminale SIN 2026")

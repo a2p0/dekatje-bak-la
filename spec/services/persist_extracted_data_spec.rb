@@ -13,9 +13,9 @@ RSpec.describe PersistExtractedData do
           "number" => 1, "title" => "Partie 1", "objective" => "Objectif...",
           "questions" => [
             { "number" => "1.1", "label" => "Calculer...", "context" => "", "points" => 2,
-              "answer_type" => "calculation", "dt_references" => ["DT1"],
+              "answer_type" => "calculation", "dt_references" => [ "DT1" ],
               "dr_references" => [], "correction" => "Result...",
-              "explanation" => "...", "key_concepts" => ["energy"], "data_hints" => [] }
+              "explanation" => "...", "key_concepts" => [ "energy" ], "data_hints" => [] }
           ]
         }
       ],
@@ -24,17 +24,17 @@ RSpec.describe PersistExtractedData do
           "number" => "A", "title" => "Partie A", "objective" => "...",
           "questions" => [
             { "number" => "A.1", "label" => "Relever...", "context" => "", "points" => 3,
-              "answer_type" => "text", "dt_references" => ["DTS1"],
-              "dr_references" => ["DRS1"], "correction" => "...",
+              "answer_type" => "text", "dt_references" => [ "DTS1" ],
+              "dr_references" => [ "DRS1" ], "correction" => "...",
               "explanation" => "...", "key_concepts" => [], "data_hints" => [] }
           ]
         }
       ],
       "document_references" => {
-        "common_dts" => [{ "label" => "DT1", "title" => "Diagrammes", "pages" => [13] }],
-        "common_drs" => [{ "label" => "DR1", "title" => "Tableau", "pages" => [22] }],
-        "specific_dts" => [{ "label" => "DTS1", "title" => "Norme", "pages" => [30] }],
-        "specific_drs" => [{ "label" => "DRS1", "title" => "Sollicitations", "pages" => [34] }]
+        "common_dts" => [ { "label" => "DT1", "title" => "Diagrammes", "pages" => [ 13 ] } ],
+        "common_drs" => [ { "label" => "DR1", "title" => "Tableau", "pages" => [ 22 ] } ],
+        "specific_dts" => [ { "label" => "DTS1", "title" => "Norme", "pages" => [ 30 ] } ],
+        "specific_drs" => [ { "label" => "DRS1", "title" => "Sollicitations", "pages" => [ 34 ] } ]
       }
     }
   end
@@ -80,7 +80,7 @@ RSpec.describe PersistExtractedData do
         expect(common_question.label).to eq("Calculer...")
         expect(common_question.points).to eq(2.0)
         expect(common_question.answer_type).to eq("calculation")
-        expect(common_question.dt_references).to eq(["DT1"])
+        expect(common_question.dt_references).to eq([ "DT1" ])
         expect(common_question.dr_references).to eq([])
 
         specific_question = subject_obj.parts.where(section_type: :specific).first.questions.first
@@ -88,8 +88,8 @@ RSpec.describe PersistExtractedData do
         expect(specific_question.label).to eq("Relever...")
         expect(specific_question.points).to eq(3.0)
         expect(specific_question.answer_type).to eq("text")
-        expect(specific_question.dt_references).to eq(["DTS1"])
-        expect(specific_question.dr_references).to eq(["DRS1"])
+        expect(specific_question.dt_references).to eq([ "DTS1" ])
+        expect(specific_question.dr_references).to eq([ "DRS1" ])
       end
 
       it "creates answers with correction_text, explanation_text, key_concepts, and data_hints" do
@@ -98,7 +98,7 @@ RSpec.describe PersistExtractedData do
         common_answer = exam_session.common_parts.first.questions.first.answer
         expect(common_answer.correction_text).to eq("Result...")
         expect(common_answer.explanation_text).to eq("...")
-        expect(common_answer.key_concepts).to eq(["energy"])
+        expect(common_answer.key_concepts).to eq([ "energy" ])
         expect(common_answer.data_hints).to eq([])
 
         specific_answer = subject_obj.parts.where(section_type: :specific).first.questions.first.answer
@@ -113,8 +113,8 @@ RSpec.describe PersistExtractedData do
 
         common_part = exam_session.common_parts.first
         expect(common_part.document_references).to include(
-          { "label" => "DT1", "title" => "Diagrammes", "pages" => [13] },
-          { "label" => "DR1", "title" => "Tableau", "pages" => [22] }
+          { "label" => "DT1", "title" => "Diagrammes", "pages" => [ 13 ] },
+          { "label" => "DR1", "title" => "Tableau", "pages" => [ 22 ] }
         )
       end
 
@@ -123,8 +123,8 @@ RSpec.describe PersistExtractedData do
 
         specific_part = subject_obj.parts.where(section_type: :specific).first
         expect(specific_part.document_references).to include(
-          { "label" => "DTS1", "title" => "Norme", "pages" => [30] },
-          { "label" => "DRS1", "title" => "Sollicitations", "pages" => [34] }
+          { "label" => "DTS1", "title" => "Norme", "pages" => [ 30 ] },
+          { "label" => "DRS1", "title" => "Sollicitations", "pages" => [ 34 ] }
         )
       end
 
@@ -149,18 +149,18 @@ RSpec.describe PersistExtractedData do
         common_part = exam_session.common_parts.create!(
           number: 1, title: "Partie 1", objective_text: "Objectif...",
           section_type: :common, position: 0, document_references: [
-            { "label" => "DT1", "title" => "Diagrammes", "pages" => [13] },
-            { "label" => "DR1", "title" => "Tableau", "pages" => [22] }
+            { "label" => "DT1", "title" => "Diagrammes", "pages" => [ 13 ] },
+            { "label" => "DR1", "title" => "Tableau", "pages" => [ 22 ] }
           ]
         )
         question = common_part.questions.create!(
           number: "1.1", label: "Calculer...", context_text: "",
           points: 2, answer_type: :calculation, position: 0, status: :draft,
-          dt_references: ["DT1"], dr_references: []
+          dt_references: [ "DT1" ], dr_references: []
         )
         question.create_answer!(
           correction_text: "Result...", explanation_text: "...",
-          key_concepts: ["energy"], data_hints: []
+          key_concepts: [ "energy" ], data_hints: []
         )
       end
 
