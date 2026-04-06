@@ -37,8 +37,21 @@ class Subject < ApplicationRecord
     exam_session&.presentation_text || presentation_text
   end
 
+  def all_parts
+    if exam_session.present?
+      Part.where(id: exam_session.common_parts.select(:id))
+          .or(Part.where(id: parts.where(section_type: :specific).select(:id)))
+    else
+      parts
+    end
+  end
+
+  def total_questions_count
+    all_parts.joins(:questions).merge(Question.kept).count
+  end
+
   def validated_questions_count
-    parts.joins(:questions).merge(Question.where(status: :validated).kept).count
+    all_parts.joins(:questions).merge(Question.where(status: :validated).kept).count
   end
 
   def publishable?

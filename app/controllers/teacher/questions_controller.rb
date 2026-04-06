@@ -53,8 +53,16 @@ class Teacher::QuestionsController < Teacher::BaseController
   end
 
   def set_part
-    @part = @subject.parts.find_by(id: params[:part_id])
+    @part = all_parts_for_subject.find { |p| p.id == params[:part_id].to_i }
     redirect_to teacher_subject_path(@subject), alert: "Partie introuvable." unless @part
+  end
+
+  def all_parts_for_subject
+    if @subject.exam_session.present?
+      @subject.exam_session.common_parts.to_a + @subject.parts.where(section_type: :specific).to_a
+    else
+      @subject.parts.to_a
+    end
   end
 
   def set_question

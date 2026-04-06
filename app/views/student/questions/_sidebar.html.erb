@@ -1,36 +1,55 @@
 <%# Sidebar content — documents, then parts/questions, then settings %>
 <div class="p-4">
 
-  <%# Documents (DT, DR) %>
-  <% has_docs = subject.dt_file.attached? || subject.dr_vierge_file.attached? %>
-  <% if has_docs %>
+  <%# Documents %>
+  <% if subject.new_format? %>
     <p class="text-slate-500 text-[10px] uppercase tracking-wide mb-2">Documents</p>
-    <% if subject.dt_file.attached? %>
-      <%= link_to rails_blob_path(subject.dt_file, disposition: "inline"),
-          target: "_blank",
-          class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
-        <%= render(BadgeComponent.new(color: :blue, label: "DT")) %>
-        <span>Documents Techniques</span>
-      <% end %>
-    <% end %>
-    <% if subject.dr_vierge_file.attached? %>
-      <%= link_to rails_blob_path(subject.dr_vierge_file, disposition: "attachment"),
-          class: "flex items-center gap-1.5 text-amber-400 text-xs my-1 no-underline hover:text-amber-300 transition-colors" do %>
-        <%= render(BadgeComponent.new(color: :amber, label: "DR")) %>
-        <span>DR vierge</span>
-      <% end %>
+    <%= link_to rails_blob_path(subject.subject_pdf, disposition: "inline"),
+        target: "_blank",
+        class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+      <%= render(BadgeComponent.new(color: :blue, label: "PDF")) %>
+      <span>Sujet complet</span>
     <% end %>
     <% if session_record.answered?(current_question.id) %>
-      <% if subject.dr_corrige_file.attached? %>
-        <%= link_to rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
-            target: "_blank",
-            class: "flex items-center gap-1.5 text-emerald-400 text-xs my-1 no-underline hover:text-emerald-300 transition-colors" do %>
-          <%= render(BadgeComponent.new(color: :emerald, label: "DR")) %>
-          <span>DR corrigé</span>
-        <% end %>
+      <%= link_to rails_blob_path(subject.correction_pdf, disposition: "inline"),
+          target: "_blank",
+          class: "flex items-center gap-1.5 text-emerald-400 text-xs my-1 no-underline hover:text-emerald-300 transition-colors" do %>
+        <%= render(BadgeComponent.new(color: :emerald, label: "PDF")) %>
+        <span>Corrigé complet</span>
       <% end %>
     <% end %>
     <hr class="border-slate-700 my-3">
+  <% else %>
+    <% has_docs = subject.dt_file.attached? || subject.dr_vierge_file.attached? %>
+    <% if has_docs %>
+      <p class="text-slate-500 text-[10px] uppercase tracking-wide mb-2">Documents</p>
+      <% if subject.dt_file.attached? %>
+        <%= link_to rails_blob_path(subject.dt_file, disposition: "inline"),
+            target: "_blank",
+            class: "flex items-center gap-1.5 text-blue-400 text-xs my-1 no-underline hover:text-blue-300 transition-colors" do %>
+          <%= render(BadgeComponent.new(color: :blue, label: "DT")) %>
+          <span>Documents Techniques</span>
+        <% end %>
+      <% end %>
+      <% if subject.dr_vierge_file.attached? %>
+        <%= link_to rails_blob_path(subject.dr_vierge_file, disposition: "attachment"),
+            class: "flex items-center gap-1.5 text-amber-400 text-xs my-1 no-underline hover:text-amber-300 transition-colors" do %>
+          <%= render(BadgeComponent.new(color: :amber, label: "DR")) %>
+          <span>DR vierge</span>
+        <% end %>
+      <% end %>
+      <% if session_record.answered?(current_question.id) %>
+        <% if subject.dr_corrige_file.attached? %>
+          <%= link_to rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
+              target: "_blank",
+              class: "flex items-center gap-1.5 text-emerald-400 text-xs my-1 no-underline hover:text-emerald-300 transition-colors" do %>
+            <%= render(BadgeComponent.new(color: :emerald, label: "DR")) %>
+            <span>DR corrigé</span>
+          <% end %>
+        <% end %>
+      <% end %>
+      <hr class="border-slate-700 my-3">
+    <% end %>
   <% end %>
 
   <%# All parts in order — active part shows questions %>

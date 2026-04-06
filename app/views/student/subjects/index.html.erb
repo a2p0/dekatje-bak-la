@@ -25,7 +25,7 @@ end %>
       <% @subjects.each do |subject| %>
         <%
           session_record = current_student.student_sessions.find_by(subject: subject)
-          total = subject.parts.joins(:questions).merge(Question.kept).count
+          total = subject.total_questions_count
           answered = session_record ? session_record.progression.count { |_k, v| v["answered"] } : 0
           matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
         %>

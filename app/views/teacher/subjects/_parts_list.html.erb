@@ -1,9 +1,10 @@
 <div id="parts-list">
-  <% if subject.parts.any? %>
+  <% all_parts = subject.all_parts.order(:position) %>
+  <% if all_parts.any? %>
     <div class="mb-6">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Valider par partie</h2>
       <div class="space-y-2">
-        <% subject.parts.order(:position).each do |part| %>
+        <% all_parts.each do |part| %>
           <details class="group rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
             <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none
                             hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors list-none">
@@ -11,7 +12,9 @@
                 <span class="font-medium text-slate-900 dark:text-white text-sm">
                   Partie <%= part.number %> — <%= part.title %>
                 </span>
-                <%= render BadgeComponent.new(color: :slate, label: part.section_type) %>
+                <% badge_color = part.common? ? :blue : :indigo %>
+                <% badge_label = part.common? ? "commune" : "spécifique" %>
+                <%= render BadgeComponent.new(color: badge_color, label: badge_label) %>
               </div>
               <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180"
                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

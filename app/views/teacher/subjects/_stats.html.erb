@@ -1,6 +1,6 @@
 <%# Subject stats + publish actions partial %>
 <div id="subject-stats">
-  <% total_questions = subject.parts.joins(:questions).merge(Question.kept).count %>
+  <% total_questions = subject.total_questions_count %>
   <% validated_count = subject.validated_questions_count %>
 
   <div class="mb-4">
