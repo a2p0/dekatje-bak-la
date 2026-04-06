@@ -8,19 +8,19 @@ default: &default
 
 development:
   <<: *default
-  host: <%= ENV.fetch("DATABASE_DEVEL_HOST") %>
-  port: <%= ENV.fetch("DATABASE_DEVEL_PORT") %>
-  username: <%= ENV.fetch("DATABASE_DEVEL_USERNAME") %>
-  password: <%= ENV.fetch("DATABASE_DEVEL_PASSWORD") %>
-  database: <%= ENV.fetch("DATABASE_DEVEL_NAME") %>
+  host: <%= ENV.fetch("DATABASE_DEVEL_HOST", "localhost") %>
+  port: <%= ENV.fetch("DATABASE_DEVEL_PORT", 5432) %>
+  username: <%= ENV.fetch("DATABASE_DEVEL_USERNAME", "dekatje") %>
+  password: <%= ENV.fetch("DATABASE_DEVEL_PASSWORD", "dekatje_dev") %>
+  database: <%= ENV.fetch("DATABASE_DEVEL_NAME", "dekatje_bak_la_development") %>
 
 test:
   <<: *default
-  host: <%= ENV.fetch("DATABASE_TEST_HOST") %>
-  port: <%= ENV.fetch("DATABASE_TEST_PORT") %>
-  username: <%= ENV.fetch("DATABASE_TEST_USERNAME") %>
-  password: <%= ENV.fetch("DATABASE_TEST_PASSWORD") %>
-  database: <%= ENV.fetch("DATABASE_TEST_NAME") %>
+  host: <%= ENV.fetch("DATABASE_TEST_HOST", "localhost") %>
+  port: <%= ENV.fetch("DATABASE_TEST_PORT", 5432) %>
+  username: <%= ENV.fetch("DATABASE_TEST_USERNAME", "dekatje") %>
+  password: <%= ENV.fetch("DATABASE_TEST_PASSWORD", "dekatje_dev") %>
+  database: <%= ENV.fetch("DATABASE_TEST_NAME", "dekatje_bak_la_test") %>
 
 production:
   primary: &primary_production
