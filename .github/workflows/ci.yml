@@ -88,8 +88,11 @@ jobs:
           - 6379:6379
 
     env:
-      DATABASE_TEST_URL: postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test
-      DATABASE_URL: postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test
+      DATABASE_TEST_HOST: localhost
+      DATABASE_TEST_PORT: 5432
+      DATABASE_TEST_USERNAME: dekatje
+      DATABASE_TEST_PASSWORD: dekatje_dev
+      DATABASE_TEST_NAME: dekatje_bak_la_test
       RAILS_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
