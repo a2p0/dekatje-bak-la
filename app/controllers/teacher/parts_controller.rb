@@ -21,10 +21,10 @@ class Teacher::PartsController < Teacher::BaseController
 
   def all_parts_for_subject
     @all_parts ||= if @subject.exam_session.present?
-                     @subject.exam_session.common_parts.order(:position).to_a +
-                       @subject.parts.where(section_type: :specific).order(:position).to_a
-                   else
-                     @subject.parts.order(:position).to_a
-                   end
+      @subject.exam_session.common_parts.order(:position).to_a +
+        @subject.parts.where(section_type: :specific).order(:position).to_a
+    else
+      @subject.parts.order(:position).to_a
+    end
   end
 end
