@@ -1,0 +1,785 @@
+```json
+{
+  "metadata": {
+    "title": "Complexe International Multisports et Escalade (C.I.M.E.)",
+    "year": 2024,
+    "exam_type": "bac",
+    "specialty": "AC"
+  },
+  "presentation": "Afin de poursuivre sa démarche de développement du sport, et singulièrement, de l'handisport dans l'Aube, le Département a construit le Complexe International Multisports et Escalade (CIME) sur la Technopole de l'Aube en Champagne.\n\nCe nouveau pôle d'excellence d'une superficie de 5000 m² est doté de l'équipement d'escalade fixe le plus important du territoire national et d'une aire d'évolution multisports adaptée au handisport.\nCe complexe sportif s'inscrit pleinement dans la stratégie territoriale développée autour des Jeux Olympiques et Paralympiques de Paris 2024.\nLe bâtiment CIME comporte une aire de compétition d'escalade regroupant les trois disciplines (difficulté, bloc, vitesse) au travers d'une Structure Artificielle d'Escalade (SAE) de niveau international d'une hauteur de 18 mètres.\n\nPour la construction de ce complexe, l'utilisation de matériaux à haute performance énergétique et respectueux de l'environnement est privilégiée. Afin de limiter l'impact environnemental, les circuits courts d'approvisionnement ont été favorisés permettant ainsi de minimiser la quantité de dioxyde de carbone rejeté dans l'atmosphère.\nLe fait d'accueillir les équipes pour des stages d'entraînement ou des compétitions sportives permet de dynamiser l'économie locale (hébergement, restauration, tourisme…).\nConçu en lien avec le milieu sportif, cet investissement constitue un atout précieux pour l'attractivité durable du territoire.\n\nLe complexe sportif « CIME » permet :\n- de développer la pratique de l'escalade dans l'Aube ;\n- d'organiser des compétitions et accueillir des stages d'entraînement pour différentes équipes nationales ou internationales ;\n- de développer et pérenniser la pratique du sport chez les Aubois, même après les Jeux Olympiques de Paris 2024 ;\n- d'encourager la pratique du handisport de haut niveau.\n\nL'espace du bâtiment « CIME » est réparti de la façon suivante :\n- une halle sportive principale comprenant une aire d'escalade pour l'échauffement des sportifs de tous niveaux, les épreuves de différentes disciplines lors des compétitions, et des entraînements simultanés;\n- une aire d'évolution sportive 44 m x 24 m (1056 m²) pour la pratique multisports, dédiée particulièrement au handisport ;\n- des tribunes pouvant accueillir jusqu'à 500 personnes (350 m²), offrant aux spectateurs des conditions optimales pour assister aux compétitions sportives, comprenant 50 places adaptées aux personnes à mobilité réduite et 20 places équipées pour la presse ;\n- pour les événements internationaux dans le domaine de l'escalade, la capacité d'accueil des spectateurs sera complétée par des installations de sièges sur l'aire d'évolution multisports, portant ainsi le nombre de places assises à 3000 ;\n- des installations supplémentaires de 350 m² sont prévues pour les vestiaires, les sanitaires et les douches, facilitant le changement de tenue des sportifs et offrant des casiers pour le stockage de leurs équipements. Des zones distinctes sont aménagées pour les sportifs et les arbitres, le tout étant accessible aux personnes à mobilité réduite.",
+  "common_parts": [
+    {
+      "number": 1,
+      "title": "Comment le complexe sportif « CIME » s'inscrit-il dans une démarche de développement durable ?",
+      "objective": "Positionner le complexe sportif « CIME » dans le cadre du développement durable ; choisir un mode de transport des athlètes à la fois économique et respectueux de l'environnement.",
+      "questions": [
+        {
+          "number": "1.1",
+          "label": "Identifier pour chacun des trois piliers du développement durable, un argument inscrivant la construction et l'exploitation du complexe sportif dans :\n- une démarche environnementale ;\n- une démarche sociétale ;\n- une démarche économique.",
+          "context": "",
+          "points": 2,
+          "answer_type": "text",
+          "dt_references": ["DT1"],
+          "dr_references": [],
+          "correction": "- une démarche environnementale :\n• Utilisation de matériaux respectueux de l'environnement.\n• Circuits courts d'approvisionnement de matériaux permettant de minimiser la quantité de CO2 rejeté dans l'atmosphère.\n- une démarche sociétale :\n• Développer la pratique de l'escalade dans l'Aube.\n• Encourager la pratique du handisport de haut niveau\n• Développer et pérenniser la pratique du sport chez les Aubois.\n- une démarche économique :\n• Utilisation de matériau performant d'un point de vue énergétique.\n• L'accueil d'équipes sportives et de spectateurs permet de dynamiser l'économie locale.",
+          "explanation": "Il faut s'appuyer sur la mise en situation et le DT1 (diagrammes SysML) pour identifier les arguments relevant de chacun des trois piliers du développement durable. La mise en situation mentionne explicitement : les matériaux respectueux de l'environnement et les circuits courts (environnemental), le développement du handisport et de la pratique sportive (sociétal), la dynamisation de l'économie locale (économique). Le DT1 présente les diagrammes SysML qui formalisent les besoins des parties prenantes et les missions du système.",
+          "data_hints": [
+            {"source": "mise_en_situation", "location": "paragraphes sur les matériaux, les circuits courts, le handisport et l'économie locale"},
+            {"source": "DT1", "location": "diagrammes SysML : mission principale, utilisation en phase d'exploitation, besoins des parties prenantes"}
+          ],
+          "key_concepts": ["développement durable", "piliers environnemental, sociétal, économique", "SysML"]
+        },
+        {
+          "number": "1.2",
+          "label": "Calculer la consommation en litres pour le car et en kW·h pour le van électrique lors d'un trajet entre Troyes et Le Bourget.",
+          "context": "Dans cette partie, nous allons comparer les impacts environnementaux et économiques liés à l'utilisation d'un car ou d'un van électrique pour transporter la délégation d'athlètes de Troyes au Bourget.\n\nEn effet, si les entraînements de la délégation se font sur le site du « CIME » à Troyes, les compétitions d'escalade s'effectuent au Bourget. La distance par route entre Troyes et Le Bourget est de 186 km. La délégation est constituée de 91 personnes (athlètes, entraîneurs et staff médical).\n\nOn se propose, à l'aide du tableau ci-dessous, de comparer pour le transport de la délégation entre Troyes et Le Bourget :\n- le coût en énergie ;\n- la consommation d'énergie primaire ;\n- l'émission de gaz à effet de serre (GES).\n\nModes de transport :\nType de véhicule : Car / Van électrique\nÉnergie : Gazole / Électricité\nConsommation moyenne : 30,5 l pour 100 km / 20,8 KW⋅h pour 100 km\nÉmissions de gaz à effet de serre en phase utilisation : 1409 g Eq CO2/km / 0 g Eq CO2/km\nNombre de places : 61 / 7\nCoût : 1,9 euros par litre / 0,2062 euro par kW·h\nConsommation en énergies primaires : ? / 0,71 kWhep·km-1",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Car = 56,73 l\nVan électrique = 38,68 kWh",
+          "explanation": "Pour le car : consommation = (30,5 l / 100 km) × 186 km = 56,73 litres.\nPour le van électrique : consommation = (20,8 kWh / 100 km) × 186 km = 38,688 kWh ≈ 38,68 kWh.\nLes données de consommation moyenne et la distance de 186 km sont données dans le tableau du contexte de la question.",
+          "data_hints": [
+            {"source": "question_context", "location": "tableau des modes de transport, lignes Consommation moyenne et distance Troyes-Le Bourget (186 km)"}
+          ],
+          "key_concepts": ["consommation énergétique", "calcul proportionnel"]
+        },
+        {
+          "number": "1.3",
+          "label": "Calculer le nombre de car(s) requis puis le nombre de van(s) électrique(s) nécessaire(s) pour assurer le déplacement de la délégation entre Troyes et Le Bourget, en arrondissant à l'unité supérieure.\nEn déduire le coût en euros pour les deux modes de transport sur le trajet entre Troyes et Le Bourget.",
+          "context": "",
+          "points": 2,
+          "answer_type": "calculation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "91/61 = 1,49 soit 2 cars\n91/7 = 13 vans\n56.7*1,9*2cars= 215,46 euros\n38,68*13vans*0.2062 = 103,68 euros",
+          "explanation": "Nombre de cars : 91 personnes ÷ 61 places = 1,49 → arrondi à 2 cars.\nNombre de vans : 91 personnes ÷ 7 places = 13 vans (exactement).\nCoût car : 56,73 l × 1,9 €/l × 2 cars = 215,46 €.\nCoût van : 38,68 kWh × 0,2062 €/kWh × 13 vans = 103,68 €.\nLes données de capacité (61 places, 7 places), de coût (1,9 €/l, 0,2062 €/kWh) et la consommation calculée à la question 1.2 sont nécessaires.",
+          "data_hints": [
+            {"source": "question_context", "location": "tableau des modes de transport, lignes Nombre de places et Coût"},
+            {"source": "question_precedente", "location": "consommations calculées en question 1.2 (56,73 l et 38,68 kWh)"},
+            {"source": "mise_en_situation", "location": "délégation de 91 personnes"}
+          ],
+          "key_concepts": ["arrondi à l'unité supérieure", "coût de transport", "nombre de véhicules"]
+        },
+        {
+          "number": "1.4",
+          "label": "Calculer la consommation en énergie primaire par kilomètre (kWhep·km-1) pour le trajet en car entre Troyes et Le Bourget.\nEn déduire la consommation en énergies primaires par passager (kWhep·km-1) pour les deux modes de transport.",
+          "context": "On considère:\n- 1 litre de gazole est équivalent à 9,82 kWh. l-1;\n- le rendement de la transformation en raffinerie pour obtenir du gasoil est de 94%.\n- 1 kWhep correspond à 1 kW⋅h d'énergie primaire.",
+          "points": 2,
+          "answer_type": "calculation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "30,5*9.82/100= 3 kWh.km-1\n3/0,94= 3,2 kWhep.km-1\nCar :\n3,2/61 = 0,052 kWhep.km-1.passager-1\nVan électrique :\n0,71/7 = 0,101 kWhep.km-1.passager-1",
+          "explanation": "Étape 1 : Consommation énergétique du car par km = (30,5 l/100 km) × 9,82 kWh/l = 2,995 ≈ 3 kWh/km.\nÉtape 2 : Prise en compte du rendement de raffinage (94%) : 3 / 0,94 = 3,19 ≈ 3,2 kWhep/km.\nÉtape 3 : Par passager pour le car : 3,2 / 61 = 0,052 kWhep·km-1·passager-1.\nÉtape 4 : Par passager pour le van électrique : 0,71 kWhep·km-1 (donné dans le tableau) / 7 places = 0,101 kWhep·km-1·passager-1.\nLes données 9,82 kWh/l, rendement 94% et 0,71 kWhep·km-1 sont dans le contexte de la question.",
+          "data_hints": [
+            {"source": "question_context", "location": "données : 1 litre de gazole = 9,82 kWh, rendement raffinerie 94%, 1 kWhep = 1 kWh"},
+            {"source": "question_context", "location": "tableau des modes de transport, ligne Consommation en énergies primaires : 0,71 kWhep·km-1 pour le van"},
+            {"source": "question_context", "location": "tableau des modes de transport, lignes Consommation moyenne (30,5 l/100 km) et Nombre de places (61 et 7)"}
+          ],
+          "key_concepts": ["énergie primaire", "rendement de raffinage", "consommation par passager"]
+        },
+        {
+          "number": "1.5",
+          "label": "Calculer la consommation en énergies primaires (kWhep) pour les deux modes de transport afin d'assurer le déplacement de la délégation entre Troyes et Le Bourget.",
+          "context": "",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Car :\n0,052*186km*2 car*61passager = 1180 kWhep\nVan électrique :\n0,101*186km*13vans*7passager = 1710kWhep",
+          "explanation": "Pour le car : consommation totale = 0,052 kWhep·km-1·passager-1 × 186 km × 2 cars × 61 passagers/car = 1180 kWhep.\nPour le van : consommation totale = 0,101 kWhep·km-1·passager-1 × 186 km × 13 vans × 7 passagers/van = 1710 kWhep.\nOn utilise les résultats des questions 1.3 (nombre de véhicules) et 1.4 (consommation par passager), ainsi que la distance de 186 km.",
+          "data_hints": [
+            {"source": "question_precedente", "location": "consommation par passager calculée en question 1.4 (0,052 et 0,101 kWhep·km-1·passager-1)"},
+            {"source": "question_precedente", "location": "nombre de véhicules calculé en question 1.3 (2 cars, 13 vans)"},
+            {"source": "question_context", "location": "distance Troyes-Le Bourget : 186 km"},
+            {"source": "question_context", "location": "tableau des modes de transport, ligne Nombre de places (61 et 7)"}
+          ],
+          "key_concepts": ["consommation en énergie primaire totale", "bilan énergétique"]
+        },
+        {
+          "number": "1.6",
+          "label": "Conclure en considérant les divers critères évalués tels que le coût énergétique, la consommation d'énergie primaire et les émissions de gaz à effet de serre (GES) en phase d'utilisation.\nIdentifier le mode de transport le plus économique et respectueux de l'environnement.\nCiter d'autres facteurs qui auraient pu favoriser ou qui favoriseront la réduction des impacts environnementaux liés au transport.",
+          "context": "",
+          "points": 2,
+          "answer_type": "argumentation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Car :\nCoût = 215,46 euros\nConsommation en énergies primaires par passager = 1180 kWhep\nEmission de gaz à effet de serre = 1409 g Eq CO2 / km\nVan électrique :\nCoût =103,68 euros\nConsommation en énergies primaires par passager = 1710kWhep\nEmission de gaz à effet de serre = 0 g Eq CO2 / km\nLe cout en van électrique en deux fois moins cher que le car.\nEn phase d'utilisation, le van électrique n'émet pas de CO2 contrairement au car. Par contre, le van électrique impacte plus sur le prélèvement d'énergies primaires.\nIl serait judicieux de tenir d'autres facteurs tel que :\n- le facteur d'occupation des passagers ;\n- l'impact du prélèvement en énergies primaires en phase fabrication.",
+          "explanation": "La conclusion doit synthétiser les trois critères calculés aux questions précédentes :\n- Coût : van électrique (103,68 €) deux fois moins cher que le car (215,46 €).\n- Énergie primaire : le car consomme moins (1180 kWhep) que le van (1710 kWhep).\n- GES en phase utilisation : le van électrique n'émet pas de CO2 (0 g Eq CO2/km) contre 1409 g Eq CO2/km pour le car.\nLe van est plus économique et plus respectueux de l'environnement en phase d'utilisation, mais consomme plus d'énergie primaire. D'autres facteurs à mentionner : taux d'occupation des véhicules, impact en phase de fabrication des véhicules.",
+          "data_hints": [
+            {"source": "question_precedente", "location": "coûts calculés en question 1.3 (215,46 € et 103,68 €)"},
+            {"source": "question_precedente", "location": "consommations en énergie primaire calculées en question 1.5 (1180 et 1710 kWhep)"},
+            {"source": "question_context", "location": "tableau des modes de transport, ligne Émissions de gaz à effet de serre (1409 g Eq CO2/km et 0 g Eq CO2/km)"}
+          ],
+          "key_concepts": ["bilan environnemental", "GES", "énergie primaire", "coût de transport", "analyse multicritère"]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Comment choisir, dans une démarche d'éco-conception, les matériaux afin de réduire l'impact environnemental de la construction du bâtiment « CIME » ?",
+      "objective": "Valider le choix du matériau d'un des poteaux de la structure porteuse du bâtiment « CIME ».",
+      "questions": [
+        {
+          "number": "2.1",
+          "label": "Un poteau a une longueur de 12 m. Justifier, à l'aide du document technique DT2, pourquoi le choix s'est porté sur une ossature en bois lamellé collé plutôt que sur du bois massif.",
+          "context": "La structure du bâtiment « CIME » (figure 1 ci-dessus) repose sur une ossature en bois lamellé collé. Ce matériau est réalisé en collant des planches de bois en longueur et en épaisseur ce qui permet d'obtenir des éléments de charpente plus massifs et plus longs que ceux réalisés avec du bois massif.\nLes planches constituant la pièce de charpente sont collées dans le sens du fil du bois.",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DT2"],
+          "dr_references": [],
+          "correction": "Ossature bois en pin portée jusque 45 m au lieu de 7 m pour le pin massif.",
+          "explanation": "D'après le DT2, le tableau comparatif indique que le bois massif (Pin) a une longueur maximale de poteau de 7 m, tandis que le bois lamellé collé (Pin) atteint 45 m. Le poteau mesure 12 m (donnée de l'énoncé), ce qui dépasse la limite du bois massif (7 m) mais reste dans les capacités du bois lamellé collé (45 m). Le choix du bois lamellé collé est donc justifié par sa capacité à atteindre des longueurs bien supérieures.",
+          "data_hints": [
+            {"source": "DT2", "location": "tableau comparatif, ligne Longueur maximale du poteau (m) : 7 m pour bois massif, 45 m pour bois lamellé collé"},
+            {"source": "question_context", "location": "longueur du poteau : 12 m"}
+          ],
+          "key_concepts": ["bois lamellé collé", "longueur maximale", "portée"]
+        },
+        {
+          "number": "2.2",
+          "label": "Sur le document réponses DR1, calculer le volume et la masse du poteau pour chaque matériau (bois, béton armé, acier).",
+          "context": "L'étude porte sur un poteau porteur de la structure. Nous allons vérifier, dans une démarche d'éco-conception, pourquoi le bois a été choisi par le bureau d'étude structure.\nNous allons le comparer au béton armé et à l'acier au niveau des caractéristiques de performances mécaniques et sur des critères d'éco-conception. Chaque matériau amènera une section différente au poteau (voir document réponses DR1).\nAfin de simplifier l'étude, nous considérerons que le poteau est uniquement soumis à un effort de compression (le flambement et les sollicitations de flexion dues aux charges climatiques ne seront pas abordés ici). La figure 3 ci-dessous schématise le cas étudié.",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": [],
+          "dr_references": ["DR1"],
+          "correction": "Bois lamellé collé : Volume = 120000 mm² × 12 m = 120000 × 10-6 m² × 12 m = 1,44 m³ ; Masse = 1,44 × 430 = 619 kg\nAcier : Volume = 8000 mm² × 12 m = 8000 × 10-6 m² × 12 m = 0,096 m³ ; Masse = 0,096 × 7850 = 754 kg\nBéton Armé : Volume = 160000 mm² × 12 m = 160000 × 10-6 m² × 12 m = 1,92 m³ ; Masse = 1,92 × 2500 = 4800 kg",
+          "explanation": "Le volume se calcule en multipliant la section (en m²) par la longueur du poteau (12 m). Il faut convertir les sections de mm² en m² en divisant par 1 000 000.\n- Bois : 120 000 mm² = 0,12 m² → V = 0,12 × 12 = 1,44 m³ → m = 1,44 × 430 = 619 kg\n- Acier : 8 000 mm² = 0,008 m² → V = 0,008 × 12 = 0,096 m³ → m = 0,096 × 7850 = 754 kg\n- Béton : 160 000 mm² = 0,16 m² → V = 0,16 × 12 = 1,92 m³ → m = 1,92 × 2500 = 4800 kg\nLes sections et masses volumiques sont dans le DR1, la longueur de 12 m est donnée dans l'énoncé.",
+          "data_hints": [
+            {"source": "DR1", "location": "tableau, colonnes Section (mm²) et Masse volumique (kg·m-3) pour chaque matériau"},
+            {"source": "question_context", "location": "longueur du poteau : 12 m (mentionnée en question 2.1)"}
+          ],
+          "key_concepts": ["volume", "masse", "masse volumique", "conversion d'unités mm² en m²"]
+        },
+        {
+          "number": "2.3",
+          "label": "Sur le document DR1, calculer la contrainte (σ) en MPa pour chacun de ces matériaux sans oublier de prendre en compte le poids propre du poteau.",
+          "context": "La contrainte en compression est donnée par la relation suivante :\nσ = F / S\nAvec :\n• σ : la contrainte en compression en MPa ;\n• F : la force appliquée sur le poteau en N ;\n• S : la section du poteau en mm².",
+          "points": 2,
+          "answer_type": "dr_reference",
+          "dt_references": [],
+          "dr_references": ["DR1"],
+          "correction": "Bois lamellé collé : σ = 0,21 MPa\nAcier : σ = 3,39 MPa\nBéton Armé : σ = 0,42 MPa",
+          "explanation": "La contrainte σ = F/S, où F inclut la force appliquée ET le poids propre du poteau (F = F_appliquée + m×g). Les valeurs de masse calculées en 2.2 permettent de calculer le poids propre (P = m × 9,81 N/kg). La force totale est ensuite divisée par la section en mm². Les résultats sont reportés dans le DR1. Les valeurs exactes de la force appliquée sont lisibles sur la figure 3 du sujet (non reproduite textuellement ici).",
+          "data_hints": [
+            {"source": "DR1", "location": "tableau, colonne Section (mm²) et données de la figure 3 pour la force appliquée"},
+            {"source": "question_precedente", "location": "masses calculées en question 2.2 pour le poids propre"}
+          ],
+          "key_concepts": ["contrainte en compression", "poids propre", "σ = F/S"]
+        },
+        {
+          "number": "2.4",
+          "label": "Avec un coefficient de sécurité de 2 et en utilisant les données du tableau du document réponses DR1, vérifier la performance des matériaux en termes de résistance mécanique.\nExpliquer pourquoi la résistance mécanique n'est pas le seul critère de choix d'un matériau pour un poteau.",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": [],
+          "dr_references": ["DR1"],
+          "correction": "σe / σ ≥ 2 c'est le cas pour tous les matériaux.\nIl faut aussi prendre en compte l'aspect environnemental.",
+          "explanation": "La vérification consiste à calculer le rapport σe / σ pour chaque matériau et vérifier qu'il est supérieur ou égal au coefficient de sécurité de 2.\n- Bois : 32 / 0,21 = 152 ≥ 2 ✓\n- Acier : 295 / 3,39 = 87 ≥ 2 ✓\n- Béton : 60 / 0,42 = 143 ≥ 2 ✓\nTous les matériaux sont mécaniquement valides. La résistance mécanique n'est pas le seul critère car il faut aussi considérer la masse, le bilan carbone (impact environnemental), le coût, etc.",
+          "data_hints": [
+            {"source": "DR1", "location": "tableau, colonnes Contrainte de l'étude (MPa) et Limite élastique (MPa) pour chaque matériau"},
+            {"source": "question_context", "location": "coefficient de sécurité de 2 mentionné dans l'énoncé"}
+          ],
+          "key_concepts": ["coefficient de sécurité", "limite élastique", "résistance mécanique", "éco-conception"]
+        },
+        {
+          "number": "2.5",
+          "label": "Classer sur le document réponses DR2, les matériaux étudiés en fonction des critères établis dans l'étude précédente.",
+          "context": "Le document réponses DR1 présente également des caractéristiques autres que mécaniques des trois matériaux étudiés.",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": [],
+          "dr_references": ["DR1", "DR2"],
+          "correction": "Bois lamellé collé : Masse = 3, Performances mécaniques = 3, Bilan carbone = 3, Total = 9\nAcier de construction : Masse = 2, Performances mécaniques = 1, Bilan carbone = 1, Total = 4\nBéton Armé Ultra Haute Performance : Masse = 1, Performances mécaniques = 2, Bilan carbone = 2, Total = 5",
+          "explanation": "Le classement s'effectue selon trois critères, en attribuant 3 points au plus performant, 2 au moyen, 1 au moins performant :\n- Masse : bois (619 kg) < acier (754 kg) < béton (4800 kg) → bois=3, acier=2, béton=1\n- Performances mécaniques (rapport σe/σ) : bois (152) > béton (143) > acier (87) → bois=3, béton=2, acier=1\n- Bilan carbone : bois (-47,2 kg eq. CO2/t) < béton (+159) < acier (+2211) → bois=3, béton=2, acier=1\nLe bois lamellé collé obtient le meilleur total (9 points).",
+          "data_hints": [
+            {"source": "DR1", "location": "tableau complet : colonnes Masse (kg), Contrainte de l'étude, Limite élastique et Bilan carbone pour chaque matériau"},
+            {"source": "DR2", "location": "tableau de classement à compléter avec les points par critère"}
+          ],
+          "key_concepts": ["analyse multicritère", "bilan carbone", "classement par points"]
+        },
+        {
+          "number": "2.6",
+          "label": "Justifier le choix du matériau du poteau retenu par le bureau d'étude en vérifiant qu'il s'agit du meilleur compromis en termes de masse, de performances mécaniques et de bilan carbone.",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": [],
+          "dr_references": ["DR2"],
+          "correction": "Voir la colonne « Total » sur le document réponses DR2.\nLe choix se porte sur un poteau en bois lamellé collé. C'est bien la solution choisie par le bureau d'étude structure.",
+          "explanation": "En s'appuyant sur le total des points du DR2, le bois lamellé collé obtient 9 points (le maximum), contre 5 pour le béton et 4 pour l'acier. Il est le meilleur compromis sur les trois critères : il est le plus léger, présente les meilleures performances mécaniques relatives et a un bilan carbone négatif (il stocke du CO2). Ce résultat confirme le choix du bureau d'étude.",
+          "data_hints": [
+            {"source": "DR2", "location": "colonne Total du tableau de classement complété en question 2.5"}
+          ],
+          "key_concepts": ["bois lamellé collé", "meilleur compromis", "éco-conception", "bilan carbone négatif"]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Comment assurer efficacement le renouvellement d'air dans le bâtiment « CIME » ?",
+      "objective": "Vérifier si la centrale de traitement de l'air (CTA) est adaptée au bâtiment « CIME ».",
+      "questions": [
+        {
+          "number": "3.1",
+          "label": "Sur le document réponses DR3, calculer le volume d'air neuf nécessaire dans les différents cas d'utilisation de la salle multisports et indiquer le volume d'air renouvelé retenu.",
+          "context": "On rappelle que la salle multisports est équipée de tribunes pouvant accueillir jusqu'à 500 personnes. Pour des événements internationaux dans le domaine de l'escalade, la capacité d'accueil des spectateurs est complétée par des installations de sièges sur l'aire d'évolution multisports, portant ainsi le nombre de places assises à 3000.",
+          "points": 2,
+          "answer_type": "dr_reference",
+          "dt_references": ["DT3"],
+          "dr_references": ["DR3"],
+          "correction": "Tennis : sportifs = 2 ou 4 × 25 = 100 m³/h ; spectateurs = 500 × 18 = 9000 m³/h ; total = 9100 m³/h\nBasket : sportifs = 17 × 25 = 425 m³/h ; spectateurs = 500 × 18 = 9000 m³/h ; total = 9425 m³/h\nHandball : sportifs = 14 × 25 = 350 m³/h ; spectateurs = 500 × 18 = 9000 m³/h ; total = 9350 m³/h\nEscalade : sportifs = 4 × 25 = 100 m³/h ; spectateurs = 3000 × 18 = 54000 m³/h ; total = 54100 m³/h\nLe volume d'air renouvelé retenu sera de : 54 100 m³/h",
+          "explanation": "Pour chaque discipline, le volume d'air neuf = (nombre de sportifs × 25 m³/h/sportif) + (nombre de spectateurs × 18 m³/h/spectateur).\nLe nombre de sportifs inclut joueurs + remplaçants (d'après DT3) :\n- Tennis : 2 ou 4 joueurs (pas de remplaçants) → 4 × 25 = 100 m³/h\n- Basket : 5 joueurs + 12 remplaçants = 17 × 25 = 425 m³/h\n- Handball : 7 joueurs + 7 remplaçants = 14 × 25 = 350 m³/h\n- Escalade : 4 sportifs × 25 = 100 m³/h\nLe cas le plus défavorable (volume maximal) est l'escalade avec 3000 spectateurs : 54 100 m³/h. C'est ce volume qui est retenu.",
+          "data_hints": [
+            {"source": "DT3", "location": "tableau Renouvellement d'air en fonction des locaux : 25 m³/h par sportif, 18 m³/h par spectateur"},
+            {"source": "DT3", "location": "tableau Nombres de joueurs participants : joueurs et remplaçants par discipline"},
+            {"source": "question_context", "location": "500 spectateurs en configuration normale, 3000 en événement international"}
+          ],
+          "key_concepts": ["renouvellement d'air", "débit d'air neuf", "cas le plus défavorable"]
+        },
+        {
+          "number": "3.2",
+          "label": "Déterminer la référence du modèle des caissons de filtration afin d'en minimiser le nombre. Indiquer le nombre de caissons installés.",
+          "context": "La solution technique retenue devra minimiser l'utilisation de caissons de filtration tout en assurant le renouvellement d'air de 60 000 m³·h-1, pour compenser les pertes de charge.",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DT4"],
+          "dr_references": [],
+          "correction": "Il faut installer 3 modules SIE20 de 20 000 m³ꞏh-1 (2 556 x 940 x 605).",
+          "explanation": "Pour minimiser le nombre de caissons, il faut choisir le modèle avec le débit le plus élevé. D'après le DT4, le modèle SI20 a un débit de 20 000 m³/h. Pour assurer 60 000 m³/h : 60 000 / 20 000 = 3 caissons SI20. Avec un modèle inférieur (SI16 = 16 000 m³/h), il faudrait 4 caissons. Le modèle SI20 permet donc de minimiser le nombre de caissons à 3.",
+          "data_hints": [
+            {"source": "DT4", "location": "tableau des caissons de filtration, colonne Débit (m³/h) et Modèle"},
+            {"source": "question_context", "location": "débit total requis : 60 000 m³/h"}
+          ],
+          "key_concepts": ["caisson de filtration", "débit volumique", "minimisation du nombre d'équipements"]
+        },
+        {
+          "number": "3.3",
+          "label": "Calculer la vitesse du fluide dans un caisson. Justifier si l'équipement est susceptible de perturber les rencontres sportives.",
+          "context": "Une vitesse de circulation d'air trop élevée dans les conduits de ventilation peut entraîner une nuisance sonore perturbante pour les spectateurs, mais surtout pour les sportifs à déficience visuelle.\nLes conduits de ventilation et les caissons de filtration choisis ont pour dimensions internes en millimètre : 2550 x 935 (L x H).",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": ["DT5"],
+          "dr_references": [],
+          "correction": "Débit d'air dans un caisson 20 000 m³ꞏh-1\nV = qv / S = (20 000 /3600) / (2,550 x 0,935) = 2,33m/s\nIl n'y aura pas de perturbation sonore.",
+          "explanation": "La vitesse se calcule avec la formule qv = S × v, soit v = qv / S.\nDébit d'un caisson : 20 000 m³/h = 20 000 / 3600 = 5,556 m³/s.\nSection du caisson : 2550 mm × 935 mm = 2,550 m × 0,935 m = 2,384 m².\nVitesse : v = 5,556 / 2,384 = 2,33 m/s.\nD'après le DT5, la vitesse maximale pour les locaux sportifs est de 4 m/s (conduits horizontaux). 2,33 m/s < 4 m/s, donc il n'y aura pas de perturbation sonore.",
+          "data_hints": [
+            {"source": "DT5", "location": "formule qv = S × v et tableau des vitesses maximales par type de local (4 m/s pour locaux sportifs)"},
+            {"source": "question_context", "location": "dimensions internes du caisson : 2550 x 935 mm"},
+            {"source": "question_precedente", "location": "débit d'un caisson SI20 : 20 000 m³/h (question 3.2)"}
+          ],
+          "key_concepts": ["vitesse d'air", "débit volumique", "section de passage", "nuisance sonore"]
+        },
+        {
+          "number": "3.4",
+          "label": "Choisir et justifier la référence du filtre à utiliser.",
+          "context": "La magnésie est de l'oxyde (ou hydroxyde) de magnésium. La magnésie se présente sous la forme d'une poudre blanche que l'on obtient par calcination de magnésium. Cet élément chimique est utilisé par les sportifs pour augmenter l'adhérence de leurs mains. Les particules typiques de magnésie, comme on les trouve dans la poussière des salles d'escalade, ont une dimension inférieure à 10 micromètres. Le filtre ne doit pas entraîner une perte de charge supérieure à 100 Pa.",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DT6"],
+          "dr_references": [],
+          "correction": "Filtre A7 PM2,5 car les particules sont inférieures à 10 µm dimension 2550 x 935, débit 22500 m³ꞏh-1, perte de charge 85 PA < 100 PA.",
+          "explanation": "Les particules de magnésie ont une dimension inférieure à 10 µm. Un filtre PM10 ne filtre que les particules > 10 µm, donc il ne convient pas. Il faut un filtre PM2,5 (filtre les particules > 2,5 µm) ou PM1. La contrainte de perte de charge ≤ 100 Pa élimine les filtres PM1 (perte de charge initiale de 120 Pa > 100 Pa). Parmi les filtres PM2,5, il faut choisir celui adapté aux dimensions du caisson (2550 × 935 mm) et au débit (20 000 m³/h) : le filtre A7 (2550 × 935 mm, débit 22 500 m³/h, perte de charge 85 Pa < 100 Pa) convient.",
+          "data_hints": [
+            {"source": "DT6", "location": "tableau des filtres : colonnes Classe ISO 16890, dimensions, débit et perte de charge initiale"},
+            {"source": "question_context", "location": "particules de magnésie < 10 µm et perte de charge maximale 100 Pa"},
+            {"source": "question_context", "location": "dimensions du caisson : 2550 x 935 mm"}
+          ],
+          "key_concepts": ["filtration PM", "perte de charge", "classe ISO 16890", "particules fines"]
+        },
+        {
+          "number": "3.5",
+          "label": "Conclure sur les solutions retenues pour le traitement de l'air.",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Les solutions : CTA avec 3 caissons SIE20 et filtres A7 Qui permettent la filtration adaptée au débit sans perturbation de bruit par la vitesse.",
+          "explanation": "La conclusion doit synthétiser les choix effectués aux questions 3.2, 3.3 et 3.4 : 3 caissons SI20 assurent le débit de 60 000 m³/h en minimisant le nombre d'équipements, la vitesse de 2,33 m/s est inférieure à la limite de 4 m/s (pas de nuisance sonore), et les filtres A7 PM2,5 filtrent efficacement les particules de magnésie avec une perte de charge acceptable (85 Pa < 100 Pa).",
+          "data_hints": [
+            {"source": "question_precedente", "location": "résultats des questions 3.2 (3 caissons SI20), 3.3 (vitesse 2,33 m/s) et 3.4 (filtre A7)"}
+          ],
+          "key_concepts": ["CTA", "bilan de la solution technique", "filtration", "débit d'air"]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Comment matérialiser sur l'aire multisports du bâtiment « CIME » un marquage au sol adapté au handisport ?",
+      "objective": "Quantifier les différents éléments équipant le plancher lumineux puis analyser la chaîne d'acquisition et de traitement de l'information relative au pilotage du marquage au sol.",
+      "questions": [
+        {
+          "number": "4.1",
+          "label": "Préciser l'intérêt de matérialiser un marquage lumineux au sol sur l'aire multisports du bâtiment « CIME ».",
+          "context": "La grande majorité des salles de sport polyvalentes offre une multitude de marquages au sol afin de pouvoir accueillir des matchs de basket, d'handball, de volley-ball, de badminton, de foot en salle, etc. Des lignes droites, courbes, des couleurs diverses et variées, tout cela peut vite amener un peu de confusion chez les sportifs, mais également chez les spectateurs.\n\nDes rubans de diodes électroluminescentes (DEL ou LED en anglais) encastrés dans le plancher permettent d'afficher le marquage au sol et de le changer sur demande pour l'adapter au sport pratiqué.\n\nLa modification des tracés est pilotable depuis une interface homme / machine.\nCette technologie offre l'avantage de n'afficher qu'un seul marquage à la fois tout en restant polyvalente.\n\nLa surface du plancher laisse passer la lumière des DELs sans éblouir les sportifs.",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Les rubans LED encastrés dans le plancher permettent d'afficher le marquage au sol et de le changer sur demande pour l'adapter instantanément au sport pratiqué. La modification des tracés est pilotable depuis une interface homme/machine. Cette technologie offre l'avantage de n'afficher qu'un seul marquage à la fois tout en restant polyvalente. La surface du plancher laisse passer la lumière des LED sans éblouir les sportifs.",
+          "explanation": "La réponse est directement dans le texte de mise en situation de la partie 4. L'intérêt principal est la polyvalence : un seul marquage affiché à la fois, modifiable à la demande, sans confusion pour les sportifs (notamment les handisportifs). La surface anti-éblouissement est aussi un avantage.",
+          "data_hints": [
+            {"source": "question_context", "location": "paragraphes décrivant les rubans DEL et leurs avantages"}
+          ],
+          "key_concepts": ["marquage lumineux", "DEL", "polyvalence", "handisport", "interface homme/machine"]
+        },
+        {
+          "number": "4.2",
+          "label": "Sur le document réponses DR4, calculer :\n- le nombre de DELs ainsi que le nombre rubans DEL nécessaires au balisage lumineux de chaque aire de jeux handisport ;\n- la puissance électrique consommée par les rubans DEL de chaque aire de jeux handisport (PFOOT , PBASKET, PHAND et PTENNIS) ;\n- le nombre de blocs alimentations 24 V / 400 W (puissance maximale disponible auprès du constructeur) nécessaires au balisage lumineux de chaque aire de jeux handisport.",
+          "context": "Les longueurs des rubans DEL pour le balisage lumineux des aires de jeux handisport sont données ci-dessous.\nAires de jeux handisport :\n- foot fauteuil électrique : 156 m de rubans DEL ;\n- basket fauteuil : 258 m de rubans DEL ;\n- hand fauteuil : 217 m de rubans DEL ;\n- tennis fauteuil : 147 m de rubans DEL.",
+          "points": 3,
+          "answer_type": "dr_reference",
+          "dt_references": ["DT7", "DT8"],
+          "dr_references": ["DR4"],
+          "correction": "Foot fauteuil : 320 × 156 = 49920 DELs ; 156/5 = 31,2 → 32 rubans ; PFOOT = 8 × 156 = 1248 W ; 1248/400 = 3,12 → 4 blocs alimentations\nBasket fauteuil : 320 × 258 = 82560 DELs ; 258/5 = 51,6 → 52 rubans ; PBASKET = 8 × 258 = 2064 W ; 2064/400 = 5,16 → 6 blocs alimentations\nHand fauteuil : 320 × 217 = 69440 DELs ; 217/5 = 43,4 → 44 rubans ; PHAND = 8 × 217 = 1736 W ; 1736/400 = 4,34 → 5 blocs alimentations\nTennis fauteuil : 320 × 147 = 47040 DELs ; 147/5 = 29,4 → 30 rubans ; PTENNIS = 8 × 147 = 1176 W ; 1176/400 = 2,94 → 3 blocs alimentations",
+          "explanation": "D'après le DT7, le ruban DEL COB a une densité de 320 DEL/m et une puissance de 8 W/m, et chaque ruban mesure 5 m.\n- Nombre de DELs = 320 DEL/m × longueur totale (m)\n- Nombre de rubans = longueur totale / 5 m (arrondi à l'unité supérieure)\n- Puissance = 8 W/m × longueur totale (m)\n- Nombre de blocs = Puissance / 400 W (arrondi à l'unité supérieure)\nD'après le DT8, la puissance maximale d'un bloc alimentation est de 400 W.",
+          "data_hints": [
+            {"source": "DT7", "location": "caractéristiques du ruban DEL COB : 320 DEL/m, 8 W/m, longueur 5 m"},
+            {"source": "DT8", "location": "caractéristiques de l'alimentation : puissance maximale 400 W"},
+            {"source": "question_context", "location": "longueurs des rubans DEL par aire de jeux : 156 m, 258 m, 217 m, 147 m"}
+          ],
+          "key_concepts": ["DEL", "puissance électrique", "alimentation", "arrondi à l'unité supérieure"]
+        },
+        {
+          "number": "4.3",
+          "label": "Déterminer la valeur de la tension (V Stop) et du niveau logique (NL Stop) en sortie du bouton poussoir « Stop » lorsque que celui-ci est relâché ou appuyé.\nRemarque :\n- un niveau logique 0 correspond à une tension de 0 V;\n- un niveau logique 1 correspond à une tension de 5 V.",
+          "context": "",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DT9", "DT10"],
+          "dr_references": [],
+          "correction": "Bouton poussoir « Stop » relâché :\nV Stop= 5 V\nNL Stop= 1\nBouton poussoir « Stop » appuyé :\nV Stop= 0 V\nNL Stop= 0",
+          "explanation": "D'après le DT10 (schéma structurel de la fonction acquérir), le bouton poussoir Stop est connecté à une alimentation 5 V avec une résistance de tirage (pull-up). Lorsque le bouton est relâché (circuit ouvert), la tension en sortie est 5 V (niveau logique 1). Lorsque le bouton est appuyé (circuit fermé vers la masse), la tension est 0 V (niveau logique 0). C'est un montage à logique négative (actif à l'état bas).",
+          "data_hints": [
+            {"source": "DT9", "location": "diagramme de blocs internes du plancher lumineux, bloc acquérir"},
+            {"source": "DT10", "location": "schéma structurel de la fonction acquérir : montage du bouton poussoir Stop avec résistance de tirage"}
+          ],
+          "key_concepts": ["niveau logique", "bouton poussoir", "résistance de tirage pull-up", "tension"]
+        },
+        {
+          "number": "4.4",
+          "label": "Compléter sur le document réponses DR5, les deux algorigrammes de programmation du plancher lumineux.",
+          "context": "",
+          "points": 2,
+          "answer_type": "dr_reference",
+          "dt_references": ["DT11"],
+          "dr_references": ["DR5"],
+          "correction": "Voir documents réponses DR5.",
+          "explanation": "Les algorigrammes doivent traduire graphiquement les algorithmes du DT11. Le programme principal comporte une boucle TANT QUE (1) contenant une boucle TANT QUE (X=0) avec des tests SI/SINON pour chaque bouton (Foot, Basket, Hand, Tennis). Chaque branche allume la DEL correspondante, les rubans DEL de l'aire concernée et affecte X=1. Le programme d'interruption éteint toutes les DELs, tous les rubans et remet X=0.",
+          "data_hints": [
+            {"source": "DT11", "location": "algorithmes complets du programme principal et du programme d'interruption"},
+            {"source": "DR5", "location": "squelettes des algorigrammes à compléter"}
+          ],
+          "key_concepts": ["algorigramme", "boucle TANT QUE", "test conditionnel SI/SINON", "programme d'interruption"]
+        },
+        {
+          "number": "4.5",
+          "label": "Pour conclure :\n- proposer un paramètre sur lequel il serait possible d'agir afin de diminuer le nombre de blocs alimentations.\n- le pilotage de la modification des tracés se fait actuellement, par un pupitre équipé de boutons poussoirs. Proposer une technologie plus innovante pour l'interface homme/machine permettant de piloter le plancher lumineux du bâtiment « CIME ».",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Choisir des blocs alimentations de puissance maximale supérieure afin de minimiser le nombre de blocs.\nÉcran tactile.",
+          "explanation": "Pour diminuer le nombre de blocs alimentations, on peut augmenter la puissance maximale de chaque bloc (par exemple passer de 400 W à 800 W réduirait de moitié le nombre de blocs). On pourrait aussi réduire la puissance consommée par les rubans DEL (en choisissant des rubans moins puissants). Pour l'interface homme/machine, une technologie plus innovante qu'un pupitre à boutons poussoirs serait un écran tactile, une application smartphone, ou une interface vocale.",
+          "data_hints": [
+            {"source": "question_precedente", "location": "nombre de blocs alimentations calculé en question 4.2"},
+            {"source": "DT8", "location": "puissance maximale du bloc alimentation : 400 W"}
+          ],
+          "key_concepts": ["interface homme/machine", "écran tactile", "puissance d'alimentation", "innovation"]
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Comment le réseau informatique contribue au fonctionnement des différents systèmes pluri technologiques du bâtiment « CIME » ?",
+      "objective": "Vérifier que les différents équipements techniques du bâtiment « CIME » sont capables de communiquer entre eux.",
+      "questions": [
+        {
+          "number": "5.1",
+          "label": "Pour chaque matériel connecté à ce sous-réseau, proposer une adresse IP afin que les équipements cités ci-dessous puissent communiquer entre eux :\n- automate dédié au traitement de l'air ;\n- automate dédié au chauffage ;\n- automate dédié au plancher lumineux ;\n- automate dédié à l'éclairage ;\n- automate dédié au contrôle d'accès au site ;\n- console de supervision des automates.",
+          "context": "Le schéma du réseau informatique est donné sur le document technique DT12.\nLes automates du sous-réseau gestion des équipements d'automatisation communiquent sur le réseau via le protocole Modbus TCP/IP (Transmission Control Protocol / Internet Protocol). Le protocole Modbus TCP/IP est destiné à la supervision et au contrôle des équipements d'automatisation. Il combine un réseau physique (Ethernet) avec une norme de réseau (TCP/IP) et une méthode de représentation des données (Modbus).\n\nSous-réseau « gestion des équipements d'automatisation »\nL'adresse IP du sous-réseau gestion des équipements d'automatisation est : 172.16.3.0\nLe masque de sous-réseau est : 255.255.255.0",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DT12"],
+          "dr_references": [],
+          "correction": "Toute adresse IP comprise entre 172.16.3.1 et 172.16.3.254 convient.\n- automate dédié au traitement de l'air : 172.16.3.10 (exemple)\n- automate dédié au chauffage : 172.16.3.20 (exemple)\n- automate dédié au plancher lumineux : 172.16.3.30 (exemple)\n- automate dédié à l'éclairage : 172.16.3.40 (exemple)\n- automate dédié au contrôle d'accès au site : 172.16.3.50 (exemple)\n- console de supervision des automates : 172.16.3.60 (exemple)",
+          "explanation": "Le sous-réseau est 172.16.3.0 avec un masque 255.255.255.0. Les adresses utilisables pour les hôtes sont comprises entre 172.16.3.1 (première adresse hôte) et 172.16.3.254 (dernière adresse hôte). L'adresse 172.16.3.0 est l'adresse réseau et 172.16.3.255 est l'adresse de broadcast, toutes deux réservées. Toute adresse dans la plage 172.16.3.1 à 172.16.3.254 est acceptable.",
+          "data_hints": [
+            {"source": "DT12", "location": "schéma du réseau informatique, sous-réseau gestion des équipements d'automatisation"},
+            {"source": "question_context", "location": "adresse IP du sous-réseau : 172.16.3.0, masque : 255.255.255.0"}
+          ],
+          "key_concepts": ["adresse IP", "sous-réseau", "masque de sous-réseau", "plage d'adresses hôtes"]
+        },
+        {
+          "number": "5.2",
+          "label": "Déterminer en justifiant votre réponse, le nombre d'adresses IP restant disponibles pour le sous-réseau gestion des équipements d'automatisation.",
+          "context": "",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": ["DT12"],
+          "dr_references": [],
+          "correction": "Le masque de sous-réseau étant 255.255.255.0, le net-ID est codé sur 3 octets. Il reste donc 1 octet pour le host-ID. Avec 1 octet, il est possible d'avoir 256 nombres (2⁸ = 256).\nDes 256 adresses IP possibles, il faut retirer :\n- l'adresse du sous-réseau « gestion des équipements d'automatisation » : 172.16.3.0 ;\n- l'adresse de diffusion (broadcast) : 172.16.3.255 ;\n- les 6 adresses IP utilisées pour les automates et la console de supervision.\nLe nombre d'adresses IP restant disponibles pour le sous-réseau gestion des équipements d'automatisation est donc égal à 248 (256 - 1 -1 – 6 = 248).",
+          "explanation": "Avec un masque /24 (255.255.255.0), le dernier octet est libre pour les adresses hôtes, soit 2⁸ = 256 adresses au total. On retire : 1 adresse réseau (172.16.3.0) + 1 adresse broadcast (172.16.3.255) + 6 adresses déjà attribuées (5 automates + 1 console) = 256 - 8 = 248 adresses disponibles.",
+          "data_hints": [
+            {"source": "question_context", "location": "masque de sous-réseau : 255.255.255.0"},
+            {"source": "question_precedente", "location": "6 adresses IP attribuées en question 5.1"}
+          ],
+          "key_concepts": ["adresses IP disponibles", "adresse réseau", "broadcast", "masque /24"]
+        },
+        {
+          "number": "5.3",
+          "label": "Déterminer l'adresse IP du sous-réseau sécurité ainsi que son adresse IP de diffusion (broadcast : message transmis à tous les participants d'un réseau ne nécessitant pas de réponse).",
+          "context": "Sous-réseau « sécurité »\nLe masque de sous-réseau est : 255.255.255.0",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": ["DT12"],
+          "dr_references": [],
+          "correction": "Pour trouver l'adresse IP du sous-réseau « sécurité » il faut réaliser un ET logique entre l'adresse IP d'un équipement et le masque de sous-réseau.\n10101100 . 00010000 . 00000010 . 00000001 = 172.16.2.1\nET logique 11111111 . 11111111 . 11111111 . 00000000 = 255.255.255.0\n10101100 . 00010000 . 00000010 . 00000000 = 172.16.2.0\nL'adresse du sous-réseau « sécurité » est donc : 172.16.2.0\nL'adresse de broadcast du sous-réseau « sécurité » est : 172.16.2.255",
+          "explanation": "Pour trouver l'adresse réseau, on effectue un ET logique bit à bit entre l'adresse IP d'un équipement du sous-réseau sécurité (lue sur le DT12, par exemple 172.16.2.1) et le masque 255.255.255.0. Le résultat donne 172.16.2.0. L'adresse de broadcast est obtenue en mettant tous les bits du host-ID à 1 : 172.16.2.255.",
+          "data_hints": [
+            {"source": "DT12", "location": "schéma du réseau informatique, sous-réseau sécurité : adresse IP d'un équipement (ex. 172.16.2.1)"},
+            {"source": "question_context", "location": "masque de sous-réseau : 255.255.255.0"}
+          ],
+          "key_concepts": ["ET logique", "adresse réseau", "broadcast", "masque de sous-réseau"]
+        },
+        {
+          "number": "5.4",
+          "label": "Relever pour l'ordinateur du technicien :\n- son adresse MAC (Media Access Control) en hexadécimal ;\n- son adresse IP en hexadécimal et la convertir en décimal.",
+          "context": "Sous-réseau « ordinateurs + imprimante »\nL'adresse IP du sous-réseau ordinateurs + imprimante est : 172.16.1.0\nLe masque de sous-réseau est : 255.255.255.0\n\nSuite à un problème technique, il n'est plus possible d'imprimer des documents. Un technicien a réalisé une commande « ping » sur ce sous-réseau entre son ordinateur portable connecté en Wi-Fi (protocole de communication sans fil régi par les normes du groupe IEEE 802.11) et l'imprimante afin de vérifier le bon fonctionnement de la connectique du sous-réseau.\nLa commande « ping » permet de tester la présence d'un hôte distant via une trame de type ICMP. Le protocole ICMP (Internet Control Message Protocol) est très utile sur les réseaux IP. En cas de problème d'émission d'un paquet, il est capable d'informer l'émetteur du paquet d'une erreur de transmission.",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DT12", "DT13"],
+          "dr_references": [],
+          "correction": "Adresse MAC ordinateur en hexadécimal : 54-BF-64-87-72-97\nAdresse IP ordinateur en hexadécimal : AC-10-01-0A\nAdresse IP ordinateur en décimal : 172.16.1.10",
+          "explanation": "D'après le DT13, la trame Ethernet/IP/ICMP est capturée. L'adresse MAC source (ordinateur émetteur) se trouve aux octets 0006 à 000B : 54 BF 64 87 72 97. L'adresse IP source se trouve aux octets 001A à 001D : AC 10 01 0A. Conversion en décimal : AC = 172, 10 = 16, 01 = 1, 0A = 10 → 172.16.1.10. L'adresse MAC destination (imprimante) est 34-64-A9-2A-36-BE et l'adresse IP destination est AC-10-01-C8 = 172.16.1.200.",
+          "data_hints": [
+            {"source": "DT13", "location": "synoptique de la trame : position de l'adresse MAC source (octets 0006-000B) et de l'adresse IP source (octets 001A-001D)"},
+            {"source": "DT13", "location": "capture de la trame Wireshark, ligne 0000 et ligne 0010"}
+          ],
+          "key_concepts": ["adresse MAC", "adresse IP", "trame Ethernet", "hexadécimal vers décimal", "Wireshark"]
+        },
+        {
+          "number": "5.5",
+          "label": "Pour conclure, compléter le document réponses DR6 en inscrivant dans chaque cellule « OUI » lorsque la communication est possible entre les équipements et « NON » dans le cas contraire.",
+          "context": "L'administrateur du réseau missionne un technicien afin qu'il expertise le fonctionnement du réseau informatique.\n\nLe rapport d'expertise comporte les éléments suivants :\n- tous les équipements informatiques sont sur le même segment Ethernet. Celui-ci ne comporte aucun routeur. Aucun équipement informatique n'est configuré pour remplir cette fonction ;\n- le relevé des configurations IP est le suivant :\n• sous-réseau « ordinateurs + imprimante » : 172.16.1.0 /24\n• sous-réseau « sécurité » : 172.16.2.0 /24\n• sous-réseau « gestion des équipements d'automatisation » : 172.16.3.0 /24",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": ["DT12"],
+          "dr_references": ["DR6"],
+          "correction": "Imprimante / Ordinateur-Accueil : OUI ; Imprimante / Console supervision vidéo : NON ; Imprimante / Console supervision automates : NON\nServeur de stockage vidéo / Ordinateur-Accueil : NON ; Serveur de stockage vidéo / Console supervision vidéo : OUI ; Serveur de stockage vidéo / Console supervision automates : NON\nAutomate dédié à l'éclairage / Ordinateur-Accueil : NON ; Automate dédié à l'éclairage / Console supervision vidéo : NON ; Automate dédié à l'éclairage / Console supervision automates : OUI\nPasserelle Internet / Ordinateur-Accueil : OUI ; Passerelle Internet / Console supervision vidéo : OUI ; Passerelle Internet / Console supervision automates : OUI",
+          "explanation": "Sans routeur, deux équipements ne peuvent communiquer que s'ils sont sur le même sous-réseau. La communication est possible (OUI) uniquement entre équipements du même sous-réseau (/24). La passerelle Internet est connectée aux trois sous-réseaux (elle joue le rôle de routeur), donc elle peut communiquer avec tous. Les équipements de sous-réseaux différents ne peuvent pas communiquer directement (NON).",
+          "data_hints": [
+            {"source": "DT12", "location": "schéma du réseau informatique : appartenance de chaque équipement à son sous-réseau"},
+            {"source": "question_context", "location": "absence de routeur entre les sous-réseaux, configurations IP des trois sous-réseaux"}
+          ],
+          "key_concepts": ["routage", "sous-réseau", "communication inter-réseau", "matrice de communication"]
+        }
+      ]
+    }
+  ],
+  "specific_parts": [
+    {
+      "number": "A",
+      "title": "Quels matériaux choisir pour respecter la Réglementation Environnementale (RE 2020) ?",
+      "objective": "Mener une étude permettant d'optimiser le choix d'un matériau au regard de la Réglementation Environnementale 2020 (RE 2020).",
+      "questions": [
+        {
+          "number": "A.1",
+          "label": "À l'aide du DTS1, calculer la valeur des résistances thermiques des composants de la paroi sur le DRS1.",
+          "context": "La Réglementation Environnementale 2020 (RE 2020) impose d'atteindre certains critères de performances énergétiques auxquels les bureaux d'études doivent répondre pour satisfaire à la norme.\n\nUne simulation pour vérifier la conformité de la RE 2020 a été réalisée sur le bâtiment. Elle a permis de déterminer une valeur pour la résistance thermique minimale des parois murales et planchers bas de Rmin murs/pl bas = 6,66 m²·K·W-1 ainsi que pour les planchers hauts de Rmin pl haut = 7,25 m²·K·W-1.\n\nLa réglementation impose la limitation de l'impact carbone sur le cycle de vie des matériaux en définissant un indice carbone Ic construction (kg eq. CO2·m²).",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": ["DTS1"],
+          "dr_references": ["DRS1"],
+          "correction": "Rse = 0,04 m²·K·W-1\nLaine de roche : épaisseur = 0,08 + 0,1 = 0,18 m ; λ = 0,034 W·m-1·K-1 ; R = 0,18/0,034 = 5,29 m²·K·W-1\nOSB : épaisseur = 0,01 m ; λ = 0,144 W·m-1·K-1 ; R = 0,01/0,144 = 0,07 m²·K·W-1\nPin : épaisseur = 0,01 m ; λ = 0,13 W·m-1·K-1 ; R = 0,01/0,13 = 0,08 m²·K·W-1\nRsi = 0,13 m²·K·W-1",
+          "explanation": "La résistance thermique de chaque couche se calcule avec la formule R = e / λ, où e est l'épaisseur en mètres et λ la conductivité thermique en W·m-1·K-1. Les épaisseurs et conductivités sont données dans le DTS1. Les résistances superficielles Rse = 0,04 et Rsi = 0,13 sont données dans le DRS1. Le pare-vapeur, le pare-pluie, la lame d'air ventilée et le bardage aluminium ne sont pas pris en compte dans le calcul (indiqué dans le DTS1).",
+          "data_hints": [
+            {"source": "DTS1", "location": "composition de la paroi : épaisseurs et conductivités thermiques de chaque couche"},
+            {"source": "DRS1", "location": "tableau à compléter avec les résistances thermiques, Rse = 0,04 et Rsi = 0,13 déjà renseignés"}
+          ],
+          "key_concepts": ["résistance thermique", "conductivité thermique", "formule R = e/λ"]
+        },
+        {
+          "number": "A.2",
+          "label": "En déduire la résistance thermique globale de la paroi.",
+          "context": "",
+          "points": 0.5,
+          "answer_type": "calculation",
+          "dt_references": [],
+          "dr_references": ["DRS1"],
+          "correction": "Rparoi murale = ΣRi = 5,61 m²·K·W-1",
+          "explanation": "La résistance thermique globale de la paroi est la somme de toutes les résistances thermiques des couches : Rparoi = Rse + R(laine de roche) + R(OSB) + R(pin) + Rsi = 0,04 + 5,29 + 0,07 + 0,08 + 0,13 = 5,61 m²·K·W-1.",
+          "data_hints": [
+            {"source": "DRS1", "location": "tableau des résistances thermiques calculées en question A.1"},
+            {"source": "question_precedente", "location": "résistances thermiques calculées en question A.1"}
+          ],
+          "key_concepts": ["résistance thermique globale", "somme des résistances en série"]
+        },
+        {
+          "number": "A.3",
+          "label": "Vérifier si cette résistance thermique est en cohérence avec la valeur simulée Rmin murs/pl bas = 6,66 m²·K·W-1.\nProposer plusieurs solutions permettant de respecter ce critère.",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "6,66 m²·K·W-1 ≥ Rtot = 5,61 m²·K·W-1. Il y a un écart de performance.\nSolution : un isolant plus performant (λ plus petit) ou une épaisseur de l'isolant plus importante.",
+          "explanation": "La résistance thermique calculée (5,61 m²·K·W-1) est inférieure à la valeur minimale imposée par la RE 2020 (6,66 m²·K·W-1). La paroi ne respecte donc pas la réglementation. Pour y remédier, on peut : augmenter l'épaisseur de l'isolant (laine de roche), choisir un isolant avec une conductivité thermique λ plus faible (plus performant), ou combiner les deux solutions.",
+          "data_hints": [
+            {"source": "question_precedente", "location": "résistance thermique globale calculée en question A.2 : 5,61 m²·K·W-1"},
+            {"source": "question_context", "location": "valeur simulée Rmin murs/pl bas = 6,66 m²·K·W-1"}
+          ],
+          "key_concepts": ["conformité RE 2020", "résistance thermique minimale", "amélioration de l'isolation"]
+        },
+        {
+          "number": "A.4",
+          "label": "Calculer l'épaisseur minimale de l'isolant en laine de roche afin d'obtenir une résistance thermique au moins égale à la valeur simulée Rmin murs/pl bas = 6,66 m²·K·W-1.",
+          "context": "L'une des solutions étudiées est d'augmenter l'épaisseur de l'isolant (ici la laine de roche).\nOn prendra une résistance thermique de la paroi murale, Rparoi murale = 5,62 m²·K·W-1 pour la suite.",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": ["DTS1"],
+          "dr_references": [],
+          "correction": "Rmini = 6,66 = 5,62 + e / λlaine de roche, e épaisseur d'isolant à ajouter.\ne=(6,66-5,62)*0,034=3,55cm soit 40 mm donc épaisseur totale d'isolant = 100 + 80 + 40 = 220 mm",
+          "explanation": "On cherche l'épaisseur supplémentaire e à ajouter à la laine de roche pour atteindre Rmin = 6,66 m²·K·W-1. En partant de Rparoi = 5,62 m²·K·W-1 (valeur donnée dans le contexte), il manque 6,66 - 5,62 = 1,04 m²·K·W-1. Cette résistance supplémentaire doit être apportée par la laine de roche : e = ΔR × λ = 1,04 × 0,034 = 0,03536 m ≈ 35,4 mm, arrondi à 40 mm. L'épaisseur totale de laine de roche devient 80 + 100 + 40 = 220 mm (inférieure à la limite de 250 mm).",
+          "data_hints": [
+            {"source": "DTS1", "location": "conductivité thermique de la laine de roche : λLDR = 0,034 W·m-1·K-1"},
+            {"source": "question_context", "location": "Rparoi murale = 5,62 m²·K·W-1 et Rmin = 6,66 m²·K·W-1"}
+          ],
+          "key_concepts": ["épaisseur d'isolant", "résistance thermique", "formule e = R × λ"]
+        },
+        {
+          "number": "A.5",
+          "label": "À la lecture du DTS2, préciser les éléments caractérisant l'Ic construction.",
+          "context": "Nous souhaitons maintenant comparer les isolants afin de vérifier si la laine de roche est le meilleur compromis pour répondre aux critères d'écoconception de l'ouvrage. L'objectif est de diminuer l'impact carbone des matériaux du bâtiment « CIME ».\n\nLe DTS2 présente les critères de validité de la RE 2020.",
+          "points": 0.5,
+          "answer_type": "text",
+          "dt_references": ["DTS2"],
+          "dr_references": [],
+          "correction": "L'impact des matériaux en considérant l'ensemble du cycle de vie et l'impact du chantier conditionnent la valeur du Iconstruction",
+          "explanation": "D'après le DTS2, l'Ic construction (kg eq. CO2·m²) est défini comme l'impact sur le changement climatique associé aux « composants » + « chantier ». Il s'agit d'une généralisation de la méthode d'analyse du cycle de vie pour l'évaluation des émissions de gaz à effet de serre des produits de construction et équipements et leur mise en œuvre.",
+          "data_hints": [
+            {"source": "DTS2", "location": "tableau des paramètres RE 2020, ligne Iconstruction : définition et critères d'évaluation"}
+          ],
+          "key_concepts": ["Ic construction", "analyse du cycle de vie", "RE 2020", "impact carbone"]
+        },
+        {
+          "number": "A.6",
+          "label": "Relever sur le DTS3, la valeur de l'impact carbone en kg eq. CO2·UF-1 de la laine de roche.\nJustifier pourquoi la laine de roche n'est pas la solution la plus efficace en terme d'abaissement du bilan carbone. Proposer une alternative à cet isolant en veillant à choisir un matériau de résistance thermique au moins équivalente.",
+          "context": "Dans un souci de dimensionnement de la paroi, l'isolant ne doit pas dépasser les 250 mm d'épaisseur.",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": ["DTS3"],
+          "dr_references": [],
+          "correction": "La laine de roche a le plus gros impact carbone de la liste (43 kg eq. CO2·UF-1). Il serait judicieux de choisir le polyuréthane pour ses performances thermiques (λ de 0,021) et sa résistance à la diffusion de la vapeur.",
+          "explanation": "D'après le DTS3, la laine de roche a un bilan carbone de 43 kg eq. CO2·UF-1, ce qui est le plus élevé parmi tous les isolants listés. Pour réduire l'impact carbone, il faut choisir un isolant avec un bilan carbone plus faible. De plus, la contrainte d'épaisseur maximale de 250 mm impose de choisir un isolant avec une conductivité thermique λ suffisamment faible. Le polyuréthane (λ = 0,021 W·m-1·K-1, bilan carbone = 16 kg eq. CO2·UF-1) est plus performant thermiquement et a un meilleur bilan carbone.",
+          "data_hints": [
+            {"source": "DTS3", "location": "tableau des matériaux isolants : colonnes µ, λ (W·m-1·K-1) et Bilan carbone (kg eq. CO2·UF-1)"},
+            {"source": "question_context", "location": "épaisseur maximale de l'isolant : 250 mm"}
+          ],
+          "key_concepts": ["bilan carbone", "impact carbone", "conductivité thermique", "choix d'isolant"]
+        },
+        {
+          "number": "A.7",
+          "label": "Expliquer pourquoi l'isolant choisi contribue à la validation de la RE 2020.",
+          "context": "",
+          "points": 0.5,
+          "answer_type": "argumentation",
+          "dt_references": ["DTS3"],
+          "dr_references": [],
+          "correction": "Paramètres contribuant à la validation de la RE 2020 :\n• Résistance thermique des parois murales supérieur ou égale à 6.66 m²·K·W-1 → Redimensionnement de l'épaisseur du matériau isolant pour obtenir le coefficient en question.\n• Bilan carbone du bâtiment « CIME » le plus faible possible → Changement de l'isolant pour un matériau plus durable avec un bilan carbone plus faible.",
+          "explanation": "Le polyuréthane contribue à la validation de la RE 2020 sur deux aspects : (1) sa conductivité thermique très faible (λ = 0,021 W·m-1·K-1) permet d'atteindre la résistance thermique minimale requise (6,66 m²·K·W-1) avec une épaisseur inférieure à 250 mm ; (2) son bilan carbone (16 kg eq. CO2·UF-1) est bien inférieur à celui de la laine de roche (43 kg eq. CO2·UF-1), contribuant à réduire l'Ic construction.",
+          "data_hints": [
+            {"source": "DTS3", "location": "tableau des matériaux isolants : λ et bilan carbone du polyuréthane"},
+            {"source": "question_precedente", "location": "choix du polyuréthane effectué en question A.6"}
+          ],
+          "key_concepts": ["RE 2020", "résistance thermique", "bilan carbone", "Ic construction"]
+        }
+      ]
+    },
+    {
+      "number": "B",
+      "title": "Comment limiter la condensation dans une paroi ?",
+      "objective": "Configurer les parois murales pour limiter la condensation liée à la pratique du sport intensif dans le bâtiment « CIME ».",
+      "questions": [
+        {
+          "number": "B.1",
+          "label": "Identifier les dommages que peut occasionner une humidité relative trop importante sur les personnes et sur les ouvrages.",
+          "context": "Le bâtiment « CIME » est un lieu de pratique sportif intense de tous niveaux. L'activité sportive des pratiquants entraîne une hyperventilation et une sudation importante au niveau de leur métabolisme.\n\nCes facteurs entraînent un taux d'humidité relative (HR) assez élevé dans le bâtiment. Il est donc important d'installer une ventilation performante et de concevoir les parois du bâtiment de façon à ce qu'il n'y ait pas de condensation à l'intérieur de l'enceinte sportive.\n\nIl s'agit dans cette partie, de définir des parois murales pour éviter une humidité relative importante du bâtiment « CIME ». La règlementation impose une humidité relative maximale de 50% dans une enceinte sportive.",
+          "points": 0.5,
+          "answer_type": "text",
+          "dt_references": [],
+          "dr_references": [],
+          "correction": "Une humidité élevée dans une enceinte sportive peut présenter un risque pour la santé des pratiquants et entraîner des dommages aux matériaux constituant le bâtiment, tels que la formation de moisissures.",
+          "explanation": "Une humidité relative trop élevée a deux types de conséquences : sur les personnes (risques pour la santé : inconfort, problèmes respiratoires, favorise le développement de micro-organismes pathogènes) et sur les ouvrages (dégradation des matériaux, formation de moisissures, corrosion, délaminage des revêtements).",
+          "data_hints": [
+            {"source": "question_context", "location": "texte de mise en situation de la partie B sur l'humidité relative et ses effets"}
+          ],
+          "key_concepts": ["humidité relative", "condensation", "moisissures", "santé des occupants"]
+        },
+        {
+          "number": "B.2",
+          "label": "Pour un taux d'humidité relative de 50% et la température optimale de la pratique du sport à 18°C, effectuer le tracé sur le document DRS2.\nEn déduire la température du point de rosée.",
+          "context": "Le document DRS2 présente le diagramme air/humide pour une pression atmosphérique moyenne dans la ville de Troyes (10) et à une altitude de 100m (altitude du bâtiment « CIME »).",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": [],
+          "dr_references": ["DRS2"],
+          "correction": "Trosée = 7°C ou 8°C",
+          "explanation": "Sur le diagramme air/humide (DRS2), on localise le point correspondant à T = 18°C et HR = 50%. On trace ensuite une horizontale depuis ce point jusqu'à la courbe de saturation (HR = 100%). La température lue à l'intersection avec la courbe de saturation est la température du point de rosée, soit environ 7°C ou 8°C.",
+          "data_hints": [
+            {"source": "DRS2", "location": "diagramme air/humide : axe des températures et courbes d'humidité relative"},
+            {"source": "question_context", "location": "conditions : HR = 50%, T = 18°C"}
+          ],
+          "key_concepts": ["point de rosée", "diagramme air/humide", "humidité relative", "température de saturation"]
+        },
+        {
+          "number": "B.3",
+          "label": "Selon les conditions décrites ci-dessus, situer le point de rosée dans la paroi sur le DRS3 et indiquer le matériau concerné.",
+          "context": "La température extérieure minimale moyenne dans le département de l'Aube est de 0°C en février. Le DRS4 décrit l'évolution de la température du mur en fonction son épaisseur. On notera que deux couches 110mm de laine de roche ont été installées.",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": [],
+          "dr_references": ["DRS3"],
+          "correction": "Le point de rosée peut être atteint dans la première couche de laine de roche depuis l'extérieur.",
+          "explanation": "Sur le DRS3 (diagramme de répartition de la température dans la paroi), on trace la droite de température du point de rosée (7-8°C) horizontalement. L'intersection avec le profil de température dans la paroi indique où la condensation peut se produire. Avec Text = 0°C et Tint = 18°C, le profil de température décroît de l'intérieur vers l'extérieur. La température de rosée (7-8°C) est atteinte dans la première couche de laine de roche depuis l'extérieur.",
+          "data_hints": [
+            {"source": "DRS3", "location": "diagramme de répartition de la température dans la paroi murale"},
+            {"source": "question_precedente", "location": "température du point de rosée : 7-8°C (question B.2)"},
+            {"source": "question_context", "location": "Text = 0°C, Tint = 18°C, deux couches de 110 mm de laine de roche"}
+          ],
+          "key_concepts": ["point de rosée dans la paroi", "profil de température", "condensation interstitielle"]
+        },
+        {
+          "number": "B.4",
+          "label": "Expliquer ce qu'il peut se passer si le point de rosée se situe dans l'isolant.\nProposer une solution technique pour protéger la paroi de l'humidité relative intérieure du bâtiment « CIME ».",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": ["DTS1"],
+          "dr_references": [],
+          "correction": "En cas de condensation sur l'isolant, ses performances thermiques seront altérées\nAppliquer un pare vapeur ou utiliser un matériau hydrophobe.",
+          "explanation": "Si le point de rosée se situe dans l'isolant, la vapeur d'eau se condense à l'intérieur de la paroi. Pour la laine de roche (matériau hygroscopique), cela entraîne une augmentation de sa conductivité thermique (λ augmente quand le matériau est humide), donc une dégradation de ses performances thermiques. À terme, cela peut aussi provoquer des moisissures et la dégradation des matériaux. La solution est d'installer un pare-vapeur côté intérieur (chaud) pour empêcher la vapeur de pénétrer dans la paroi, ou d'utiliser un isolant hydrophobe (comme le polyuréthane).",
+          "data_hints": [
+            {"source": "DTS1", "location": "composition de la paroi : présence d'un pare-vapeur (couche 2)"},
+            {"source": "question_precedente", "location": "localisation du point de rosée dans la laine de roche (question B.3)"}
+          ],
+          "key_concepts": ["condensation interstitielle", "pare-vapeur", "performances thermiques", "matériau hydrophobe"]
+        },
+        {
+          "number": "B.5",
+          "label": "À partir du DTS3, indiquer le paramètre permettant de limiter au mieux le risque de condensation dans la paroi.\nChoisir le matériau isolant en menant une analyse par critère dans l'ordre suivant :\n1 : la résistance thermique ; 2 : le coefficient de diffusion de la vapeur ; 3 : le bilan carbone.",
+          "context": "",
+          "points": 1,
+          "answer_type": "argumentation",
+          "dt_references": ["DTS3"],
+          "dr_references": [],
+          "correction": "Le paramètre est le coefficient de diffusion de la vapeur « µ »\nLe polyuréthane est un bon compromis avec une valeur de µ>200. C'est le meilleur isolant thermique et le matériau qui présente l'impact carbone le plus favorable. La laine de bois pourrait également convenir.",
+          "explanation": "Le coefficient µ (coefficient de diffusion de la vapeur) mesure la résistance d'un matériau à la diffusion de la vapeur d'eau. Plus µ est élevé, moins la vapeur traverse le matériau, donc moins il y a de risque de condensation interstitielle. D'après le DTS3 :\n1. Résistance thermique : le polyuréthane (λ = 0,021) et le polystyrène expansé (λ = 0,029) sont les plus performants.\n2. Coefficient µ : le polyuréthane et le polystyrène expansé ont µ > 200 (les meilleurs).\n3. Bilan carbone : le polyuréthane (16 kg eq. CO2·UF-1) est meilleur que le polystyrène (22 kg eq. CO2·UF-1).\nLe polyuréthane est donc le meilleur choix selon ces trois critères dans cet ordre.",
+          "data_hints": [
+            {"source": "DTS3", "location": "tableau des matériaux isolants : colonnes µ, λ (W·m-1·K-1) et Bilan carbone (kg eq. CO2·UF-1)"}
+          ],
+          "key_concepts": ["coefficient de diffusion de la vapeur µ", "résistance à la vapeur", "analyse multicritère", "polyuréthane"]
+        }
+      ]
+    },
+    {
+      "number": "C",
+      "title": "La règlementation pour l'accessibilité des personnes à mobilité réduite (PMR) est-elle respectée ?",
+      "objective": "Vérifier si les vestiaires répondent aux normes liées aux personnes à mobilité réduite.",
+      "questions": [
+        {
+          "number": "C.1",
+          "label": "Énoncer deux arguments issus du DTS4, expliquant la non-conformité du vestiaire à la réglementation pour les PMR (voir DRS4).",
+          "context": "Les normes liées aux ERP neufs (Établissements Recevant du Public) et notamment les complexes sportifs, se doivent de répondre aux exigences liées à la mobilité et l'utilisation du bâtiment par les PMR.\nLe complexe « CIME », en plus d'être voué à l'escalade de haut niveau, est un des lieux phares de l'handisport en France. L'aire d'évolution multisport d'une superficie de 44m x 24m (1056 m²), est totalement dévouée à sa pratique. Il est donc primordial de dimensionner les vestiaires pour le passage des PMR. Le DTS4 résume les points importants de la réglementation pour les PMR à prendre en compte pour un vestiaire. Le document DRS4 est un des plans qui a été mentionné dans l'étude du projet du bâtiment.",
+          "points": 1,
+          "answer_type": "text",
+          "dt_references": ["DTS4"],
+          "dr_references": ["DRS4"],
+          "correction": "• Pas l'espace pour un fauteuil roulant. Impossible de faire rentrer un cercle de diamètre 1,50m.\n• La porte n'est pas réglementaire. Elle permet une ouverture de 845mm alors que la réglementation impose 900 mm.",
+          "explanation": "En comparant le plan du DRS4 avec les exigences du DTS4 : (1) Le DTS4 impose un espace de manœuvre avec demi-tour de 150 cm de diamètre. Sur le plan DRS4, cet espace n'est pas disponible dans le vestiaire. (2) Le DTS4 impose une entrée avec un espace de 90 cm pour le passage d'un fauteuil roulant. La porte du plan DRS4 ne permet qu'une ouverture de 845 mm, inférieure aux 900 mm requis.",
+          "data_hints": [
+            {"source": "DTS4", "location": "exigences PMR : espace de manœuvre demi-tour 150 cm et entrée 90 cm pour fauteuil roulant"},
+            {"source": "DRS4", "location": "plan du vestiaire : dimensions de la porte et espace disponible"}
+          ],
+          "key_concepts": ["PMR", "accessibilité", "espace de manœuvre", "largeur de passage"]
+        },
+        {
+          "number": "C.2",
+          "label": "Déterminer l'échelle du plan du DRS4.\nDéterminer le nombre de douches réalisables en respect de la réglementation PMR pour le vestiaire, en gardant une longueur de 3m pour l'espace douche.",
+          "context": "",
+          "points": 1,
+          "answer_type": "calculation",
+          "dt_references": [],
+          "dr_references": ["DRS4"],
+          "correction": "Echelle : 1/30ème\nIl est possible de réaliser 2 douches = 3.000 / 1.200",
+          "explanation": "L'échelle se détermine en mesurant une dimension connue sur le plan et en la comparant à la dimension réelle. Pour le nombre de douches : d'après le DTS4, une douche PMR doit mesurer au minimum 1,20 m × 0,90 m. Avec une longueur d'espace douche de 3 m, on peut installer 3 000 mm / 1 200 mm = 2,5 → 2 douches (arrondi à l'entier inférieur pour respecter la réglementation).",
+          "data_hints": [
+            {"source": "DRS4", "location": "plan du vestiaire avec dimensions à mesurer pour déterminer l'échelle"},
+            {"source": "DTS4", "location": "dimensions minimales d'une douche PMR : 1,20 m × 0,90 m"},
+            {"source": "question_context", "location": "longueur de 3 m pour l'espace douche"}
+          ],
+          "key_concepts": ["échelle d'un plan", "dimensions PMR", "douche accessible"]
+        },
+        {
+          "number": "C.3",
+          "label": "Modifier le plan sur le document DRS4, pour rendre le vestiaire adapté aux personnes à mobilité réduite.",
+          "context": "",
+          "points": 1,
+          "answer_type": "dr_reference",
+          "dt_references": [],
+          "dr_references": ["DRS4"],
+          "correction": "La porte laisse un passage de 90cm. Les douches sont dimensionnées pour les fauteuils roulants. Il faudrait enlever le banc et une partie des casiers. L'espace d'accès aux douches est bien de 1,50 m.",
+          "explanation": "Les modifications à apporter sur le plan DRS4 sont : (1) Agrandir la porte pour permettre un passage de 90 cm minimum. (2) Dimensionner les douches à 1,20 m × 0,90 m minimum. (3) Prévoir un espace de manœuvre avec demi-tour de 150 cm de diamètre. (4) Supprimer ou déplacer le banc et une partie des casiers pour libérer l'espace nécessaire. (5) Vérifier que tous les équipements sont accessibles à une hauteur maximale de 1,30 m.",
+          "data_hints": [
+            {"source": "DTS4", "location": "ensemble des exigences PMR pour un vestiaire"},
+            {"source": "DRS4", "location": "plan du vestiaire à modifier"},
+            {"source": "question_precedente", "location": "non-conformités identifiées en question C.1 et nombre de douches calculé en question C.2"}
+          ],
+          "key_concepts": ["plan de vestiaire PMR", "accessibilité", "espace de manœuvre", "modification de plan"]
+        }
+      ]
+    }
+  ],
+  "document_references": {
+    "common_dts": [
+      {"label": "DT1", "title": "Diagrammes SysML du complexe sportif « CIME »", "pages": [13]},
+      {"label": "DT2", "title": "Comparatif entre le bois massif et le bois lamellé collé", "pages": [14]},
+      {"label": "DT3", "title": "Prescriptions minimales d'air neuf et participants lors de rencontres sportives", "pages": [14]},
+      {"label": "DT4", "title": "Caisson de filtration industriel – Type SIE", "pages": [15]},
+      {"label": "DT5", "title": "Vitesse maximale d'air dans les conduites en fonction des locaux", "pages": [15]},
+      {"label": "DT6", "title": "Filtres pour caisson de traitement d'air", "pages": [16]},
+      {"label": "DT7", "title": "Rubans DEL COB (Chip-On-Board)", "pages": [17]},
+      {"label": "DT8", "title": "Alimentation 24 V DC (Direct Current) pour rubans DEL", "pages": [17]},
+      {"label": "DT9", "title": "Diagramme de blocs internes du plancher lumineux", "pages": [18]},
+      {"label": "DT10", "title": "Schéma structurel de la fonction acquérir, du plancher lumineux", "pages": [18]},
+      {"label": "DT11", "title": "Algorithmes de programmation du plancher lumineux", "pages": [19]},
+      {"label": "DT12", "title": "Schéma du réseau informatique du complexe sportif « CIME »", "pages": [20]},
+      {"label": "DT13", "title": "Trame Ethernet / IP / ICMP d'une commande ping", "pages": [21]}
+    ],
+    "common_drs": [
+      {"label": "DR1", "title": "Tableau des caractéristiques liées à l'étude du béton armé, de l'acier de construction et du bois lamellé collé", "pages": [23]},
+      {"label": "DR2", "title": "Tableau de choix du matériau pour le poteau", "pages": [23]},
+      {"label": "DR3", "title": "Calcul du renouvellement d'air", "pages": [25]},
+      {"label": "DR4", "title": "Étude du marquage lumineux au sol", "pages": [25]},
+      {"label": "DR5", "title": "Algorigrammes de programmation du plancher lumineux", "pages": [26]},
+      {"label": "DR6", "title": "Matrice de communication du réseau informatique local", "pages": [27]}
+    ],
+    "specific_dts": [
+      {"label": "DTS1", "title": "Composition de la paroi des murs extérieurs", "pages": [31]},
+      {"label": "DTS2", "title": "Indices de la Réglementation Environnementale 2020", "pages": [32]},
+      {"label": "DTS3", "title": "Coefficient de diffusion de la vapeur µ", "pages": [33]},
+      {"label": "DTS4", "title": "Extrait de la réglementation pour les PMR pour un vestiaire", "pages": [33]}
+    ],
+    "specific_drs": [
+      {"label": "DRS1", "title": "Calcul de résistance thermique globale de la paroi murale", "pages": [34]},
+      {"label": "DRS2", "title": "Diagramme air/humide (coefficient de diffusion de la vapeur µ)", "pages": [34]},
+      {"label": "DRS3", "title": "Diagramme de répartition de la température dans la paroi murale", "pages": [35]},
+      {"label": "DRS4", "title": "Plan des vestiaires", "pages": [36]}
+    ]
+  }
+}
+```
