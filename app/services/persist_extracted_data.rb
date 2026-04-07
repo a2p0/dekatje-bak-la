@@ -7,7 +7,7 @@ class PersistExtractedData
         exam_session.update!(presentation_text: data["presentation"])
       end
 
-      subject.update!(status: :pending_validation)
+      subject.update_column(:status, Subject.statuses[:pending_validation])
 
       # Common parts: only create if exam_session has none yet
       unless exam_session.common_parts.any?
