@@ -16,7 +16,7 @@ class PersistExtractedData
 
         Array(data["common_parts"]).each_with_index do |part_data, idx|
           part = exam_session.common_parts.create!(
-            number:               part_data["number"].to_i,
+            number:               part_data["number"].to_s,
             title:                part_data["title"].to_s,
             objective_text:       part_data["objective"].to_s,
             section_type:         :common,
@@ -34,7 +34,7 @@ class PersistExtractedData
 
       Array(data["specific_parts"]).each_with_index do |part_data, idx|
         part = subject.parts.create!(
-          number:               part_data["number"].to_i,
+          number:               part_data["number"].to_s,
           title:                part_data["title"].to_s,
           objective_text:       part_data["objective"].to_s,
           section_type:         :specific,
