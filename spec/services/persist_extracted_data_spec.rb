@@ -53,7 +53,7 @@ RSpec.describe PersistExtractedData do
         expect(common_parts.count).to eq(1)
 
         part = common_parts.first
-        expect(part.number).to eq(1)
+        expect(part.number).to eq("1")
         expect(part.title).to eq("Partie 1")
         expect(part.objective_text).to eq("Objectif...")
         expect(part.section_type).to eq("common")

@@ -36,7 +36,7 @@ class AiClientFactory
     connection = Faraday.new(url: @config[:base_url]) do |f|
       f.request :json
       f.response :json
-      f.options.timeout = 180
+      f.options.timeout = 600
     end
 
     headers = build_headers

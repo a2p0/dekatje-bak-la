@@ -7,10 +7,28 @@ class BuildExtractionPrompt
     - Les parties communes (common) valent environ 12 points et sont identiques pour toutes les spécialités.
     - Les parties spécifiques (specific) valent environ 8 points et dépendent de la spécialité de l'élève.
 
-    Tu dois croiser chaque question avec sa correction pour produire une réponse complète.
+    Chaque partie est INDÉPENDANTE. Les données d'une partie ne servent pas dans une autre partie.
 
-    Identifie tous les Documents Techniques (DT) et Documents Réponses (DR) référencés,
-    en notant les numéros de page où ils apparaissent dans le sujet.
+    ## Règle de fidélité au texte source
+
+    RÈGLE ABSOLUE : recopie VERBATIM (mot pour mot) les champs suivants depuis le PDF source.
+    Aucun mot ne doit être ajouté, retiré ou reformulé. Tu peux uniquement supprimer les sauts de ligne
+    et autres marqueurs de mise en page (numéros de page, en-têtes/pieds de page).
+    Les champs concernés :
+    - presentation : la TOTALITÉ du texte de mise en situation générale du sujet
+    - label : l'énoncé complet de chaque question
+    - context : tout texte introductif, tableau, données chiffrées ou informations qui précèdent la question
+      dans le sujet (entre la question précédente et la question courante). Si aucun texte ne précède
+      la question, utiliser une chaîne vide "".
+    - correction : la réponse officielle extraite du corrigé
+
+    ## Conventions de nommage des documents
+
+    - Partie commune : les documents techniques sont DT1, DT2, DT3... et les documents réponses DR1, DR2, DR3...
+    - Partie spécifique : les documents techniques sont DTS1, DTS2, DTS3... et les documents réponses DRS1, DRS2, DRS3...
+    - TOUJOURS utiliser le numéro exact (DT2, DRS1...), jamais un label générique (DT, DR).
+
+    ## Structure JSON attendue
 
     Retourne UNIQUEMENT un objet JSON valide, sans aucun texte autour, avec cette structure :
     {
@@ -20,28 +38,26 @@ class BuildExtractionPrompt
         "exam_type": "bac",
         "specialty": "ITEC"
       },
-      "presentation": "Mise en situation générale du sujet",
+      "presentation": "Texte COMPLET et VERBATIM de la mise en situation générale...",
       "common_parts": [
         {
           "number": 1,
           "title": "Titre de la partie commune",
-          "objective": "Objectif pédagogique",
+          "objective": "Objectif pédagogique de la partie",
           "questions": [
             {
               "number": "1.1",
-              "label": "Énoncé complet de la question",
-              "context": "Contexte local ou données spécifiques (peut être vide)",
+              "label": "Énoncé VERBATIM de la question",
+              "context": "Texte VERBATIM précédant la question (données, tableaux, intro locale)",
               "points": 2,
               "answer_type": "calculation",
               "dt_references": ["DT1", "DT2"],
               "dr_references": ["DR1"],
-              "correction": "Réponse officielle extraite du corrigé",
-              "explanation": "Explication pédagogique",
+              "correction": "Réponse VERBATIM extraite du corrigé",
+              "explanation": "Explication pédagogique détaillée avec citations exactes des données utilisées et références précises aux documents",
               "data_hints": [
-                {"source": "DT", "location": "description précise de l'emplacement"},
-                {"source": "DR", "location": "tableau à compléter"},
-                {"source": "enonce", "location": "valeur donnée dans l'énoncé"},
-                {"source": "question_context", "location": "donnée dans le contexte local"}
+                {"source": "DT2", "location": "tableau des caractéristiques, colonne Portée maximale"},
+                {"source": "question_context", "location": "valeur de la distance donnée avant la question"}
               ],
               "key_concepts": ["concept1", "concept2"]
             }
@@ -50,21 +66,23 @@ class BuildExtractionPrompt
       ],
       "specific_parts": [
         {
-          "number": 3,
+          "number": "A",
           "title": "Titre de la partie spécifique",
-          "objective": "Objectif pédagogique",
+          "objective": "Objectif pédagogique de la partie",
           "questions": [
             {
-              "number": "3.1",
-              "label": "Énoncé complet",
-              "context": "",
+              "number": "A.1",
+              "label": "Énoncé VERBATIM",
+              "context": "Texte VERBATIM précédant la question",
               "points": 2,
               "answer_type": "text",
-              "dt_references": [],
-              "dr_references": [],
-              "correction": "Réponse officielle",
-              "explanation": "Explication pédagogique",
-              "data_hints": [],
+              "dt_references": ["DTS1"],
+              "dr_references": ["DRS1"],
+              "correction": "Réponse VERBATIM du corrigé",
+              "explanation": "Explication pédagogique avec citations exactes",
+              "data_hints": [
+                {"source": "DTS1", "location": "tableau de composition de la paroi"}
+              ],
               "key_concepts": []
             }
           ]
@@ -78,19 +96,117 @@ class BuildExtractionPrompt
           {"label": "DR1", "title": "Titre du document réponse", "pages": [10]}
         ],
         "specific_dts": [
-          {"label": "DT5", "title": "Document technique spécifique", "pages": [7]}
+          {"label": "DTS1", "title": "Document technique spécifique", "pages": [7]}
         ],
         "specific_drs": [
-          {"label": "DR3", "title": "Document réponse spécifique", "pages": [12]}
+          {"label": "DRS1", "title": "Document réponse spécifique", "pages": [12]}
         ]
       }
     }
 
-    Règles :
+    ## Règles pour data_hints
+
+    Les data_hints indiquent à l'élève OÙ trouver les données nécessaires pour répondre.
+    Chaque hint doit avoir :
+    - source : l'identifiant EXACT de la source parmi :
+      - "mise_en_situation" : données dans le texte de présentation générale du sujet
+      - "question_context" : données dans le texte introductif juste avant la question
+      - "question_precedente" : le résultat d'une question précédente est nécessaire
+      - "DT1", "DT2", "DTS1"... : un document technique précis (avec son numéro)
+      - "DR1", "DRS1"... : un document réponse précis (avec son numéro)
+    - location : description précise de l'emplacement dans la source
+      (ex: "tableau des modes de transport, ligne Consommation moyenne",
+       "diagramme SysML, bloc Performances", "schéma structurel, résistance R3")
+
+    ## Règles pour explanation
+
+    L'explanation est une explication pédagogique destinée à l'élève APRÈS correction.
+    Elle doit contenir :
+    - Les citations exactes des données utilisées (valeurs, extraits de texte)
+    - Les références précises aux documents sources (DT2 tableau X, mise en situation paragraphe Y)
+    - Le raisonnement étape par étape pour arriver à la réponse
+    - Les pièges courants ou erreurs fréquentes si pertinent
+
+    ## Autres règles
+
     - answer_type : "text", "calculation", "argumentation", "dr_reference", "completion", "choice"
-    - data_hints.source : "DT", "DR", "enonce", "question_context"
     - Ne retourne AUCUN texte en dehors du JSON
     - Si une information est manquante, utilise une chaîne vide "" ou un tableau vide []
+    - Les numéros des parties spécifiques sont des lettres (A, B, C...) et les numéros des questions
+      spécifiques suivent le format lettre.numéro (A.1, A.2, B.1...)
+
+    ## Exemple d'extraction attendue
+
+    Voici un exemple partiel montrant le niveau de précision attendu :
+
+    {
+      "presentation": "Le Complexe International Multisports et Escalade (CIME) est un équipement sportif situé dans le département de l'Aube. L'utilisation de matériaux à haute performance énergétique et respectueux de l'environnement est privilégiée. Afin de limiter l'impact environnemental, les circuits courts d'approvisionnement ont été favorisés. Le CIME accueille des compétitions de niveau national et international et encourage la pratique du handisport...",
+      "common_parts": [
+        {
+          "number": 2,
+          "title": "Comment choisir, dans une démarche d'éco-conception, les matériaux ?",
+          "objective": "Valider le choix du matériau d'un des poteaux de la structure porteuse.",
+          "questions": [
+            {
+              "number": "2.1",
+              "label": "Un poteau a une longueur de 12 m. Justifier, à l'aide du document technique DT2, pourquoi le choix s'est porté sur une ossature en bois lamellé collé plutôt que sur du bois massif.",
+              "context": "",
+              "points": 1,
+              "answer_type": "text",
+              "dt_references": ["DT2"],
+              "dr_references": [],
+              "correction": "Le bois lamellé collé permet des portées allant jusqu'à 45 m alors que le bois massif est limité à 7 m. Un poteau de 12 m nécessite donc du bois lamellé collé.",
+              "explanation": "D'après le DT2, le tableau comparatif indique que le bois massif a une portée maximale de 7 m tandis que le bois lamellé collé atteint 45 m. Comme le poteau mesure 12 m (donnée de l'énoncé), seul le bois lamellé collé convient. L'erreur fréquente est d'oublier de comparer les deux valeurs de portée.",
+              "data_hints": [
+                {"source": "DT2", "location": "tableau comparatif bois massif / bois lamellé collé, ligne Portée maximale"}
+              ],
+              "key_concepts": ["bois lamellé collé", "portée maximale"]
+            },
+            {
+              "number": "2.2",
+              "label": "Sur le document réponses DR1, calculer le volume et la masse du poteau pour chaque matériau (bois, béton armé, acier).",
+              "context": "Les sections des poteaux sont : Bois = 120 000 mm², Acier = 8 000 mm², Béton armé = 160 000 mm². La longueur du poteau est de 12 m.",
+              "points": 2,
+              "answer_type": "calculation",
+              "dt_references": [],
+              "dr_references": ["DR1"],
+              "correction": "Volume bois = 0,120 × 12 = 1,44 m³, masse = 1,44 × 430 = 619 kg. Volume acier = 0,008 × 12 = 0,096 m³, masse = 0,096 × 7 850 = 754 kg. Volume béton = 0,160 × 12 = 1,92 m³, masse = 1,92 × 2 500 = 4 800 kg.",
+              "explanation": "Il faut convertir les sections de mm² en m² (diviser par 1 000 000), puis multiplier par la longueur de 12 m pour obtenir le volume. La masse s'obtient en multipliant le volume par la masse volumique donnée dans le DR1. Les masses volumiques sont : bois = 430 kg/m³, acier = 7 850 kg/m³, béton = 2 500 kg/m³.",
+              "data_hints": [
+                {"source": "question_context", "location": "sections des poteaux et longueur de 12 m"},
+                {"source": "DR1", "location": "tableau des caractéristiques, colonne Masse volumique"}
+              ],
+              "key_concepts": ["volume", "masse", "conversion d'unités"]
+            }
+          ]
+        }
+      ],
+      "specific_parts": [
+        {
+          "number": "A",
+          "title": "Quels matériaux choisir pour respecter la RE 2020 ?",
+          "objective": "Optimiser le choix d'un matériau au regard de la RE 2020.",
+          "questions": [
+            {
+              "number": "A.1",
+              "label": "À l'aide du DTS1, calculer la valeur des résistances thermiques des composants de la paroi sur le DRS1.",
+              "context": "La paroi extérieure du bâtiment CIME est composée de plusieurs couches de matériaux dont les caractéristiques thermiques sont données dans le DTS1.",
+              "points": 2,
+              "answer_type": "calculation",
+              "dt_references": ["DTS1"],
+              "dr_references": ["DRS1"],
+              "correction": "R = e / λ pour chaque couche. Béton : R = 0,20 / 1,75 = 0,114 m²·K/W. Laine de roche : R = 0,18 / 0,038 = 4,74 m²·K/W...",
+              "explanation": "La résistance thermique se calcule avec la formule R = e / λ (épaisseur divisée par conductivité thermique). Les valeurs d'épaisseur et de conductivité sont dans le DTS1, tableau de composition de la paroi. Les résultats sont à reporter dans le DRS1.",
+              "data_hints": [
+                {"source": "DTS1", "location": "tableau de composition de la paroi, colonnes Épaisseur et Conductivité thermique"},
+                {"source": "DRS1", "location": "tableau de calcul à compléter"}
+              ],
+              "key_concepts": ["résistance thermique", "conductivité thermique"]
+            }
+          ]
+        }
+      ]
+    }
   PROMPT
 
   SKIP_COMMON_ADDENDUM = <<~ADDENDUM.freeze

@@ -149,11 +149,11 @@ RSpec.describe ExtractQuestionsFromPdf do
       expect(AiClientFactory).to have_received(:build).with(provider: :anthropic, api_key: "sk-test")
     end
 
-    it "calls the AI client with max_tokens: 16384" do
+    it "calls the AI client with max_tokens: 32768" do
       described_class.call(subject: subject_obj, api_key: "sk-test", provider: :anthropic)
 
       expect(fake_client).to have_received(:call).with(
-        hash_including(max_tokens: 16_384)
+        hash_including(max_tokens: 32_768)
       )
     end
 

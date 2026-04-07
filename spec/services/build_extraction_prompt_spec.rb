@@ -34,6 +34,10 @@ RSpec.describe BuildExtractionPrompt do
       expect(result[:system]).to include("8")
     end
 
+    it "system prompt states parts are independent" do
+      expect(result[:system]).to include("INDÉPENDANTE")
+    end
+
     # --- System prompt: JSON schema keys ---
 
     it "system prompt defines common_parts key in the JSON schema" do
@@ -56,6 +60,23 @@ RSpec.describe BuildExtractionPrompt do
       expect(result[:system]).to include("presentation")
     end
 
+    # --- System prompt: verbatim rule ---
+
+    it "system prompt requires verbatim extraction" do
+      expect(result[:system]).to include("VERBATIM")
+    end
+
+    it "system prompt lists verbatim fields" do
+      system = result[:system]
+      %w[presentation label context correction].each do |field|
+        expect(system).to include(field), "expected system prompt to mention verbatim field '#{field}'"
+      end
+    end
+
+    it "system prompt forbids adding or removing words" do
+      expect(result[:system]).to include("ajouté, retiré ou reformulé")
+    end
+
     # --- System prompt: answer_type enum ---
 
     it "system prompt mentions answer_type enum values" do
@@ -68,13 +89,42 @@ RSpec.describe BuildExtractionPrompt do
 
     # --- System prompt: data_hints sources ---
 
-    it "system prompt mentions data_hints source values" do
+    it "system prompt mentions all data_hints source values" do
       system = result[:system]
 
-      expect(system).to include("data_hints")
-      %w[DT DR].each do |source|
+      %w[mise_en_situation question_context question_precedente].each do |source|
         expect(system).to include(source), "expected system prompt to include data_hints source '#{source}'"
       end
+    end
+
+    it "system prompt requires numbered DT/DR references in data_hints" do
+      system = result[:system]
+      expect(system).to include("DT1")
+      expect(system).to include("DTS1")
+      expect(system).to include("DR1")
+      expect(system).to include("DRS1")
+    end
+
+    it "system prompt forbids generic DT/DR labels" do
+      expect(result[:system]).to include("jamais un label générique")
+    end
+
+    # --- System prompt: document naming conventions ---
+
+    it "system prompt defines DTS/DRS convention for specific parts" do
+      system = result[:system]
+      expect(system).to include("DTS1")
+      expect(system).to include("DRS1")
+    end
+
+    # --- System prompt: explanation rules ---
+
+    it "system prompt requires citations in explanation" do
+      expect(result[:system]).to include("citations exactes")
+    end
+
+    it "system prompt requires step-by-step reasoning in explanation" do
+      expect(result[:system]).to include("raisonnement étape par étape")
     end
 
     # --- System prompt: dt_references and dr_references ---
@@ -93,14 +143,33 @@ RSpec.describe BuildExtractionPrompt do
       expect(result[:system]).to include("correction")
     end
 
-    # --- System prompt: page numbers for DTs/DRs ---
+    # --- System prompt: specific parts numbering ---
 
-    it "system prompt instructs to identify DTs and DRs with page numbers" do
+    it "system prompt specifies letter numbering for specific parts" do
       system = result[:system]
+      expect(system).to include("A, B, C")
+      expect(system).to include("A.1")
+    end
 
-      expect(system).to include("DT")
-      expect(system).to include("DR")
-      expect(system).to include("page")
+    # --- System prompt: few-shot example ---
+
+    it "system prompt includes a few-shot example" do
+      system = result[:system]
+      expect(system).to include("Exemple d'extraction attendue")
+    end
+
+    it "few-shot example shows common part with numbered DT" do
+      expect(result[:system]).to include('"DT2"')
+    end
+
+    it "few-shot example shows specific part with DTS/DRS" do
+      system = result[:system]
+      expect(system).to include('"DTS1"')
+      expect(system).to include('"DRS1"')
+    end
+
+    it "few-shot example shows question_context as data_hint source" do
+      expect(result[:system]).to include('"question_context"')
     end
 
     # --- Messages: content and structure ---
