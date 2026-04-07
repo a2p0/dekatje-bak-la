@@ -16,7 +16,7 @@ class ExtractQuestionsFromPdf
     raw_response = client.call(
       messages: prompt[:messages],
       system: prompt[:system],
-      max_tokens: 16_384,
+      max_tokens: 32_768,
       temperature: 0.1
     )
 
