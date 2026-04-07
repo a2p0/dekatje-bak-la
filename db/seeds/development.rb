@@ -83,6 +83,28 @@ if subject.new_record?
   puts "  Sujet créé: #{subject.title} (#{subject.specialty})"
 end
 
+# Attach PDFs if not already attached
+seeds_dir = Rails.root.join("db", "seeds", "development")
+
+unless subject.subject_pdf.attached?
+  subject.subject_pdf.attach(
+    io: File.open(seeds_dir.join("sujet_cime_2024.pdf")),
+    filename: "sujet_cime_2024.pdf",
+    content_type: "application/pdf"
+  )
+  puts "  PDF sujet attaché"
+end
+
+unless subject.correction_pdf.attached?
+  subject.correction_pdf.attach(
+    io: File.open(seeds_dir.join("corrige_cime_2024.pdf")),
+    filename: "corrige_cime_2024.pdf",
+    content_type: "application/pdf"
+  )
+  puts "  PDF corrigé attaché"
+end
+
+# Persist extraction data
 unless exam_session.common_parts.any?
   PersistExtractedData.call(subject: subject, data: data)
 
@@ -90,6 +112,13 @@ unless exam_session.common_parts.any?
   subject.update_column(:status, Subject.statuses[:published])
 
   puts "  Extraction persistée: #{Question.where(part: subject.all_parts).count} questions (publiées)"
+end
+
+# Create ExtractionJob record
+ExtractionJob.find_or_create_by!(subject: subject) do |job|
+  job.status = :done
+  job.raw_json = raw
+  job.provider_used = :server
 end
 
 # === C. Lien Classroom ↔ Subject ===
