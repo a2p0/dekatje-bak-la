@@ -72,6 +72,9 @@ end %>
       <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">
         Partie <%= @part.number %> — <%= @part.title %>
       </p>
+      <% if @part.objective_text.present? %>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><%= @part.objective_text %></p>
+      <% end %>
     </div>
 
     <%# Question card %>
@@ -159,9 +162,24 @@ end %>
             student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_q.id),
             class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
       <% else %>
-        <%= link_to "Retour aux sujets",
-            student_root_path(access_code: params[:access_code]),
-            class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+        <% part_idx = @parts.index(@part) %>
+        <% next_part = part_idx && part_idx < @parts.size - 1 ? @parts[part_idx + 1] : nil %>
+        <% if next_part %>
+          <% first_question = next_part.questions.kept.order(:position).first %>
+          <% if first_question %>
+            <%= link_to "Continuer → Partie #{next_part.number}",
+                student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: first_question.id),
+                class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+          <% else %>
+            <%= link_to "Retour aux sujets",
+                student_root_path(access_code: params[:access_code]),
+                class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+          <% end %>
+        <% else %>
+          <%= link_to "Retour aux sujets",
+              student_root_path(access_code: params[:access_code]),
+              class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+        <% end %>
       <% end %>
     </div>
   </div>
