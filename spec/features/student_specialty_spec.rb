@@ -5,9 +5,8 @@ RSpec.describe "US3: Student specialty in settings", type: :feature do
   let(:student)   { create(:student, classroom: classroom, specialty: nil) }
   let(:subject_record) do
     create(:subject,
-      title: "BAC STI2D Metropole 2025",
       status: :published,
-      presentation_text: "La société CIME fabrique des véhicules électriques.")
+      specific_presentation: "La société CIME fabrique des véhicules électriques.")
   end
 
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }

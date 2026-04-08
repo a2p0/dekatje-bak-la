@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Teacher::Questions", type: :request do
   let(:user) { create(:user, confirmed_at: Time.current) }
   let(:subject_obj) { create(:subject, owner: user) }
-  let(:part) { create(:part, subject: subject_obj) }
+  let(:part) { create(:part, :specific, subject: subject_obj) }
   let(:question) { create(:question, part: part) }
   let(:answer) { create(:answer, question: question) }
 

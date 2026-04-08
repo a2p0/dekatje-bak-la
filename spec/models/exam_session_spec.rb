@@ -25,22 +25,26 @@ RSpec.describe ExamSession, type: :model do
       expect(exam_session.errors[:region]).to be_present
     end
 
-    it "requires exam_type" do
-      exam_session = build(:exam_session, exam_type: nil)
+    it "requires exam" do
+      exam_session = build(:exam_session, exam: nil)
       expect(exam_session).not_to be_valid
-      expect(exam_session.errors[:exam_type]).to be_present
+      expect(exam_session.errors[:exam]).to be_present
     end
   end
 
   describe "enums" do
     it "defines region enum" do
       expect(ExamSession.regions).to eq(
-        "metropole" => 0, "drom_com" => 1, "polynesie" => 2, "candidat_libre" => 3
+        "metropole" => 0, "reunion" => 1, "polynesie" => 2, "candidat_libre" => 3
       )
     end
 
-    it "defines exam_type enum" do
-      expect(ExamSession.exam_types).to eq("bac" => 0, "bts" => 1, "autre" => 2)
+    it "defines exam enum" do
+      expect(ExamSession.exams).to eq("bac" => 0, "bts" => 1, "autre" => 2)
+    end
+
+    it "defines variante enum" do
+      expect(ExamSession.variantes).to eq("normale" => 0, "remplacement" => 1)
     end
   end
 

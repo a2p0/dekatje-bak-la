@@ -11,7 +11,8 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
   scenario "un enseignant connecté voit ses classes et ses sujets avec des liens vers toutes les actions possibles" do
     teacher = create(:user, confirmed_at: Time.current)
     classroom = create(:classroom, owner: teacher, name: "Terminale SIN 2026")
-    subject = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025", status: :published)
+    es = create(:exam_session, owner: teacher, title: "BAC STI2D Metropole 2025")
+    subject = create(:subject, owner: teacher, exam_session: es, status: :published)
 
     visit new_user_session_path
     fill_in "Email", with: teacher.email
@@ -25,7 +26,8 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
 
   scenario "un enseignant voit un bouton Nouveau sujet et des liens vers chaque sujet sur la liste des sujets" do
     teacher = create(:user, confirmed_at: Time.current)
-    subject_record = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025")
+    es = create(:exam_session, owner: teacher, title: "BAC STI2D Metropole 2025")
+    subject_record = create(:subject, owner: teacher, exam_session: es)
 
     visit new_user_session_path
     fill_in "Email", with: teacher.email
@@ -41,7 +43,8 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
 
   scenario "un enseignant voit les PDFs, le statut d'extraction, les parties et les stats sur la page d'un sujet" do
     teacher = create(:user, confirmed_at: Time.current)
-    subject_record = create(:subject, owner: teacher, title: "BAC STI2D Metropole 2025", status: :pending_validation)
+    es = create(:exam_session, owner: teacher, title: "BAC STI2D Metropole 2025")
+    subject_record = create(:subject, owner: teacher, exam_session: es, status: :pending_validation)
     create(:extraction_job, subject: subject_record, status: :done)
     part = create(:part, subject: subject_record, title: "Analyse du système CIME", position: 1)
     create(:question, part: part, position: 1, status: :validated)
@@ -87,7 +90,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
   scenario "un élève connecté peut toujours accéder aux réglages et à la déconnexion" do
     classroom = create(:classroom, name: "Terminale SIN 2026")
     student = create(:student, classroom: classroom, first_name: "Marie")
-    subject = create(:subject, title: "BAC STI2D 2025", status: :published)
+    subject = create(:subject, status: :published)
     create(:classroom_subject, classroom: classroom, subject: subject)
     part = create(:part, subject: subject, position: 1)
     question = create(:question, part: part, position: 1, label: "Calculer la consommation")

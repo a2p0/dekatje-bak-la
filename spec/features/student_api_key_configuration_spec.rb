@@ -5,9 +5,8 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   let(:student)   { create(:student, classroom: classroom) }
   let(:subject_record) do
     create(:subject,
-      title: "BAC STI2D Metropole 2025",
       status: :published,
-      presentation_text: "La société CIME fabrique des véhicules électriques.")
+      specific_presentation: "La société CIME fabrique des véhicules électriques.")
   end
 
   let(:part) do

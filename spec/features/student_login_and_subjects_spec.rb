@@ -38,13 +38,16 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
   scenario "un élève voit uniquement les sujets publiés assignés à sa classe avec la progression" do
     student = create(:student, classroom: classroom)
 
-    published_subject = create(:subject, title: "BAC STI2D Metropole 2025", status: :published)
+    published_es = create(:exam_session, title: "BAC STI2D Metropole 2025")
+    published_subject = create(:subject, exam_session: published_es, status: :published)
     create(:classroom_subject, classroom: classroom, subject: published_subject)
 
-    draft_subject = create(:subject, title: "Sujet Brouillon", status: :draft)
+    draft_es = create(:exam_session, title: "Sujet Brouillon")
+    draft_subject = create(:subject, exam_session: draft_es, status: :draft)
     create(:classroom_subject, classroom: classroom, subject: draft_subject)
 
-    unassigned_subject = create(:subject, title: "Sujet Autre Classe", status: :published)
+    unassigned_es = create(:exam_session, title: "Sujet Autre Classe")
+    unassigned_subject = create(:subject, exam_session: unassigned_es, status: :published)
 
     # Create a part with questions for progress display
     part = create(:part, subject: published_subject)
@@ -61,7 +64,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
 
   scenario "un élève clique Commencer sur un sujet non commencé" do
     student = create(:student, classroom: classroom)
-    subject = create(:subject, title: "BAC STI2D 2025", status: :published)
+    subject = create(:subject, status: :published)
     create(:classroom_subject, classroom: classroom, subject: subject)
 
     part = create(:part, subject: subject, position: 1)
@@ -82,7 +85,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
 
   scenario "un élève clique Continuer sur un sujet en cours et arrive sur la première question non terminée" do
     student = create(:student, classroom: classroom)
-    subject = create(:subject, title: "BAC STI2D 2025", status: :published)
+    subject = create(:subject, status: :published)
     create(:classroom_subject, classroom: classroom, subject: subject)
 
     part = create(:part, subject: subject, position: 1)

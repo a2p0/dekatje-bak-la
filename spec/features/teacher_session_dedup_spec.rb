@@ -15,7 +15,6 @@ RSpec.describe "US2: Teacher uploads second specialty — dedup common parts", t
   before do
     # First subject already uploaded with common parts
     @first_subject = create(:subject, :new_format,
-      title: "Sujet SIN",
       owner: user,
       exam_session: exam_session,
       specialty: :SIN)
@@ -53,7 +52,7 @@ RSpec.describe "US2: Teacher uploads second specialty — dedup common parts", t
     # Verify the second subject was created under the same session
     second_subject = Subject.last
     expect(second_subject.exam_session).to eq(exam_session)
-    expect(second_subject.title).to eq("Sujet AC")
+    expect(second_subject.title).to eq("BAC 2024 Polynesie")
 
     # Common parts should NOT be duplicated — still only 1
     expect(exam_session.common_parts.count).to eq(1)
