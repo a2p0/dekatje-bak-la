@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_111918) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -90,13 +90,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_111918) do
   end
 
   create_table "exam_sessions", force: :cascade do |t|
+    t.text "common_presentation"
     t.datetime "created_at", null: false
-    t.integer "exam_type", default: 0, null: false
+    t.integer "exam", default: 0, null: false
     t.bigint "owner_id", null: false
-    t.text "presentation_text"
     t.integer "region", default: 0, null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.integer "variante", default: 0, null: false
     t.string "year", null: false
     t.index ["owner_id", "year", "region"], name: "idx_exam_sessions_lookup"
     t.index ["owner_id"], name: "index_exam_sessions_on_owner_id"
@@ -204,18 +205,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_111918) do
   end
 
   create_table "subjects", force: :cascade do |t|
+    t.string "code"
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
     t.bigint "exam_session_id"
-    t.integer "exam_type", default: 0, null: false
     t.bigint "owner_id", null: false
-    t.text "presentation_text"
-    t.integer "region", default: 0, null: false
     t.integer "specialty", default: 0, null: false
+    t.text "specific_presentation"
     t.integer "status", default: 0, null: false
-    t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.string "year", null: false
     t.index ["discarded_at"], name: "index_subjects_on_discarded_at"
     t.index ["exam_session_id"], name: "index_subjects_on_exam_session_id"
     t.index ["owner_id"], name: "index_subjects_on_owner_id"
