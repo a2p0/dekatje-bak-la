@@ -21,7 +21,7 @@ class Subject < ApplicationRecord
   enum :specialty, { tronc_commun: 0, SIN: 1, ITEC: 2, EE: 3, AC: 4 }
   enum :status,    { draft: 0, pending_validation: 1, published: 2, archived: 3 }
 
-  delegate :title, :year, :exam, :region, :common_presentation, :variante, to: :exam_session
+  delegate :title, :year, :exam, :region, :common_presentation, :variante, to: :exam_session, allow_nil: true
 
   validates :specialty, presence: true
 
