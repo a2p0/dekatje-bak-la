@@ -84,7 +84,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
   end
 
   let!(:legacy_part) do
-    create(:part,
+    create(:part, :specific,
       subject: legacy_subject,
       number: 1,
       title: "Partie unique",

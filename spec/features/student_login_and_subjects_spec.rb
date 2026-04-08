@@ -50,7 +50,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     unassigned_subject = create(:subject, exam_session: unassigned_es, status: :published)
 
     # Create a part with questions for progress display
-    part = create(:part, subject: published_subject)
+    part = create(:part, :specific, subject: published_subject)
     q1 = create(:question, part: part, position: 1)
     q2 = create(:question, part: part, number: "1.2", position: 2)
 
@@ -67,7 +67,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     subject = create(:subject, status: :published)
     create(:classroom_subject, classroom: classroom, subject: subject)
 
-    part = create(:part, subject: subject, position: 1)
+    part = create(:part, :specific, subject: subject, position: 1)
     question = create(:question, part: part, position: 1, label: "Calculer la consommation")
 
     visit student_login_path(access_code: classroom.access_code)
@@ -88,7 +88,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     subject = create(:subject, status: :published)
     create(:classroom_subject, classroom: classroom, subject: subject)
 
-    part = create(:part, subject: subject, position: 1)
+    part = create(:part, :specific, subject: subject, position: 1)
     q1 = create(:question, part: part, position: 1, number: "1.1", label: "Question terminée")
     q2 = create(:question, part: part, position: 2, number: "1.2", label: "Question suivante à faire")
 

@@ -10,7 +10,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   end
 
   let(:part) do
-    create(:part,
+    create(:part, :specific,
       subject: subject_record,
       number: 1,
       title: "Transport et développement durable",

@@ -10,7 +10,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   end
 
   let(:part) do
-    create(:part,
+    create(:part, :specific,
       subject: subject,
       number: 1,
       title: "Transport et développement durable",

@@ -35,7 +35,7 @@ RSpec.describe "Student::Subjects", type: :request do
   end
 
   describe "GET /subjects/:id (show)" do
-    it "creates a student session and renders scope selection" do
+    it "creates a student session and renders mise en situation" do
       part = create(:part, :specific, subject: subject_obj, position: 1)
       question = create(:question, part: part, position: 1)
       get student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
@@ -43,9 +43,10 @@ RSpec.describe "Student::Subjects", type: :request do
       expect(StudentSession.where(student: student, subject: subject_obj).count).to eq(1)
     end
 
-    it "renders scope selection page for subject without parts" do
+    it "redirects with alert for subject without parts" do
       get student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
-      expect(response).to have_http_status(:ok)
+      expect(response).to redirect_to(student_root_path(access_code: classroom.access_code))
+      expect(flash[:alert]).to include("pas encore de questions")
     end
 
     it "redirects for unassigned subject" do

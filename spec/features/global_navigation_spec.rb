@@ -46,7 +46,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     es = create(:exam_session, owner: teacher, title: "BAC STI2D Metropole 2025")
     subject_record = create(:subject, owner: teacher, exam_session: es, status: :pending_validation)
     create(:extraction_job, subject: subject_record, status: :done)
-    part = create(:part, subject: subject_record, title: "Analyse du système CIME", position: 1)
+    part = create(:part, :specific, subject: subject_record, title: "Analyse du système CIME", position: 1)
     create(:question, part: part, position: 1, status: :validated)
 
     visit new_user_session_path
@@ -92,7 +92,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     student = create(:student, classroom: classroom, first_name: "Marie")
     subject = create(:subject, status: :published)
     create(:classroom_subject, classroom: classroom, subject: subject)
-    part = create(:part, subject: subject, position: 1)
+    part = create(:part, :specific, subject: subject, position: 1)
     question = create(:question, part: part, position: 1, label: "Calculer la consommation")
 
     visit student_login_path(access_code: classroom.access_code)

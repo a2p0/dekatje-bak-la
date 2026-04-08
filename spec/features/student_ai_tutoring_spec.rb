@@ -12,7 +12,7 @@ RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
   end
 
   let(:part) do
-    create(:part,
+    create(:part, :specific,
       subject: subject_record,
       number: 1,
       title: "Transport et developpement durable",

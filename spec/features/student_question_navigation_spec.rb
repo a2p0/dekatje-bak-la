@@ -10,7 +10,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   let(:part1) do
-    create(:part,
+    create(:part, :specific,
       subject: subject,
       number: 1,
       title: "Transport et développement durable",
@@ -19,7 +19,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
   end
 
   let(:part2) do
-    create(:part,
+    create(:part, :specific,
       subject: subject,
       number: 2,
       title: "Analyse fonctionnelle",

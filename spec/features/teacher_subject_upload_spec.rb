@@ -65,7 +65,7 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
   scenario "l'enseignant voit les parties et questions extraites quand l'extraction est terminée" do
     subject = create(:subject, owner: user)
     create(:extraction_job, subject: subject, status: :done)
-    part = create(:part, subject: subject, title: "Étude des transports", number: 1, position: 1)
+    part = create(:part, :specific, subject: subject, title: "Étude des transports", number: 1, position: 1)
     create(:question, part: part, number: "1.1", label: "Calculer la consommation")
 
     visit teacher_subject_path(subject)

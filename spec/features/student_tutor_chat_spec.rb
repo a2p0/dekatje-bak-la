@@ -13,7 +13,7 @@ RSpec.describe "Story 10: Chat adaptatif avec contexte de reperage", type: :feat
   end
 
   let(:part) do
-    create(:part,
+    create(:part, :specific,
       subject: subject_record,
       number: 1,
       title: "Transport et developpement durable",
