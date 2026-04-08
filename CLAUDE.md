@@ -332,6 +332,10 @@ SECRET_KEY_BASE            # rails secret
 - Ruby 3.3+ / Rails 8.1.3 + Hotwire (Turbo Streams, Stimulus), ViewComponent, Sidekiq, ActionCable (011-guided-tutor-spotting)
 - PostgreSQL via Neon (JSONB pour l'état du tuteur) (011-guided-tutor-spotting)
 - Ruby 3.3+ / Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage (015-extraction-consolidation)
+- Ruby 3.3+ / Rails 8.1 + pdf-reader, Faraday, AiClientFactory (020-extraction-json-restructure)
+- PostgreSQL via Neon (ExamSession.presentation_text, Subject.presentation_text — déjà existants) (020-extraction-json-restructure)
+- Ruby 3.3+ / Rails 8.1 + Hotwire (Turbo Streams, Stimulus), ViewComponent, Tailwind CSS (021-student-subject-workflow)
+- PostgreSQL via Neon (JSONB `progression` dans `student_sessions`) (021-student-subject-workflow)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
