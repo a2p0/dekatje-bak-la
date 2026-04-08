@@ -12,29 +12,8 @@ RSpec.describe Subject, type: :model do
       expect(subject_obj).to be_valid
     end
 
-    it "requires title" do
-      subject_obj = build(:subject, title: nil)
-      expect(subject_obj).not_to be_valid
-      expect(subject_obj.errors[:title]).to be_present
-    end
-
-    it "requires year" do
-      subject_obj = build(:subject, year: nil)
-      expect(subject_obj).not_to be_valid
-    end
-
-    it "requires exam_type" do
-      subject_obj = build(:subject, exam_type: nil)
-      expect(subject_obj).not_to be_valid
-    end
-
     it "requires specialty" do
       subject_obj = build(:subject, specialty: nil)
-      expect(subject_obj).not_to be_valid
-    end
-
-    it "requires region" do
-      subject_obj = build(:subject, region: nil)
       expect(subject_obj).not_to be_valid
     end
 
@@ -64,10 +43,6 @@ RSpec.describe Subject, type: :model do
   end
 
   describe "enums" do
-    it "defines exam_type enum" do
-      expect(Subject.exam_types).to eq("bac" => 0, "bts" => 1, "autre" => 2)
-    end
-
     it "defines specialty enum with EE (was EC)" do
       expect(Subject.specialties).to eq(
         "tronc_commun" => 0, "SIN" => 1, "ITEC" => 2, "EE" => 3, "AC" => 4
@@ -76,12 +51,6 @@ RSpec.describe Subject, type: :model do
 
     it "maps EE to integer 3" do
       expect(Subject.specialties["EE"]).to eq(3)
-    end
-
-    it "defines region enum" do
-      expect(Subject.regions).to eq(
-        "metropole" => 0, "drom_com" => 1, "polynesie" => 2, "candidat_libre" => 3
-      )
     end
 
     it "defines status enum with draft as default" do
@@ -96,9 +65,9 @@ RSpec.describe Subject, type: :model do
       expect(subject_obj.owner).to be_a(User)
     end
 
-    it "optionally belongs to exam_session" do
+    it "requires exam_session" do
       subject_obj = build(:subject, exam_session: nil)
-      expect(subject_obj).to be_valid
+      expect(subject_obj).not_to be_valid
     end
 
     it "can belong to an exam_session" do
@@ -129,23 +98,12 @@ RSpec.describe Subject, type: :model do
     end
   end
 
-  describe "#effective_presentation_text" do
-    it "returns exam_session presentation_text when present" do
-      exam_session = create(:exam_session)
-      exam_session.update!(presentation_text: "Session presentation")
-      subject_obj = build(:subject, exam_session: exam_session, presentation_text: "Subject presentation")
-      expect(subject_obj.effective_presentation_text).to eq("Session presentation")
-    end
-
-    it "falls back to own presentation_text when no exam_session" do
-      subject_obj = build(:subject, exam_session: nil, presentation_text: "Subject presentation")
-      expect(subject_obj.effective_presentation_text).to eq("Subject presentation")
-    end
-
-    it "falls back to own presentation_text when exam_session has no presentation_text" do
-      exam_session = create(:exam_session)
-      subject_obj = build(:subject, exam_session: exam_session, presentation_text: "Subject presentation")
-      expect(subject_obj.effective_presentation_text).to eq("Subject presentation")
+  describe "delegations" do
+    it "delegates title, year, exam, region, common_presentation, variante to exam_session" do
+      exam_session = create(:exam_session, title: "BAC 2025", common_presentation: "Mise en situation")
+      subject_obj = create(:subject, :new_format, exam_session: exam_session)
+      expect(subject_obj.title).to eq("BAC 2025")
+      expect(subject_obj.common_presentation).to eq("Mise en situation")
     end
   end
 

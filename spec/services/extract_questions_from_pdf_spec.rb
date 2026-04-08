@@ -5,8 +5,9 @@ RSpec.describe ExtractQuestionsFromPdf do
 
   let(:ai_response) do
     {
-      "presentation" => "Le système CIME permet de transporter des charges lourdes.",
-      "metadata" => { "exam_type" => "bac", "specialty" => "SIN", "year" => "2024" },
+      "common_presentation" => "Le système CIME permet de transporter des charges lourdes.",
+      "specific_presentation" => "Contexte spécifique SIN.",
+      "metadata" => { "exam" => "bac", "specialty" => "SIN", "year" => "2024" },
       "document_references" => [
         { "type" => "DT", "number" => 1, "title" => "Diagrammes SysML", "start_page" => 5, "end_page" => 7 },
         { "type" => "DR", "number" => 1, "title" => "Document réponse", "start_page" => 12, "end_page" => 13 }

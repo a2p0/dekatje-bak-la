@@ -7,17 +7,16 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
   # --- New-format subject (with exam_session) ---
   let(:exam_session) do
-    create(:exam_session, owner: teacher, title: "BAC STI2D 2025", presentation_text: "Mise en situation CIME.")
+    create(:exam_session, owner: teacher, title: "BAC STI2D 2025", common_presentation: "Mise en situation CIME.")
   end
 
   let(:new_format_subject) do
     create(:subject, :new_format,
-      title: "Sujet Nouveau Format",
       status: :published,
       specialty: :SIN,
       exam_session: exam_session,
       owner: teacher,
-      presentation_text: "Presentation specifique SIN")
+      specific_presentation: "Presentation specifique SIN")
   end
 
   # Common parts (belong to exam_session, not subject)
@@ -71,18 +70,21 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
   let!(:new_format_cs) { create(:classroom_subject, classroom: classroom, subject: new_format_subject) }
 
-  # --- Legacy subject (no exam_session) ---
+  # --- Subject without common parts (no scope selection needed) ---
+  let(:legacy_exam_session) do
+    create(:exam_session, owner: teacher, title: "BAC Legacy 2025",
+      common_presentation: "Sujet classique sans parties communes")
+  end
   let(:legacy_subject) do
     create(:subject,
-      title: "Sujet Legacy Format",
       status: :published,
       specialty: :SIN,
       owner: teacher,
-      presentation_text: "Sujet classique sans exam session")
+      exam_session: legacy_exam_session)
   end
 
   let!(:legacy_part) do
-    create(:part,
+    create(:part, :specific,
       subject: legacy_subject,
       number: 1,
       title: "Partie unique",
@@ -152,7 +154,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     expect(page).to have_content("Question commune sur le transport durable")
   end
 
-  scenario "legacy subject (no exam_session) skips scope selection" do
+  scenario "subject without common parts skips scope selection" do
     login_as_student(student, classroom)
 
     visit student_subject_path(access_code: classroom.access_code, id: legacy_subject.id)

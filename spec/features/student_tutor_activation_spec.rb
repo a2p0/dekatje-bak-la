@@ -4,7 +4,7 @@ RSpec.describe "Student tutor activation banner", type: :feature do
   let(:classroom) { create(:classroom) }
   let(:subject_obj) { create(:subject, status: :published) }
   let!(:_classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_obj) }
-  let(:part) { create(:part, subject: subject_obj, position: 1) }
+  let(:part) { create(:part, :specific, subject: subject_obj, position: 1) }
   let!(:first_question) { create(:question, part: part, position: 1) }
 
   # Uses login_as_student from StudentLoginHelper (included via spec/support/)

@@ -6,8 +6,13 @@ RSpec.describe PersistExtractedData do
 
   let(:data) do
     {
-      "metadata" => { "title" => "CIME", "year" => "2024", "specialty" => "ITEC" },
-      "presentation" => "Mise en situation...",
+      "metadata" => {
+        "title" => "CIME", "year" => "2024", "specialty" => "ITEC",
+        "code" => "24-2D2IDACPO1", "exam" => "bac",
+        "region" => "polynesie", "variante" => "normale"
+      },
+      "common_presentation" => "Mise en situation...",
+      "specific_presentation" => "Contexte spécifique ITEC...",
       "common_parts" => [
         {
           "number" => 1, "title" => "Partie 1", "objective" => "Objectif...",
@@ -41,9 +46,30 @@ RSpec.describe PersistExtractedData do
 
   describe ".call" do
     context "first upload (no existing common parts)" do
-      it "sets exam_session presentation_text from data" do
+      it "sets exam_session common_presentation from data" do
         described_class.call(subject: subject_obj, data: data)
-        expect(exam_session.reload.presentation_text).to eq("Mise en situation...")
+        expect(exam_session.reload.common_presentation).to eq("Mise en situation...")
+      end
+
+      it "sets subject specific_presentation from data" do
+        described_class.call(subject: subject_obj, data: data)
+        expect(subject_obj.reload.specific_presentation).to eq("Contexte spécifique ITEC...")
+      end
+
+      it "sets subject code from metadata" do
+        described_class.call(subject: subject_obj, data: data)
+        expect(subject_obj.reload.code).to eq("24-2D2IDACPO1")
+      end
+
+      it "sets exam_session variante from metadata" do
+        described_class.call(subject: subject_obj, data: data)
+        expect(exam_session.reload.variante).to eq("normale")
+      end
+
+      it "sets exam_session exam from metadata" do
+        data["metadata"]["exam"] = "bts"
+        described_class.call(subject: subject_obj, data: data)
+        expect(exam_session.reload.exam).to eq("bts")
       end
 
       it "creates common parts on exam_session (not on subject)" do
@@ -145,7 +171,7 @@ RSpec.describe PersistExtractedData do
     context "second upload (common parts already exist on exam_session)" do
       before do
         # Simulate first upload already completed: common parts exist
-        exam_session.update!(presentation_text: "Mise en situation...")
+        exam_session.update!(common_presentation: "Mise en situation...")
         common_part = exam_session.common_parts.create!(
           number: 1, title: "Partie 1", objective_text: "Objectif...",
           section_type: :common, position: 0, document_references: [
@@ -193,7 +219,7 @@ RSpec.describe PersistExtractedData do
       let(:bad_data) do
         {
           "metadata" => { "title" => "CIME", "year" => "2024", "specialty" => "ITEC" },
-          "presentation" => "Mise en situation...",
+          "common_presentation" => "Mise en situation...",
           "common_parts" => [
             {
               "number" => 1, "title" => "Partie 1", "objective" => "Objectif...",
@@ -221,9 +247,9 @@ RSpec.describe PersistExtractedData do
         expect(subject_obj.reload.status).to eq("draft")
       end
 
-      it "does not update exam_session presentation_text on failure" do
+      it "does not update exam_session common_presentation on failure" do
         described_class.call(subject: subject_obj, data: bad_data) rescue nil
-        expect(exam_session.reload.presentation_text).to be_nil
+        expect(exam_session.reload.common_presentation).to be_nil
       end
     end
   end

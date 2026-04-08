@@ -12,8 +12,10 @@ RSpec.describe "Teacher::Subjects", type: :request do
     end
 
     it "only shows subjects owned by current teacher" do
-      own_subject = create(:subject, owner: user)
-      other_subject = create(:subject)
+      own_es = create(:exam_session, owner: user, title: "Mon sujet BAC")
+      own_subject = create(:subject, owner: user, exam_session: own_es)
+      other_es = create(:exam_session, title: "Sujet autre prof")
+      other_subject = create(:subject, exam_session: other_es)
       get teacher_subjects_path
       expect(response.body).to include(own_subject.title)
       expect(response.body).not_to include(other_subject.title)
@@ -40,14 +42,11 @@ RSpec.describe "Teacher::Subjects", type: :request do
         subject: {
           title: "Sujet SIN 2026",
           year: "2026",
-          exam_type: "bac",
+          exam: "bac",
           specialty: "SIN",
           region: "metropole",
-          enonce_file: pdf_upload("enonce.pdf"),
-          dt_file: pdf_upload("dt.pdf"),
-          dr_vierge_file: pdf_upload("dr_vierge.pdf"),
-          dr_corrige_file: pdf_upload("dr_corrige.pdf"),
-          questions_corrigees_file: pdf_upload("questions_corrigees.pdf")
+          subject_pdf: pdf_upload("subject.pdf"),
+          correction_pdf: pdf_upload("correction.pdf")
         }
       }
     end
@@ -62,7 +61,7 @@ RSpec.describe "Teacher::Subjects", type: :request do
     it "does not create subject with missing files" do
       expect {
         post teacher_subjects_path, params: {
-          subject: { title: "Test", year: "2026", exam_type: "bac", specialty: "SIN", region: "metropole" }
+          subject: { title: "Test", year: "2026", exam: "bac", specialty: "SIN", region: "metropole" }
         }
       }.not_to change(Subject, :count)
       expect(response).to have_http_status(:unprocessable_entity)
@@ -87,7 +86,7 @@ RSpec.describe "Teacher::Subjects", type: :request do
   describe "PATCH /teacher/subjects/:id/publish" do
     it "publishes a pending_validation subject with validated questions" do
       subject = create(:subject, owner: user, status: :pending_validation)
-      part = create(:part, subject: subject)
+      part = create(:part, :specific, subject: subject)
       create(:question, part: part, status: :validated)
       patch publish_teacher_subject_path(subject)
       expect(subject.reload.status).to eq("published")

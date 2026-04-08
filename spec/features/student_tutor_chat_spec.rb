@@ -7,14 +7,13 @@ RSpec.describe "Story 10: Chat adaptatif avec contexte de reperage", type: :feat
   let(:student)   { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }
   let(:subject_record) do
     create(:subject,
-      title: "BAC STI2D Metropole 2025",
       status: :published,
       owner: teacher,
-      presentation_text: "La societe CIME fabrique des vehicules electriques.")
+      specific_presentation: "La societe CIME fabrique des vehicules electriques.")
   end
 
   let(:part) do
-    create(:part,
+    create(:part, :specific,
       subject: subject_record,
       number: 1,
       title: "Transport et developpement durable",

@@ -1,6 +1,6 @@
 class Student::SubjectsController < Student::BaseController
   def index
-    @subjects = @classroom.subjects.published.order(:title)
+    @subjects = @classroom.subjects.published.includes(:exam_session).order(:created_at)
   end
 
   def show

@@ -58,25 +58,23 @@ metadata = data["metadata"]
 
 exam_session = ExamSession.find_or_create_by!(
   title: metadata["title"],
-  year: metadata["year"].to_i,
+  year: metadata["year"].to_s,
   owner: teacher
 ) do |es|
-  es.exam_type = metadata["exam_type"]
-  es.region = :metropole
+  es.exam = metadata["exam"]
+  es.region = metadata["region"] || :metropole
+  es.variante = metadata["variante"] || :normale
 end
 
 subject = Subject.find_or_initialize_by(
-  title: metadata["title"],
-  year: metadata["year"].to_i,
   owner: teacher,
-  exam_session: exam_session
+  exam_session: exam_session,
+  specialty: metadata["specialty"]
 )
 
 if subject.new_record?
   subject.assign_attributes(
-    exam_type: metadata["exam_type"],
-    specialty: metadata["specialty"],
-    region: :metropole,
+    code: metadata["code"],
     status: :draft
   )
   subject.save!(validate: false)

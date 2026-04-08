@@ -15,7 +15,11 @@ class BuildExtractionPrompt
     Aucun mot ne doit être ajouté, retiré ou reformulé. Tu peux uniquement supprimer les sauts de ligne
     et autres marqueurs de mise en page (numéros de page, en-têtes/pieds de page).
     Les champs concernés :
-    - presentation : la TOTALITÉ du texte de mise en situation générale du sujet
+    - common_presentation : la TOTALITÉ du texte de mise en situation commune du sujet
+      (en début de document, avant les parties numérotées). Partagée entre toutes les spécialités.
+    - specific_presentation : le texte de mise en situation spécifique à la spécialité
+      (entre les parties communes et les parties spécifiques, avant les parties lettrées A/B/C).
+      Si aucune mise en situation spécifique n'est identifiable, utiliser une chaîne vide "".
     - label : l'énoncé complet de chaque question
     - context : tout texte introductif, tableau, données chiffrées ou informations qui précèdent la question
       dans le sujet (entre la question précédente et la question courante). Si aucun texte ne précède
@@ -30,15 +34,30 @@ class BuildExtractionPrompt
 
     ## Structure JSON attendue
 
+    ## Code sujet (OBLIGATOIRE)
+
+    Le code sujet est un identifiant standardisé du ministère, toujours présent dans l'en-tête du PDF.
+    Format : YY-SSSSXXRRN (ex: 24-2D2IDACPO1)
+    - YY : année (24 = 2024)
+    - SSSSXX : identifiant matière/spécialité
+    - RR : région (ME=metropole, LR=reunion, PO=polynesie, NC=nouvelle_caledonie)
+    - N : variante (1=normale, 2=remplacement)
+
+    Tu DOIS extraire ce code du PDF. Si le code est introuvable, utilise une chaîne vide "".
+
     Retourne UNIQUEMENT un objet JSON valide, sans aucun texte autour, avec cette structure :
     {
       "metadata": {
         "title": "Titre du sujet",
-        "year": 2024,
-        "exam_type": "bac",
-        "specialty": "ITEC"
+        "year": "2024",
+        "exam": "bac",
+        "specialty": "ITEC",
+        "code": "24-2D2IDACPO1",
+        "region": "polynesie",
+        "variante": "normale"
       },
-      "presentation": "Texte COMPLET et VERBATIM de la mise en situation générale...",
+      "common_presentation": "Texte COMPLET et VERBATIM de la mise en situation commune...",
+      "specific_presentation": "Texte VERBATIM de la mise en situation spécifique à la spécialité...",
       "common_parts": [
         {
           "number": 1,
@@ -140,7 +159,17 @@ class BuildExtractionPrompt
     Voici un exemple partiel montrant le niveau de précision attendu :
 
     {
-      "presentation": "Le Complexe International Multisports et Escalade (CIME) est un équipement sportif situé dans le département de l'Aube. L'utilisation de matériaux à haute performance énergétique et respectueux de l'environnement est privilégiée. Afin de limiter l'impact environnemental, les circuits courts d'approvisionnement ont été favorisés. Le CIME accueille des compétitions de niveau national et international et encourage la pratique du handisport...",
+      "metadata": {
+        "title": "CIME - Complexe International Multisports et Escalade",
+        "year": "2024",
+        "exam": "bac",
+        "specialty": "AC",
+        "code": "24-2D2IDACPO1",
+        "region": "polynesie",
+        "variante": "normale"
+      },
+      "common_presentation": "Le Complexe International Multisports et Escalade (CIME) est un équipement sportif situé dans le département de l'Aube. L'utilisation de matériaux à haute performance énergétique et respectueux de l'environnement est privilégiée. Afin de limiter l'impact environnemental, les circuits courts d'approvisionnement ont été favorisés. Le CIME accueille des compétitions de niveau national et international et encourage la pratique du handisport...",
+      "specific_presentation": "Dans le cadre de la construction du CIME, l'étude porte sur les choix de matériaux pour la structure porteuse et l'enveloppe du bâtiment, en tenant compte des exigences de la RE 2020...",
       "common_parts": [
         {
           "number": 2,

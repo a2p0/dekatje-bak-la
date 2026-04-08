@@ -5,13 +5,12 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
   let(:student)   { create(:student, classroom: classroom) }
   let(:subject) do
     create(:subject,
-      title: "BAC STI2D Metropole 2025",
       status: :published,
-      presentation_text: "La société CIME fabrique des véhicules électriques.")
+      specific_presentation: "La société CIME fabrique des véhicules électriques.")
   end
 
   let(:part) do
-    create(:part,
+    create(:part, :specific,
       subject: subject,
       number: 1,
       title: "Transport et développement durable",

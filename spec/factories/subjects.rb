@@ -1,12 +1,9 @@
 FactoryBot.define do
   factory :subject do
-    title       { "Sujet BAC STI2D #{Faker::Number.number(digits: 4)}" }
-    year        { "2026" }
-    exam_type   { :bac }
     specialty   { :SIN }
-    region      { :metropole }
     status      { :draft }
     association :owner, factory: :user
+    association :exam_session
 
     after(:build) do |subject|
       subject.enonce_file.attach(
@@ -37,8 +34,6 @@ FactoryBot.define do
     end
 
     trait :new_format do
-      association :exam_session
-
       after(:build) do |subject|
         # Remove legacy files
         %i[enonce_file dt_file dr_vierge_file dr_corrige_file questions_corrigees_file].each do |file|

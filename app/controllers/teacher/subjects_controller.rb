@@ -11,7 +11,7 @@ class Teacher::SubjectsController < Teacher::BaseController
   end
 
   def create
-    @subject = current_teacher.subjects.build(subject_params.except(:exam_session_id))
+    @subject = current_teacher.subjects.build(subject_params)
 
     assign_or_create_exam_session
 
@@ -94,9 +94,12 @@ class Teacher::SubjectsController < Teacher::BaseController
 
   def subject_params
     params.require(:subject).permit(
-      :title, :year, :exam_type, :specialty, :region,
-      :subject_pdf, :correction_pdf, :exam_session_id
+      :specialty, :subject_pdf, :correction_pdf, :exam_session_id
     )
+  end
+
+  def session_params
+    params.require(:subject).permit(:title, :year, :exam, :region)
   end
 
   def assign_or_create_exam_session
@@ -106,10 +109,7 @@ class Teacher::SubjectsController < Teacher::BaseController
       @subject.exam_session = current_teacher.exam_sessions.find(exam_session_id)
     else
       @subject.exam_session = current_teacher.exam_sessions.build(
-        title: @subject.title,
-        year: @subject.year,
-        region: @subject.region,
-        exam_type: @subject.exam_type
+        session_params.merge(owner: current_teacher)
       )
     end
   end

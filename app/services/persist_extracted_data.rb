@@ -3,8 +3,27 @@ class PersistExtractedData
     ActiveRecord::Base.transaction do
       exam_session = subject.exam_session
 
-      if exam_session.presentation_text.blank?
-        exam_session.update!(presentation_text: data["presentation"])
+      if exam_session.common_presentation.blank?
+        exam_session.update!(common_presentation: data["common_presentation"])
+      end
+
+      if subject.specific_presentation.blank? && data["specific_presentation"].present?
+        subject.update_column(:specific_presentation, data["specific_presentation"])
+      end
+
+      metadata = data["metadata"] || {}
+      subject.update_column(:code, metadata["code"]) if metadata["code"].present?
+
+      if metadata["variante"].present?
+        exam_session.update!(variante: metadata["variante"])
+      end
+
+      if metadata["region"].present?
+        exam_session.update!(region: metadata["region"])
+      end
+
+      if metadata["exam"].present?
+        exam_session.update!(exam: metadata["exam"])
       end
 
       subject.update_column(:status, Subject.statuses[:pending_validation])

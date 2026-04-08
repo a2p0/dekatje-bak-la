@@ -30,7 +30,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
     scenario "l'enseignant voit la liste des questions à gauche et le PDF énoncé à droite" do
       subject_record = create(:subject, owner: user)
       create(:extraction_job, subject: subject_record, status: :done)
-      part = create(:part, subject: subject_record, title: "Étude des transports", number: 1, position: 1)
+      part = create(:part, :specific, subject: subject_record, title: "Étude des transports", number: 1, position: 1)
       create(:question, part: part, number: "1.1", label: "Calculer la consommation", points: 2.0)
       create(:question, part: part, number: "1.2", label: "Comparer les énergies", points: 3.0)
 
@@ -48,7 +48,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
   context "validation d'une question" do
     scenario "le statut passe à 'validated' et le bouton change quand l'enseignant clique 'Valider'" do
       subject_record = create(:subject, owner: user)
-      part = create(:part, subject: subject_record)
+      part = create(:part, :specific, subject: subject_record)
       question = create(:question, part: part, number: "1.1", label: "Calculer la consommation", status: :draft)
 
       visit teacher_subject_part_path(subject_record, part)
@@ -67,7 +67,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
   context "modification d'une question" do
     scenario "les modifications du label et des points sont enregistrées sans rechargement" do
       subject_record = create(:subject, owner: user)
-      part = create(:part, subject: subject_record)
+      part = create(:part, :specific, subject: subject_record)
       question = create(:question, part: part, number: "1.1", label: "Ancien énoncé", points: 2.0)
       create(:answer, question: question)
 
@@ -89,7 +89,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
   context "suppression d'une question" do
     scenario "la question disparaît de la liste après suppression douce" do
       subject_record = create(:subject, owner: user)
-      part = create(:part, subject: subject_record)
+      part = create(:part, :specific, subject: subject_record)
       create(:question, part: part, number: "1.1", label: "Question à supprimer")
       create(:question, part: part, number: "1.2", label: "Question à garder", position: 2)
 
@@ -113,7 +113,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
     scenario "le sujet passe en 'published' et redirige vers l'assignation quand au moins une question est validée" do
       subject_record = create(:subject, owner: user, status: :draft)
       create(:extraction_job, subject: subject_record, status: :done)
-      part = create(:part, subject: subject_record)
+      part = create(:part, :specific, subject: subject_record)
       create(:question, part: part, status: :validated)
 
       visit teacher_subject_path(subject_record)
@@ -128,7 +128,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
     scenario "le bouton 'Publier' est désactivé avec un message quand aucune question n'est validée" do
       subject_record = create(:subject, owner: user, status: :draft)
       create(:extraction_job, subject: subject_record, status: :done)
-      part = create(:part, subject: subject_record)
+      part = create(:part, :specific, subject: subject_record)
       create(:question, part: part, status: :draft)
 
       visit teacher_subject_path(subject_record)
@@ -163,7 +163,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
     scenario "le sujet repasse en brouillon quand l'enseignant clique 'Dépublier'" do
       subject_record = create(:subject, owner: user, status: :published)
       create(:extraction_job, subject: subject_record, status: :done)
-      part = create(:part, subject: subject_record)
+      part = create(:part, :specific, subject: subject_record)
       create(:question, part: part, status: :validated)
 
       visit teacher_subject_path(subject_record)

@@ -95,8 +95,10 @@ class StudentSession < ApplicationRecord
     Question.kept.where(part: filtered_parts).joins(:part).order("parts.position, questions.position")
   end
 
-  # Whether this session requires scope selection (new-format subject)
+  # Whether this session requires scope selection (both common and specific parts exist)
   def requires_scope_selection?
-    subject.exam_session.present?
+    return false unless subject.exam_session.present?
+
+    subject.exam_session.common_parts.any? && subject.parts.where(section_type: :specific).any?
   end
 end
