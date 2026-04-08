@@ -29,14 +29,20 @@ class Student::SubjectsController < Student::BaseController
                          alert: "Ce sujet n'a pas encore de questions."
     end
 
-    # 2. Subject completed → relecture mode (parts list with badges)
+    # 2. Just completed (from complete action redirect) → show Bravo page
+    if params[:completed]
+      @show_completion = true
+      return render :show
+    end
+
+    # 3. Subject already completed (re-entry) → relecture mode
     if @session_record.subject_completed?
       @parts = all_parts
       @relecture_mode = true
       return render :show
     end
 
-    # 3. All parts completed + unanswered questions → unanswered page
+    # 4. All parts completed + unanswered questions → unanswered page
     if @session_record.all_parts_completed?
       unanswered = @session_record.unanswered_questions
       if unanswered.any?
@@ -44,7 +50,7 @@ class Student::SubjectsController < Student::BaseController
         @parts = all_parts
         return render :show
       else
-        # 4. All parts completed + all answered → completion page
+        # 5. All parts completed + all answered → completion page
         @show_completion = true
         return render :show
       end
@@ -111,7 +117,7 @@ class Student::SubjectsController < Student::BaseController
     @session_record = current_student.student_sessions.find_by!(subject: @subject)
     @session_record.mark_subject_completed!
 
-    redirect_to student_subject_path(access_code: params[:access_code], id: @subject.id)
+    redirect_to student_subject_path(access_code: params[:access_code], id: @subject.id, completed: true)
   end
 
   private
