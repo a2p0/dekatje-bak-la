@@ -154,7 +154,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       expect(page).to have_content("Partie commune transport")
       expect(page).to have_content("Termine")
       # Specific part should NOT be marked as terminated
-      specific_row = find("div", text: "Partie specifique SIN")
+      specific_row = find("[data-part-id='#{specific_part.id}']")
       expect(specific_row).not_to have_content("Termine")
     end
   end
