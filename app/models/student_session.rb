@@ -26,7 +26,7 @@ class StudentSession < ApplicationRecord
   end
 
   def answered_count
-    progression.count { |_k, v| v["answered"] == true }
+    progression.count { |_k, v| v.is_a?(Hash) && v["answered"] == true }
   end
 
   def first_undone_question(part)
@@ -38,7 +38,7 @@ class StudentSession < ApplicationRecord
 
   def mark_part_completed!(part_id)
     progression["parts_completed"] ||= []
-    progression["parts_completed"] |= [part_id]
+    progression["parts_completed"] |= [ part_id ]
     update!(last_activity_at: Time.current)
   end
 
