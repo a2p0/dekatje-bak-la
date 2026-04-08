@@ -53,6 +53,8 @@ Rails.application.routes.draw do
     get "/subjects",                                to: "student/subjects#index",    as: :root
     get   "/subjects/:id",                            to: "student/subjects#show",     as: :subject
     patch "/subjects/:id/set_scope",                   to: "student/subjects#set_scope", as: :set_scope_subject
+    patch "/subjects/:id/complete_part/:part_id",      to: "student/subjects#complete_part", as: :complete_part_subject
+    patch "/subjects/:id/complete",                    to: "student/subjects#complete",      as: :complete_subject
     get "/subjects/:subject_id/questions/:id",      to: "student/questions#show",    as: :question
     patch "/subjects/:subject_id/questions/:id/reveal", to: "student/questions#reveal", as: :reveal_question
     get   "/settings",          to: "student/settings#show",     as: :settings

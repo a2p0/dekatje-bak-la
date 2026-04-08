@@ -34,6 +34,50 @@ class StudentSession < ApplicationRecord
     questions.detect { |q| !answered?(q.id) } || questions.first
   end
 
+  # Part completion tracking
+
+  def mark_part_completed!(part_id)
+    progression["parts_completed"] ||= []
+    progression["parts_completed"] |= [part_id]
+    update!(last_activity_at: Time.current)
+  end
+
+  def part_completed?(part_id)
+    Array(progression["parts_completed"]).include?(part_id)
+  end
+
+  def all_parts_completed?
+    completed = Array(progression["parts_completed"])
+    filtered_parts.pluck(:id).all? { |id| completed.include?(id) }
+  end
+
+  # Subject completion tracking
+
+  def subject_completed?
+    progression["completed_at"].present?
+  end
+
+  def mark_subject_completed!
+    progression["completed_at"] = Time.current.iso8601
+    update!(last_activity_at: Time.current)
+  end
+
+  # Specific presentation tracking
+
+  def specific_presentation_seen?
+    progression["specific_presentation_seen"] == true
+  end
+
+  def mark_specific_presentation_seen!
+    progression["specific_presentation_seen"] = true
+    update!(last_activity_at: Time.current)
+  end
+
+  # Returns questions from filtered parts that haven't been answered
+  def unanswered_questions
+    filtered_questions.reject { |q| answered?(q.id) }
+  end
+
   # Tutor state helpers
 
   def question_step(question_id)
