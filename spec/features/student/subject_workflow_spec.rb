@@ -141,7 +141,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Should be back on subject page with completion badge
       expect(page).to have_current_path(student_subject_path(access_code: classroom.access_code, id: subject_record.id))
-      expect(page).to have_css("[data-part-completed]", minimum: 1)
+      expect(page).to have_content("Termine")
     end
 
     scenario "completed part shows visual badge on subject page" do
@@ -151,9 +151,11 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_button "Fin de la partie"
 
       # Should see completion indicator for common part
-      within("[data-part-id='#{common_part.id}']") do
-        expect(page).to have_content("Termine")
-      end
+      expect(page).to have_content("Partie commune transport")
+      expect(page).to have_content("Termine")
+      # Specific part should NOT be marked as terminated
+      specific_row = find("div", text: "Partie specifique SIN")
+      expect(specific_row).not_to have_content("Termine")
     end
   end
 
@@ -168,6 +170,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_button "Fin de la partie"
 
       # Now start specific part
+      expect(page).to have_content("PARTIES DU SUJET")
       click_link "Commencer"
 
       # Should see specific presentation
@@ -183,7 +186,8 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_link "Question suivante"
       click_button "Fin de la partie"
 
-      # Start specific part — should go directly to question
+      # Start specific part — should go directly to question (no specific presentation)
+      expect(page).to have_content("PARTIES DU SUJET")
       click_link "Commencer"
 
       expect(page).to have_content("Question specifique reseau")
@@ -201,8 +205,10 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_button "Fin de la partie"
 
       # Complete specific part without answering
-      click_link "Commencer"  # specific presentation
-      click_link "Commencer"  # start questions
+      expect(page).to have_content("PARTIES DU SUJET")
+      click_link "Commencer"
+      expect(page).to have_content("Presentation specifique SIN.")
+      click_link "Commencer"
       click_link "Question suivante"
       click_button "Fin de la partie"
 
@@ -220,7 +226,9 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_link "Question suivante"
       click_button "Fin de la partie"
 
+      expect(page).to have_content("PARTIES DU SUJET")
       click_link "Commencer"
+      expect(page).to have_content("Presentation specifique SIN.")
       click_link "Commencer"
       click_link "Question suivante"
       click_button "Fin de la partie"
@@ -249,7 +257,9 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_button "Fin de la partie"
 
       # Specific presentation
+      expect(page).to have_content("PARTIES DU SUJET")
       click_link "Commencer"
+      expect(page).to have_content("Presentation specifique SIN.")
       click_link "Commencer"
 
       # Answer specific q1
@@ -275,12 +285,15 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_link "Question suivante"
       click_button "Fin de la partie"
 
+      expect(page).to have_content("PARTIES DU SUJET")
       click_link "Commencer"
+      expect(page).to have_content("Presentation specifique SIN.")
       click_link "Commencer"
       click_link "Question suivante"
       click_button "Fin de la partie"
 
       # On unanswered page, click Terminer
+      expect(page).to have_content("Questions non repondues")
       click_button "Terminer le sujet"
 
       expect(page).to have_content("Bravo")
@@ -294,11 +307,14 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_link "Question suivante"
       click_button "Fin de la partie"
 
+      expect(page).to have_content("PARTIES DU SUJET")
       click_link "Commencer"
+      expect(page).to have_content("Presentation specifique SIN.")
       click_link "Commencer"
       click_link "Question suivante"
       click_button "Fin de la partie"
 
+      expect(page).to have_content("Questions non repondues")
       click_button "Terminer le sujet"
 
       # Re-enter the subject

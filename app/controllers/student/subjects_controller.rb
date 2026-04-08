@@ -56,14 +56,17 @@ class Student::SubjectsController < Student::BaseController
       end
     end
 
-    # 5. First visit (no progress) → mise en situation + parts list
-    if params[:start].blank? && @session_record.answered_count.zero? && !@session_record.progression["parts_completed"]&.any?
+    # 5. Parts list — first visit OR returning after completing a part (but not all)
+    has_completed_parts = @session_record.progression["parts_completed"]&.any?
+    first_visit = @session_record.answered_count.zero? && !has_completed_parts
+    returning_from_part = has_completed_parts && params[:start].blank?
+    if (first_visit || returning_from_part) && !@session_record.all_parts_completed?
       @parts = all_parts
       @first_question = first_incomplete_part_question(all_parts)
       return render :show
     end
 
-    # 6. Specific part next + specific presentation not seen
+    # 6. Specific part next + specific presentation not seen (when user clicks Commencer)
     if should_show_specific_presentation?(all_parts)
       @show_specific_presentation = true
       @parts = all_parts

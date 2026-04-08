@@ -126,12 +126,21 @@ end %>
     <div class="text-center">
       <%
         first_q = @first_question
-        unless first_q
-          incomplete_part = @parts&.find { |p| !@session_record.part_completed?(p.id) } || @parts&.first
-          first_q = incomplete_part&.questions&.kept&.order(:position)&.first
-        end
+        incomplete_part = @parts&.find { |p| !@session_record.part_completed?(p.id) }
+        incomplete_part ||= @parts&.first
+        first_q ||= incomplete_part&.questions&.kept&.order(:position)&.first
+
+        # Route through subject#show if specific presentation needs to be shown
+        needs_specific_presentation = incomplete_part&.section_type == "specific" &&
+          @subject.specific_presentation.present? &&
+          !@session_record.specific_presentation_seen?
       %>
-      <% if first_q %>
+      <% if needs_specific_presentation %>
+        <%= link_to student_subject_path(access_code: params[:access_code], id: @subject.id, start: true),
+            class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" do %>
+          Commencer
+        <% end %>
+      <% elsif first_q %>
         <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: first_q.id),
             class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" do %>
           Commencer
