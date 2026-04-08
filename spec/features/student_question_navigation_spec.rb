@@ -122,7 +122,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     visit_question(q2)
 
     expect(page).not_to have_link("Question suivante")
-    click_link "Fin de la partie"
+    click_button "Fin de la partie"
 
     # Redirects to subject page
     expect(page).to have_current_path(student_subject_path(access_code: classroom.access_code, id: subject.id))

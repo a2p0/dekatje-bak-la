@@ -127,7 +127,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       expect(page).to have_content("Deuxieme question commune")
 
       # Should show "Fin de la partie" instead of "Question suivante"
-      expect(page).to have_link("Fin de la partie")
+      expect(page).to have_button("Fin de la partie")
       expect(page).not_to have_link("Question suivante")
     end
 
@@ -137,7 +137,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Go to last question
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Should be back on subject page with completion badge
       expect(page).to have_current_path(student_subject_path(access_code: classroom.access_code, id: subject_record.id))
@@ -148,7 +148,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Should see completion indicator for common part
       within("[data-part-id='#{common_part.id}']") do
@@ -165,7 +165,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Now start specific part
       click_link "Commencer"
@@ -181,7 +181,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Start specific part — should go directly to question
       click_link "Commencer"
@@ -198,32 +198,32 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Complete specific part without answering
       click_link "Commencer"  # specific presentation
       click_link "Commencer"  # start questions
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Should see unanswered questions page
       expect(page).to have_content("Questions non repondues")
       expect(page).to have_content("Question commune transport durable")
       expect(page).to have_content("Question specifique reseau")
       expect(page).to have_link("Revenir a cette question", minimum: 1)
-      expect(page).to have_link("Terminer le sujet")
+      expect(page).to have_button("Terminer le sujet")
     end
 
     scenario "'Revenir a cette question' opens question, 'Question suivante' returns to unanswered page" do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       click_link "Commencer"
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Click on first unanswered question
       first(:link, "Revenir a cette question").click
@@ -246,7 +246,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Answer q2
       click_button "Voir la correction"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Specific presentation
       click_link "Commencer"
@@ -258,7 +258,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Answer specific q2
       click_button "Voir la correction"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # Should go directly to completion page
       expect(page).to have_content("Bravo")
@@ -273,15 +273,15 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       click_link "Commencer"
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       # On unanswered page, click Terminer
-      click_link "Terminer le sujet"
+      click_button "Terminer le sujet"
 
       expect(page).to have_content("Bravo")
       expect(page).to have_link("Revenir aux sujets")
@@ -292,14 +292,14 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
       click_link "Commencer"
       click_link "Commencer"
       click_link "Question suivante"
-      click_link "Fin de la partie"
+      click_button "Fin de la partie"
 
-      click_link "Terminer le sujet"
+      click_button "Terminer le sujet"
 
       # Re-enter the subject
       visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)

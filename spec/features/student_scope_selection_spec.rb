@@ -135,7 +135,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
     # Last question in common scope — should show "Fin de la partie" not another question
     expect(page).not_to have_link("Question suivante")
-    expect(page).to have_link("Fin de la partie")
+    expect(page).to have_button("Fin de la partie")
   end
 
   scenario "student chooses 'Sujet complet' and sees all questions" do

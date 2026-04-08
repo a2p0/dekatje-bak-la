@@ -18,8 +18,8 @@
 </div>
 
 <div class="text-center">
-  <%= link_to "Terminer le sujet",
+  <%= button_to "Terminer le sujet",
       student_complete_subject_path(access_code: access_code, id: subject.id),
-      data: { turbo_method: :patch },
-      class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+      method: :patch,
+      class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold border-0 cursor-pointer hover:bg-emerald-700 transition-colors" %>
 </div>
