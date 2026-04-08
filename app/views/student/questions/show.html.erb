@@ -154,13 +154,20 @@ end %>
         <span></span>
       <% end %>
 
-      <% if next_q %>
+      <% if params[:from] == "review" %>
+        <%# Coming from unanswered questions page — "Question suivante" goes back to review %>
+        <%= link_to "Question suivante →",
+            student_subject_path(access_code: params[:access_code], id: @subject.id),
+            class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+      <% elsif next_q %>
         <%= link_to "Question suivante →",
             student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_q.id),
             class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
       <% else %>
-        <%= link_to "Retour aux sujets",
-            student_root_path(access_code: params[:access_code]),
+        <%# Last question in part — "Fin de la partie" %>
+        <%= link_to "Fin de la partie",
+            student_complete_part_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id),
+            data: { turbo_method: :patch },
             class: "inline-flex items-center px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
       <% end %>
     </div>
