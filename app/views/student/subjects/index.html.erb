@@ -48,7 +48,7 @@ end %>
               <%= subject.title %>
             </h3>
             <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
-              <%= subject.exam_type&.upcase %> <%= subject.year %>
+              <%= subject.exam&.upcase %> <%= subject.year %>
             </p>
             <%= render(ProgressBarComponent.new(current: answered, total: total, show_text: true)) %>
           <% end %>

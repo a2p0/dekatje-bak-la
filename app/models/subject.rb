@@ -1,6 +1,6 @@
 class Subject < ApplicationRecord
   belongs_to :owner, class_name: "User"
-  belongs_to :exam_session, optional: true
+  belongs_to :exam_session
   has_one :extraction_job, dependent: :destroy
   has_many :parts, dependent: :destroy
   has_many :classroom_subjects, dependent: :destroy
@@ -18,12 +18,12 @@ class Subject < ApplicationRecord
   has_one_attached :dr_corrige_file
   has_one_attached :questions_corrigees_file
 
-  enum :exam_type, { bac: 0, bts: 1, autre: 2 }
   enum :specialty, { tronc_commun: 0, SIN: 1, ITEC: 2, EE: 3, AC: 4 }
-  enum :region,    { metropole: 0, drom_com: 1, polynesie: 2, candidat_libre: 3 }
   enum :status,    { draft: 0, pending_validation: 1, published: 2, archived: 3 }
 
-  validates :title, :year, :exam_type, :specialty, :region, presence: true
+  delegate :title, :year, :exam, :region, :common_presentation, :variante, to: :exam_session
+
+  validates :specialty, presence: true
 
   validate :required_files_attached
 
@@ -31,10 +31,6 @@ class Subject < ApplicationRecord
 
   def new_format?
     subject_pdf.attached?
-  end
-
-  def effective_presentation_text
-    exam_session&.presentation_text || presentation_text
   end
 
   def all_parts

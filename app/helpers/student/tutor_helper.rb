@@ -22,7 +22,7 @@ module Student::TutorHelper
     options << [ "dt", "Document Technique (DT)" ] if subject.dt_file.attached?
     options << [ "dr", "Document Réponse (DR)" ] if subject.dr_vierge_file.attached?
     options << [ "enonce", "Énoncé de la question" ]
-    options << [ "mise_en_situation", "Mise en situation" ] if subject.presentation_text.present?
+    options << [ "mise_en_situation", "Mise en situation" ] if subject.common_presentation.present?
     options
   end
 end
