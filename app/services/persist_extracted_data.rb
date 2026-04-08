@@ -14,12 +14,16 @@ class PersistExtractedData
       metadata = data["metadata"] || {}
       subject.update_column(:code, metadata["code"]) if metadata["code"].present?
 
-      if metadata["variante"].present? && exam_session.variante.blank?
+      if metadata["variante"].present?
         exam_session.update!(variante: metadata["variante"])
       end
 
-      if metadata["region"].present? && exam_session.region.blank?
+      if metadata["region"].present?
         exam_session.update!(region: metadata["region"])
+      end
+
+      if metadata["exam"].present?
+        exam_session.update!(exam: metadata["exam"])
       end
 
       subject.update_column(:status, Subject.statuses[:pending_validation])

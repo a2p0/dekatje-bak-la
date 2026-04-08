@@ -56,8 +56,52 @@ RSpec.describe BuildExtractionPrompt do
       expect(result[:system]).to include("metadata")
     end
 
-    it "system prompt defines presentation key in the JSON schema" do
-      expect(result[:system]).to include("presentation")
+    it "system prompt defines common_presentation key in the JSON schema" do
+      expect(result[:system]).to include("common_presentation")
+    end
+
+    it "system prompt defines specific_presentation key in the JSON schema" do
+      expect(result[:system]).to include("specific_presentation")
+    end
+
+    it "system prompt does NOT use the old 'presentation' key at top level" do
+      system = result[:system]
+      # The JSON schema should use common_presentation/specific_presentation, not bare "presentation"
+      expect(system).not_to match(/"presentation"\s*:/)
+    end
+
+    # --- System prompt: metadata fields ---
+
+    it "system prompt defines metadata.code in the JSON schema" do
+      expect(result[:system]).to include('"code"')
+    end
+
+    it "system prompt defines metadata.region in the JSON schema" do
+      system = result[:system]
+      expect(system).to include('"region"')
+    end
+
+    it "system prompt defines metadata.variante in the JSON schema" do
+      system = result[:system]
+      expect(system).to include('"variante"')
+    end
+
+    it "system prompt uses metadata.exam (not exam_type)" do
+      system = result[:system]
+      # The JSON schema should use "exam", not "exam_type"
+      expect(system).not_to match(/"exam_type"\s*:/)
+      expect(system).to match(/"exam"\s*:/)
+    end
+
+    it "system prompt documents year as a string" do
+      system = result[:system]
+      expect(system).to match(/"year"\s*:\s*"/)
+    end
+
+    it "system prompt explains the subject code format" do
+      system = result[:system]
+      expect(system).to include("code")
+      expect(system).to include("OBLIGATOIRE")
     end
 
     # --- System prompt: verbatim rule ---
@@ -68,7 +112,7 @@ RSpec.describe BuildExtractionPrompt do
 
     it "system prompt lists verbatim fields" do
       system = result[:system]
-      %w[presentation label context correction].each do |field|
+      %w[common_presentation specific_presentation label context correction].each do |field|
         expect(system).to include(field), "expected system prompt to mention verbatim field '#{field}'"
       end
     end
