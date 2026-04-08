@@ -108,7 +108,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     click_link "Commencer"
 
     # "Commencer" leads to the mise en situation page — click through to questions
-    click_link "Commencer les questions"
+    click_link "Commencer"
 
     # On desktop viewport (1400px), sidebar is always visible (lg:translate-x-0)
     within("aside") do

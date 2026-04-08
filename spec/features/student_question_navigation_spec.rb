@@ -122,9 +122,10 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     visit_question(q2)
 
     expect(page).not_to have_link("Question suivante")
-    click_link "Retour aux sujets"
+    click_link "Fin de la partie"
 
-    expect(page).to have_content("Mes sujets")
+    # Redirects to subject page
+    expect(page).to have_current_path(student_subject_path(access_code: classroom.access_code, id: subject.id))
   end
 
   scenario "cliquer sur une autre question dans la sidebar redirige vers cette question" do
@@ -149,7 +150,7 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
 
     # Subject#show displays the mise en situation page (first visit, no answers yet)
     # The "Commencer les questions" link only appears on the subject show page
-    expect(page).to have_link("Commencer les questions")
+    expect(page).to have_link("Commencer")
   end
 
   scenario "un lien DT s'ouvre dans un nouvel onglet" do
