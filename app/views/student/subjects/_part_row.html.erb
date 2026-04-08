@@ -1,0 +1,19 @@
+<div class="flex items-start justify-between py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
+     data-part-id="<%= part.id %>"
+     data-part-completed="<%= session_record.part_completed?(part.id) %>">
+  <div class="flex-1">
+    <div class="flex items-center gap-2">
+      <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Partie <%= part.number %></span>
+      <span class="text-sm text-slate-500 dark:text-slate-400">— <%= part.title %></span>
+      <% if session_record.part_completed?(part.id) %>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+          Termine
+        </span>
+      <% end %>
+    </div>
+    <% if part.objective_text.present? %>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5 ml-0"><%= part.objective_text %></p>
+    <% end %>
+  </div>
+  <span class="text-xs text-slate-400 whitespace-nowrap ml-3"><%= part.questions.kept.count %> questions</span>
+</div>

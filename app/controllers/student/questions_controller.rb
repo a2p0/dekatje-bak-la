@@ -10,6 +10,11 @@ class Student::QuestionsController < Student::BaseController
     @questions_in_part = @part.questions.kept.where(id: filtered_question_ids).order(:position)
     @session_record.mark_seen!(@question.id)
 
+    # Mark specific presentation as seen (from specific presentation page link)
+    if params[:mark_specific_seen]
+      @session_record.mark_specific_presentation_seen!
+    end
+
     # Load existing conversation for this question (if any)
     @conversation = current_student.conversations.find_by(question: @question)
 

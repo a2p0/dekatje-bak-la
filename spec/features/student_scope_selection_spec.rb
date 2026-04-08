@@ -124,7 +124,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
     # Should redirect to mise en situation, then start questions
     expect(page).to have_content("MISE EN SITUATION")
-    click_link "Commencer les questions"
+    click_link "Commencer"
 
     # Should see common question
     expect(page).to have_content("Question commune sur le transport durable")
@@ -133,9 +133,9 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     click_link "Question suivante"
     expect(page).to have_content("Deuxieme question commune")
 
-    # Last question in common scope — should show "Retour aux sujets" not another question
+    # Last question in common scope — should show "Fin de la partie" not another question
     expect(page).not_to have_link("Question suivante")
-    expect(page).to have_link("Retour aux sujets")
+    expect(page).to have_button("Fin de la partie")
   end
 
   scenario "student chooses 'Sujet complet' and sees all questions" do
@@ -148,7 +148,7 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     expect(page).to have_content("Partie commune transport")
     expect(page).to have_content("Partie specifique SIN")
 
-    click_link "Commencer les questions"
+    click_link "Commencer"
 
     # Should see first common question
     expect(page).to have_content("Question commune sur le transport durable")
@@ -162,9 +162,9 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     # Should go directly to mise en situation, no scope selection
     expect(page).not_to have_content("Choisissez votre perimetre de travail")
     expect(page).to have_content("MISE EN SITUATION")
-    expect(page).to have_link("Commencer les questions")
+    expect(page).to have_link("Commencer")
 
-    click_link "Commencer les questions"
+    click_link "Commencer"
     expect(page).to have_content("Question du sujet legacy")
   end
 
