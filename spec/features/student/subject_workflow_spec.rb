@@ -139,12 +139,13 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
-      # Common part is marked completed
-      session = student.student_sessions.find_by!(subject: subject_record)
-      expect(session.part_completed?(common_part.id)).to be true
-
-      # And we are routed directly to the specific presentation (since specific_presentation is set)
+      # Routed directly to the specific presentation (since specific_presentation is set)
       expect(page).to have_content("Presentation specifique SIN.")
+
+      # And the common part is marked completed in the session record
+      session = StudentSession.where(student_id: student.id, subject_id: subject_record.id).first
+      expect(session).to be_present
+      expect(session.part_completed?(common_part.id)).to be true
     end
 
     scenario "completed common part shows visual badge when returning to subject page" do
