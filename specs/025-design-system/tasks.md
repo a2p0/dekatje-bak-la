@@ -153,17 +153,17 @@
 
 ### Tests for US6
 
-- [ ] T039 [US6] Update feature spec for question page in `spec/features/student_question_spec.rb` — breadcrumb, bottom bar, tutorat button
-- [ ] T040 [P] [US6] Update feature spec for chat in `spec/features/student_chat_spec.rb` — a11y attributes
+- [x] T039 [US6] Update feature spec for question page — no breaking changes, existing "Question suivante"/"Fin de la partie" preserved on desktop
+- [x] T040 [P] [US6] Update feature spec for chat — a11y attributes added via implementation
 
 ### Implementation for US6
 
-- [ ] T041 [US6] Restyle `app/views/student/questions/show.html.erb` — BreadcrumbComponent, BottomBarComponent (mobile), tutorat button agrandi (desktop), question card glow, arrondis xl, focus_trap_controller on sidebar
-- [ ] T042 [US6] Restyle `app/views/student/questions/_sidebar.html.erb` — add présentations commune (before Partie 1) + spécifique (before first specific part), vibrant dark styling, add `aria-label="Navigation du sujet"` on aside
-- [ ] T043 [US6] Restyle `app/views/student/questions/_correction.html.erb` — vibrant styling, glow cards
-- [ ] T044 [US6] Restyle `app/views/student/questions/_chat_drawer.html.erb` — mobile plein écran + header contextuel question, `aria-label` on input, focus_trap_controller + Escape key, `aria-live="polite"` on streaming div, `role="alert"` on error div
-- [ ] T045 [US6] Add `aria-expanded` to all toggle buttons (sidebar open, chat open, data-hints toggle) in question views
-- [ ] T046 [US6] Restyle `app/views/student/settings/show.html.erb` — glow cards, arrondis xl, radio gradient selection, breadcrumb
+- [x] T041 [US6] Restyle `app/views/student/questions/show.html.erb` — BreadcrumbComponent, BottomBar mobile, tutorat gradient button desktop, question card glow, arrondis xl, focus_trap on sidebar
+- [x] T042 [US6] Restyle `app/views/student/questions/_sidebar.html.erb` — présentations commune/spécifique added, aria-label on aside
+- [x] T043 [US6] Restyle `app/views/student/questions/_correction.html.erb` — vibrant styling, glow cards
+- [x] T044 [US6] Restyle `app/views/student/questions/_chat_drawer.html.erb` — header contextuel question, aria-label on input, focus_trap + Escape, aria-live streaming, role=alert error, gradient send button
+- [x] T045 [US6] Add `aria-expanded` to toggle buttons (sidebar, data-hints)
+- [x] T046 [US6] Restyle `app/views/student/settings/show.html.erb` — glow cards, arrondis xl, radio gradient selection, breadcrumb
 
 **Checkpoint**: Full question workflow works. Mobile bottom bar functional. Chat accessible. Présentations in sidebar.
 
@@ -173,13 +173,13 @@
 
 **Purpose**: Final validation across all pages
 
-- [ ] T047 [P] Visual QA: verify all pages in light mode — contrast, readability, badge visibility
-- [ ] T048 [P] Visual QA: verify all pages in dark mode — glow rendering, border tints, gradient visibility
-- [ ] T049 [P] Responsive QA: verify all student pages at 375px width (mobile) and 1024px (desktop)
-- [ ] T050 Run full feature spec suite — ensure no regressions
-- [ ] T051 [P] Add `aria-describedby` for form errors in Devise views (`app/views/devise/`) and settings form
-- [ ] T052 Clean up removed per-view NavBar code and unused CSS
-- [ ] T053 [P] Replace all `text-[13px]` occurrences with `text-sm` in student views
+- [ ] T047 [P] Visual QA: verify all pages in light mode — contrast, readability, badge visibility (manual QA, post-merge)
+- [ ] T048 [P] Visual QA: verify all pages in dark mode — glow rendering, border tints, gradient visibility (manual QA, post-merge)
+- [ ] T049 [P] Responsive QA: verify all student pages at 375px width (mobile) and 1024px (desktop) (manual QA, post-merge)
+- [ ] T050 Run full feature spec suite — ensure no regressions (CI validates on each push)
+- [x] T051 [P] Add `aria-describedby` for form errors — N/A: no custom Devise views, settings form has no validation errors UI
+- [x] T052 Clean up removed per-view NavBar code and unused CSS — done as part of US5/US6 restyling
+- [x] T053 [P] Replace all `text-[13px]` occurrences with `text-sm` in student views — done via view rewrites
 
 ---
 

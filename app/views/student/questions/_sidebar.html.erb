@@ -1,4 +1,4 @@
-<%# Sidebar content — documents, then parts/questions, then settings %>
+<%# Sidebar content — documents, presentations, parts/questions, settings %>
 <div class="p-4">
 
   <%# Documents %>
@@ -52,6 +52,34 @@
     <% end %>
   <% end %>
 
+  <%# Context — presentations (commune before Partie 1, specifique before first specific part) %>
+  <% has_common_presentation = subject.common_presentation.present? %>
+  <% has_specific_presentation = subject.specific_presentation.present? %>
+  <% if has_common_presentation || has_specific_presentation %>
+    <p class="text-slate-500 text-[10px] uppercase tracking-wide mb-2">Contexte</p>
+    <% if has_common_presentation %>
+      <%= link_to student_subject_path(access_code: access_code, id: subject.id),
+          class: "flex items-center gap-1.5 text-slate-400 text-xs my-1 no-underline hover:text-indigo-300 transition-colors" do %>
+        <span>📋</span>
+        <span>Présentation commune</span>
+      <% end %>
+    <% end %>
+    <% if has_specific_presentation %>
+      <%
+        first_specific = parts.order(:position).find { |p| p.section_type == "specific" }
+        specific_q = first_specific&.questions&.kept&.order(:position)&.first
+      %>
+      <% if specific_q %>
+        <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: specific_q.id, show_specific_presentation: true),
+            class: "flex items-center gap-1.5 text-slate-400 text-xs my-1 no-underline hover:text-indigo-300 transition-colors" do %>
+          <span>📋</span>
+          <span>Présentation spécifique</span>
+        <% end %>
+      <% end %>
+    <% end %>
+    <hr class="border-slate-700 my-3">
+  <% end %>
+
   <%# All parts in order — active part shows questions %>
   <% parts.order(:position).each do |p| %>
     <% is_active = p == current_part %>
@@ -67,7 +95,7 @@
         <% answered = session_record.answered?(q.id) %>
         <% is_current = q == current_question %>
         <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: q.id),
-            class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
+            class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded-lg text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
             data: { action: "click->sidebar#close" } do %>
           <% if answered %>
             <span class="text-emerald-400 text-[10px]">✓</span>
@@ -81,7 +109,7 @@
       <% end %>
     <% else %>
       <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: p.id),
-          class: "flex items-center justify-between px-2 py-1.5 mt-2 my-0.5 rounded text-xs text-slate-400 no-underline hover:bg-slate-800 hover:text-slate-200 transition-colors",
+          class: "flex items-center justify-between px-2 py-1.5 mt-2 my-0.5 rounded-lg text-xs text-slate-400 no-underline hover:bg-slate-800 hover:text-slate-200 transition-colors",
           data: { action: "click->sidebar#close" } do %>
         <span>Partie <%= p.number %></span>
         <span class="text-slate-600 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
@@ -92,7 +120,7 @@
   <hr class="border-slate-700 my-3">
 
   <%= link_to student_settings_path(access_code: access_code),
-      class: "flex items-center gap-1.5 text-slate-500 text-xs no-underline px-2 py-1.5 rounded hover:text-slate-300 hover:bg-slate-800 transition-colors" do %>
+      class: "flex items-center gap-1.5 text-slate-400 text-xs no-underline px-2 py-1.5 rounded-lg hover:text-slate-200 hover:bg-slate-800 transition-colors" do %>
     <span>⚙</span>
     <span>Réglages</span>
   <% end %>
