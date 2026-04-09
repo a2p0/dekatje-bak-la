@@ -18,7 +18,7 @@
         <%
           session_record = current_student.student_sessions.find_by(subject: subject)
           total = subject.total_questions_count
-          answered = session_record ? session_record.progression.count { |_k, v| v["answered"] } : 0
+          answered = session_record ? session_record.answered_count : 0
           matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
         %>
         <%= render(CardComponent.new(variant: :glow)) do |card|
