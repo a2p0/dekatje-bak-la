@@ -14,7 +14,16 @@
               elsif next_q
                 student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_q.id)
               end
-  next_label = next_q ? "Q#{next_q.number}" : "Suivante"
+
+  # End-of-part button: "Partie suivante" (intermediate) or "Fin de la partie ..." (section terminal)
+  parts_in_section = @parts.select { |p| p.section_type == @part.section_type }
+  part_idx_in_section = parts_in_section.index(@part)
+  next_part_in_section = part_idx_in_section && parts_in_section[part_idx_in_section + 1]
+  next_part_first_question = next_part_in_section&.questions&.kept&.order(:position)&.first
+
+  section_label = @part.section_type == "specific" ? "spécifique" : "commune"
+  end_of_part_label = next_part_in_section ? "Partie suivante →" : "Fin de la partie #{section_label}"
+  end_of_part_mobile_label = next_part_in_section ? "Partie suivante →" : "Fin partie →"
 %>
 
 <div data-controller="sidebar chat"
@@ -186,8 +195,14 @@
         <%= link_to "Question suivante →",
             next_href,
             class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+      <% elsif next_part_in_section && next_part_first_question %>
+        <%# Last question of an intermediate part → go to first question of next part in same section %>
+        <%= link_to end_of_part_label,
+            student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_part_first_question.id),
+            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
       <% else %>
-        <%= button_to "Fin de la partie",
+        <%# Last question of the last part in its section → mark part done and route to other section %>
+        <%= button_to end_of_part_label,
             student_complete_part_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id),
             method: :patch,
             class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold border-0 cursor-pointer hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
@@ -220,9 +235,14 @@
           class: "flex-1 min-w-0 text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate no-underline" do %>
         <%= next_q ? "Q#{next_q.number}" : (params[:from] == 'review' ? "Retour" : "Suivante") %> &rarr;
       <% end %>
+    <% elsif next_part_in_section && next_part_first_question %>
+      <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_part_first_question.id),
+          class: "flex-1 min-w-0 text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate no-underline" do %>
+        <%= end_of_part_mobile_label %>
+      <% end %>
     <% else %>
       <div class="flex-1 min-w-0 text-right">
-        <%= button_to "Fin partie →",
+        <%= button_to end_of_part_mobile_label,
             student_complete_part_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id),
             method: :patch,
             class: "text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate border-0 bg-transparent cursor-pointer p-0" %>

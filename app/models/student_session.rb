@@ -78,6 +78,13 @@ class StudentSession < ApplicationRecord
     filtered_questions.reject { |q| answered?(q.id) }
   end
 
+  # Whether every part of a given section_type (within the student's scope) is marked completed
+  def section_completed?(section_type)
+    parts_in_section = filtered_parts.select { |p| p.section_type == section_type.to_s }
+    return false if parts_in_section.empty?
+    parts_in_section.all? { |p| part_completed?(p.id) }
+  end
+
   # Tutor state helpers
 
   def question_step(question_id)
