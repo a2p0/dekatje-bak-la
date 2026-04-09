@@ -129,20 +129,23 @@ class Student::SubjectsController < Student::BaseController
 
     target_first_question = target_parts.first.questions.kept.order(:position).first
 
-    if target_first_question && !@session_record.answered?(target_first_question.id)
-      # First question not answered → show the section's presentation
-      if target_section == "specific" && @subject.specific_presentation.present?
-        return redirect_to student_subject_path(
-          access_code: params[:access_code],
-          id: @subject.id,
-          start: true
-        )
-      else
-        return redirect_to student_subject_path(access_code: params[:access_code], id: @subject.id)
-      end
+    # If the target section's first question hasn't been answered yet and that
+    # section has a presentation page, route through it (subject#show will render
+    # the specific or common presentation as appropriate). Otherwise jump straight
+    # to the first unanswered question of the target section.
+    show_presentation = target_first_question &&
+                        !@session_record.answered?(target_first_question.id) &&
+                        target_section == "specific" &&
+                        @subject.specific_presentation.present?
+
+    if show_presentation
+      return redirect_to student_subject_path(
+        access_code: params[:access_code],
+        id: @subject.id,
+        start: true
+      )
     end
 
-    # Otherwise jump to the first unanswered question in the target section
     first_unanswered = target_parts
       .flat_map { |p| p.questions.kept.order(:position).to_a }
       .detect { |q| !@session_record.answered?(q.id) }
