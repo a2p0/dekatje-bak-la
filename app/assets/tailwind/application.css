@@ -26,12 +26,12 @@
   --radius-input: 0.75rem;
   --radius-pill: 9999px;
 
-  /* Z-index scale */
-  --z-sidebar: 30;
-  --z-bottom-bar: 35;
+  /* Z-index scale — drawers/modals must be ABOVE their backdrops */
+  --z-bottom-bar: 30;
   --z-backdrop: 40;
-  --z-chat-drawer: 45;
-  --z-modal: 50;
+  --z-sidebar: 50;
+  --z-chat-drawer: 50;
+  --z-modal: 60;
 
   /* Transitions */
   --transition-fast: 150ms ease;
