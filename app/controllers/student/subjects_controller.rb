@@ -108,7 +108,7 @@ class Student::SubjectsController < Student::BaseController
     end
 
     @session_record = current_student.student_sessions.find_by!(subject: @subject)
-    completed_part = @subject.parts.kept.find_by(id: params[:part_id])
+    completed_part = Part.find_by(id: params[:part_id])
     @session_record.mark_part_completed!(params[:part_id].to_i)
 
     # If every filtered part is completed, defer to subject#show which handles
