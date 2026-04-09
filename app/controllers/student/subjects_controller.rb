@@ -57,10 +57,11 @@ class Student::SubjectsController < Student::BaseController
     end
 
     # 5. Parts list — first visit OR returning after completing a part (but not all)
+    # Bypass this step if the user explicitly requested a part (e.g. clicking a sidebar link)
     has_completed_parts = @session_record.progression["parts_completed"]&.any?
     first_visit = @session_record.answered_count.zero? && !has_completed_parts
     returning_from_part = has_completed_parts && params[:start].blank?
-    if (first_visit || returning_from_part) && !@session_record.all_parts_completed?
+    if (first_visit || returning_from_part) && !@session_record.all_parts_completed? && params[:part_id].blank?
       @parts = all_parts
       @first_question = first_incomplete_part_question(all_parts)
       return render :show
