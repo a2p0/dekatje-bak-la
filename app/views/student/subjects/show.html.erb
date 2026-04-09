@@ -1,13 +1,4 @@
-<%= render(NavBarComponent.new) do |nav|
-  nav.with_brand { "DekatjeBakLa" }
-  nav.with_actions do
-    render(ThemeToggleComponent.new) +
-    link_to("← Mes sujets", student_root_path(access_code: params[:access_code]),
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
-  end
-end %>
-
-<main class="max-w-3xl mx-auto px-4 py-8">
+<div class="max-w-3xl mx-auto px-4 py-8">
   <%# Subject title %>
   <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2"><%= @subject.title %></h1>
   <div class="flex flex-wrap gap-1.5 mb-6">
@@ -148,4 +139,4 @@ end %>
       <% end %>
     </div>
   <% end %>
-</main>
+</div>

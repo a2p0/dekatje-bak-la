@@ -1,4 +1,6 @@
 class Student::BaseController < ApplicationController
+  layout "student"
+
   before_action :require_student_auth
   before_action :set_classroom_from_url
 

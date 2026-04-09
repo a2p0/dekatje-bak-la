@@ -1,16 +1,4 @@
-<%= render(NavBarComponent.new) do |nav|
-  nav.with_brand { "DekatjeBakLa" }
-  nav.with_actions do
-    render(ThemeToggleComponent.new) +
-    link_to("⚙ Réglages", student_settings_path(access_code: params[:access_code]),
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5") +
-    link_to("Déconnexion", student_session_path(access_code: params[:access_code]),
-      data: { turbo_method: :delete },
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
-  end
-end %>
-
-<main class="max-w-5xl mx-auto px-4 py-8">
+<div class="max-w-5xl mx-auto px-4 py-8">
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Mes sujets</h1>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -64,4 +52,4 @@ end %>
       <% end %>
     </div>
   <% end %>
-</main>
+</div>

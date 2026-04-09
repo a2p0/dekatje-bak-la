@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark">
   <head>
-    <title><%= content_for(:title) || "Dekatje Bak La" %></title>
+    <title><%= content_for(:title) || "DekatjeBakLa" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Dekatje Bak La">
+    <meta name="application-name" content="DekatjeBakLa">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -34,6 +34,19 @@
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen"
         data-controller="theme">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:m-2">Aller au contenu</a>
+
+    <%= render(NavBarComponent.new) do |nav|
+      nav.with_brand { "DekatjeBakLa" }
+      nav.with_actions do
+        render(ThemeToggleComponent.new) +
+        link_to("⚙ Réglages", student_settings_path(access_code: params[:access_code]),
+          class: "text-sm text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5") +
+        link_to("Déconnexion", student_session_path(access_code: params[:access_code]),
+          data: { turbo_method: :delete },
+          class: "text-sm text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
+      end
+    end %>
+
     <div aria-live="polite" role="status">
       <% if notice.present? %>
         <div class="max-w-4xl mx-auto mt-4 px-4">
@@ -46,6 +59,7 @@
         </div>
       <% end %>
     </div>
+
     <main id="main-content">
       <%= yield %>
     </main>

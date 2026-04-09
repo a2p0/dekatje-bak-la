@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark">
+<html lang="fr" class="dark">
   <head>
     <title>DekatjeBakLa — Espace enseignant</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -23,6 +23,7 @@
 
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen"
         data-controller="theme">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:m-2">Aller au contenu</a>
     <%= render(NavBarComponent.new) do |nav|
       nav.with_brand { link_to "DekatjeBakLa", teacher_root_path, class: "text-base font-semibold text-slate-800 dark:text-slate-200 no-underline" }
       nav.with_link(href: teacher_root_path, label: "Mes classes")
@@ -34,17 +35,19 @@
       end
     end %>
 
-    <main class="max-w-6xl mx-auto px-4 py-6">
-      <% if notice.present? %>
-        <div class="mb-4">
-          <%= render(FlashComponent.new(type: :notice, message: notice)) %>
-        </div>
-      <% end %>
-      <% if alert.present? %>
-        <div class="mb-4">
-          <%= render(FlashComponent.new(type: :alert, message: alert)) %>
-        </div>
-      <% end %>
+    <main id="main-content" class="max-w-6xl mx-auto px-4 py-6">
+      <div aria-live="polite" role="status">
+        <% if notice.present? %>
+          <div class="mb-4">
+            <%= render(FlashComponent.new(type: :notice, message: notice)) %>
+          </div>
+        <% end %>
+        <% if alert.present? %>
+          <div class="mb-4">
+            <%= render(FlashComponent.new(type: :alert, message: alert)) %>
+          </div>
+        <% end %>
+      </div>
       <%= yield %>
     </main>
   </body>
