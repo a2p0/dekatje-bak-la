@@ -57,11 +57,13 @@ class Student::SubjectsController < Student::BaseController
     end
 
     # 5. Parts list — first visit OR returning after completing a part (but not all)
-    # Bypass this step if the user explicitly requested a part (e.g. clicking a sidebar link)
+    # Bypass this step if the user explicitly requested a part (sidebar link)
+    # or clicked "Commencer" (start=true), which should fall through to step 6/7.
     has_completed_parts = @session_record.progression["parts_completed"]&.any?
     first_visit = @session_record.answered_count.zero? && !has_completed_parts
     returning_from_part = has_completed_parts && params[:start].blank?
-    if (first_visit || returning_from_part) && !@session_record.all_parts_completed? && params[:part_id].blank?
+    explicit_navigation = params[:part_id].present? || params[:start].present?
+    if (first_visit || returning_from_part) && !@session_record.all_parts_completed? && !explicit_navigation
       @parts = all_parts
       @first_question = first_incomplete_part_question(all_parts)
       return render :show
