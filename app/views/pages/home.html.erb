@@ -1,46 +1,135 @@
-<div class="min-h-screen flex items-center justify-center px-4">
-  <div class="max-w-md w-full text-center">
-    <div class="fixed top-4 right-4">
-      <%= render(ThemeToggleComponent.new) %>
-    </div>
+<div class="min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+  <%# Subtle radial glow %>
+  <div aria-hidden="true" class="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(99,102,241,0.18),transparent_70%)]"></div>
 
-    <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">DekatjeBakLa</h1>
-    <p class="text-slate-500 dark:text-slate-400 mb-10">Entraînement aux examens BAC</p>
+  <%# Top nav: brand + theme toggle %>
+  <nav class="relative z-10 flex items-center justify-between px-4 py-4 sm:px-8 sm:py-6">
+    <span class="text-base sm:text-lg font-bold bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+      DekatjeBakLa
+    </span>
+    <%= render(ThemeToggleComponent.new) %>
+  </nav>
 
-    <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-4">Espace élève</h2>
+  <%# Hero section %>
+  <section class="relative z-10 max-w-2xl mx-auto px-4 pt-8 pb-16 text-center">
+    <h1 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-3 leading-tight">
+      Prépare ton <span class="bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent">BAC</span>
+    </h1>
+    <p class="text-base text-slate-600 dark:text-slate-400 mb-10 max-w-md mx-auto">
+      Entraîne-toi sur des sujets réels avec un tuteur IA qui te guide pas à pas.
+    </p>
 
-    <%= form_tag nil, method: :get, id: "student-access-form" do %>
-      <div class="flex gap-2 justify-center items-center">
-        <label for="access_code" class="sr-only">Code d'accès</label>
-        <%= text_field_tag :access_code, nil,
-            placeholder: "Code de la classe",
-            id: "access_code",
-            class: "px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500" %>
-        <%= render(ButtonComponent.new(variant: :success, pill: true, type: "submit")) { "Accéder" } %>
+    <%# Unified access card %>
+    <div class="max-w-md mx-auto bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 shadow-sm dark:shadow-[0_0_25px_rgba(99,102,241,0.08)] backdrop-blur-sm">
+      <%# Élève %>
+      <div class="text-left">
+        <p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">Élève</p>
+        <%= form_tag nil, method: :get, id: "student-access-form" do %>
+          <div class="flex gap-2">
+            <label for="access_code" class="sr-only">Code d'accès</label>
+            <%= text_field_tag :access_code, nil,
+                placeholder: "Code de ta classe...",
+                id: "access_code",
+                class: "flex-1 px-4 py-3 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+            <%= render(ButtonComponent.new(variant: :gradient, size: :md, type: "submit")) { "Go !" } %>
+          </div>
+        <% end %>
+        <p class="text-xs text-slate-500 dark:text-slate-500 mt-2">Ton enseignant t'a donné un code d'accès.</p>
       </div>
-    <% end %>
 
-    <script>
-      document.getElementById("student-access-form").addEventListener("submit", function(e) {
-        e.preventDefault();
-        var code = this.querySelector("[name='access_code']").value.trim();
-        if (code) {
-          window.location.href = "/" + encodeURIComponent(code);
-        }
-      });
-    </script>
+      <%# Divider %>
+      <div class="border-t border-slate-200 dark:border-slate-700/40 my-5"></div>
 
-    <hr class="border-slate-200 dark:border-slate-700 my-10">
-
-    <%= render(ButtonComponent.new(variant: :ghost, href: new_user_session_path)) { "Espace enseignant →" } %>
-
-    <div class="mt-16 text-xs text-slate-400 dark:text-slate-500 space-y-1">
-      <p>DekatjeBakLa — Martinique</p>
-      <p>
-        <%= link_to "Mentions légales", legal_path, class: "hover:text-emerald-600 dark:hover:text-emerald-400 underline" %>
-        ·
-        <%= link_to "Confidentialité", privacy_path, class: "hover:text-emerald-600 dark:hover:text-emerald-400 underline" %>
-      </p>
+      <%# Enseignant %>
+      <div class="text-left">
+        <p class="text-xs font-semibold text-slate-600 dark:text-slate-500 uppercase tracking-wider mb-2">Enseignant</p>
+        <%= link_to new_user_session_path,
+            class: "block w-full text-center bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-4 py-3 rounded-xl text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-500/15 transition-colors no-underline" do %>
+          Connexion enseignant &rarr;
+        <% end %>
+      </div>
     </div>
-  </div>
+
+    <%# Scroll hint %>
+    <p class="mt-12 text-xs text-slate-400 dark:text-slate-600">
+      &darr; Découvrir l'app
+    </p>
+  </section>
+
+  <%# Below the fold: features then workflow %>
+  <section class="relative z-10 max-w-5xl mx-auto px-4 py-16 sm:py-24">
+    <%# Features grid %>
+    <div class="mb-20">
+      <h2 class="text-center text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-3">
+        Pourquoi DekatjeBakLa ?
+      </h2>
+      <p class="text-center text-slate-600 dark:text-slate-400 mb-12 max-w-xl mx-auto">
+        Une plateforme pensée pour les lycéens martiniquais qui veulent réussir leur BAC.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-6 text-center">
+          <div class="text-3xl mb-3">📚</div>
+          <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">Sujets BAC réels</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Des annales d'examens réels, sélectionnées par ton enseignant.</p>
+        </div>
+        <div class="bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-6 text-center">
+          <div class="text-3xl mb-3">🤖</div>
+          <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">Tuteur IA personnalisé</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Une IA qui te guide pas à pas, sans jamais te donner la réponse directement.</p>
+        </div>
+        <div class="bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-6 text-center">
+          <div class="text-3xl mb-3">📈</div>
+          <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">Suivi de progression</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Reprends là où tu t'étais arrêté, à ton rythme.</p>
+        </div>
+      </div>
+    </div>
+
+    <%# Workflow steps %>
+    <div>
+      <h2 class="text-center text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-3">
+        Comment ça marche ?
+      </h2>
+      <p class="text-center text-slate-600 dark:text-slate-400 mb-12 max-w-xl mx-auto">
+        Trois étapes simples, et tu commences ton entraînement.
+      </p>
+      <ol class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <li class="relative bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-6">
+          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white font-bold text-sm mb-3">1</div>
+          <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">L'enseignant crée la classe</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Il génère un code d'accès et te le donne (sans email, sans inscription).</p>
+        </li>
+        <li class="relative bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-6">
+          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white font-bold text-sm mb-3">2</div>
+          <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">Tu te connectes et t'entraînes</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Avec ton code, tu accèdes aux sujets BAC de ta spécialité.</p>
+        </li>
+        <li class="relative bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-6">
+          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white font-bold text-sm mb-3">3</div>
+          <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-2">Le tuteur IA te guide</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Bloqué sur une question ? L'IA t'aide à trouver, pas à recopier.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <%# Footer %>
+  <footer class="relative z-10 max-w-5xl mx-auto px-4 py-8 text-center border-t border-slate-200 dark:border-slate-800/50">
+    <p class="text-xs text-slate-500 dark:text-slate-500 mb-2">DekatjeBakLa — Martinique</p>
+    <p class="text-xs text-slate-500 dark:text-slate-500">
+      <%= link_to "Mentions légales", legal_path, class: "hover:text-indigo-600 dark:hover:text-indigo-400 underline" %>
+      &middot;
+      <%= link_to "Confidentialité", privacy_path, class: "hover:text-indigo-600 dark:hover:text-indigo-400 underline" %>
+    </p>
+  </footer>
+
+  <script>
+    document.getElementById("student-access-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var code = this.querySelector("[name='access_code']").value.trim();
+      if (code) {
+        window.location.href = "/" + encodeURIComponent(code);
+      }
+    });
+  </script>
 </div>

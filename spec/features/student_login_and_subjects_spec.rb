@@ -21,7 +21,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     click_button "Se connecter"
 
     expect(page).to have_content("Bienvenue, Marie")
-    expect(page).to have_content("Mes sujets")
+    expect(page).to have_content("Salut Marie")
   end
 
   scenario "un élève tente de se connecter avec des identifiants incorrects" do
@@ -117,7 +117,7 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     fill_in "Mot de passe", with: "password123"
     click_button "Se connecter"
 
-    expect(page).to have_content("Mes sujets")
+    expect(page).to have_content("Salut #{student.first_name}")
 
     # The logout link uses data-turbo-method="delete".
     # Turbo JS may not intercept in headless Chrome; submit a DELETE form via JS.

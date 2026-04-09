@@ -4,7 +4,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
   scenario "un visiteur voit un lien connexion enseignant et un champ code d'accès élève sur la page d'accueil" do
     visit root_path
 
-    expect(page).to have_link("Espace enseignant →")
+    expect(page).to have_link("Connexion enseignant →")
     expect(page).to have_field("Code d'accès")
   end
 

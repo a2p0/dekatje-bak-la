@@ -141,7 +141,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Should be back on subject page with completion badge
       expect(page).to have_current_path(student_subject_path(access_code: classroom.access_code, id: subject_record.id))
-      expect(page).to have_content("Termine")
+      expect(page).to have_content("Terminé")
     end
 
     scenario "completed part shows visual badge on subject page" do
@@ -152,10 +152,10 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Should see completion indicator for common part
       expect(page).to have_content("Partie commune transport")
-      expect(page).to have_content("Termine")
+      expect(page).to have_content("Terminé")
       # Specific part should NOT be marked as terminated
       specific_row = find("[data-part-id='#{specific_part.id}']")
-      expect(specific_row).not_to have_content("Termine")
+      expect(specific_row).not_to have_content("Terminé")
     end
   end
 

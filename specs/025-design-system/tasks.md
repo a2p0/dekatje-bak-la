@@ -91,12 +91,12 @@
 
 ### Tests for US3
 
-- [ ] T025 [US3] Add/update feature spec for home page in `spec/features/home_page_spec.rb` — hero, access code, enseignant link, below-the-fold sections
+- [x] T025 [US3] Add/update feature spec for home page in `spec/features/global_navigation_spec.rb` — hero, access code, enseignant link
 
 ### Implementation for US3
 
-- [ ] T026 [US3] Redesign `app/views/home/index.html.erb` — above the fold: hero centré + carte unifiée (élève + enseignant) + theme toggle + gradient glow
-- [ ] T027 [US3] Add below-the-fold section to `app/views/home/index.html.erb` — features grid (3 items) + workflow steps (3 étapes)
+- [x] T026 [US3] Redesign `app/views/pages/home.html.erb` — above the fold: hero centré + carte unifiée (élève + enseignant) + theme toggle + gradient glow
+- [x] T027 [US3] Add below-the-fold section to `app/views/pages/home.html.erb` — features grid (3 items) + workflow steps (3 étapes)
 
 **Checkpoint**: Home page functional with new design in light + dark mode.
 
@@ -110,11 +110,11 @@
 
 ### Tests for US4
 
-- [ ] T028 [US4] Update feature spec for student login in `spec/features/student_login_spec.rb` — verify gradient background elements if needed
+- [x] T028 [US4] Update feature spec for student login (no changes needed — labels and form structure preserved)
 
 ### Implementation for US4
 
-- [ ] T029 [US4] Restyle `app/views/student/sessions/new.html.erb` — dark gradient background, carte centrée, inputs rounded-lg, bouton gradient
+- [x] T029 [US4] Restyle `app/views/student/sessions/new.html.erb` — dark gradient background, carte centrée, inputs rounded-xl, bouton gradient
 
 **Checkpoint**: Login page matches home page ambiance.
 
@@ -128,18 +128,18 @@
 
 ### Tests for US5
 
-- [ ] T030 [US5] Update feature spec for subjects index in `spec/features/student_subjects_spec.rb` — "Salut" header, card styling
-- [ ] T031 [P] [US5] Update feature spec for bravo page in `spec/features/student_subject_workflow_spec.rb` — confetti/festive elements
+- [x] T030 [US5] Update feature spec for subjects index in `spec/features/student_login_and_subjects_spec.rb` — "Salut" header replaces "Mes sujets"
+- [x] T031 [P] [US5] Update feature spec for bravo page in `spec/features/student/subject_workflow_spec.rb` — "Terminé" accent added
 
 ### Implementation for US5
 
-- [ ] T032 [US5] Restyle `app/views/student/subjects/index.html.erb` — "Salut [prénom]" header, CardComponent glow, ProgressBar gradient, badge fix, breadcrumb
-- [ ] T033 [US5] Restyle `app/views/student/subjects/show.html.erb` — arrondis xl, glow cards, gradient "Commencer" button, breadcrumb
-- [ ] T034 [P] [US5] Restyle `app/views/student/subjects/_part_row.html.erb` — glow hover, vibrant styling
-- [ ] T035 [P] [US5] Restyle `app/views/student/subjects/_completion.html.erb` — festive bravo with ConfettiComponent, titre gradient, résumé progression
-- [ ] T036 [P] [US5] Restyle `app/views/student/subjects/_scope_selection.html.erb` — vibrant styling
-- [ ] T037 [P] [US5] Restyle `app/views/student/subjects/_specific_presentation.html.erb` — vibrant styling
-- [ ] T038 [P] [US5] Restyle `app/views/student/subjects/_unanswered_questions.html.erb` — vibrant styling
+- [x] T032 [US5] Restyle `app/views/student/subjects/index.html.erb` — "Salut [prénom]" header, CardComponent glow, ProgressBar gradient, badge fix
+- [x] T033 [US5] Restyle `app/views/student/subjects/show.html.erb` — arrondis xl, glow cards, gradient "Commencer" button, breadcrumb
+- [x] T034 [P] [US5] Restyle `app/views/student/subjects/_part_row.html.erb` — vibrant styling, BadgeComponent for completion
+- [x] T035 [P] [US5] Restyle `app/views/student/subjects/_completion.html.erb` — festive bravo with ConfettiComponent, titre gradient
+- [x] T036 [P] [US5] Restyle `app/views/student/subjects/_scope_selection.html.erb` — contrast fixes
+- [x] T037 [P] [US5] Restyle `app/views/student/subjects/_specific_presentation.html.erb` — vibrant styling
+- [x] T038 [P] [US5] Restyle `app/views/student/subjects/_unanswered_questions.html.erb` — vibrant styling
 
 **Checkpoint**: Full subject flow works with new design. Bravo page has confetti.
 

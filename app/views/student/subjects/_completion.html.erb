@@ -1,8 +1,16 @@
-<div class="text-center py-16">
-  <div class="text-6xl mb-6">🎉</div>
-  <h2 class="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-4">Bravo !!</h2>
-  <p class="text-slate-500 dark:text-slate-400 mb-8">Vous avez termine ce sujet.</p>
-  <%= link_to "Revenir aux sujets",
-      student_root_path(access_code: access_code),
-      class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" %>
+<div class="text-center py-16 relative">
+  <%# Confetti trigger (respects prefers-reduced-motion) %>
+  <%= render(ConfettiComponent.new) %>
+
+  <div class="text-6xl mb-6" aria-hidden="true">🎉</div>
+  <h2 class="text-3xl sm:text-5xl font-bold mb-4">
+    <span class="bg-gradient-to-br from-indigo-500 via-violet-500 to-emerald-500 bg-clip-text text-transparent">Bravo !!</span>
+  </h2>
+  <p class="text-slate-700 dark:text-slate-300 mb-8 text-base">Vous avez termine ce sujet.</p>
+  <%= render(ButtonComponent.new(
+    variant: :gradient,
+    size: :lg,
+    pill: true,
+    href: student_root_path(access_code: access_code)
+  )) { "Revenir aux sujets" } %>
 </div>
