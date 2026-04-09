@@ -33,7 +33,8 @@
   </div>
 
   <%# Sidebar / Drawer — stays dark in both modes %>
-  <aside data-sidebar-target="drawer"
+  <aside id="sidebar-drawer"
+         data-sidebar-target="drawer"
          data-controller="focus-trap"
          data-action="focus-trap:close->sidebar#close"
          aria-label="Navigation du sujet"
@@ -66,6 +67,7 @@
     <%# Progress bar row %>
     <div class="flex items-center gap-2.5 mb-4">
       <button data-action="click->sidebar#open"
+              data-sidebar-target="toggle"
               aria-label="Ouvrir le menu"
               aria-expanded="false"
               aria-controls="sidebar-drawer"
@@ -80,7 +82,10 @@
       </div>
       <%# Tutorat button — larger on desktop with gradient %>
       <button data-action="click->chat#open"
+              data-chat-target="toggle"
               aria-label="Ouvrir le tutorat IA"
+              aria-expanded="false"
+              aria-controls="chat-drawer"
               class="hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]">
         💬 Tutorat
       </button>
@@ -197,7 +202,10 @@
     <% end %>
 
     <button data-action="click->chat#open"
+            data-chat-target="toggle"
             aria-label="Ouvrir le tutorat IA"
+            aria-expanded="false"
+            aria-controls="chat-drawer"
             class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(99,102,241,0.3)]">
       💬 Tutorat
     </button>

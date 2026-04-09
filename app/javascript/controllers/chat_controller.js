@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 import { createConsumer } from "@rails/actioncable"
 
 export default class extends Controller {
-  static targets = ["drawer", "backdrop", "messages", "streaming", "error", "input", "sendButton"]
+  static targets = ["drawer", "backdrop", "messages", "streaming", "error", "input", "sendButton", "toggle"]
   static values = {
     createUrl: String,
     messageUrl: String,
@@ -17,6 +17,7 @@ export default class extends Controller {
     this.consumer = null
     this.subscription = null
     this.isStreaming = false
+    this.previouslyFocused = null
     this.element.dataset.chatConnected = "true"
 
     if (this.conversationIdValue) {
@@ -36,9 +37,11 @@ export default class extends Controller {
       return
     }
 
+    this.previouslyFocused = document.activeElement
     this.drawerTarget.classList.remove("translate-x-full")
     this.drawerTarget.classList.add("translate-x-0")
     this.backdropTarget.classList.remove("hidden")
+    this.updateToggles(true)
 
     if (!this.conversationIdValue) {
       this.createConversation()
@@ -52,6 +55,18 @@ export default class extends Controller {
     this.drawerTarget.classList.add("translate-x-full")
     this.drawerTarget.classList.remove("translate-x-0")
     this.backdropTarget.classList.add("hidden")
+    this.updateToggles(false)
+
+    if (this.previouslyFocused && typeof this.previouslyFocused.focus === "function") {
+      this.previouslyFocused.focus()
+      this.previouslyFocused = null
+    }
+  }
+
+  updateToggles(isOpen) {
+    this.toggleTargets.forEach(el => {
+      el.setAttribute("aria-expanded", String(isOpen))
+    })
   }
 
   openWithMessage(event) {
