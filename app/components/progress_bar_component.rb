@@ -1,7 +1,8 @@
 class ProgressBarComponent < ViewComponent::Base
   COLORS = {
     indigo: "bg-indigo-500",
-    emerald: "bg-emerald-500"
+    emerald: "bg-emerald-500",
+    gradient: "bg-gradient-to-r from-indigo-500 to-violet-500"
   }.freeze
 
   def initialize(current:, total:, color: :indigo, show_text: false)

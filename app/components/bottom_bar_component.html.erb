@@ -1,0 +1,25 @@
+<div class="lg:hidden fixed bottom-0 left-0 right-0 z-[var(--z-bottom-bar)] bg-white/95 dark:bg-slate-900/95 border-t border-slate-200 dark:border-indigo-500/15 backdrop-blur-sm px-4 py-3 flex items-center gap-3">
+  <% if @prev_href %>
+    <%= link_to @prev_href,
+        class: "flex-1 min-w-0 text-left text-sm text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 truncate no-underline" do %>
+      &larr; <%= @prev_label || "Précédent" %>
+    <% end %>
+  <% else %>
+    <span class="flex-1"></span>
+  <% end %>
+
+  <% if center? %>
+    <div class="flex-shrink-0">
+      <%= center %>
+    </div>
+  <% end %>
+
+  <% if @next_href %>
+    <%= link_to @next_href,
+        class: "flex-1 min-w-0 text-right text-sm font-semibold truncate no-underline #{@next_variant == :gradient ? 'bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent' : 'text-emerald-600 dark:text-emerald-400'}" do %>
+      <%= @next_label || "Suivant" %> &rarr;
+    <% end %>
+  <% else %>
+    <span class="flex-1"></span>
+  <% end %>
+</div>

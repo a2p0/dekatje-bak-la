@@ -1,0 +1,21 @@
+<nav aria-label="Fil d'Ariane" class="text-xs">
+  <ol class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+    <% @items.each_with_index do |item, index| %>
+      <% is_last = index == @items.length - 1 %>
+      <li class="flex items-center gap-1.5 min-w-0">
+        <% if item[:href] && !is_last %>
+          <%= link_to item[:label], item[:href],
+              class: "hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate" %>
+        <% else %>
+          <span class="text-slate-700 dark:text-slate-200 font-medium truncate"
+                <%= 'aria-current="page"'.html_safe if is_last %>>
+            <%= item[:label] %>
+          </span>
+        <% end %>
+        <% unless is_last %>
+          <span class="text-slate-300 dark:text-slate-600" aria-hidden="true">&rsaquo;</span>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</nav>

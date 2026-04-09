@@ -49,8 +49,8 @@
 - [x] T011 Create `focus_trap_controller.js` in `app/javascript/controllers/` — trap Tab/Shift+Tab, Escape dispatches `close` event. Define targets/values contract for sidebar, chat, modal integration
 - [x] T011b [P] Add `prefers-reduced-motion` CSS reset in `app/assets/tailwind/application.css` — disable transitions/glow/transforms for users who request reduced motion
 - [x] T012 Update all student controllers to use `layout "student"` and remove per-view NavBar rendering — **except** `SessionsController` (login stays on `application` layout)
-- [ ] T013a Update existing feature specs (student subjects/settings) to match new student layout
-- [ ] T013b [P] Update existing feature specs (student questions/chat/sidebar) to match new student layout
+- [x] T013a Update existing feature specs (student subjects/settings) to match new student layout (no changes needed — CI green)
+- [x] T013b [P] Update existing feature specs (student questions/chat/sidebar) to match new student layout (no changes needed — CI green)
 
 **Checkpoint**: Foundation ready — font loads, tokens defined, student layout works, a11y base in place, specs green
 
@@ -64,20 +64,20 @@
 
 ### Tests for US2
 
-- [ ] T014 [P] [US2] Add feature spec for BreadcrumbComponent rendering in `spec/features/components/breadcrumb_spec.rb`
-- [ ] T015 [P] [US2] Add feature spec for BottomBarComponent rendering in `spec/features/components/bottom_bar_spec.rb`
+- [x] T014 [P] [US2] Add feature spec for BreadcrumbComponent rendering in `spec/components/breadcrumb_component_spec.rb`
+- [x] T015 [P] [US2] Add feature spec for BottomBarComponent rendering in `spec/components/bottom_bar_component_spec.rb`
 
 ### Implementation for US2
 
-- [ ] T016 [P] [US2] Fix BadgeComponent light/dark styles in `app/components/badge_component.rb` — light: `bg-{color}-100 text-{color}-700`, dark: `bg-{color}-500/15 text-{color}-400`
-- [ ] T017 [P] [US2] Add `:gradient` variant to ButtonComponent in `app/components/button_component.rb` — indigo→violet gradient + glow shadow; hover darkens 10%, focus-visible ring, disabled desaturates
-- [ ] T018 [P] [US2] Add `:glow` variant to CardComponent in `app/components/card_component.rb` — border-indigo + box-shadow glow in dark
-- [ ] T019 [P] [US2] Add `:gradient` color option to ProgressBarComponent in `app/components/progress_bar_component.rb`
-- [ ] T020 [US2] Fix ModalComponent in `app/components/modal_component.rb` — add focus_trap_controller, Escape key, close button, `aria-labelledby`
-- [ ] T021 [US2] Add breadcrumb slot to NavBarComponent in `app/components/nav_bar_component.rb`
-- [ ] T022 [US2] Create BreadcrumbComponent in `app/components/breadcrumb_component.rb` — `items: [{label, href}]`, `<nav aria-label="Fil d'Ariane">` wrapper, `aria-current="page"` on last item
-- [ ] T023 [US2] Create BottomBarComponent in `app/components/bottom_bar_component.rb` — prev/next links + tutorat button, mobile only
-- [ ] T024 [US2] Create ConfettiComponent in `app/components/confetti_component.rb` + `app/javascript/controllers/confetti_controller.js` — check `prefers-reduced-motion` before firing
+- [x] T016 [P] [US2] Fix BadgeComponent light/dark styles in `app/components/badge_component.rb` — light: `bg-{color}-100 text-{color}-700`, dark: `bg-{color}-500/15 text-{color}-400`
+- [x] T017 [P] [US2] Add `:gradient` variant to ButtonComponent in `app/components/button_component.rb` — indigo→violet gradient + glow shadow; hover darkens 10%, focus-visible ring, disabled desaturates
+- [x] T018 [P] [US2] Add `:glow` variant to CardComponent in `app/components/card_component.rb` — border-indigo + box-shadow glow in dark
+- [x] T019 [P] [US2] Add `:gradient` color option to ProgressBarComponent in `app/components/progress_bar_component.rb`
+- [x] T020 [US2] Fix ModalComponent in `app/components/modal_component.rb` — add focus_trap_controller, Escape key, close button, `aria-labelledby`
+- [x] T021 [US2] Add breadcrumb slot to NavBarComponent in `app/components/nav_bar_component.rb`
+- [x] T022 [US2] Create BreadcrumbComponent in `app/components/breadcrumb_component.rb` — `items: [{label, href}]`, `<nav aria-label="Fil d'Ariane">` wrapper, `aria-current="page"` on last item
+- [x] T023 [US2] Create BottomBarComponent in `app/components/bottom_bar_component.rb` — prev/next links + tutorat button, mobile only
+- [x] T024 [US2] Create ConfettiComponent in `app/components/confetti_component.rb` + `app/javascript/controllers/confetti_controller.js` — check `prefers-reduced-motion` before firing
 
 **Checkpoint**: All components ready. Badge readable in light mode, gradient buttons work, glow cards render, breadcrumb and bottom bar exist.
 

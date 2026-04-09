@@ -1,19 +1,18 @@
-<div class="bg-white border border-slate-200 shadow-sm rounded-lg overflow-hidden
-            dark:bg-slate-800 dark:border-slate-700 dark:shadow-none">
+<div class="<%= card_classes %>">
   <% if header? %>
-    <div class="px-4 py-3">
+    <div class="px-5 py-4">
       <%= header %>
     </div>
   <% end %>
 
   <% if body? %>
-    <div class="px-4 py-3">
+    <div class="px-5 py-4">
       <%= body %>
     </div>
   <% end %>
 
   <% if footer? %>
-    <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-3">
+    <div class="border-t border-slate-200 dark:border-slate-700/50 px-5 py-4">
       <%= footer %>
     </div>
   <% end %>
