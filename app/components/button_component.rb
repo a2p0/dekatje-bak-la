@@ -1,10 +1,17 @@
 class ButtonComponent < ViewComponent::Base
+  # Variants:
+  #   :primary  — vibrant gradient (indigo→violet + glow). Default, use for the main CTA of a page.
+  #   :success  — solid emerald. Use for "next" / "continue" secondary actions.
+  #   :ghost    — outline, low-emphasis. Use for cancel, back, or tertiary actions.
+  #   :gradient — alias of :primary (kept for backwards compatibility with views that pass :gradient explicitly).
   VARIANTS = {
-    primary: "bg-indigo-500 text-white hover:bg-indigo-600 focus-visible:ring-indigo-500 disabled:opacity-60",
+    primary: "bg-gradient-to-br from-indigo-500 to-violet-500 text-white hover:from-indigo-600 hover:to-violet-600 focus-visible:ring-indigo-500 shadow-[0_0_16px_rgba(99,102,241,0.3)] disabled:opacity-60 disabled:saturate-50 disabled:shadow-none",
     success: "bg-emerald-500 text-white hover:bg-emerald-600 focus-visible:ring-emerald-500 disabled:opacity-60",
-    ghost: "border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-slate-400 disabled:opacity-60",
-    gradient: "bg-gradient-to-br from-indigo-500 to-violet-500 text-white hover:from-indigo-600 hover:to-violet-600 focus-visible:ring-indigo-500 shadow-[0_0_16px_rgba(99,102,241,0.3)] disabled:opacity-60 disabled:saturate-50 disabled:shadow-none"
+    ghost: "border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-slate-400 disabled:opacity-60"
   }.freeze
+
+  # Views that pass variant: :gradient still work — it maps to :primary
+  VARIANTS[:gradient] = VARIANTS[:primary]
 
   SIZES = {
     sm: "px-3 py-1.5 text-xs",
