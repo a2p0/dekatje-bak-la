@@ -100,9 +100,14 @@
 
     <%# Question card (glow) %>
     <div class="bg-white/80 dark:bg-slate-900/60 rounded-2xl p-5 mb-4 border border-slate-200 dark:border-indigo-500/15 shadow-sm dark:shadow-[0_0_20px_rgba(99,102,241,0.05)]">
-      <div class="flex justify-between items-center mb-3">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
         <span class="text-indigo-600 dark:text-indigo-400 font-semibold text-sm">Question <%= @question.number %></span>
-        <%= render(BadgeComponent.new(color: :indigo, label: "#{@question.points} pts")) %>
+        <% Array(@question.dt_references).each do |dt_ref| %>
+          <%= render(BadgeComponent.new(color: :blue, label: dt_ref)) %>
+        <% end %>
+        <% Array(@question.dr_references).each do |dr_ref| %>
+          <%= render(BadgeComponent.new(color: :amber, label: dr_ref)) %>
+        <% end %>
       </div>
       <p class="text-slate-800 dark:text-slate-100 text-sm leading-relaxed mb-2"><%= @question.label %></p>
       <% if @question.context_text.present? %>
