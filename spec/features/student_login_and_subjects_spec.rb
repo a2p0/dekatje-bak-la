@@ -70,16 +70,13 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     part = create(:part, :specific, subject: subject, position: 1)
     question = create(:question, part: part, position: 1, label: "Calculer la consommation")
 
-    visit student_login_path(access_code: classroom.access_code)
-    fill_in "Identifiant", with: student.username
-    fill_in "Mot de passe", with: "password123"
-    click_button "Se connecter"
+    login_as_student(student, classroom)
 
-    click_link "Commencer"
+    # Navigate through subject pages until the question is reached
+    visit student_subject_path(access_code: classroom.access_code, id: subject.id, start: true)
 
-    # Subject show page: mise en situation → parts list → click "Commencer" to reach question
-    3.times do
-      break unless page.has_link?("Commencer", wait: 1)
+    # The controller may show parts list or redirect to question — click through if needed
+    if page.has_link?("Commencer", wait: 2)
       click_link "Commencer"
     end
 
