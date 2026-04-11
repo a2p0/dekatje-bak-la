@@ -85,7 +85,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     expect(page).to have_content("Où trouver les données ?")
     expect(page).to have_content("DT")
     expect(page).to have_content("tableau Consommation")
-    expect(page).to have_content("mise_en_situation")
+    expect(page).to have_content("Présentation")
     expect(page).to have_content("distance 186 km")
 
     # Key concepts (badges)

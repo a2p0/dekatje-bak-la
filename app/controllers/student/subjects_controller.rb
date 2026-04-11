@@ -79,6 +79,17 @@ class Student::SubjectsController < Student::BaseController
 
     # 7. Default → redirect to first undone question
     part = target_part(all_parts)
+
+    # 7a. If navigating to a specific part and presentation not seen, show it first
+    if part.section_type == "specific" &&
+       !@session_record.specific_presentation_seen? &&
+       @subject.specific_presentation.present?
+      @show_specific_presentation = true
+      @parts = all_parts
+      @first_specific_question = first_specific_question(all_parts)
+      return render :show
+    end
+
     question = @session_record.first_undone_question(part)
     redirect_to student_question_path(
       access_code: params[:access_code],
