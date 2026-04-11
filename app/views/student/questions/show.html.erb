@@ -151,29 +151,7 @@
               method: :patch,
               data: { turbo_frame: "question_#{@question.id}_correction" },
               class: "px-8 py-3 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm cursor-pointer hover:from-indigo-600 hover:to-violet-600 transition-all font-semibold shadow-[0_0_16px_rgba(99,102,241,0.3)]" %>
-          <% if @question.answer.data_hints.present? %>
-            <button type="button"
-                    class="text-amber-600 dark:text-amber-400 text-xs hover:text-amber-700 dark:hover:text-amber-300 cursor-pointer underline underline-offset-2"
-                    aria-expanded="false"
-                    aria-controls="data-hints-<%= @question.id %>"
-                    onclick="var el = document.getElementById('data-hints-<%= @question.id %>'); el.classList.toggle('hidden'); this.setAttribute('aria-expanded', !el.classList.contains('hidden'));">
-              Où trouver les données ?
-            </button>
-          <% end %>
         </div>
-        <% if @question.answer.data_hints.present? %>
-          <div id="data-hints-<%= @question.id %>" class="hidden mb-4 bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-amber-500/20 rounded-2xl px-4 py-3">
-            <p class="text-amber-700 dark:text-amber-400 font-semibold text-xs mb-2">Où trouver les données ?</p>
-            <div class="space-y-1.5">
-              <% @question.answer.data_hints.each do |hint| %>
-                <div class="flex items-center gap-2">
-                  <%= render(BadgeComponent.new(color: :amber, label: hint["source"])) %>
-                  <span class="text-xs text-slate-600 dark:text-slate-400"><%= hint["location"] %></span>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
       <% end %>
     <% end %>
 
