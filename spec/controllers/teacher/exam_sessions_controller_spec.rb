@@ -51,9 +51,8 @@ RSpec.describe Teacher::ExamSessionsController, type: :request do
       other_teacher = create(:user, :confirmed)
       other_session = create(:exam_session, owner: other_teacher)
 
-      expect {
-        delete teacher_exam_session_path(other_session)
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      delete teacher_exam_session_path(other_session)
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

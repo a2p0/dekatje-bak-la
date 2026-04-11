@@ -77,8 +77,11 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
 
     click_link "Commencer"
 
-    # "Commencer" leads to the mise en situation page — click through to questions
-    click_link "Commencer"
+    # Subject show page: mise en situation → parts list → click "Commencer" to reach question
+    3.times do
+      break unless page.has_link?("Commencer", wait: 1)
+      click_link "Commencer"
+    end
 
     expect(page).to have_content("Calculer la consommation")
   end
