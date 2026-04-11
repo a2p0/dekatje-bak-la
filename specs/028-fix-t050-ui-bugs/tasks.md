@@ -27,8 +27,8 @@
 
 **Purpose**: Create the helper used by all data hints rendering. Blocks US3, US4, US5.
 
-- [ ] T001 Create `app/helpers/student/data_hints_helper.rb` with `hint_source_label(source)` and `hint_badge_color(source)` methods
-- [ ] T002 Add unit specs in `spec/helpers/student/data_hints_helper_spec.rb` — test all source key translations and badge color mappings
+- [x] T001 Create `app/helpers/student/data_hints_helper.rb` with `hint_source_label(source)` and `hint_badge_color(source)` methods
+- [x] T002 Add unit specs in `spec/helpers/student/data_hints_helper_spec.rb` — test all source key translations and badge color mappings
 
 **Checkpoint**: Helper ready, unit specs green.
 
@@ -40,9 +40,9 @@
 
 **Independent Test**: Reveal a correction → data hints section is the first element visible.
 
-- [ ] T003 [US5] Move data hints section to the top of `app/views/student/questions/_correction.html.erb` (before the correction div). Use `hint_source_label` and `hint_badge_color` helpers for rendering.
-- [ ] T004 [US5] Remove pre-correction "Où trouver les données ?" collapsible from `app/views/student/questions/show.html.erb` (lines 154-176) and the standalone button (lines 155-161)
-- [ ] T005 [US5] Remove data hints collapsible from `app/views/student/questions/_correction_button.html.erb`
+- [x] T003 [US5] Move data hints section to the top of `app/views/student/questions/_correction.html.erb` (before the correction div). Use `hint_source_label` and `hint_badge_color` helpers for rendering.
+- [x] T004 [US5] Remove pre-correction "Où trouver les données ?" collapsible from `app/views/student/questions/show.html.erb` (lines 154-176) and the standalone button (lines 155-161)
+- [x] T005 [US5] Remove data hints collapsible from `app/views/student/questions/_correction_button.html.erb`
 
 **Checkpoint**: Correction shows data hints at top. No duplicate "Où trouver les données?" sections.
 
@@ -54,8 +54,8 @@
 
 **Independent Test**: View correction → badges show "Contexte" (not "question_context"), DT=blue, DR=amber.
 
-- [ ] T006 [US3] [US4] Verify `_correction.html.erb` uses `hint_source_label` and `hint_badge_color` (done in T003). If any other view renders data hints, update it too.
-- [ ] T007 [US3] [US4] Update `app/views/student/tutor/_spotting_feedback.html.erb` — use `hint_source_label` for missed source badges if applicable
+- [x] T006 [US3] [US4] Verify `_correction.html.erb` uses `hint_source_label` and `hint_badge_color` (done in T003). If any other view renders data hints, update it too.
+- [x] T007 [US3] [US4] Update `app/views/student/tutor/_spotting_feedback.html.erb` — use `hint_source_label` for missed source badges if applicable
 
 **Checkpoint**: All source labels are human-readable, all badge colors are consistent.
 
@@ -67,8 +67,8 @@
 
 **Independent Test**: Visit a question with context text → two distinct cards visible (context above, question below).
 
-- [ ] T008 [US2] Extract `context_text` from inside the question card in `app/views/student/questions/show.html.erb` (lines 122-124) and render it in a separate card above, with lighter styling and no question number. Only render if `context_text.present?`.
-- [ ] T009 [US2] Update feature specs in `spec/features/student_question_navigation_spec.rb` if selectors changed by the new DOM structure.
+- [x] T008 [US2] Extract `context_text` from inside the question card in `app/views/student/questions/show.html.erb` (lines 122-124) and render it in a separate card above, with lighter styling and no question number. Only render if `context_text.present?`.
+- [x] T009 [US2] Update feature specs in `spec/features/student_question_navigation_spec.rb` if selectors changed by the new DOM structure.
 
 **Checkpoint**: Context card visually distinct and above the question card.
 
@@ -80,8 +80,8 @@
 
 **Independent Test**: Start a subject with common + specific parts → first question is from the common section.
 
-- [ ] T010 [US1] Investigate `all_parts_for_subject` and `target_part` in `app/controllers/student/subjects_controller.rb` — verify common parts sort before specific parts. Fix if position values cause wrong ordering.
-- [ ] T011 [US1] Update/add feature spec in `spec/features/student/subject_workflow_spec.rb` to verify that starting a complete subject navigates to the first common question, not a specific one.
+- [x] T010 [US1] Investigate `all_parts_for_subject` and `target_part` in `app/controllers/student/subjects_controller.rb` — verify common parts sort before specific parts. Fix if position values cause wrong ordering.
+- [x] T011 [US1] Update/add feature spec in `spec/features/student/subject_workflow_spec.rb` to verify that starting a complete subject navigates to the first common question, not a specific one.
 
 **Checkpoint**: Subject always starts with the common section's first question.
 
@@ -93,9 +93,9 @@
 
 **Independent Test**: Complete common part → see specific presentation → then first specific question.
 
-- [ ] T012 [US6] In `app/controllers/student/subjects_controller.rb` step 7 (line 80-88), add check: if `target_part` returns a specific part and `specific_presentation_seen?` is false, redirect through the specific presentation flow instead of directly to the question.
-- [ ] T013 [US6] Verify that sidebar navigation to a specific part (with `part_id` param) also triggers the specific presentation check.
-- [ ] T014 [US6] Update/add feature spec in `spec/features/student/subject_workflow_spec.rb` to verify specific presentation is shown when transitioning to the specific section.
+- [x] T012 [US6] In `app/controllers/student/subjects_controller.rb` step 7 (line 80-88), add check: if `target_part` returns a specific part and `specific_presentation_seen?` is false, redirect through the specific presentation flow instead of directly to the question.
+- [x] T013 [US6] Verify that sidebar navigation to a specific part (with `part_id` param) also triggers the specific presentation check.
+- [x] T014 [US6] Update/add feature spec in `spec/features/student/subject_workflow_spec.rb` to verify specific presentation is shown when transitioning to the specific section.
 
 **Checkpoint**: Specific presentation always shown before first specific question.
 
@@ -105,7 +105,7 @@
 
 **Purpose**: Full regression check.
 
-- [ ] T015 Run `bundle exec rspec` — full spec suite, no regressions
+- [x] T015 Run `bundle exec rspec` — full spec suite, no regressions
 - [ ] T016 Manual QA: verify all 6 bugs are fixed (light + dark mode)
 
 ---
