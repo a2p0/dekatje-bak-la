@@ -17,11 +17,13 @@ export default class extends Controller {
     form.append("task_type", taskType)
     sources.forEach(s => form.append("sources[]", s))
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || ""
+
     fetch(this.verifyUrlValue, {
       method: "POST",
       body: form,
       headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "X-CSRF-Token": csrfToken,
         "Accept": "text/vnd.turbo-stream.html"
       }
     }).then(response => response.text())
@@ -29,10 +31,12 @@ export default class extends Controller {
   }
 
   skip() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || ""
+
     fetch(this.skipUrlValue, {
       method: "POST",
       headers: {
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "X-CSRF-Token": csrfToken,
         "Accept": "text/vnd.turbo-stream.html"
       }
     }).then(response => response.text())

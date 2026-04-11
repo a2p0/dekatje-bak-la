@@ -44,6 +44,7 @@ class Student::TutorController < Student::BaseController
     spotting_data = {
       "task_type_answer" => task_type_answer,
       "task_type_correct" => task_type_correct,
+      "task_type_expected" => @question.answer_type,
       "sources_answer" => sources_answer,
       "sources_correct" => correct_sources,
       "sources_missed" => missed_with_location,
@@ -66,11 +67,18 @@ class Student::TutorController < Student::BaseController
 
     @session_record.set_question_step!(@question.id, "skipped")
 
-    render turbo_stream: turbo_stream.replace(
-      "spotting_question_#{@question.id}",
-      partial: "student/tutor/spotting_skipped",
-      locals: { question: @question }
-    )
+    render turbo_stream: [
+      turbo_stream.replace(
+        "spotting_question_#{@question.id}",
+        partial: "student/tutor/spotting_skipped",
+        locals: { question: @question }
+      ),
+      turbo_stream.replace(
+        "question_#{@question.id}_correction",
+        partial: "student/questions/correction_button",
+        locals: { question: @question, subject: @subject, session_record: @session_record, access_code: params[:access_code] }
+      )
+    ]
   end
 
   private

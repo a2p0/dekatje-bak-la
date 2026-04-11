@@ -1,3 +1,4 @@
+<% spotting = spotting.with_indifferent_access if spotting.is_a?(Hash) %>
 <%= turbo_frame_tag "spotting_question_#{question.id}" do %>
   <div class="bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-500/30 rounded-lg p-5 mb-4">
     <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-4">Avant de répondre — résultats</p>
@@ -23,7 +24,7 @@
           <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/40">
             <span class="text-emerald-600 dark:text-emerald-400 font-bold text-sm">✓</span>
             <span class="text-sm text-emerald-700 dark:text-emerald-300">
-              Bonne réponse : <%= Student::TutorHelper::TASK_TYPE_LABELS[spotting[:task_type_correct]] || spotting[:task_type_correct] %>
+              Bonne réponse : <%= Student::TutorHelper::TASK_TYPE_LABELS[spotting[:task_type_expected]] %>
             </span>
           </div>
         </div>
@@ -46,15 +47,16 @@
 
           <%# Missed sources (false negatives) %>
           <% Array(spotting[:sources_missed]).each do |hint| %>
+            <% hint = hint.with_indifferent_access if hint.is_a?(Hash) %>
             <div class="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/40">
               <span class="text-amber-600 dark:text-amber-400 font-bold text-sm mt-0.5">⚠</span>
               <div>
                 <div class="flex items-center gap-1.5 mb-0.5">
-                  <%= render(BadgeComponent.new(color: :amber, label: hint["source"])) %>
+                  <%= render(BadgeComponent.new(color: :amber, label: hint[:source])) %>
                   <span class="text-xs text-amber-700 dark:text-amber-300">oublié</span>
                 </div>
-                <% if hint["location"].present? %>
-                  <p class="text-xs text-slate-500 dark:text-slate-400"><%= hint["location"] %></p>
+                <% if hint[:location].present? %>
+                  <p class="text-xs text-slate-500 dark:text-slate-400"><%= hint[:location] %></p>
                 <% end %>
               </div>
             </div>
