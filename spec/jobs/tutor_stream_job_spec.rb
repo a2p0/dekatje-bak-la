@@ -59,7 +59,7 @@ RSpec.describe TutorStreamJob, type: :job do
       allow(mock_client).to receive(:stream).and_raise(RuntimeError, "API error 401: Unauthorized")
 
       expect(ActionCable.server).to receive(:broadcast)
-        .with("conversation_#{conversation.id}", { error: "Cle API invalide. Verifiez vos reglages." })
+        .with("conversation_#{conversation.id}", { error: "Clé API invalide. Vérifiez vos réglages." })
 
       described_class.perform_now(conversation.id)
 
@@ -70,7 +70,7 @@ RSpec.describe TutorStreamJob, type: :job do
       allow(mock_client).to receive(:stream).and_raise(Faraday::TimeoutError)
 
       expect(ActionCable.server).to receive(:broadcast)
-        .with("conversation_#{conversation.id}", { error: "Le serveur n'a pas repondu. Reessayez." })
+        .with("conversation_#{conversation.id}", { error: "Le serveur n'a pas répondu. Réessayez." })
 
       described_class.perform_now(conversation.id)
     end
