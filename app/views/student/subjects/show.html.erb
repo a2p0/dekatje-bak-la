@@ -1,15 +1,14 @@
-<%= render(NavBarComponent.new) do |nav|
-  nav.with_brand { "DekatjeBakLa" }
-  nav.with_actions do
-    render(ThemeToggleComponent.new) +
-    link_to("← Mes sujets", student_root_path(access_code: params[:access_code]),
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
-  end
-end %>
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <%# Breadcrumb %>
+  <div class="mb-4">
+    <%= render(BreadcrumbComponent.new(items: [
+      { label: "Mes sujets", href: student_root_path(access_code: params[:access_code]) },
+      { label: @subject.title }
+    ])) %>
+  </div>
 
-<main class="max-w-3xl mx-auto px-4 py-8">
   <%# Subject title %>
-  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2"><%= @subject.title %></h1>
+  <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-3"><%= @subject.title %></h1>
   <div class="flex flex-wrap gap-1.5 mb-6">
     <%= render(BadgeComponent.new(color: :indigo, label: @subject.specialty&.upcase || "—")) %>
     <%= render(BadgeComponent.new(color: :emerald, label: @subject.year.to_s)) %>
@@ -57,14 +56,16 @@ end %>
 
     <%# Scope change link (for new-format subjects with scope already selected) %>
     <% if @session_record.requires_scope_selection? && @session_record.scope_selected? %>
-      <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg px-4 py-3 mb-6 flex items-center justify-between">
+      <div class="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
         <div class="text-sm text-indigo-700 dark:text-indigo-300">
           <span class="font-medium">Perimetre :</span>
           <%= scope_label(@session_record, @subject) %>
         </div>
         <button type="button"
                 class="text-xs text-indigo-600 dark:text-indigo-400 underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200 cursor-pointer"
-                onclick="document.getElementById('scope-selector').classList.toggle('hidden')">
+                aria-expanded="false"
+                aria-controls="scope-selector"
+                onclick="var el = document.getElementById('scope-selector'); el.classList.toggle('hidden'); this.setAttribute('aria-expanded', !el.classList.contains('hidden'));">
           Changer de perimetre
         </button>
       </div>
@@ -78,22 +79,22 @@ end %>
 
     <%# Relecture mode banner %>
     <% if @relecture_mode %>
-      <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg px-4 py-3 mb-6">
-        <p class="text-sm text-emerald-700 dark:text-emerald-300 font-medium">Mode relecture — Naviguez librement dans les questions pour revoir les corrections.</p>
+      <div class="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl px-4 py-3 mb-6">
+        <p class="text-sm text-emerald-700 dark:text-emerald-400 font-medium">Mode relecture — Naviguez librement dans les questions pour revoir les corrections.</p>
       </div>
     <% end %>
 
     <%# Mise en situation — full text from PDF (only on first visit, not relecture) %>
     <% unless @relecture_mode %>
-      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-6">
-        <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Mise en situation</h2>
+      <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-6 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
+        <h2 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">Mise en situation</h2>
         <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line"><%= @subject.common_presentation %></div>
       </div>
     <% end %>
 
     <%# Parts overview with grouping %>
-    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-8">
-      <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Parties du sujet</h2>
+    <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
+      <h2 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">Parties du sujet</h2>
 
       <% common_parts = @parts.select { |p| p.section_type == "common" } %>
       <% specific_parts = @parts.select { |p| p.section_type == "specific" } %>
@@ -136,16 +137,20 @@ end %>
           !@session_record.specific_presentation_seen?
       %>
       <% if needs_specific_presentation %>
-        <%= link_to student_subject_path(access_code: params[:access_code], id: @subject.id, start: true),
-            class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" do %>
-          Commencer
-        <% end %>
+        <%= render(ButtonComponent.new(
+          variant: :gradient,
+          size: :lg,
+          pill: true,
+          href: student_subject_path(access_code: params[:access_code], id: @subject.id, start: true)
+        )) { "Commencer" } %>
       <% elsif first_q %>
-        <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: first_q.id),
-            class: "inline-flex items-center px-8 py-3 bg-emerald-600 text-white rounded-full text-sm font-semibold no-underline hover:bg-emerald-700 transition-colors" do %>
-          Commencer
-        <% end %>
+        <%= render(ButtonComponent.new(
+          variant: :gradient,
+          size: :lg,
+          pill: true,
+          href: student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: first_q.id)
+        )) { "Commencer" } %>
       <% end %>
     </div>
   <% end %>
-</main>
+</div>

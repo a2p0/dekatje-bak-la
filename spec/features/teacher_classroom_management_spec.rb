@@ -176,7 +176,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
     expect(page).to have_content("2 élèves")
 
     # Verify access codes are visible on each classroom's show page
-    within(find(".rounded-lg.overflow-hidden", text: "Terminale SIN")) { click_link "Voir →" }
+    within(find(".rounded-xl.overflow-hidden", text: "Terminale SIN")) { click_link "Voir →" }
     expect(page).to have_content("Code d'accès")
     expect(page).to have_content(classroom1.access_code)
   end

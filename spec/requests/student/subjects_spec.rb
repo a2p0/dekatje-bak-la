@@ -87,7 +87,7 @@ RSpec.describe "Student::Subjects", type: :request do
         id: subject_obj.id
       )
 
-      expect(response).to redirect_to(student_subject_path(access_code: classroom.access_code, id: subject_obj.id))
+      expect(response).to redirect_to(student_subject_path(access_code: classroom.access_code, id: subject_obj.id, completed: true))
       session_record = StudentSession.find_by(student: student, subject: subject_obj)
       expect(session_record.subject_completed?).to be true
     end

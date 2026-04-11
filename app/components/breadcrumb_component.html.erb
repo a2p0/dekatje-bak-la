@@ -1,0 +1,39 @@
+<nav aria-label="Fil d'Ariane" class="text-xs">
+  <%# Mobile: compact "← Parent" style (only parent + current) %>
+  <% if @items.length > 1 %>
+    <% parent = @items[-2] %>
+    <div class="sm:hidden flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
+      <% if parent[:href] %>
+        <%= link_to parent[:href],
+            class: "inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate" do %>
+          <span aria-hidden="true">&larr;</span>
+          <span class="truncate"><%= parent[:label] %></span>
+        <% end %>
+      <% else %>
+        <span class="truncate"><%= parent[:label] %></span>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# Desktop: full breadcrumb %>
+  <ol class="hidden sm:flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
+    <% @items.each_with_index do |item, index| %>
+      <% is_last = index == @items.length - 1 %>
+      <li class="flex items-center gap-1.5 min-w-0">
+        <% if item[:href] && !is_last %>
+          <%= link_to item[:label], item[:href],
+              class: "hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate" %>
+        <% else %>
+          <%= tag.span(
+                item[:label],
+                class: "text-slate-700 dark:text-slate-200 font-medium truncate",
+                aria: { current: is_last ? "page" : nil }
+              ) %>
+        <% end %>
+        <% unless is_last %>
+          <span class="text-slate-300 dark:text-slate-600" aria-hidden="true">&rsaquo;</span>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</nav>

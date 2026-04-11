@@ -1,35 +1,27 @@
-<%= render(NavBarComponent.new) do |nav|
-  nav.with_brand { "DekatjeBakLa" }
-  nav.with_actions do
-    render(ThemeToggleComponent.new) +
-    link_to("⚙ Réglages", student_settings_path(access_code: params[:access_code]),
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5") +
-    link_to("Déconnexion", student_session_path(access_code: params[:access_code]),
-      data: { turbo_method: :delete },
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
-  end
-end %>
-
-<main class="max-w-5xl mx-auto px-4 py-8">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Mes sujets</h1>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-      <%= @classroom.name %> — <%= pluralize(@subjects.size, "sujet") %>
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100">
+      Salut <span class="bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent"><%= current_student.first_name %></span> 👋
+    </h1>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
+      <%= @classroom.name %> &middot; <%= pluralize(@subjects.size, "sujet") %>
     </p>
   </div>
 
   <% if @subjects.empty? %>
-    <p class="text-slate-500 dark:text-slate-400">Aucun sujet n'a encore été assigné à votre classe.</p>
+    <div class="bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-8 text-center">
+      <p class="text-slate-600 dark:text-slate-400">Aucun sujet n'a encore été assigné à votre classe.</p>
+    </div>
   <% else %>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <% @subjects.each do |subject| %>
         <%
           session_record = current_student.student_sessions.find_by(subject: subject)
           total = subject.total_questions_count
-          answered = session_record ? session_record.progression.count { |_k, v| v["answered"] } : 0
+          answered = session_record ? session_record.answered_count : 0
           matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
         %>
-        <%= render(CardComponent.new) do |card|
+        <%= render(CardComponent.new(variant: :glow)) do |card|
           card.with_body do %>
             <div class="flex flex-wrap gap-1.5 mb-3">
               <%= render(BadgeComponent.new(
@@ -37,7 +29,7 @@ end %>
                 label: subject.specialty&.upcase || "—"
               )) %>
               <% if matches_specialty %>
-                <%= render(BadgeComponent.new(color: :emerald, label: "Ma spe")) %>
+                <%= render(BadgeComponent.new(color: :emerald, label: "Ma spé")) %>
               <% end %>
               <%= render(BadgeComponent.new(color: :slate, label: subject.year.to_s)) %>
               <% if subject.region.present? %>
@@ -47,14 +39,14 @@ end %>
             <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1">
               <%= subject.title %>
             </h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
               <%= subject.exam&.upcase %> <%= subject.year %>
             </p>
-            <%= render(ProgressBarComponent.new(current: answered, total: total, show_text: true)) %>
+            <%= render(ProgressBarComponent.new(current: answered, total: total, color: :gradient, show_text: true)) %>
           <% end %>
           <% card.with_footer do %>
             <%= render(ButtonComponent.new(
-              variant: session_record ? :primary : :success,
+              variant: session_record ? :gradient : :gradient,
               pill: true,
               size: :sm,
               href: student_subject_path(access_code: params[:access_code], id: subject.id)
@@ -64,4 +56,4 @@ end %>
       <% end %>
     </div>
   <% end %>
-</main>
+</div>

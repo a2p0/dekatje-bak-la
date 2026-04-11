@@ -1,73 +1,71 @@
-<%= render(NavBarComponent.new) do |nav|
-  nav.with_brand { "DekatjeBakLa" }
-  nav.with_actions do
-    render(ThemeToggleComponent.new) +
-    link_to("← Mes sujets", student_root_path(access_code: params[:access_code]),
-      class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5")
-  end
-end %>
+<div class="max-w-xl mx-auto px-4 py-6">
+  <%# Breadcrumb %>
+  <div class="mb-4">
+    <%= render(BreadcrumbComponent.new(items: [
+      { label: "Mes sujets", href: student_root_path(access_code: params[:access_code]) },
+      { label: "Réglages" }
+    ])) %>
+  </div>
 
-<main class="max-w-xl mx-auto px-4 py-6">
-  <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Réglages</h1>
-
+  <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-6">Réglages</h1>
 
   <%= form_with model: current_student, url: student_settings_path(access_code: params[:access_code]),
                 method: :patch, data: { controller: "settings", settings_models_value: @models_json } do |f| %>
 
     <%# Mode section %>
-    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-5">
-      <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">Mode par défaut</p>
+    <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-5 mb-5 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
+      <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4">Mode par défaut</p>
 
       <div class="space-y-3">
-        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-500/10 transition-colors">
+        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-gradient-to-br has-[:checked]:from-indigo-50 has-[:checked]:to-violet-50 dark:has-[:checked]:from-indigo-500/10 dark:has-[:checked]:to-violet-500/10 transition-all">
           <%= f.radio_button :default_mode, "revision", class: "accent-indigo-500 w-4 h-4 shrink-0" %>
           <div>
             <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Révision autonome</span>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Correction seule, sans IA</p>
+            <p class="text-xs text-slate-600 dark:text-slate-400">Correction seule, sans IA</p>
           </div>
         </label>
 
-        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-500/10 transition-colors">
+        <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border-2 border-transparent has-[:checked]:border-indigo-500 has-[:checked]:bg-gradient-to-br has-[:checked]:from-indigo-50 has-[:checked]:to-violet-50 dark:has-[:checked]:from-indigo-500/10 dark:has-[:checked]:to-violet-500/10 transition-all">
           <%= f.radio_button :default_mode, "tutored", class: "accent-indigo-500 w-4 h-4 shrink-0" %>
           <div>
             <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Tutorat IA</span>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Nécessite une clé API</p>
+            <p class="text-xs text-slate-600 dark:text-slate-400">Nécessite une clé API</p>
           </div>
         </label>
       </div>
     </div>
 
     <%# Specialty section %>
-    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-5">
-      <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">Profil</p>
+    <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-5 mb-5 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
+      <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4">Profil</p>
 
       <div class="mb-0">
-        <%= f.label :specialty, "Ma spécialité", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
+        <%= f.label :specialty, "Ma spécialité", class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5" %>
         <%= f.select :specialty,
             Student.specialties.keys.map { |k| [k, k] },
             { include_blank: "Pas de spécialité" },
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+            class: "w-full px-4 py-3 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
       </div>
     </div>
 
     <%# AI config section %>
-    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-5">
-      <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-4">Configuration IA</p>
+    <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-5 mb-5 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
+      <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4">Configuration IA</p>
 
       <div class="mb-4">
-        <%= f.label :api_provider, "Provider", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
+        <%= f.label :api_provider, "Provider", class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5" %>
         <%= f.select :api_provider,
             Student.api_providers.keys.map { |k| [k.capitalize, k] },
             {},
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500",
+            class: "w-full px-4 py-3 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500",
             data: { action: "change->settings#providerChanged", settings_target: "provider" } %>
       </div>
 
       <div class="mb-4">
-        <%= f.label :api_model, "Modèle", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
+        <%= f.label :api_model, "Modèle", class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5" %>
         <select name="student[api_model]"
                 data-settings-target="model"
-                class="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="w-full px-4 py-3 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <% models = Student::AVAILABLE_MODELS[current_student.api_provider] || [] %>
           <% models.each do |m| %>
             <option value="<%= m[:id] %>" <%= "selected" if current_student.api_model == m[:id] || (current_student.api_model.blank? && m == models.first) %>>
@@ -78,16 +76,17 @@ end %>
       </div>
 
       <div class="mb-5">
-        <%= f.label :api_key, "Clé API", class: "block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5" %>
+        <%= f.label :api_key, "Clé API", class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5" %>
         <div class="flex gap-2">
           <%= f.password_field :api_key,
               value: current_student.api_key,
               placeholder: "sk-...",
-              class: "flex-1 px-4 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500",
+              class: "flex-1 px-4 py-3 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500",
               data: { settings_target: "apiKey" } %>
           <button type="button"
                   data-action="click->settings#toggleApiKey"
-                  class="px-3 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">
+                  aria-label="Afficher / masquer la clé API"
+                  class="px-3 py-3 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-slate-600 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer">
             👁
           </button>
         </div>
@@ -102,6 +101,6 @@ end %>
       <% end %>
     </div>
 
-    <%= render(ButtonComponent.new(variant: :primary, size: :md, type: "submit")) { "Enregistrer" } %>
+    <%= render(ButtonComponent.new(variant: :gradient, size: :md, type: "submit")) { "Enregistrer" } %>
   <% end %>
-</main>
+</div>

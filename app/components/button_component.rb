@@ -1,8 +1,17 @@
 class ButtonComponent < ViewComponent::Base
+  # Variants:
+  #   :primary  — vibrant gradient (indigo→violet + glow). Default, use for the main CTA of a page.
+  #   :success  — solid emerald. Use for "next" / "continue" secondary actions.
+  #   :ghost    — outline, low-emphasis. Use for cancel, back, or tertiary actions.
+  #   :gradient — alias of :primary (kept for backwards compatibility with views that pass :gradient explicitly).
+  PRIMARY_CLASSES = "bg-gradient-to-br from-indigo-500 to-violet-500 text-white hover:from-indigo-600 hover:to-violet-600 focus-visible:ring-indigo-500 shadow-[0_0_16px_rgba(99,102,241,0.3)] disabled:opacity-60 disabled:saturate-50 disabled:shadow-none".freeze
+
   VARIANTS = {
-    primary: "bg-indigo-500 text-white hover:bg-indigo-600 focus-visible:ring-indigo-500",
-    success: "bg-emerald-500 text-white hover:bg-emerald-600 focus-visible:ring-emerald-500",
-    ghost: "border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+    primary: PRIMARY_CLASSES,
+    # :gradient is kept as an alias of :primary for views that still pass it explicitly.
+    gradient: PRIMARY_CLASSES,
+    success: "bg-emerald-500 text-white hover:bg-emerald-600 focus-visible:ring-emerald-500 disabled:opacity-60",
+    ghost: "border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-slate-400 disabled:opacity-60"
   }.freeze
 
   SIZES = {
@@ -21,7 +30,7 @@ class ButtonComponent < ViewComponent::Base
 
   def call
     css = class_names(
-      "inline-flex items-center justify-center font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 cursor-pointer",
+      "inline-flex items-center justify-center font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed",
       VARIANTS[@variant],
       SIZES[@size],
       @pill ? "rounded-full" : "rounded-lg"

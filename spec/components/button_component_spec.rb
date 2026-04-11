@@ -1,11 +1,20 @@
 require "rails_helper"
 
 RSpec.describe ButtonComponent, type: :component do
-  it "renders a primary button by default" do
+  it "renders a primary (gradient) button by default" do
     render_inline(described_class.new) { "Continuer" }
 
     expect(page).to have_button("Continuer")
-    expect(page).to have_css("button.bg-indigo-500")
+    # Primary uses the indigo → violet gradient as the vibrant brand CTA
+    expect(page).to have_css("button.from-indigo-500")
+    expect(page).to have_css("button.to-violet-500")
+  end
+
+  it "treats :gradient as an alias of :primary for backwards compatibility" do
+    render_inline(described_class.new(variant: :gradient)) { "Go !" }
+
+    expect(page).to have_css("button.from-indigo-500")
+    expect(page).to have_css("button.to-violet-500")
   end
 
   it "renders a success button" do
@@ -32,7 +41,7 @@ RSpec.describe ButtonComponent, type: :component do
     render_inline(described_class.new(href: "/subjects")) { "Voir" }
 
     expect(page).to have_link("Voir", href: "/subjects")
-    expect(page).to have_css("a.bg-indigo-500")
+    expect(page).to have_css("a.from-indigo-500")
   end
 
   it "renders small size" do

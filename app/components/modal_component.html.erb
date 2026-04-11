@@ -1,7 +1,21 @@
-<div role="dialog" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center">
-  <div class="absolute inset-0 bg-black/50"></div>
-  <div class="relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4"><%= @title %></h3>
+<div role="dialog"
+     aria-modal="true"
+     aria-labelledby="<%= @title_id %>"
+     data-controller="modal focus-trap"
+     data-action="focus-trap:close->modal#close"
+     class="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center"
+     tabindex="-1">
+  <div class="absolute inset-0 bg-black/50" data-action="click->modal#close"></div>
+  <div class="relative bg-white dark:bg-slate-800/95 border border-slate-200 dark:border-indigo-500/15 rounded-2xl shadow-xl dark:shadow-[0_0_30px_rgba(99,102,241,0.15)] max-w-md w-full mx-4 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <h3 id="<%= @title_id %>" class="text-lg font-semibold text-slate-800 dark:text-slate-100"><%= @title %></h3>
+      <button type="button"
+              data-action="click->modal#close"
+              aria-label="Fermer"
+              class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-transparent border-0 cursor-pointer text-xl leading-none p-1">
+        &times;
+      </button>
+    </div>
     <% if body? %>
       <%= body %>
     <% end %>

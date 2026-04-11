@@ -7,7 +7,7 @@ RSpec.describe CardComponent, type: :component do
     end
 
     expect(page).to have_text("Hello world")
-    expect(page).to have_css("div.rounded-lg")
+    expect(page).to have_css("div.rounded-xl")
     expect(page).to have_css("div.border")
   end
 

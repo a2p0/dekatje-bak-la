@@ -117,15 +117,15 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     expect(page).to have_content("Comparer les émissions de CO2 des deux véhicules.")
   end
 
-  scenario "sur la dernière question de la partie, le bouton redirige vers les sujets" do
+  scenario "sur la dernière question d'une partie intermédiaire, 'Partie suivante' envoie à la partie suivante" do
     login_as_student(student, classroom)
     visit_question(q2)
 
     expect(page).not_to have_link("Question suivante")
-    click_button "Fin de la partie"
+    click_link "Partie suivante"
 
-    # Redirects to subject page
-    expect(page).to have_current_path(student_subject_path(access_code: classroom.access_code, id: subject.id))
+    # Should be on the first question of the next specific part
+    expect(page).to have_current_path(student_question_path(access_code: classroom.access_code, subject_id: subject.id, id: q3.id))
   end
 
   scenario "cliquer sur une autre question dans la sidebar redirige vers cette question" do

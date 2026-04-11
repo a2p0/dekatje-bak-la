@@ -336,6 +336,8 @@ SECRET_KEY_BASE            # rails secret
 - PostgreSQL via Neon (ExamSession.presentation_text, Subject.presentation_text — déjà existants) (020-extraction-json-restructure)
 - Ruby 3.3+ / Rails 8.1 + Hotwire (Turbo Streams, Stimulus), ViewComponent, Tailwind CSS (021-student-subject-workflow)
 - PostgreSQL via Neon (JSONB `progression` dans `student_sessions`) (021-student-subject-workflow)
+- Ruby 3.3+ / Rails 8.1 + Tailwind CSS 4 (already installed), Plus Jakarta Sans (Google Fonts), Stimulus, ViewComponent (025-design-system)
+- N/A (no schema changes) (025-design-system)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage

@@ -1,4 +1,48 @@
 @import "tailwindcss";
 
+/* Self-hosted Plus Jakarta Sans font */
+@import "../fonts/plus-jakarta-sans.css";
+
 /* Dark mode via class strategy (toggle .dark on <html>) */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens */
+@theme {
+  /* Font */
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Brand gradients */
+  --color-primary-gradient-from: #6366f1;
+  --color-primary-gradient-to: #8b5cf6;
+
+  /* Glow shadows */
+  --shadow-glow-indigo: 0 0 16px rgba(99, 102, 241, 0.3);
+  --shadow-glow-indigo-sm: 0 0 8px rgba(99, 102, 241, 0.1);
+  --shadow-glow-emerald: 0 0 12px rgba(16, 185, 129, 0.2);
+
+  /* Border radius */
+  --radius-card: 1rem;
+  --radius-button: 0.75rem;
+  --radius-input: 0.75rem;
+  --radius-pill: 9999px;
+
+  /* Z-index scale — drawers/modals must be ABOVE their backdrops */
+  --z-bottom-bar: 30;
+  --z-backdrop: 40;
+  --z-sidebar: 50;
+  --z-chat-drawer: 50;
+  --z-modal: 60;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+
+/* Reduced motion: disable transitions and glow for users who request it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
