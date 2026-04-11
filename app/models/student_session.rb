@@ -137,7 +137,7 @@ class StudentSession < ApplicationRecord
     else # full
       Part.where(id: exam.common_parts.select(:id))
           .or(Part.where(id: subject.parts.where(section_type: :specific).select(:id)))
-          .order(:position)
+          .order(:section_type, :position)
     end
   end
 
