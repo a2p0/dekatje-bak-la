@@ -78,7 +78,9 @@ jobs:
           bundler-cache: true
 
       - name: Load schema and seed data
-        run: bin/rails db:schema:load
+        run: |
+          bin/rails db:schema:load
+          bin/rails db:seed
 
       - name: Run tutor simulation
         env:
