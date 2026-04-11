@@ -75,14 +75,16 @@ RSpec.describe "Tuteur guidé : micro-tâches de repérage", type: :feature do
     scenario "sélectionner un mauvais type affiche le type incorrect et le bon", js: true do
       visit_question_page
 
-      choose("Rédiger une réponse")
+      # Pick any wrong radio option (not "Calculer une valeur")
+      wrong_option = all("input[name='task_type']").find { |r| r.value != "calculation" }
+      wrong_option.click
       check("Document Technique (DT)")
       check("Mise en situation")
       click_button "Vérifier"
 
       expect(page).to have_text("Avant de répondre — résultats", wait: 5)
       expect(page).to have_text("✗")
-      expect(page).to have_text("Rédiger une réponse")
+      expect(page).to have_text("Bonne réponse")
       expect(page).to have_text("Calculer une valeur")
     end
 
