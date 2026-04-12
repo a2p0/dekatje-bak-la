@@ -69,18 +69,22 @@ end
 
 ---
 
-### Vague 3 — Exports et retry (4 actions)
+### Vague 3 — Exports et retry (4 actions) — MERGÉE
 
-**Controllers** :
-- `Teacher::SubjectsController` : `retry_extraction`, `assign`
-- `Teacher::ClassroomsController` : `export_pdf`, `export_markdown`
+**Actions migrées** :
+- `Teacher::SubjectsController#retry_extraction` → `Teacher::Subjects::ExtractionsController#create`
+- `Teacher::SubjectsController#assign` (GET + PATCH) → `Teacher::Subjects::AssignmentsController#edit + #update`
+- `Teacher::ClassroomsController#export_pdf` + `#export_markdown` → `Teacher::Classrooms::ExportsController#show` (2 formats via respond_to)
 
-**Nouveaux controllers** :
-- `Teacher::Subjects::ExtractionsController#create` (retry via nouvelle création)
-- `Teacher::Subjects::AssignmentsController#create/destroy` (classroom-subject association)
-- `Teacher::Classrooms::ExportsController#show` avec `format: :pdf` / `:markdown`
+**Patterns nouveaux (vs vagues 1-2)** :
+- `edit`/`update` sur singular resource (Assignment)
+- `show` avec `respond_to` multi-format (PDF + Markdown) — MIME type markdown enregistré dans `config/initializers/mime_types.rb`
+- Idempotence au niveau service : `PersistExtractedData` fait `destroy_all` des specific parts avant recréation (fixe bug de doublons au retry)
 
-**Statut** : pas démarrée
+**Effet de bord vague 1** : `Teacher::Subjects::PublicationsController#create` redirect mis à jour de `assign_teacher_subject_path` vers `edit_teacher_subject_assignment_path`
+
+**PR** : #36 (mergée 2026-04-12)
+**Statut** : **DONE** ✓
 
 ---
 
@@ -128,8 +132,8 @@ Pages de navigation, pas des ressources. Gardées custom.
 |-------|----|----|----|
 | 1 | #34 | DONE | 2 migrées + 1 supprimée (archive orpheline) |
 | 2 | #35 | DONE | 3 migrées + shallow nesting sur questions |
-| 3 | — | Backlog | 4 |
+| 3 | #36 | DONE | 4 migrées + 3 patterns nouveaux (edit/update singular, respond_to multi-format, service idempotent) |
 | 4 | — | Backlog | 2 |
 | 5 | — | À qualifier | 0-8 |
 
-Total à migrer : **6-14 actions restantes** après vague 2.
+Total à migrer : **2-10 actions restantes** après vague 3.
