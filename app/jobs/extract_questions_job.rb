@@ -4,7 +4,7 @@ class ExtractQuestionsJob < ApplicationJob
   def perform(subject_id)
     subject = Subject.find(subject_id)
     job = subject.extraction_job
-    return if job&.done?
+    return if job.nil? || job.done?
 
     job.update!(status: :processing)
 
