@@ -88,15 +88,18 @@ end
 
 ---
 
-### Vague 4 — Student bulk operations (2 actions)
+### Vague 4 — Student bulk operations (2 actions) — MERGÉE
 
-**Controller** : `Teacher::StudentsController`
-**Actions** : `bulk_new`, `bulk_create`
+**Actions migrées** :
+- `Teacher::StudentsController#bulk_new` → `Teacher::Classrooms::StudentImportsController#new`
+- `Teacher::StudentsController#bulk_create` → `Teacher::Classrooms::StudentImportsController#create`
 
-**Nouveau controller** :
-- `Teacher::Classrooms::StudentBatchesController#new/create`
+**Nommage retenu** : `StudentImport` (plus évocateur que `StudentBatch`, prépare un potentiel import CSV post-MVP).
 
-**Statut** : pas démarrée
+**Pas de nouveau pattern** : réutilisation pure des patterns vagues 1-3. Vague la plus courte de la migration.
+
+**PR** : #37 (mergée 2026-04-12)
+**Statut** : **DONE** ✓
 
 ---
 
@@ -133,7 +136,7 @@ Pages de navigation, pas des ressources. Gardées custom.
 | 1 | #34 | DONE | 2 migrées + 1 supprimée (archive orpheline) |
 | 2 | #35 | DONE | 3 migrées + shallow nesting sur questions |
 | 3 | #36 | DONE | 4 migrées + 3 patterns nouveaux (edit/update singular, respond_to multi-format, service idempotent) |
-| 4 | — | Backlog | 2 |
+| 4 | #37 | DONE | 2 migrées (StudentImport) |
 | 5 | — | À qualifier | 0-8 |
 
-Total à migrer : **2-10 actions restantes** après vague 3.
+Total à migrer : **0-8 actions restantes** après vague 4.
