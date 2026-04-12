@@ -200,7 +200,7 @@
 
 - [x] T050 Lancer la suite de tests complète — 572 examples, 1 failure (pré-existante sur main, test flaky), 1 pending
 - [x] T051 Vérifier les critères de succès — tous PASS (voir détails dans le rapport)
-- [ ] T052 Push et vérifier CI verte sur GitHub Actions
+- [x] T052 Push et PR créée — https://github.com/a2p0/dekatje-bak-la/pull/32 (CI en cours)
 
 ---
 
