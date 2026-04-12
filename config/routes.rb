@@ -5,14 +5,12 @@ Rails.application.routes.draw do
     root to: "classrooms#index"
 
     resources :classrooms, only: [ :index, :new, :create, :show ] do
-      resources :students, only: [ :index, :new, :create ] do
+      resources :students, only: [ :index, :new, :create ], shallow: true do
         collection do
           get  :bulk_new
           post :bulk_create
         end
-        member do
-          post :reset_password
-        end
+        resource :password_reset, only: [ :create ], module: "students"
       end
       member do
         get :export_pdf
@@ -24,11 +22,8 @@ Rails.application.routes.draw do
 
     resources :subjects, only: [ :index, :new, :create, :show ] do
       resources :parts, only: [ :show ] do
-        resources :questions, only: [ :update, :destroy ] do
-          member do
-            patch :validate
-            patch :invalidate
-          end
+        resources :questions, only: [ :update, :destroy ], shallow: true do
+          resource :validation, only: [ :create, :destroy ], module: "questions"
         end
       end
       resource :publication, only: [ :create, :destroy ], module: "subjects"
