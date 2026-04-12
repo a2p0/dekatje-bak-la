@@ -6,8 +6,14 @@ class Part < ApplicationRecord
   enum :section_type, { common: 0, specific: 1 }
   enum :specialty, { SIN: 0, ITEC: 1, EE: 2, AC: 3 }, prefix: true
 
+  scope :specific, -> { where(section_type: :specific) }
+
   validates :number, :title, presence: true
   validate :exactly_one_owner
+
+  def validated_questions_count
+    questions.kept.where(status: :validated).count
+  end
 
   private
 
