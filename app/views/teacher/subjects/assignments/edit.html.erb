@@ -5,7 +5,7 @@
     "<%= @subject.title %>"
   </p>
 
-  <%= form_with url: assign_teacher_subject_path(@subject), method: :patch, class: "space-y-4" do |f| %>
+  <%= form_with url: teacher_subject_assignment_path(@subject), method: :patch, class: "space-y-4" do |f| %>
     <% if @classrooms.empty? %>
       <p class="text-slate-500 dark:text-slate-400">Vous n'avez pas encore de classe.</p>
     <% else %>

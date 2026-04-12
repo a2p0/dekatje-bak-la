@@ -1,5 +1,5 @@
 class Teacher::ClassroomsController < Teacher::BaseController
-  before_action :set_classroom, only: [ :show, :export_pdf, :export_markdown ]
+  before_action :set_classroom, only: [ :show ]
 
   def index
     @classrooms = current_teacher.classrooms.includes(:students).order(created_at: :desc)
@@ -28,22 +28,6 @@ class Teacher::ClassroomsController < Teacher::BaseController
   def show
     @students = @classroom.students.order(:last_name, :first_name)
     @generated_credentials = session.delete(:generated_credentials)
-  end
-
-  def export_pdf
-    pdf = ExportStudentCredentialsPdf.call(classroom: @classroom)
-    send_data pdf.render,
-              filename: "fiches-connexion-#{@classroom.access_code}.pdf",
-              type: "application/pdf",
-              disposition: "attachment"
-  end
-
-  def export_markdown
-    markdown = ExportStudentCredentialsMarkdown.call(classroom: @classroom)
-    send_data markdown,
-              filename: "fiches-connexion-#{@classroom.access_code}.md",
-              type: "text/markdown",
-              disposition: "attachment"
   end
 
   private

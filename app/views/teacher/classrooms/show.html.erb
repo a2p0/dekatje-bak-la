@@ -66,12 +66,12 @@
       Ajout en lot
     <% end %>
     <%= render ButtonComponent.new(
-          href: export_pdf_teacher_classroom_path(@classroom),
+          href: teacher_classroom_export_path(@classroom, format: :pdf),
           variant: :ghost, size: :sm) do %>
       Exporter fiches PDF
     <% end %>
     <%= render ButtonComponent.new(
-          href: export_markdown_teacher_classroom_path(@classroom),
+          href: teacher_classroom_export_path(@classroom, format: :markdown),
           variant: :ghost, size: :sm) do %>
       Exporter Markdown
     <% end %>
