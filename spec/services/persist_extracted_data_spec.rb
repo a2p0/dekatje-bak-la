@@ -252,5 +252,26 @@ RSpec.describe PersistExtractedData do
         expect(exam_session.reload.common_presentation).to be_nil
       end
     end
+
+    context "idempotence (retry after partial failure)" do
+      it "does not create duplicate specific parts when called twice" do
+        described_class.call(subject: subject_obj, data: data)
+        first_count = subject_obj.parts.specific.count
+        expect(first_count).to be > 0
+
+        described_class.call(subject: subject_obj, data: data)
+        expect(subject_obj.parts.specific.count).to eq(first_count)
+      end
+
+      it "preserves common parts (shared via exam_session) across retries" do
+        described_class.call(subject: subject_obj, data: data)
+        common_ids_before = exam_session.reload.common_parts.pluck(:id).sort
+        expect(common_ids_before).not_to be_empty
+
+        described_class.call(subject: subject_obj, data: data)
+        common_ids_after = exam_session.reload.common_parts.pluck(:id).sort
+        expect(common_ids_after).to eq(common_ids_before)
+      end
+    end
   end
 end

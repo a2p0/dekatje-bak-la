@@ -54,7 +54,11 @@ class PersistExtractedData
         end
       end
 
-      # Specific parts: always create on subject
+      # Specific parts: cleanup before recreate (idempotence / retry-safe).
+      # Cascade removes associated questions and answers via dependent: :destroy.
+      # Common parts (shared via exam_session) are NOT touched.
+      @subject.parts.specific.destroy_all
+
       specific_doc_refs = Array(@data.dig("document_references", "specific_dts")) +
                           Array(@data.dig("document_references", "specific_drs"))
 
