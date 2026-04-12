@@ -30,26 +30,26 @@ Motivation :
 
 ## Vagues
 
-### Vague 1 — Subject state transitions (3 actions) — En cours
+### Vague 1 — Subject state transitions (2 actions) — MERGÉE
 
 **Controller** : `Teacher::SubjectsController`
-**Actions** : `publish`, `unpublish`, `archive`
-**Nouveaux controllers** :
+**Actions migrées** : `publish`, `unpublish`
+**Action supprimée** : `archive` (route orpheline, jamais exposée dans une vue)
+**Nouveau controller** :
 - `Teacher::Subjects::PublicationsController#create/destroy`
-- `Teacher::Subjects::ArchivesController#create`
-**Modèle** : ajouter `Subject#publish!/unpublish!/archive!` + `Subject::InvalidTransition`
+**Modèle** : `Subject#publish!/unpublish!` + `Subject::InvalidTransition`
 
-**Routes** :
+**Routes finales** :
 ```ruby
 namespace :teacher do
   resources :subjects do
-    resource :publication, only: [:create, :destroy]
-    resource :archive,     only: [:create]
+    resource :publication, only: [:create, :destroy], module: "subjects"
   end
 end
 ```
 
-**Statut** : spec en cours
+**PR** : #34 (mergée 2026-04-12)
+**Statut** : **DONE** ✓
 
 ---
 
@@ -126,10 +126,10 @@ Pages de navigation, pas des ressources. Gardées custom.
 
 | Vague | PR | Statut | Actions migrées |
 |-------|----|----|----|
-| 1 | — | En cours (spec) | 3 |
+| 1 | #34 | DONE | 2 migrées + 1 supprimée (archive orpheline) |
 | 2 | — | Backlog | 3 |
 | 3 | — | Backlog | 4 |
 | 4 | — | Backlog | 2 |
 | 5 | — | À qualifier | 0-8 |
 
-Total à migrer : **12-20 actions** selon exceptions retenues en vague 5.
+Total à migrer : **11-19 actions restantes** après vague 1.
