@@ -9,38 +9,23 @@ RSpec.describe "Teacher::Questions", type: :request do
 
   before { sign_in user }
 
-  describe "PATCH /teacher/subjects/:subject_id/parts/:part_id/questions/:id" do
+  describe "PATCH /teacher/questions/:id" do
     it "updates the question" do
-      patch teacher_subject_part_question_path(subject_obj, part, question),
+      patch teacher_question_path(question),
             params: { question: { label: "Nouveau label" } },
             headers: { "Accept" => "text/vnd.turbo-stream.html" }
       expect(question.reload.label).to eq("Nouveau label")
     end
   end
 
-  describe "DELETE /teacher/subjects/:subject_id/parts/:part_id/questions/:id" do
+  describe "DELETE /teacher/questions/:id" do
     it "soft deletes the question" do
-      delete teacher_subject_part_question_path(subject_obj, part, question),
+      delete teacher_question_path(question),
              headers: { "Accept" => "text/vnd.turbo-stream.html" }
       expect(question.reload.discarded_at).not_to be_nil
     end
   end
 
-  describe "PATCH validate" do
-    it "validates the question" do
-      patch validate_teacher_subject_part_question_path(subject_obj, part, question),
-            headers: { "Accept" => "text/vnd.turbo-stream.html" }
-      expect(question.reload.status).to eq("validated")
-    end
-  end
-
-  describe "PATCH invalidate" do
-    let(:question) { create(:question, part: part, status: :validated) }
-
-    it "invalidates the question" do
-      patch invalidate_teacher_subject_part_question_path(subject_obj, part, question),
-            headers: { "Accept" => "text/vnd.turbo-stream.html" }
-      expect(question.reload.status).to eq("draft")
-    end
-  end
+  # Validate/invalidate coverage moved to spec/requests/teacher/questions/validations_spec.rb
+  # (refactored to RESTful Teacher::Questions::ValidationsController#create/destroy)
 end
