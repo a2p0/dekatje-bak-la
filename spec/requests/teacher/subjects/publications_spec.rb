@@ -24,7 +24,7 @@ RSpec.describe "Teacher::Subjects::Publications", type: :request do
 
       it "redirects to the assign page with a notice" do
         post teacher_subject_publication_path(subject_obj)
-        expect(response).to redirect_to(assign_teacher_subject_path(subject_obj))
+        expect(response).to redirect_to(edit_teacher_subject_assignment_path(subject_obj))
         follow_redirect!
         expect(flash[:notice]).to match(/publié/i)
       end

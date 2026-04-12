@@ -159,7 +159,7 @@ RSpec.describe "Story 2: Gestion des classes et des eleves", type: :feature do
 
     sign_in_teacher(user)
     click_link "Voir →"
-    expect(page).to have_link("Exporter fiches PDF", href: export_pdf_teacher_classroom_path(classroom))
+    expect(page).to have_link("Exporter fiches PDF", href: teacher_classroom_export_path(classroom, format: :pdf))
   end
 
   scenario "le tableau de bord affiche le nombre d'eleves et le code d'acces pour chaque classe" do
