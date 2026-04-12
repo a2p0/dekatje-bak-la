@@ -31,10 +31,8 @@ Rails.application.routes.draw do
           end
         end
       end
+      resource :publication, only: [ :create, :destroy ], module: "subjects"
       member do
-        patch :publish
-        patch :archive
-        patch :unpublish
         post  :retry_extraction
         get   :assign
         patch :assign
