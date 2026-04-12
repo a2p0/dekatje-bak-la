@@ -4,6 +4,8 @@ class TutorStreamJob < ApplicationJob
 
   def perform(conversation_id)
     conversation = Conversation.find(conversation_id)
+    return if conversation.messages.last&.dig("role") == "assistant"
+
     student = conversation.student
     question = conversation.question
 

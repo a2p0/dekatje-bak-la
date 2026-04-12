@@ -2,7 +2,7 @@ class Teacher::SubjectsController < Teacher::BaseController
   before_action :set_subject, only: [ :show, :publish, :archive, :unpublish, :retry_extraction, :assign ]
 
   def index
-    @subjects = current_teacher.subjects.kept.order(created_at: :desc)
+    @subjects = current_teacher.subjects.kept.includes(:exam_session).order(created_at: :desc)
   end
 
   def new

@@ -12,4 +12,6 @@ class Question < ApplicationRecord
   validates :number, :label, presence: true
 
   scope :kept, -> { where(discarded_at: nil) }
+  scope :for_parts, ->(parts) { kept.where(part: parts) }
+  scope :for_subject, ->(subject) { kept.joins(:part).where(parts: { subject_id: subject.id }) }
 end

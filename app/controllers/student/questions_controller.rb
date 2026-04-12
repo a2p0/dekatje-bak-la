@@ -67,7 +67,7 @@ class Student::QuestionsController < Student::BaseController
   end
 
   def filtered_question_ids
-    @filtered_question_ids ||= Question.kept.where(part: filtered_parts).pluck(:id)
+    @filtered_question_ids ||= Question.for_parts(filtered_parts).pluck(:id)
   end
 
   def extract_previous_insights

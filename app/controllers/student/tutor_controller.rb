@@ -88,9 +88,7 @@ class Student::TutorController < Student::BaseController
   end
 
   def set_question
-    @question = Question.kept.joins(:part)
-                        .where(parts: { subject_id: @subject.id })
-                        .find(params[:question_id])
+    @question = Question.for_subject(@subject).find(params[:question_id])
   end
 
   def set_session_record

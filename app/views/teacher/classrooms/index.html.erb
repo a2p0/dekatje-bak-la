@@ -23,7 +23,7 @@
             <%= render BadgeComponent.new(color: :slate, label: classroom.school_year) %>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400">
-            <%= classroom.students.count %> élève<%= classroom.students.count == 1 ? "" : "s" %>
+            <%= pluralize(classroom.students.size, "élève") %>
           </p>
         <% end %>
         <% c.with_footer do %>

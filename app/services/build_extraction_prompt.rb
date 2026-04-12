@@ -245,14 +245,23 @@ class BuildExtractionPrompt
     Le JSON doit contenir : "common_parts": [], "document_references": {"common_dts": [], "common_drs": [], "specific_dts": [...], "specific_drs": [...]}
   ADDENDUM
 
-  def self.call(subject_text:, correction_text:, specialty:, skip_common: false)
-    system = if skip_common
+  def self.call(...) = new(...).call
+
+  def initialize(subject_text:, correction_text:, specialty:, skip_common: false)
+    @subject_text = subject_text
+    @correction_text = correction_text
+    @specialty = specialty
+    @skip_common = skip_common
+  end
+
+  def call
+    system = if @skip_common
                SYSTEM_PROMPT + "\n" + SKIP_COMMON_ADDENDUM
     else
                SYSTEM_PROMPT
     end
 
-    extraction_instruction = if skip_common
+    extraction_instruction = if @skip_common
                                "Extrais uniquement les parties spécifiques (specific_parts) avec leurs questions, corrections et références aux documents. Ignore la partie commune."
     else
                                "Extrais toutes les parties communes et spécifiques avec leurs questions, corrections et références aux documents."
@@ -264,15 +273,15 @@ class BuildExtractionPrompt
         {
           role: "user",
           content: <<~MSG
-            Spécialité de l'élève : #{specialty}
+            Spécialité de l'élève : #{@specialty}
 
             === SUJET DE L'EXAMEN ===
-            #{subject_text}
+            #{@subject_text}
 
             === CORRIGÉ OFFICIEL ===
-            #{correction_text}
+            #{@correction_text}
 
-            Analyse le sujet et le corrigé ci-dessus pour la spécialité #{specialty}.
+            Analyse le sujet et le corrigé ci-dessus pour la spécialité #{@specialty}.
             #{extraction_instruction}
           MSG
         }

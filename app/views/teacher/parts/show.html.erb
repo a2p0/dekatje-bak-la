@@ -13,8 +13,8 @@
       <%= link_to teacher_subject_part_path(@subject, part), class: tab_class do %>
         Partie <%= part.number %>
         <% part_q = part.questions.kept %>
-        <% part_validated = part_q.select(&:validated?).count %>
-        <span class="text-[10px] opacity-70">(<%= part_validated %>/<%= part_q.count %>)</span>
+        <% part_validated = part.validated_questions_count %>
+        <span class="text-[10px] opacity-70">(<%= part_validated %>/<%= part_q.size %>)</span>
       <% end %>
     <% end %>
   </nav>
@@ -35,7 +35,7 @@
   <%# Questions column %>
   <div>
     <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-      Questions (<%= @questions.count %>)
+      Questions (<%= @questions.size %>)
     </h3>
 
     <% if @questions.empty? %>

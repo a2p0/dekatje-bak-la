@@ -24,7 +24,7 @@
       <%# Élève %>
       <div class="text-left">
         <p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">Élève</p>
-        <%= form_tag nil, method: :get, id: "student-access-form" do %>
+        <%= form_with(url: nil, method: :get, id: "student-access-form", data: { controller: "access-code", action: "submit->access-code#redirect" }) do %>
           <div class="flex gap-2">
             <label for="access_code" class="sr-only">Code d'accès</label>
             <%= text_field_tag :access_code, nil,
@@ -123,13 +123,4 @@
     </p>
   </footer>
 
-  <script>
-    document.getElementById("student-access-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-      var code = this.querySelector("[name='access_code']").value.trim();
-      if (code) {
-        window.location.href = "/" + encodeURIComponent(code);
-      }
-    });
-  </script>
 </div>

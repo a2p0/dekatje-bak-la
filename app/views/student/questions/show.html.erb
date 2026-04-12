@@ -5,7 +5,7 @@
   next_q = idx < @questions_in_part.size - 1 ? @questions_in_part[idx + 1] : nil
 
   total = @questions_in_part.size
-  answered = @questions_in_part.count { |q| @session_record.answered?(q.id) }
+  answered = @session_record.answered_count_for(@questions_in_part)
 
   # Navigation hrefs
   prev_href = prev_q && student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: prev_q.id)

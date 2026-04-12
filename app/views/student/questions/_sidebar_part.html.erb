@@ -1,7 +1,7 @@
 <%
   is_active = part == current_part
   part_questions = part.questions.kept.order(:position)
-  part_answered = part_questions.count { |q| session_record.answered?(q.id) }
+  part_answered = session_record.answered_count_for(part_questions)
 %>
 
 <% if is_active %>

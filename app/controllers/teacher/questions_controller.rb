@@ -59,7 +59,7 @@ class Teacher::QuestionsController < Teacher::BaseController
 
   def all_parts_for_subject
     if @subject.exam_session.present?
-      @subject.exam_session.common_parts.to_a + @subject.parts.where(section_type: :specific).to_a
+      @subject.exam_session.common_parts.to_a + @subject.parts.specific.to_a
     else
       @subject.parts.to_a
     end

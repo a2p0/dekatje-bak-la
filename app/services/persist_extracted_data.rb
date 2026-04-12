@@ -1,18 +1,25 @@
 class PersistExtractedData
-  def self.call(subject:, data:)
+  def self.call(subject:, data:) = new(subject:, data:).call
+
+  def initialize(subject:, data:)
+    @subject = subject
+    @data = data
+  end
+
+  def call
     ActiveRecord::Base.transaction do
-      exam_session = subject.exam_session
+      exam_session = @subject.exam_session
 
       if exam_session.common_presentation.blank?
-        exam_session.update!(common_presentation: data["common_presentation"])
+        exam_session.update!(common_presentation: @data["common_presentation"])
       end
 
-      if subject.specific_presentation.blank? && data["specific_presentation"].present?
-        subject.update_column(:specific_presentation, data["specific_presentation"])
+      if @subject.specific_presentation.blank? && @data["specific_presentation"].present?
+        @subject.update_column(:specific_presentation, @data["specific_presentation"])
       end
 
-      metadata = data["metadata"] || {}
-      subject.update_column(:code, metadata["code"]) if metadata["code"].present?
+      metadata = @data["metadata"] || {}
+      @subject.update_column(:code, metadata["code"]) if metadata["code"].present?
 
       if metadata["variante"].present?
         exam_session.update!(variante: metadata["variante"])
@@ -26,14 +33,14 @@ class PersistExtractedData
         exam_session.update!(exam: metadata["exam"])
       end
 
-      subject.update_column(:status, Subject.statuses[:pending_validation])
+      @subject.update_column(:status, Subject.statuses[:pending_validation])
 
       # Common parts: only create if exam_session has none yet
       unless exam_session.common_parts.any?
-        common_doc_refs = Array(data.dig("document_references", "common_dts")) +
-                          Array(data.dig("document_references", "common_drs"))
+        common_doc_refs = Array(@data.dig("document_references", "common_dts")) +
+                          Array(@data.dig("document_references", "common_drs"))
 
-        Array(data["common_parts"]).each_with_index do |part_data, idx|
+        Array(@data["common_parts"]).each_with_index do |part_data, idx|
           part = exam_session.common_parts.create!(
             number:               part_data["number"].to_s,
             title:                part_data["title"].to_s,
@@ -48,16 +55,16 @@ class PersistExtractedData
       end
 
       # Specific parts: always create on subject
-      specific_doc_refs = Array(data.dig("document_references", "specific_dts")) +
-                          Array(data.dig("document_references", "specific_drs"))
+      specific_doc_refs = Array(@data.dig("document_references", "specific_dts")) +
+                          Array(@data.dig("document_references", "specific_drs"))
 
-      Array(data["specific_parts"]).each_with_index do |part_data, idx|
-        part = subject.parts.create!(
+      Array(@data["specific_parts"]).each_with_index do |part_data, idx|
+        part = @subject.parts.create!(
           number:               part_data["number"].to_s,
           title:                part_data["title"].to_s,
           objective_text:       part_data["objective"].to_s,
           section_type:         :specific,
-          specialty:            subject.specialty,
+          specialty:            @subject.specialty,
           position:             idx,
           document_references:  specific_doc_refs
         )
@@ -66,10 +73,12 @@ class PersistExtractedData
       end
     end
 
-    subject
+    @subject
   end
 
-  def self.create_questions_and_answers(part, questions_data)
+  private
+
+  def create_questions_and_answers(part, questions_data)
     Array(questions_data).each_with_index do |q_data, q_index|
       question = part.questions.create!(
         number:        q_data["number"].to_s,
@@ -91,6 +100,4 @@ class PersistExtractedData
       )
     end
   end
-
-  private_class_method :create_questions_and_answers
 end

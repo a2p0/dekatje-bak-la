@@ -29,6 +29,10 @@ class StudentSession < ApplicationRecord
     progression.count { |_k, v| v.is_a?(Hash) && v["answered"] == true }
   end
 
+  def answered_count_for(questions)
+    questions.count { |q| answered?(q.id) }
+  end
+
   def first_undone_question(part)
     questions = part.questions.kept.order(:position)
     questions.detect { |q| !answered?(q.id) } || questions.first
@@ -124,20 +128,22 @@ class StudentSession < ApplicationRecord
   # For new-format subjects (with exam_session), filters by part_filter.
   # For legacy subjects, returns all parts.
   def filtered_parts
-    exam = subject.exam_session
-    unless exam
-      return subject.parts.order(:position)
-    end
-
-    case part_filter
-    when "common_only"
-      exam.common_parts.order(:position)
-    when "specific_only"
-      subject.parts.where(section_type: :specific).order(:position)
-    else # full
-      Part.where(id: exam.common_parts.select(:id))
-          .or(Part.where(id: subject.parts.where(section_type: :specific).select(:id)))
-          .order(:section_type, :position)
+    @filtered_parts ||= begin
+      exam = subject.exam_session
+      if exam
+        case part_filter
+        when "common_only"
+          exam.common_parts.order(:position)
+        when "specific_only"
+          subject.parts.where(section_type: :specific).order(:position)
+        else # full
+          Part.where(id: exam.common_parts.select(:id))
+              .or(Part.where(id: subject.parts.where(section_type: :specific).select(:id)))
+              .order(:section_type, :position)
+        end
+      else
+        subject.parts.order(:position)
+      end
     end
   end
 

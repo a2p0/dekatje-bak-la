@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "rails": {
+      "command": "rails-mcp-server",
+      "args": ["--single-project"],
+      "env": {
+        "RAILS_MCP_PROJECT_PATH": "."
+      }
+    }
+  }
+}
