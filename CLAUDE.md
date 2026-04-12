@@ -340,6 +340,7 @@ SECRET_KEY_BASE            # rails secret
 - N/A (no schema changes) (025-design-system)
 - Ruby 3.3+ / Rails 8.1 + Hotwire (Turbo Streams, Stimulus), ViewComponent, Tailwind CSS 4 (028-fix-t050-ui-bugs)
 - PostgreSQL via Neon (JSONB `progression` and `tutor_state` in `student_sessions`) (028-fix-t050-ui-bugs)
+- Ruby 3.3+ / Rails 8.1 + Devise, Stimulus, Turbo, Sidekiq, FactoryBot (031-rails-conventions-fix)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
