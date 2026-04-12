@@ -47,4 +47,32 @@ RSpec.describe Question, type: :model do
       expect(question.part).to be_a(Part)
     end
   end
+
+  describe "#validate!" do
+    let(:question) { create(:question, status: :draft) }
+
+    it "transitions from draft to validated" do
+      question.validate!
+      expect(question.reload.status).to eq("validated")
+    end
+
+    it "raises InvalidTransition when already validated" do
+      question.update!(status: :validated)
+      expect { question.validate! }.to raise_error(Question::InvalidTransition, /déjà validée/)
+    end
+  end
+
+  describe "#invalidate!" do
+    let(:question) { create(:question, status: :validated) }
+
+    it "transitions from validated to draft" do
+      question.invalidate!
+      expect(question.reload.status).to eq("draft")
+    end
+
+    it "raises InvalidTransition when already draft" do
+      question.update!(status: :draft)
+      expect { question.invalidate! }.to raise_error(Question::InvalidTransition, /brouillon/)
+    end
+  end
 end
