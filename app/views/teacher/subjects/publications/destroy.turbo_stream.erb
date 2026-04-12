@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "subject_stats_#{@subject.id}",
+      partial: "teacher/subjects/stats",
+      locals: { subject: @subject } %>
+<%= turbo_stream.replace "flash",
+      partial: "shared/flash",
+      locals: { notice: "Sujet dépublié." } %>
