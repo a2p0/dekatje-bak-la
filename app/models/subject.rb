@@ -35,11 +35,11 @@ class Subject < ApplicationRecord
 
   def legacy_attached_files
     [
-      [enonce_file, "Énoncé"],
-      [dt_file, "Documents Techniques (DT)"],
-      [dr_vierge_file, "Document Réponse vierge"],
-      [dr_corrige_file, "Document Réponse corrigé"],
-      [questions_corrigees_file, "Questions corrigées"]
+      [ enonce_file, "Énoncé" ],
+      [ dt_file, "Documents Techniques (DT)" ],
+      [ dr_vierge_file, "Document Réponse vierge" ],
+      [ dr_corrige_file, "Document Réponse corrigé" ],
+      [ questions_corrigees_file, "Questions corrigées" ]
     ].select { |file, _| file.attached? }
   end
 
