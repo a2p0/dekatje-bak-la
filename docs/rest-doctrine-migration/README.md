@@ -1,0 +1,135 @@
+# REST Doctrine Migration — Plan global
+
+**Date de lancement** : 2026-04-12
+**Référence** : `~/.claude/skills/rails-conventions/references/rest-doctrine.md`
+**Issue d'origine** : audit `/rails-conventions audit` post-PR #33 — 24 actions non-RESTful identifiées
+
+## Objectif
+
+Aligner tous les controllers du projet sur la doctrine CRUD-only :
+chaque action mappe sur `index/show/new/create/edit/update/destroy`.
+Les actions custom sont extraites en controllers dédiés pour des resources nommées.
+
+## Approche
+
+Migration par **vagues thématiques** plutôt qu'une mega-PR.
+Chaque vague = 1 feature speckit indépendante = 1 PR.
+
+Motivation :
+- Mega-PR avec 24 renommages = touche 50+ fichiers = revue impossible
+- Chaque vague permet d'apprendre et d'ajuster l'approche
+- Risque localisé, rollback simple
+
+## Décisions techniques (tranchées 2026-04-12)
+
+1. **État machine** : enum Rails natif + méthodes métier (pas de gem AASM/state_machines)
+2. **Exception custom** : `<Model>::InvalidTransition < StandardError` par modèle avec transitions
+3. **Error handling** : `rescue_from` dans le controller de transition + `respond_to` html/turbo_stream
+4. **Namespacing** : conserver `Teacher::` / `Student::` existants
+5. **Tests** : request specs pour nouveaux controllers + feature specs existantes mises à jour
+
+## Vagues
+
+### Vague 1 — Subject state transitions (3 actions) — En cours
+
+**Controller** : `Teacher::SubjectsController`
+**Actions** : `publish`, `unpublish`, `archive`
+**Nouveaux controllers** :
+- `Teacher::Subjects::PublicationsController#create/destroy`
+- `Teacher::Subjects::ArchivesController#create`
+**Modèle** : ajouter `Subject#publish!/unpublish!/archive!` + `Subject::InvalidTransition`
+
+**Routes** :
+```ruby
+namespace :teacher do
+  resources :subjects do
+    resource :publication, only: [:create, :destroy]
+    resource :archive,     only: [:create]
+  end
+end
+```
+
+**Statut** : spec en cours
+
+---
+
+### Vague 2 — Validation workflow (3 actions)
+
+**Controllers** :
+- `Teacher::QuestionsController` : `validate`, `invalidate`
+- `Teacher::StudentsController` : `reset_password`
+
+**Nouveaux controllers** :
+- `Teacher::Questions::ValidationsController#create/destroy`
+- `Teacher::Students::PasswordResetsController#create`
+
+**Modèle** : ajouter `Question#validate!/invalidate!` + exception
+
+**Statut** : pas démarrée
+
+---
+
+### Vague 3 — Exports et retry (4 actions)
+
+**Controllers** :
+- `Teacher::SubjectsController` : `retry_extraction`, `assign`
+- `Teacher::ClassroomsController` : `export_pdf`, `export_markdown`
+
+**Nouveaux controllers** :
+- `Teacher::Subjects::ExtractionsController#create` (retry via nouvelle création)
+- `Teacher::Subjects::AssignmentsController#create/destroy` (classroom-subject association)
+- `Teacher::Classrooms::ExportsController#show` avec `format: :pdf` / `:markdown`
+
+**Statut** : pas démarrée
+
+---
+
+### Vague 4 — Student bulk operations (2 actions)
+
+**Controller** : `Teacher::StudentsController`
+**Actions** : `bulk_new`, `bulk_create`
+
+**Nouveau controller** :
+- `Teacher::Classrooms::StudentBatchesController#new/create`
+
+**Statut** : pas démarrée
+
+---
+
+### Vague 5 — Student workflow (8 actions, questionnée au cas par cas)
+
+**Controllers** : `Student::SubjectsController`, `Student::TutorController`,
+`Student::QuestionsController`, `Student::ConversationsController`,
+`Student::SettingsController`
+
+Actions à examiner :
+- `set_scope`, `complete_part`, `complete` (student/subjects)
+- `activate`, `verify_spotting`, `skip_spotting` (student/tutor) — **potentielles exceptions légitimes** (workflow tuteur stateful)
+- `reveal` (student/questions) — transition sur StudentSession
+- `test_key` (student/settings) — action de test, potentielle exception légitime
+- `message` (student/conversations) — déjà géré via `create` ?
+
+**Décision cas par cas** avant refactoring systématique.
+
+**Statut** : pas démarrée
+
+---
+
+## Hors scope — exceptions légitimes
+
+**Pages statiques** (`PagesController`) : `home`, `legal`, `privacy`
+Pages de navigation, pas des ressources. Gardées custom.
+
+---
+
+## Suivi
+
+| Vague | PR | Statut | Actions migrées |
+|-------|----|----|----|
+| 1 | — | En cours (spec) | 3 |
+| 2 | — | Backlog | 3 |
+| 3 | — | Backlog | 4 |
+| 4 | — | Backlog | 2 |
+| 5 | — | À qualifier | 0-8 |
+
+Total à migrer : **12-20 actions** selon exceptions retenues en vague 5.

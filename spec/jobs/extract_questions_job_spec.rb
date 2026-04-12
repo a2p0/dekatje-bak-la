@@ -56,7 +56,7 @@ RSpec.describe ExtractQuestionsJob, type: :job do
         stream, hash_including(target: "parts-list")
       )
       expect(Turbo::StreamsChannel).to have_received(:broadcast_replace_to).with(
-        stream, hash_including(target: "subject-stats")
+        stream, hash_including(target: "subject_stats_#{subject_obj.id}")
       )
     end
 

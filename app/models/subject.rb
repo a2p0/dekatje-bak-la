@@ -1,4 +1,6 @@
 class Subject < ApplicationRecord
+  class InvalidTransition < StandardError; end
+
   belongs_to :owner, class_name: "User"
   belongs_to :exam_session
   has_one :extraction_job, dependent: :destroy
@@ -63,6 +65,19 @@ class Subject < ApplicationRecord
 
   def publishable?
     validated_questions_count > 0
+  end
+
+  def publish!
+    raise InvalidTransition, "Le sujet est déjà publié." if published?
+    raise InvalidTransition, "Publiez au moins une question validée avant de publier." unless publishable?
+
+    update!(status: :published)
+  end
+
+  def unpublish!
+    raise InvalidTransition, "Seul un sujet publié peut être dépublié." unless published?
+
+    update!(status: :draft)
   end
 
   private

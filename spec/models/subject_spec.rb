@@ -127,6 +127,51 @@ RSpec.describe Subject, type: :model do
     end
   end
 
+  describe "#publish!" do
+    let(:subject_obj) { create(:subject, :new_format) }
+
+    before do
+      part = create(:part, subject: subject_obj, exam_session: nil, section_type: :specific, position: 0)
+      create(:question, part: part, status: :validated)
+    end
+
+    it "publishes a draft subject with at least one validated question" do
+      expect(subject_obj.status).to eq("draft")
+      subject_obj.publish!
+      expect(subject_obj.reload.status).to eq("published")
+    end
+
+    it "publishes a pending_validation subject with at least one validated question" do
+      subject_obj.update!(status: :pending_validation)
+      subject_obj.publish!
+      expect(subject_obj.reload.status).to eq("published")
+    end
+
+    it "raises InvalidTransition when already published" do
+      subject_obj.update!(status: :published)
+      expect { subject_obj.publish! }.to raise_error(Subject::InvalidTransition, /déjà publié/)
+    end
+
+    it "raises InvalidTransition when no validated question" do
+      Question.update_all(status: :draft)
+      expect { subject_obj.publish! }.to raise_error(Subject::InvalidTransition, /au moins une question validée/)
+    end
+  end
+
+  describe "#unpublish!" do
+    let(:subject_obj) { create(:subject, :new_format, status: :published) }
+
+    it "unpublishes a published subject back to draft" do
+      subject_obj.unpublish!
+      expect(subject_obj.reload.status).to eq("draft")
+    end
+
+    it "raises InvalidTransition when not published" do
+      subject_obj.update!(status: :draft)
+      expect { subject_obj.unpublish! }.to raise_error(Subject::InvalidTransition, /Seul un sujet publié/)
+    end
+  end
+
   describe "ActiveStorage attachments" do
     context "legacy format" do
       it "has enonce_file attached" do

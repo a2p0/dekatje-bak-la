@@ -1,0 +1,12 @@
+<div id="flash" aria-live="polite" role="status">
+  <% if local_assigns.fetch(:notice, nil).present? %>
+    <div class="mb-4">
+      <%= render(FlashComponent.new(type: :notice, message: notice)) %>
+    </div>
+  <% end %>
+  <% if local_assigns.fetch(:alert, nil).present? %>
+    <div class="mb-4">
+      <%= render(FlashComponent.new(type: :alert, message: alert)) %>
+    </div>
+  <% end %>
+</div>

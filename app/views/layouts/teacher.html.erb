@@ -36,18 +36,7 @@
     end %>
 
     <main id="main-content" class="max-w-6xl mx-auto px-4 py-6">
-      <div aria-live="polite" role="status">
-        <% if notice.present? %>
-          <div class="mb-4">
-            <%= render(FlashComponent.new(type: :notice, message: notice)) %>
-          </div>
-        <% end %>
-        <% if alert.present? %>
-          <div class="mb-4">
-            <%= render(FlashComponent.new(type: :alert, message: alert)) %>
-          </div>
-        <% end %>
-      </div>
+      <%= render "shared/flash", notice: notice, alert: alert %>
       <%= yield %>
     </main>
   </body>

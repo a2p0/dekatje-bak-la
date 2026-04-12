@@ -44,7 +44,7 @@ class ExtractQuestionsJob < ApplicationJob
       locals: { subject: subject }
     )
     Turbo::StreamsChannel.broadcast_replace_to(
-      stream, target: "subject-stats",
+      stream, target: "subject_stats_#{subject.id}",
       partial: "teacher/subjects/stats",
       locals: { subject: subject }
     )

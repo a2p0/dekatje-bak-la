@@ -60,8 +60,8 @@
           Toutes les questions sont validées (<%= all_validated %>/<%= all_questions %>). Prêt à publier !
         </p>
         <%= button_to "Publier le sujet",
-              publish_teacher_subject_path(@subject),
-              method: :patch,
+              teacher_subject_publication_path(@subject),
+              method: :post,
               data: { turbo_confirm: "Publier ce sujet ?" },
               class: "inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
       </div>
