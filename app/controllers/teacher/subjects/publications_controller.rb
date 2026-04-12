@@ -5,7 +5,7 @@ class Teacher::Subjects::PublicationsController < Teacher::BaseController
   def create
     @subject.publish!
     respond_to do |format|
-      format.html { redirect_to assign_teacher_subject_path(@subject), notice: "Sujet publié. Assignez-le maintenant aux classes." }
+      format.html { redirect_to edit_teacher_subject_assignment_path(@subject), notice: "Sujet publié. Assignez-le maintenant aux classes." }
       format.turbo_stream
     end
   end

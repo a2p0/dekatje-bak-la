@@ -144,7 +144,7 @@ RSpec.describe "Story 4: Validation et publication des questions", type: :featur
       classroom1 = create(:classroom, owner: user, name: "Terminale SIN A")
       classroom2 = create(:classroom, owner: user, name: "Terminale ITEC B")
 
-      visit assign_teacher_subject_path(subject_record)
+      visit edit_teacher_subject_assignment_path(subject_record)
 
       expect(page).to have_content("Assigner")
       expect(page).to have_content("Terminale SIN A")

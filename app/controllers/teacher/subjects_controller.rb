@@ -1,5 +1,5 @@
 class Teacher::SubjectsController < Teacher::BaseController
-  before_action :set_subject, only: [ :show, :retry_extraction, :assign ]
+  before_action :set_subject, only: [ :show ]
 
   def index
     @subjects = current_teacher.subjects.kept.includes(:exam_session).order(created_at: :desc)
@@ -28,30 +28,6 @@ class Teacher::SubjectsController < Teacher::BaseController
 
   def show
     @extraction_job = @subject.extraction_job
-  end
-
-  def assign
-    @classrooms = current_teacher.classrooms.order(:name)
-    @assigned_ids = @subject.classroom_ids
-
-    if request.patch?
-      selected_ids = Array(params[:classroom_ids]).map(&:to_i)
-      @subject.classroom_ids = selected_ids
-      redirect_to teacher_subject_path(@subject), notice: "Assignation mise à jour."
-    end
-  end
-
-  def retry_extraction
-    job = @subject.extraction_job
-    unless job&.failed?
-      return redirect_to teacher_subject_path(@subject),
-                         alert: "L'extraction ne peut être relancée que si elle a échoué."
-    end
-
-    job.update!(status: :processing, error_message: nil)
-    ExtractQuestionsJob.perform_later(@subject.id)
-    redirect_to teacher_subject_path(@subject),
-                notice: "Extraction relancée."
   end
 
   private

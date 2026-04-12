@@ -12,10 +12,7 @@ Rails.application.routes.draw do
         end
         resource :password_reset, only: [ :create ], module: "students"
       end
-      member do
-        get :export_pdf
-        get :export_markdown
-      end
+      resource :export, only: [ :show ], module: "classrooms"
     end
 
     resources :exam_sessions, only: [ :destroy ]
@@ -27,11 +24,8 @@ Rails.application.routes.draw do
         end
       end
       resource :publication, only: [ :create, :destroy ], module: "subjects"
-      member do
-        post  :retry_extraction
-        get   :assign
-        patch :assign
-      end
+      resource :extraction,  only: [ :create ], module: "subjects"
+      resource :assignment,  only: [ :edit, :update ], module: "subjects"
     end
   end
 

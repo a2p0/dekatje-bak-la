@@ -42,7 +42,7 @@
             method: :delete,
             data: { turbo_confirm: "Dépublier ce sujet ?" },
             class: "inline-flex items-center justify-center font-semibold px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" %>
-      <%= render ButtonComponent.new(href: assign_teacher_subject_path(subject), variant: :ghost, size: :sm) do %>
+      <%= render ButtonComponent.new(href: edit_teacher_subject_assignment_path(subject), variant: :ghost, size: :sm) do %>
         Gérer l'assignation
       <% end %>
     <% end %>
