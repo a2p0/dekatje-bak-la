@@ -1,5 +1,5 @@
 class Teacher::SubjectsController < Teacher::BaseController
-  before_action :set_subject, only: [ :show, :publish, :archive, :unpublish, :retry_extraction, :assign ]
+  before_action :set_subject, only: [ :show, :retry_extraction, :assign ]
 
   def index
     @subjects = current_teacher.subjects.kept.includes(:exam_session).order(created_at: :desc)
@@ -30,27 +30,6 @@ class Teacher::SubjectsController < Teacher::BaseController
     @extraction_job = @subject.extraction_job
   end
 
-  def publish
-    unless @subject.publishable?
-      return redirect_to teacher_subject_path(@subject),
-                         alert: "Publiez au moins une question validée avant de publier."
-    end
-
-    @subject.update!(status: :published)
-    redirect_to assign_teacher_subject_path(@subject),
-                notice: "Sujet publié. Assignez-le maintenant aux classes."
-  end
-
-  def unpublish
-    unless @subject.published?
-      return redirect_to teacher_subject_path(@subject),
-                         alert: "Seul un sujet publié peut être dépublié."
-    end
-
-    @subject.update!(status: :draft)
-    redirect_to teacher_subject_path(@subject), notice: "Sujet dépublié."
-  end
-
   def assign
     @classrooms = current_teacher.classrooms.order(:name)
     @assigned_ids = @subject.classroom_ids
@@ -73,16 +52,6 @@ class Teacher::SubjectsController < Teacher::BaseController
     ExtractQuestionsJob.perform_later(@subject.id)
     redirect_to teacher_subject_path(@subject),
                 notice: "Extraction relancée."
-  end
-
-  def archive
-    unless @subject.published?
-      return redirect_to teacher_subject_path(@subject),
-                         alert: "Seul un sujet publié peut être archivé."
-    end
-
-    @subject.update!(status: :archived)
-    redirect_to teacher_subject_path(@subject), notice: "Sujet archivé."
   end
 
   private
