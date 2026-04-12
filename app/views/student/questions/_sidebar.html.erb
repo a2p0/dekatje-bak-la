@@ -83,15 +83,15 @@
   <%# All parts grouped by section_type (commune / specifique) %>
   <%
     ordered_parts = parts.order(:position).to_a
-    common_parts = ordered_parts.select { |p| p.section_type == "common" }
-    specific_parts = ordered_parts.select { |p| p.section_type == "specific" }
-    show_section_headers = common_parts.any? && specific_parts.any?
+    common_parts_list = common_parts(ordered_parts)
+    specific_parts_list = specific_parts(ordered_parts)
+    show_section_headers = common_parts_list.any? && specific_parts_list.any?
   %>
 
-  <% if show_section_headers && common_parts.any? %>
+  <% if show_section_headers && common_parts_list.any? %>
     <p class="text-slate-500 text-[10px] uppercase tracking-wide mb-1 mt-2 font-semibold px-2">Partie commune</p>
   <% end %>
-  <% common_parts.each do |p| %>
+  <% common_parts_list.each do |p| %>
     <%= render "student/questions/sidebar_part",
         part: p,
         current_part: current_part,
@@ -101,10 +101,10 @@
         access_code: access_code %>
   <% end %>
 
-  <% if show_section_headers && specific_parts.any? %>
+  <% if show_section_headers && specific_parts_list.any? %>
     <p class="text-slate-500 text-[10px] uppercase tracking-wide mb-1 mt-4 font-semibold px-2">Partie spécifique</p>
   <% end %>
-  <% specific_parts.each do |p| %>
+  <% specific_parts_list.each do |p| %>
     <%= render "student/questions/sidebar_part",
         part: p,
         current_part: current_part,

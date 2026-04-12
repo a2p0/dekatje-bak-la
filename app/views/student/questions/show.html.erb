@@ -16,7 +16,7 @@
               end
 
   # End-of-part button: "Partie suivante" (intermediate) or "Fin de la partie ..." (section terminal)
-  parts_in_section = @parts.select { |p| p.section_type == @part.section_type }
+  parts_in_section = parts_in_same_section(@parts, @part)
   part_idx_in_section = parts_in_section.index(@part)
   next_part_in_section = part_idx_in_section && parts_in_section[part_idx_in_section + 1]
   next_part_first_question = next_part_in_section&.questions&.kept&.order(:position)&.first

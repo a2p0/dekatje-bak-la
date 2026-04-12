@@ -96,28 +96,28 @@
     <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
       <h2 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">Parties du sujet</h2>
 
-      <% common_parts = @parts.select { |p| p.section_type == "common" } %>
-      <% specific_parts = @parts.select { |p| p.section_type == "specific" } %>
-      <% show_section_headers = common_parts.any? && specific_parts.any? %>
+      <% common_parts_list = common_parts(@parts) %>
+      <% specific_parts_list = specific_parts(@parts) %>
+      <% show_section_headers = common_parts_list.any? && specific_parts_list.any? %>
 
       <div class="space-y-2">
-        <% if show_section_headers && common_parts.any? %>
+        <% if show_section_headers && common_parts_list.any? %>
           <div class="pt-2 pb-1">
             <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Partie commune</span>
           </div>
         <% end %>
 
-        <% common_parts.each do |part| %>
+        <% common_parts_list.each do |part| %>
           <%= render "student/subjects/part_row", part: part, session_record: @session_record %>
         <% end %>
 
-        <% if show_section_headers && specific_parts.any? %>
+        <% if show_section_headers && specific_parts_list.any? %>
           <div class="pt-4 pb-1">
             <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Partie specifique</span>
           </div>
         <% end %>
 
-        <% specific_parts.each do |part| %>
+        <% specific_parts_list.each do |part| %>
           <%= render "student/subjects/part_row", part: part, session_record: @session_record %>
         <% end %>
       </div>
