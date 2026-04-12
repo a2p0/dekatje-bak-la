@@ -1,6 +1,5 @@
 class Teacher::StudentsController < Teacher::BaseController
   before_action :set_classroom
-  before_action :set_student, only: [ :reset_password ]
 
   def new
     @student = Student.new
@@ -83,27 +82,11 @@ class Teacher::StudentsController < Teacher::BaseController
     redirect_to teacher_classroom_path(@classroom)
   end
 
-  def reset_password
-    password = ResetStudentPassword.call(student: @student)
-    session[:generated_credentials] = [
-      { "name" => "#{@student.first_name} #{@student.last_name}",
-        "username" => @student.username,
-        "password" => password }
-    ]
-    redirect_to teacher_classroom_path(@classroom),
-                notice: "Mot de passe réinitialisé. Notez le nouveau mot de passe ci-dessous."
-  end
-
   private
 
   def set_classroom
     @classroom = current_teacher.classrooms.find_by(id: params[:classroom_id])
     redirect_to teacher_root_path, alert: "Classe introuvable." unless @classroom
-  end
-
-  def set_student
-    @student = @classroom.students.find_by(id: params[:id])
-    redirect_to teacher_classroom_path(@classroom), alert: "Élève introuvable." unless @student
   end
 
   def student_params

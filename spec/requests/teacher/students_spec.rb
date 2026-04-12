@@ -39,12 +39,6 @@ RSpec.describe "Teacher::Students", type: :request do
     end
   end
 
-  describe "POST reset_password" do
-    let(:student) { create(:student, classroom: classroom) }
-
-    it "resets password and redirects" do
-      post reset_password_teacher_classroom_student_path(classroom, student)
-      expect(response).to redirect_to(teacher_classroom_path(classroom))
-    end
-  end
+  # Password reset coverage moved to spec/requests/teacher/students/password_resets_spec.rb
+  # (refactored to RESTful Teacher::Students::PasswordResetsController#create)
 end

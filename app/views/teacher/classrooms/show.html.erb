@@ -100,7 +100,7 @@
               <%= student.username %>
             </td>
             <td class="px-4 py-3 border-t border-slate-200 dark:border-slate-700">
-              <%= button_to reset_password_teacher_classroom_student_path(@classroom, student),
+              <%= button_to teacher_student_password_reset_path(student),
                     method: :post,
                     data: { confirm: "Réinitialiser le mot de passe de #{student.first_name} #{student.last_name} ?" },
                     class: "inline-flex items-center justify-center font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 cursor-pointer border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 text-xs rounded-lg" do %>
