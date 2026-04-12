@@ -343,6 +343,7 @@ SECRET_KEY_BASE            # rails secret
 - Ruby 3.3+ / Rails 8.1 + Devise, Stimulus, Turbo, Sidekiq, FactoryBot (031-rails-conventions-fix)
 - Ruby 3.3+ / Rails 8.1 + Hotwire (Turbo Streams), Devise (authorization existante) (032-rest-subject-transitions)
 - Ruby 3.3+ / Rails 8.1 + Hotwire (Turbo Streams), Devise, ResetStudentPassword service existant (033-rest-validation-password)
+- Ruby 3.3+ / Rails 8.1 + Hotwire, Devise, Sidekiq, Prawn (PDF), existing export services (034-rest-extraction-assign-export)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
