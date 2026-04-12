@@ -1,10 +1,16 @@
 class ExportStudentCredentialsMarkdown
-  def self.call(classroom:)
-    students = classroom.students.order(:last_name, :first_name)
+  def self.call(...) = new(...).call
+
+  def initialize(classroom:)
+    @classroom = classroom
+  end
+
+  def call
+    students = @classroom.students.order(:last_name, :first_name)
 
     lines = []
-    lines << "# Classe : #{classroom.name} #{classroom.school_year}"
-    lines << "# Code d'accès : /#{classroom.access_code}"
+    lines << "# Classe : #{@classroom.name} #{@classroom.school_year}"
+    lines << "# Code d'accès : /#{@classroom.access_code}"
     lines << ""
     lines << "| Nom | Identifiant | Mot de passe |"
     lines << "|-----|-------------|--------------|"

@@ -2,14 +2,20 @@ require "prawn"
 require "prawn/table"
 
 class ExportStudentCredentialsPdf
-  def self.call(classroom:)
-    students = classroom.students.order(:last_name, :first_name)
+  def self.call(...) = new(...).call
+
+  def initialize(classroom:)
+    @classroom = classroom
+  end
+
+  def call
+    students = @classroom.students.order(:last_name, :first_name)
 
     Prawn::Document.new(page_size: "A4") do |pdf|
       pdf.font_size 12
 
-      pdf.text "Classe : #{classroom.name} #{classroom.school_year}", size: 16, style: :bold
-      pdf.text "Code d'accès élèves : /#{classroom.access_code}"
+      pdf.text "Classe : #{@classroom.name} #{@classroom.school_year}", size: 16, style: :bold
+      pdf.text "Code d'accès élèves : /#{@classroom.access_code}"
       pdf.move_down 10
 
       table_data = [ [ "Nom", "Identifiant", "Mot de passe" ] ]
