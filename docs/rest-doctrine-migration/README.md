@@ -53,19 +53,19 @@ end
 
 ---
 
-### Vague 2 — Validation workflow (3 actions)
+### Vague 2 — Validation workflow (3 actions) — MERGÉE
 
-**Controllers** :
-- `Teacher::QuestionsController` : `validate`, `invalidate`
-- `Teacher::StudentsController` : `reset_password`
+**Actions migrées** :
+- `Teacher::QuestionsController#validate` → `Teacher::Questions::ValidationsController#create`
+- `Teacher::QuestionsController#invalidate` → `Teacher::Questions::ValidationsController#destroy`
+- `Teacher::StudentsController#reset_password` → `Teacher::Students::PasswordResetsController#create`
 
-**Nouveaux controllers** :
-- `Teacher::Questions::ValidationsController#create/destroy`
-- `Teacher::Students::PasswordResetsController#create`
+**Modèle** : `Question#validate!/invalidate!` + `Question::InvalidTransition`
 
-**Modèle** : ajouter `Question#validate!/invalidate!` + exception
+**Nouveauté vague 2** : `shallow: true` appliqué sur `resources :questions` — les URLs CRUD questions passent de `/teacher/subjects/:s/parts/:p/questions/:id` à `/teacher/questions/:id`. Conceptuel aussi sur `resources :students` (prépare vagues futures).
 
-**Statut** : pas démarrée
+**PR** : #35 (mergée 2026-04-12)
+**Statut** : **DONE** ✓
 
 ---
 
@@ -127,9 +127,9 @@ Pages de navigation, pas des ressources. Gardées custom.
 | Vague | PR | Statut | Actions migrées |
 |-------|----|----|----|
 | 1 | #34 | DONE | 2 migrées + 1 supprimée (archive orpheline) |
-| 2 | — | Backlog | 3 |
+| 2 | #35 | DONE | 3 migrées + shallow nesting sur questions |
 | 3 | — | Backlog | 4 |
 | 4 | — | Backlog | 2 |
 | 5 | — | À qualifier | 0-8 |
 
-Total à migrer : **11-19 actions restantes** après vague 1.
+Total à migrer : **6-14 actions restantes** après vague 2.
