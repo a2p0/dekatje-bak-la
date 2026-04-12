@@ -33,13 +33,24 @@ class Subject < ApplicationRecord
     subject_pdf.attached?
   end
 
+  def legacy_attached_files
+    [
+      [enonce_file, "Énoncé"],
+      [dt_file, "Documents Techniques (DT)"],
+      [dr_vierge_file, "Document Réponse vierge"],
+      [dr_corrige_file, "Document Réponse corrigé"],
+      [questions_corrigees_file, "Questions corrigées"]
+    ].select { |file, _| file.attached? }
+  end
+
   def all_parts
-    if exam_session.present?
-      Part.where(id: exam_session.common_parts.select(:id))
-          .or(Part.where(id: parts.where(section_type: :specific).select(:id)))
-    else
-      parts
-    end
+    @all_parts ||=
+      if exam_session.present?
+        Part.where(id: exam_session.common_parts.select(:id))
+            .or(Part.where(id: parts.specific.select(:id)))
+      else
+        parts
+      end
   end
 
   def total_questions_count
