@@ -154,8 +154,13 @@ class StudentSession < ApplicationRecord
 
   # Whether this session requires scope selection (both common and specific parts exist)
   def requires_scope_selection?
-    return false unless subject.exam_session.present?
+    return @requires_scope_selection if defined?(@requires_scope_selection)
 
-    subject.exam_session.common_parts.any? && subject.parts.where(section_type: :specific).any?
+    @requires_scope_selection =
+      if subject.exam_session.present?
+        subject.exam_session.common_parts.any? && subject.parts.specific.any?
+      else
+        false
+      end
   end
 end
