@@ -6,12 +6,9 @@ Rails.application.routes.draw do
 
     resources :classrooms, only: [ :index, :new, :create, :show ] do
       resources :students, only: [ :index, :new, :create ], shallow: true do
-        collection do
-          get  :bulk_new
-          post :bulk_create
-        end
         resource :password_reset, only: [ :create ], module: "students"
       end
+      resource :student_import, only: [ :new, :create ], module: "classrooms"
       resource :export, only: [ :show ], module: "classrooms"
     end
 

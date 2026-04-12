@@ -23,21 +23,8 @@ RSpec.describe "Teacher::Students", type: :request do
     end
   end
 
-  describe "GET /teacher/classrooms/:id/students/bulk_new" do
-    it "returns 200" do
-      get bulk_new_teacher_classroom_students_path(classroom)
-      expect(response).to have_http_status(:ok)
-    end
-  end
-
-  describe "POST /teacher/classrooms/:id/students/bulk_create" do
-    it "creates multiple students" do
-      expect {
-        post bulk_create_teacher_classroom_students_path(classroom),
-             params: { students_list: "Jean Dupont\nMarie Martin" }
-      }.to change(Student, :count).by(2)
-    end
-  end
+  # Bulk import coverage moved to spec/requests/teacher/classrooms/student_imports_spec.rb
+  # (refactored to RESTful Teacher::Classrooms::StudentImportsController#new/create)
 
   # Password reset coverage moved to spec/requests/teacher/students/password_resets_spec.rb
   # (refactored to RESTful Teacher::Students::PasswordResetsController#create)

@@ -11,7 +11,7 @@
       Saisissez un élève par ligne, au format : <strong class="text-slate-900 dark:text-slate-100">Prénom Nom</strong>
     </p>
 
-    <%= form_with url: bulk_create_teacher_classroom_students_path(@classroom), method: :post do |f| %>
+    <%= form_with url: teacher_classroom_student_import_path(@classroom), method: :post do |f| %>
       <div class="space-y-4">
         <div>
           <%= f.label :students_list, "Liste des élèves",
