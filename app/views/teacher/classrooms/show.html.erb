@@ -61,7 +61,7 @@
       Ajouter un élève
     <% end %>
     <%= render ButtonComponent.new(
-          href: bulk_new_teacher_classroom_students_path(@classroom),
+          href: new_teacher_classroom_student_import_path(@classroom),
           variant: :ghost, size: :sm) do %>
       Ajout en lot
     <% end %>
