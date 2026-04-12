@@ -4,14 +4,16 @@ class ExtractQuestionsJob < ApplicationJob
   def perform(subject_id)
     subject = Subject.find(subject_id)
     job = subject.extraction_job
+    return if job&.done?
+
     job.update!(status: :processing)
 
     resolved = ResolveApiKey.call(user: subject.owner)
     skip_common = subject.exam_session&.common_parts&.any? || false
     raw_response, data = ExtractQuestionsFromPdf.call(
       subject: subject,
-      api_key: resolved[:api_key],
-      provider: resolved[:provider],
+      api_key: resolved.api_key,
+      provider: resolved.provider,
       skip_common: skip_common
     )
     PersistExtractedData.call(subject: subject, data: data)
