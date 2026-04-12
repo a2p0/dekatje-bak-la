@@ -16,15 +16,15 @@ class Teacher::StudentsController < Teacher::BaseController
     student = @classroom.students.build(
       first_name: student_params[:first_name],
       last_name: student_params[:last_name],
-      username: credentials[:username],
-      password: credentials[:password]
+      username: credentials.username,
+      password: credentials.password
     )
 
     if student.save
       session[:generated_credentials] = [
         { "name" => "#{student.first_name} #{student.last_name}",
-          "username" => credentials[:username],
-          "password" => credentials[:password] }
+          "username" => credentials.username,
+          "password" => credentials.password }
       ]
       redirect_to teacher_classroom_path(@classroom),
                   notice: "Élève ajouté. Notez les identifiants ci-dessous."
@@ -59,14 +59,14 @@ class Teacher::StudentsController < Teacher::BaseController
       student = @classroom.students.build(
         first_name: first_name,
         last_name: last_name,
-        username: credentials[:username],
-        password: credentials[:password]
+        username: credentials.username,
+        password: credentials.password
       )
 
       if student.save
         generated << { "name" => "#{first_name} #{last_name}",
-                       "username" => credentials[:username],
-                       "password" => credentials[:password] }
+                       "username" => credentials.username,
+                       "password" => credentials.password }
       else
         errors << "Erreur pour #{line} : #{student.errors.full_messages.join(", ")}"
       end
@@ -84,11 +84,11 @@ class Teacher::StudentsController < Teacher::BaseController
   end
 
   def reset_password
-    result = ResetStudentPassword.call(student: @student)
+    password = ResetStudentPassword.call(student: @student)
     session[:generated_credentials] = [
       { "name" => "#{@student.first_name} #{@student.last_name}",
         "username" => @student.username,
-        "password" => result[:password] }
+        "password" => password }
     ]
     redirect_to teacher_classroom_path(@classroom),
                 notice: "Mot de passe réinitialisé. Notez le nouveau mot de passe ci-dessous."

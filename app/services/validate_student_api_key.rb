@@ -1,18 +1,30 @@
 class ValidateStudentApiKey
-  def self.call(provider:, api_key:, model:)
-    client = AiClientFactory.build(provider: provider, api_key: api_key)
+  class InvalidApiKeyError < StandardError; end
+
+  def self.call(provider:, api_key:, model:) = new(provider:, api_key:, model:).call
+
+  def initialize(provider:, api_key:, model:)
+    @provider = provider
+    @api_key = api_key
+    @model = model
+  end
+
+  def call
+    client = AiClientFactory.build(provider: @provider, api_key: @api_key)
     client.call(
       messages: [ { role: "user", content: "Réponds OK" } ],
       system: "Réponds uniquement OK.",
       max_tokens: 10,
       temperature: 0
     )
-    { valid: true }
+    true
   rescue AiClientFactory::UnknownProviderError
-    { valid: false, error: "Provider inconnu : #{provider}" }
+    raise InvalidApiKeyError, "Provider inconnu : #{@provider}"
   rescue Faraday::TimeoutError
-    { valid: false, error: "Timeout — le serveur n'a pas répondu." }
+    raise InvalidApiKeyError, "Timeout — le serveur n'a pas répondu."
+  rescue InvalidApiKeyError
+    raise
   rescue => e
-    { valid: false, error: e.message }
+    raise InvalidApiKeyError, e.message
   end
 end

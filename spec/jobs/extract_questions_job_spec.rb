@@ -4,7 +4,7 @@ RSpec.describe ExtractQuestionsJob, type: :job do
   let(:subject_obj) { create(:subject, :new_format) }
   let(:extraction_job) { create(:extraction_job, subject: subject_obj, status: :pending) }
 
-  let(:resolved_key) { { api_key: "sk-test", provider: :anthropic } }
+  let(:resolved_key) { ResolveApiKey::Result.new(api_key: "sk-test", provider: :anthropic) }
   let(:raw_response) { '{"presentation":"Test","parts":[]}' }
   let(:extracted_data) { { "presentation" => "Test", "parts" => [] } }
 
