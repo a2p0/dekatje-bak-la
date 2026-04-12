@@ -2,7 +2,7 @@ class Teacher::ClassroomsController < Teacher::BaseController
   before_action :set_classroom, only: [ :show, :export_pdf, :export_markdown ]
 
   def index
-    @classrooms = current_teacher.classrooms.order(created_at: :desc)
+    @classrooms = current_teacher.classrooms.includes(:students).order(created_at: :desc)
     @recent_subjects = current_teacher.subjects.kept.order(created_at: :desc).limit(5)
   end
 
