@@ -1,8 +1,6 @@
 class Teacher::QuestionsController < Teacher::BaseController
   include ActionView::RecordIdentifier
 
-  before_action :set_subject
-  before_action :set_part
   before_action :set_question
 
   def update
@@ -27,47 +25,21 @@ class Teacher::QuestionsController < Teacher::BaseController
     render turbo_stream: turbo_stream.remove(dom_id(@question))
   end
 
-  def validate
-    @question.update!(status: :validated)
-    render turbo_stream: turbo_stream.replace(
-      dom_id(@question),
-      partial: "teacher/questions/question",
-      locals: { question: @question, subject: @subject, part: @part }
-    )
-  end
-
-  def invalidate
-    @question.update!(status: :draft)
-    render turbo_stream: turbo_stream.replace(
-      dom_id(@question),
-      partial: "teacher/questions/question",
-      locals: { question: @question, subject: @subject, part: @part }
-    )
-  end
-
   private
 
-  def set_subject
-    @subject = current_teacher.subjects.find_by(id: params[:subject_id])
-    redirect_to teacher_subjects_path, alert: "Sujet introuvable." unless @subject
-  end
-
-  def set_part
-    @part = all_parts_for_subject.find { |p| p.id == params[:part_id].to_i }
-    redirect_to teacher_subject_path(@subject), alert: "Partie introuvable." unless @part
-  end
-
-  def all_parts_for_subject
-    if @subject.exam_session.present?
-      @subject.exam_session.common_parts.to_a + @subject.parts.specific.to_a
-    else
-      @subject.parts.to_a
-    end
-  end
-
   def set_question
-    @question = @part.questions.kept.find_by(id: params[:id])
-    redirect_to teacher_subject_part_path(@subject, @part), alert: "Question introuvable." unless @question
+    @question = Question.kept
+                        .joins(:part)
+                        .joins("LEFT JOIN subjects ON subjects.id = parts.subject_id")
+                        .joins("LEFT JOIN exam_sessions ON exam_sessions.id = parts.exam_session_id")
+                        .where("subjects.owner_id = ? OR exam_sessions.owner_id = ?", current_user.id, current_user.id)
+                        .find_by(id: params[:id])
+    if @question
+      @part = @question.part
+      @subject = @part.subject || current_user.subjects.joins(:exam_session).find_by(exam_sessions: { id: @part.exam_session_id })
+    else
+      redirect_to teacher_subjects_path, alert: "Question introuvable."
+    end
   end
 
   def question_params

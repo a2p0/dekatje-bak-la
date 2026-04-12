@@ -1,4 +1,4 @@
-<%= form_with url: teacher_subject_part_question_path(subject, part, question),
+<%= form_with url: teacher_question_path(question),
               scope: :question,
               method: :patch,
               data: { turbo_frame: dom_id(question) } do |f| %>

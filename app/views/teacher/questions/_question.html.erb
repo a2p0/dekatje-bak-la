@@ -25,12 +25,12 @@
         <% end %>
         <div class="flex items-center gap-2">
           <%= button_to "Invalider",
-              invalidate_teacher_subject_part_question_path(subject, part, question),
-              method: :patch,
+              teacher_question_validation_path(question),
+              method: :delete,
               form: { data: { turbo_frame: dom_id(question) } },
               class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer" %>
           <%= button_to "Supprimer",
-              teacher_subject_part_question_path(subject, part, question),
+              teacher_question_path(question),
               method: :delete,
               data: { turbo_confirm: "Supprimer cette question ?" },
               form: { data: { turbo_frame: "_top" } },
@@ -51,12 +51,12 @@
         </div>
         <div class="flex items-center gap-2">
           <%= button_to "Valider",
-              validate_teacher_subject_part_question_path(subject, part, question),
-              method: :patch,
+              teacher_question_validation_path(question),
+              method: :post,
               form: { data: { turbo_frame: dom_id(question) } },
               class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
           <%= button_to "Supprimer",
-              teacher_subject_part_question_path(subject, part, question),
+              teacher_question_path(question),
               method: :delete,
               data: { turbo_confirm: "Supprimer cette question ?" },
               form: { data: { turbo_frame: "_top" } },
