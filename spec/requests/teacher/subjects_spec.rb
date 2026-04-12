@@ -83,33 +83,7 @@ RSpec.describe "Teacher::Subjects", type: :request do
     end
   end
 
-  describe "PATCH /teacher/subjects/:id/publish" do
-    it "publishes a pending_validation subject with validated questions" do
-      subject = create(:subject, owner: user, status: :pending_validation)
-      part = create(:part, :specific, subject: subject)
-      create(:question, part: part, status: :validated)
-      patch publish_teacher_subject_path(subject)
-      expect(subject.reload.status).to eq("published")
-    end
-
-    it "does not publish an archived subject" do
-      subject = create(:subject, owner: user, status: :archived)
-      patch publish_teacher_subject_path(subject)
-      expect(subject.reload.status).to eq("archived")
-    end
-  end
-
-  describe "PATCH /teacher/subjects/:id/archive" do
-    it "archives a published subject" do
-      subject = create(:subject, owner: user, status: :published)
-      patch archive_teacher_subject_path(subject)
-      expect(subject.reload.status).to eq("archived")
-    end
-
-    it "does not archive a draft subject" do
-      subject = create(:subject, owner: user, status: :draft)
-      patch archive_teacher_subject_path(subject)
-      expect(subject.reload.status).to eq("draft")
-    end
-  end
+  # Publish/unpublish coverage lives in spec/requests/teacher/subjects/publications_spec.rb
+  # (refactored to RESTful Teacher::Subjects::PublicationsController#create/destroy)
+  # Archive route was removed as orphaned (no view exposed it).
 end
