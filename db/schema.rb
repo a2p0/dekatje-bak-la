@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_221441) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_222842) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_221441) do
     t.bigint "owner_id", null: false
     t.string "school_year", null: false
     t.string "specialty"
+    t.boolean "tutor_free_mode_enabled", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["access_code"], name: "index_classrooms_on_access_code", unique: true
     t.index ["owner_id"], name: "index_classrooms_on_owner_id"
@@ -216,6 +217,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_221441) do
     t.string "password_digest", null: false
     t.integer "specialty"
     t.datetime "updated_at", null: false
+    t.boolean "use_personal_key", default: true, null: false
     t.string "username", null: false
     t.index ["classroom_id"], name: "index_students_on_classroom_id"
     t.index ["username", "classroom_id"], name: "index_students_on_username_and_classroom_id", unique: true
@@ -248,6 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_221441) do
     t.string "encrypted_password", default: "", null: false
     t.string "first_name", default: "", null: false
     t.string "last_name", default: "", null: false
+    t.string "openrouter_api_key"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"

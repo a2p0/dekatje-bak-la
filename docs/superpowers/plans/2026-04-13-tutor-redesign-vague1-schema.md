@@ -352,10 +352,9 @@
                default: false, null: false
 
     # User: OpenRouter key used when tutor_free_mode_enabled on one of their classrooms.
-    # The app already uses ActiveRecord Encryption (encrypts :api_key in User).
-    # The encrypted ciphertext is stored as a plain text column; the attribute name
-    # used in the model is :openrouter_api_key and Rails encryption stores it here.
-    add_column :users, :openrouter_api_key_ciphertext, :text
+    # Encrypted via `encrypts :openrouter_api_key` in the User model (Rails native encryption
+    # stores ciphertext in the same column — matches the existing `api_key` pattern).
+    add_column :users, :openrouter_api_key, :string
 
     # Student: whether this student uses their own API key (true) or the classroom
     # free-mode key provided by the teacher (false).
@@ -376,7 +375,7 @@
   ```
   Confirm `db/schema.rb` contains:
   - `t.boolean "tutor_free_mode_enabled", default: false, null: false` in classrooms
-  - `t.text "openrouter_api_key_ciphertext"` in users
+  - `t.string "openrouter_api_key"` in users
   - `t.boolean "use_personal_key", default: true, null: false` in students
 
 - [ ] Commit:
