@@ -24,6 +24,7 @@ gem "devise"
 gem "sidekiq"
 gem "aasm"
 gem "ruby_llm"
+gem "rack-attack"
 gem "redis"
 
 gem "pdf-reader"
