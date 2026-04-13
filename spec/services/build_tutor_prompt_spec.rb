@@ -1,7 +1,7 @@
 # spec/services/build_tutor_prompt_spec.rb
 require "rails_helper"
 
-RSpec.xdescribe BuildTutorPrompt do
+RSpec.xdescribe "BuildTutorPrompt (removed in vague1)" do
   let(:user) { create(:user, tutor_prompt_template: nil) }
   let(:subject_record) { create(:subject, owner: user, specialty: :SIN) }
   let(:part) { create(:part, subject: subject_record, title: "Partie 1", objective_text: "Comparer les transports") }
