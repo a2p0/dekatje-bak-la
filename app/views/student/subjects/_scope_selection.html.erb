@@ -7,7 +7,7 @@
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <%# Partie commune %>
-    <%= button_to student_set_scope_subject_path(access_code: access_code, id: subject.id),
+    <%= button_to student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
         method: :patch,
         params: { part_filter: "common_only" },
         class: "text-left bg-white dark:bg-slate-800 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-5 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all cursor-pointer group" do %>
@@ -25,7 +25,7 @@
     <% end %>
 
     <%# Partie specifique %>
-    <%= button_to student_set_scope_subject_path(access_code: access_code, id: subject.id),
+    <%= button_to student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
         method: :patch,
         params: { part_filter: "specific_only" },
         class: "text-left bg-white dark:bg-slate-800 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-5 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md transition-all cursor-pointer group" do %>
@@ -43,7 +43,7 @@
     <% end %>
 
     <%# Sujet complet %>
-    <%= button_to student_set_scope_subject_path(access_code: access_code, id: subject.id),
+    <%= button_to student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
         method: :patch,
         params: { part_filter: "full" },
         class: "text-left bg-white dark:bg-slate-800 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-5 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-md transition-all cursor-pointer group" do %>

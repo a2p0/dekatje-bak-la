@@ -44,7 +44,7 @@ export default class extends Controller {
 
     const token = document.querySelector('meta[name="csrf-token"]')?.content
     const response = await fetch(
-      window.location.pathname.replace("/settings", "/settings/test_key"),
+      window.location.pathname.replace("/settings", "/settings/api_key_test"),
       {
         method: "POST",
         headers: {

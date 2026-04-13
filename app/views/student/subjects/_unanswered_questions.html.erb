@@ -19,7 +19,7 @@
 
 <div class="text-center">
   <%= button_to "Terminer le sujet",
-      student_complete_subject_path(access_code: access_code, id: subject.id),
-      method: :patch,
+      student_subject_completion_path(access_code: access_code, subject_id: subject.id),
+      method: :post,
       class: "inline-flex items-center px-8 py-3 bg-gradient-to-br from-indigo-500 to-violet-500 text-white rounded-full text-sm font-semibold border-0 cursor-pointer hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]" %>
 </div>

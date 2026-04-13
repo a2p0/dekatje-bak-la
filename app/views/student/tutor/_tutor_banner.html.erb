@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="flex-shrink-0">
-      <%= button_to student_tutor_activate_path(access_code: access_code, subject_id: subject.id),
+      <%= button_to student_subject_tutor_activation_path(access_code: access_code, subject_id: subject.id),
                     method: :post,
                     class: "inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer" do %>
         Activer le mode tuteur
