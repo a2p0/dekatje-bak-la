@@ -1,5 +1,5 @@
 # app/models/types/tutor_state_type.rb
-class TutorStateType < ActiveRecord::Type::Value
+class TutorStateType < ActiveRecord::Type::Json
   def cast(value)
     case value
     when TutorState
@@ -14,17 +14,17 @@ class TutorStateType < ActiveRecord::Type::Value
   end
 
   def serialize(value)
-    return {} if value.nil?
+    return super({}) if value.nil?
 
     tutor_state = cast(value)
-    {
+    super(
       "current_phase"        => tutor_state.current_phase,
       "current_question_id"  => tutor_state.current_question_id,
       "concepts_mastered"    => tutor_state.concepts_mastered,
       "concepts_to_revise"   => tutor_state.concepts_to_revise,
       "discouragement_level" => tutor_state.discouragement_level,
       "question_states"      => serialize_question_states(tutor_state.question_states)
-    }
+    )
   end
 
   def deserialize(value)

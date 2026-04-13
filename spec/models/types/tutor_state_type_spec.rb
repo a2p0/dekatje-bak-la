@@ -74,15 +74,16 @@ RSpec.describe TutorStateType do
   end
 
   describe "#serialize" do
-    it "converts TutorState to a plain Hash" do
+    it "converts TutorState to a JSON string" do
       state = TutorState.default
       result = type.serialize(state)
-      expect(result).to be_a(Hash)
-      expect(result["current_phase"]).to eq("idle")
-      expect(result["question_states"]).to eq({})
+      expect(result).to be_a(String)
+      parsed = JSON.parse(result)
+      expect(parsed["current_phase"]).to eq("idle")
+      expect(parsed["question_states"]).to eq({})
     end
 
-    it "converts nested QuestionState to a hash" do
+    it "converts nested QuestionState to a hash inside the JSON payload" do
       qs = QuestionState.new(
         step: 1, hints_used: 0, last_confidence: nil,
         error_types: [], completed_at: nil
@@ -93,15 +94,15 @@ RSpec.describe TutorStateType do
         discouragement_level: 0,
         question_states: { "5" => qs }
       )
-      result = type.serialize(state)
-      expect(result["question_states"]["5"]).to be_a(Hash)
-      expect(result["question_states"]["5"]["step"]).to eq(1)
+      parsed = JSON.parse(type.serialize(state))
+      expect(parsed["question_states"]["5"]).to be_a(Hash)
+      expect(parsed["question_states"]["5"]["step"]).to eq(1)
     end
   end
 
   describe "#deserialize" do
     it "parses a JSON string and casts to TutorState" do
-      json = TutorState.default.then { |s| type.serialize(s).to_json }
+      json = type.serialize(TutorState.default)
       result = type.deserialize(json)
       expect(result).to be_a(TutorState)
       expect(result.current_phase).to eq("idle")
@@ -117,7 +118,7 @@ RSpec.describe TutorStateType do
   end
 
   describe "round-trip" do
-    it "cast(serialize(state)) equals the original state for a populated state" do
+    it "deserialize(serialize(state)) equals the original state for a populated state" do
       qs = QuestionState.new(
         step: 3, hints_used: 2, last_confidence: 4,
         error_types: ["calcul", "unit"], completed_at: "2026-04-13T10:00:00Z"
@@ -130,7 +131,7 @@ RSpec.describe TutorStateType do
         discouragement_level: 2,
         question_states:      { "7" => qs }
       )
-      round_tripped = type.cast(type.serialize(original))
+      round_tripped = type.deserialize(type.serialize(original))
       expect(round_tripped).to eq(original)
     end
   end

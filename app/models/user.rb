@@ -4,6 +4,7 @@ class User < ApplicationRecord
          :confirmable
 
   encrypts :api_key
+  encrypts :openrouter_api_key
 
   enum :api_provider, { anthropic: 0, openrouter: 1, openai: 2, google: 3 }
 
