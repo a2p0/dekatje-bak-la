@@ -40,8 +40,6 @@ Rails.application.routes.draw do
       controller: "student/subjects/scope_selections"
     resource :subject_completion, only: [ :create ], path: "subjects/:subject_id/completion",
       controller: "student/subjects/completions"
-    resource :subject_tutor_activation, only: [ :create ], path: "subjects/:subject_id/tutor_activation",
-      controller: "student/subjects/tutor_activations"
     resource :subject_part_completion, only: [ :create ], path: "subjects/:subject_id/parts/:part_id/part_completion",
       controller: "student/subjects/part_completions"
     get "/subjects/:subject_id/questions/:id",      to: "student/questions#show",    as: :question
@@ -55,10 +53,6 @@ Rails.application.routes.draw do
       member do
         post :message
       end
-    end
-    scope "/subjects/:subject_id/questions/:question_id/tutor", as: :tutor_question do
-      post :verify_spotting, to: "student/tutor#verify_spotting"
-      post :skip_spotting,   to: "student/tutor#skip_spotting"
     end
   end
 
