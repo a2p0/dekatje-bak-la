@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_221103) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_221441) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -117,6 +117,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_221103) do
     t.index ["exam_session_id"], name: "index_extraction_jobs_on_exam_session_id"
     t.index ["status"], name: "index_extraction_jobs_on_status"
     t.index ["subject_id"], name: "index_extraction_jobs_on_subject_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "chunk_index", default: 0, null: false
+    t.text "content", null: false
+    t.bigint "conversation_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "question_id"
+    t.integer "role", null: false
+    t.datetime "streaming_finished_at"
+    t.integer "tokens_in", default: 0, null: false
+    t.integer "tokens_out", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["question_id"], name: "index_messages_on_question_id"
   end
 
   create_table "parts", force: :cascade do |t|
@@ -256,6 +271,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_221103) do
   add_foreign_key "exam_sessions", "users", column: "owner_id"
   add_foreign_key "extraction_jobs", "exam_sessions"
   add_foreign_key "extraction_jobs", "subjects"
+  add_foreign_key "messages", "conversations", on_delete: :cascade
+  add_foreign_key "messages", "questions", on_delete: :nullify
   add_foreign_key "parts", "exam_sessions"
   add_foreign_key "parts", "subjects"
   add_foreign_key "questions", "parts"
