@@ -103,22 +103,36 @@ end
 
 ---
 
-### Vague 5 — Student workflow (8 actions, questionnée au cas par cas)
+### Vague 5a — Student actions (6 actions) — MERGÉE
 
-**Controllers** : `Student::SubjectsController`, `Student::TutorController`,
-`Student::QuestionsController`, `Student::ConversationsController`,
-`Student::SettingsController`
+**Actions migrées** :
+- `Student::SubjectsController#set_scope` → `Student::Subjects::ScopeSelectionsController#update`
+- `Student::SubjectsController#complete_part` → `Student::Subjects::PartCompletionsController#create`
+- `Student::SubjectsController#complete` → `Student::Subjects::CompletionsController#create`
+- `Student::QuestionsController#reveal` → `Student::Questions::CorrectionsController#create`
+- `Student::SettingsController#test_key` → `Student::Settings::ApiKeyTestsController#create`
+- `Student::TutorController#activate` → `Student::Subjects::TutorActivationsController#create`
 
-Actions à examiner :
-- `set_scope`, `complete_part`, `complete` (student/subjects)
-- `activate`, `verify_spotting`, `skip_spotting` (student/tutor) — **potentielles exceptions légitimes** (workflow tuteur stateful)
-- `reveal` (student/questions) — transition sur StudentSession
-- `test_key` (student/settings) — action de test, potentielle exception légitime
-- `message` (student/conversations) — déjà géré via `create` ?
+**Particularités** :
+- Scope `/:access_code` préservé avec `controller:` explicite dans routes.rb (le scope ne supporte pas `module:`)
+- Réutilisation pure des patterns vagues 1-4 (pas de nouveauté technique)
+- Bug fix : scoping CorrectionsController étendu aux common parts via exam_session
 
-**Décision cas par cas** avant refactoring systématique.
+**PR** : #38 (mergée 2026-04-13)
+**Statut** : **DONE** ✓
 
-**Statut** : pas démarrée
+---
+
+### Vague 5b — Student tuteur (3 actions) — REPORTÉE
+
+**Actions non migrées** (reportées) :
+- `Student::ConversationsController#message`
+- `Student::TutorController#verify_spotting`
+- `Student::TutorController#skip_spotting`
+
+**Raison du report** : le tuteur sera repensé entièrement. Ces 3 actions font partie du workflow tuteur guidé (stateful, multi-étapes). Elles seront migrées au moment du refonte du tuteur, ou conservées comme exceptions légitimes selon le design retenu.
+
+**Statut** : **REPORTÉE** ⏸
 
 ---
 
@@ -137,6 +151,7 @@ Pages de navigation, pas des ressources. Gardées custom.
 | 2 | #35 | DONE | 3 migrées + shallow nesting sur questions |
 | 3 | #36 | DONE | 4 migrées + 3 patterns nouveaux (edit/update singular, respond_to multi-format, service idempotent) |
 | 4 | #37 | DONE | 2 migrées (StudentImport) |
-| 5 | — | À qualifier | 0-8 |
+| 5a | #38 | DONE | 6 migrées (student actions) |
+| 5b | — | REPORTÉE | 3 (workflow tuteur, sera repensé) |
 
-Total à migrer : **0-8 actions restantes** après vague 4.
+**Total : 17 actions migrées + 1 supprimée. 3 restantes reportées à la refonte du tuteur.**
