@@ -151,8 +151,8 @@
       <% elsif @question.answer && (!@session_record.tutored? || @session_record.spotting_completed?(@question.id)) %>
         <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
           <%= button_to "Voir la correction",
-              student_reveal_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @question.id),
-              method: :patch,
+              student_subject_question_correction_path(access_code: params[:access_code], subject_id: @subject.id, question_id: @question.id),
+              method: :post,
               data: { turbo_frame: "question_#{@question.id}_correction" },
               class: "px-8 py-3 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm cursor-pointer hover:from-indigo-600 hover:to-violet-600 transition-all font-semibold shadow-[0_0_16px_rgba(99,102,241,0.3)]" %>
         </div>
@@ -185,8 +185,8 @@
       <% else %>
         <%# Last question of the last part in its section → mark part done and route to other section %>
         <%= button_to end_of_part_label,
-            student_complete_part_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id),
-            method: :patch,
+            student_subject_part_completion_path(access_code: params[:access_code], subject_id: @subject.id, part_id: @part.id),
+            method: :post,
             class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold border-0 cursor-pointer hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
       <% end %>
     </div>
@@ -225,8 +225,8 @@
     <% else %>
       <div class="flex-1 min-w-0 text-right">
         <%= button_to end_of_part_mobile_label,
-            student_complete_part_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id),
-            method: :patch,
+            student_subject_part_completion_path(access_code: params[:access_code], subject_id: @subject.id, part_id: @part.id),
+            method: :post,
             class: "text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate border-0 bg-transparent cursor-pointer p-0" %>
       </div>
     <% end %>

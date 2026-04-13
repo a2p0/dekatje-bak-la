@@ -35,13 +35,6 @@ RSpec.describe "Student::Questions", type: :request do
     end
   end
 
-  describe "PATCH /subjects/:subject_id/questions/:id/reveal" do
-    it "marks question as answered" do
-      patch student_reveal_question_path(
-        access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id
-      ), headers: { "Accept" => "text/vnd.turbo-stream.html" }
-      ss = StudentSession.find_by(student: student, subject: subject_obj)
-      expect(ss.progression[question.id.to_s]["answered"]).to be true
-    end
-  end
+  # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).
+  # See spec/requests/student/questions/corrections_spec.rb
 end

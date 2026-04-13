@@ -39,24 +39,6 @@ RSpec.describe "Student::Settings", type: :request do
     end
   end
 
-  describe "POST /settings/test_key" do
-    it "returns turbo stream with valid result" do
-      allow(ValidateStudentApiKey).to receive(:call).and_return(true)
-
-      post student_test_key_path(access_code: classroom.access_code),
-           params: { provider: "anthropic", api_key: "sk-test", model: "claude-haiku-4-5-20251001" },
-           headers: { "Accept" => "text/vnd.turbo-stream.html" }
-      expect(response.body).to include("valide")
-    end
-
-    it "returns turbo stream with error for bad key" do
-      allow(ValidateStudentApiKey).to receive(:call)
-        .and_raise(ValidateStudentApiKey::InvalidApiKeyError, "API error 401: Unauthorized")
-
-      post student_test_key_path(access_code: classroom.access_code),
-           params: { provider: "anthropic", api_key: "bad", model: "claude-haiku-4-5-20251001" },
-           headers: { "Accept" => "text/vnd.turbo-stream.html" }
-      expect(response.body).to include("401")
-    end
-  end
+  # API key test coverage moved to spec/requests/student/settings/api_key_tests_spec.rb
+  # (refactored to RESTful Student::Settings::ApiKeyTestsController#create)
 end

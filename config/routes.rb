@@ -35,22 +35,26 @@ Rails.application.routes.draw do
     post   "/session", to: "student/sessions#create",  as: :session
     delete "/session", to: "student/sessions#destroy"
     get "/subjects",                                to: "student/subjects#index",    as: :root
-    get   "/subjects/:id",                            to: "student/subjects#show",     as: :subject
-    patch "/subjects/:id/set_scope",                   to: "student/subjects#set_scope", as: :set_scope_subject
-    patch "/subjects/:id/complete_part/:part_id",      to: "student/subjects#complete_part", as: :complete_part_subject
-    patch "/subjects/:id/complete",                    to: "student/subjects#complete",      as: :complete_subject
+    get "/subjects/:id",                            to: "student/subjects#show",     as: :subject
+    resource :subject_scope_selection, only: [ :update ], path: "subjects/:subject_id/scope_selection",
+      controller: "student/subjects/scope_selections"
+    resource :subject_completion, only: [ :create ], path: "subjects/:subject_id/completion",
+      controller: "student/subjects/completions"
+    resource :subject_tutor_activation, only: [ :create ], path: "subjects/:subject_id/tutor_activation",
+      controller: "student/subjects/tutor_activations"
+    resource :subject_part_completion, only: [ :create ], path: "subjects/:subject_id/parts/:part_id/part_completion",
+      controller: "student/subjects/part_completions"
     get "/subjects/:subject_id/questions/:id",      to: "student/questions#show",    as: :question
-    patch "/subjects/:subject_id/questions/:id/reveal", to: "student/questions#reveal", as: :reveal_question
+    resource :subject_question_correction, only: [ :create ], path: "subjects/:subject_id/questions/:question_id/correction",
+      controller: "student/questions/corrections"
     get   "/settings",          to: "student/settings#show",     as: :settings
     patch "/settings",          to: "student/settings#update"
-    post  "/settings/test_key", to: "student/settings#test_key", as: :test_key
+    resource :api_key_test, only: [ :create ], path: "settings/api_key_test",
+      controller: "student/settings/api_key_tests"
     resources :conversations, only: [ :create ], controller: "student/conversations" do
       member do
         post :message
       end
-    end
-    scope "/subjects/:subject_id/tutor", as: :tutor do
-      post :activate, to: "student/tutor#activate"
     end
     scope "/subjects/:subject_id/questions/:question_id/tutor", as: :tutor_question do
       post :verify_spotting, to: "student/tutor#verify_spotting"

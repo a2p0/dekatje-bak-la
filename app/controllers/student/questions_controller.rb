@@ -22,15 +22,6 @@ class Student::QuestionsController < Student::BaseController
     extract_previous_insights
   end
 
-  def reveal
-    @session_record.mark_answered!(@question.id)
-    render turbo_stream: turbo_stream.replace(
-      "question_#{@question.id}_correction",
-      partial: "student/questions/correction",
-      locals: { question: @question, subject: @subject, session_record: @session_record }
-    )
-  end
-
   private
 
   def set_subject
