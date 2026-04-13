@@ -56,40 +56,8 @@ RSpec.describe "Student::Subjects", type: :request do
     end
   end
 
-  describe "PATCH /subjects/:id/complete_part/:part_id" do
-    let(:part) { create(:part, :specific, subject: subject_obj, position: 1) }
-    let!(:question) { create(:question, part: part, position: 1) }
-
-    it "marks the part as completed and redirects to subject page" do
-      get student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
-
-      patch student_complete_part_subject_path(
-        access_code: classroom.access_code,
-        id: subject_obj.id,
-        part_id: part.id
-      )
-
-      expect(response).to redirect_to(student_subject_path(access_code: classroom.access_code, id: subject_obj.id))
-      session_record = StudentSession.find_by(student: student, subject: subject_obj)
-      expect(session_record.part_completed?(part.id)).to be true
-    end
-  end
-
-  describe "PATCH /subjects/:id/complete" do
-    let(:part) { create(:part, :specific, subject: subject_obj, position: 1) }
-    let!(:question) { create(:question, part: part, position: 1) }
-
-    it "marks the subject as completed and redirects to subject page" do
-      get student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
-
-      patch student_complete_subject_path(
-        access_code: classroom.access_code,
-        id: subject_obj.id
-      )
-
-      expect(response).to redirect_to(student_subject_path(access_code: classroom.access_code, id: subject_obj.id, completed: true))
-      session_record = StudentSession.find_by(student: student, subject: subject_obj)
-      expect(session_record.subject_completed?).to be true
-    end
-  end
+  # Part/subject completion coverage moved to :
+  # - spec/requests/student/subjects/part_completions_spec.rb
+  # - spec/requests/student/subjects/completions_spec.rb
+  # (refactored to RESTful Student::Subjects::PartCompletionsController / CompletionsController)
 end
