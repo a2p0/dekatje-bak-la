@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_221103) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -77,16 +77,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
 
   create_table "conversations", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.jsonb "messages", default: [], null: false
+    t.string "lifecycle_state", default: "disabled", null: false
     t.string "provider_used"
-    t.bigint "question_id", null: false
-    t.boolean "streaming", default: false, null: false
+    t.bigint "question_id"
     t.bigint "student_id", null: false
+    t.bigint "subject_id", null: false
     t.integer "tokens_used", default: 0, null: false
+    t.jsonb "tutor_state", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["question_id"], name: "index_conversations_on_question_id"
-    t.index ["student_id", "question_id"], name: "index_conversations_on_student_id_and_question_id"
+    t.index ["student_id", "subject_id"], name: "index_conversations_on_student_id_and_subject_id", unique: true
     t.index ["student_id"], name: "index_conversations_on_student_id"
+    t.index ["subject_id"], name: "index_conversations_on_subject_id"
   end
 
   create_table "exam_sessions", force: :cascade do |t|
@@ -250,6 +252,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
   add_foreign_key "classrooms", "users", column: "owner_id"
   add_foreign_key "conversations", "questions"
   add_foreign_key "conversations", "students"
+  add_foreign_key "conversations", "subjects"
   add_foreign_key "exam_sessions", "users", column: "owner_id"
   add_foreign_key "extraction_jobs", "exam_sessions"
   add_foreign_key "extraction_jobs", "subjects"
