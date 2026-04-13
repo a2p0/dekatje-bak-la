@@ -23,6 +23,7 @@ gem "devise"
 
 gem "sidekiq"
 gem "aasm"
+gem "ruby_llm"
 gem "redis"
 
 gem "pdf-reader"
