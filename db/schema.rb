@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_13_222842) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_223100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -198,7 +198,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_13_222842) do
     t.datetime "started_at"
     t.bigint "student_id", null: false
     t.bigint "subject_id", null: false
-    t.jsonb "tutor_state", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["student_id", "subject_id"], name: "index_student_sessions_on_student_id_and_subject_id", unique: true
     t.index ["student_id"], name: "index_student_sessions_on_student_id"
