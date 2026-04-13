@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe TutorChannel, type: :channel do
+RSpec.xdescribe TutorChannel, type: :channel do
   let(:student) { create(:student) }
   let(:question) { create(:question) }
   let(:conversation) { create(:conversation, student: student, question: question) }

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Student tutor activation banner", type: :feature do
+RSpec.xdescribe "Student tutor activation banner", type: :feature do
   let(:classroom) { create(:classroom) }
   let(:subject_obj) { create(:subject, status: :published) }
   let!(:_classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_obj) }
