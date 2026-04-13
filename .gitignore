@@ -66,3 +66,4 @@ spec/examples.txt
 !/app/assets/builds/.keep
 sources/
 db/seeds/development/*.pdf
+wireframes/
