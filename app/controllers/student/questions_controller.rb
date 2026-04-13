@@ -14,12 +14,6 @@ class Student::QuestionsController < Student::BaseController
     if params[:mark_specific_seen]
       @session_record.mark_specific_presentation_seen!
     end
-
-    # Load existing conversation for this question (if any)
-    @conversation = current_student.conversations.find_by(question: @question)
-
-    # Trigger insight extraction for the previous conversation (if any)
-    extract_previous_insights
   end
 
   private
@@ -61,14 +55,4 @@ class Student::QuestionsController < Student::BaseController
     @filtered_question_ids ||= Question.for_parts(filtered_parts).pluck(:id)
   end
 
-  def extract_previous_insights
-    last_id = session[:last_conversation_id]
-    return unless last_id
-
-    session.delete(:last_conversation_id)
-    conversation = current_student.conversations.find_by(id: last_id)
-    return unless conversation && conversation.question_id != @question.id
-
-    ExtractStudentInsightsJob.perform_later(conversation.id)
-  end
 end

@@ -1,7 +1,7 @@
 # spec/services/extract_student_insights_spec.rb
 require "rails_helper"
 
-RSpec.describe ExtractStudentInsights do
+RSpec.xdescribe "ExtractStudentInsights (removed in vague1)" do
   let(:student) { create(:student, api_provider: :anthropic, api_key: "sk-test") }
   let(:part) { create(:part) }
   let(:question) { create(:question, part: part) }

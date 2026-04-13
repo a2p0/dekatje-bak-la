@@ -49,11 +49,6 @@ Rails.application.routes.draw do
     patch "/settings",          to: "student/settings#update"
     resource :api_key_test, only: [ :create ], path: "settings/api_key_test",
       controller: "student/settings/api_key_tests"
-    resources :conversations, only: [ :create ], controller: "student/conversations" do
-      member do
-        post :message
-      end
-    end
   end
 
   root to: "pages#home"

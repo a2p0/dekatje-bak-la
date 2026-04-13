@@ -1,7 +1,7 @@
 # spec/jobs/extract_student_insights_job_spec.rb
 require "rails_helper"
 
-RSpec.describe ExtractStudentInsightsJob, type: :job do
+RSpec.xdescribe "ExtractStudentInsightsJob (removed in vague1)", type: :job do
   let(:student) { create(:student, api_provider: :anthropic, api_key: "sk-test") }
   let(:question) { create(:question) }
   let(:conversation) { create(:conversation, student: student, question: question) }
