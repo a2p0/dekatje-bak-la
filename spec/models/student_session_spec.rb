@@ -211,7 +211,7 @@ RSpec.describe StudentSession, type: :model do
     end
   end
 
-  describe "tutor_state helpers" do
+  xdescribe "tutor_state helpers (removed in vague1 — column dropped in T8)" do
     let(:ss) { create(:student_session, mode: :tutored) }
     let(:question_id) { 123 }
 
