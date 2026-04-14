@@ -1,5 +1,5 @@
 class Teacher::ClassroomsController < Teacher::BaseController
-  before_action :set_classroom, only: [ :show ]
+  before_action :set_classroom, only: [ :show, :edit, :update ]
 
   def index
     @classrooms = current_teacher.classrooms.includes(:students).order(created_at: :desc)
@@ -30,6 +30,18 @@ class Teacher::ClassroomsController < Teacher::BaseController
     @generated_credentials = session.delete(:generated_credentials)
   end
 
+  def edit
+  end
+
+  def update
+    if @classroom.update(classroom_update_params)
+      redirect_to teacher_classroom_path(@classroom),
+                  notice: "Paramètres mis à jour."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_classroom
@@ -39,5 +51,9 @@ class Teacher::ClassroomsController < Teacher::BaseController
 
   def classroom_params
     params.require(:classroom).permit(:name, :school_year, :specialty)
+  end
+
+  def classroom_update_params
+    params.require(:classroom).permit(:tutor_free_mode_enabled)
   end
 end

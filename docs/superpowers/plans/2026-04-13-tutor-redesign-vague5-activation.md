@@ -8,17 +8,11 @@
 
 **Tech Stack:** Rails 8, rack-attack, ActiveRecord Encryption, Devise registrations, RSpec request specs
 
-> **📌 Carry-over from Vague 4 (2026-04-14):** 4 E2E scenarios in
-> `spec/features/student_tutor_spotting_spec.rb` are `skip:`ped
-> pending async ActionCable adapter + inline job execution in
-> feature specs. Add a dedicated task to:
-> 1. Add `test_async:` entry to `config/cable.yml` (adapter: async)
->    or switch `test:` to async;
-> 2. Wrap tutor feature specs in `perform_enqueued_jobs` (or set
->    `ActiveJob::Base.queue_adapter = :inline` via `around`);
-> 3. Remove the `skip:` marker and verify the 4 scenarios pass.
-> Backend coverage is complete (spec/services/tutor/*); this is a
-> test-infrastructure gap, not a code gap.
+> **✅ Carry-over from Vague 4 — resolved:** 4 E2E scenarios in
+> `spec/features/student_tutor_spotting_spec.rb` reactivated during
+> Vague 5 via `config/cable.yml` (test: adapter: async) +
+> `spec/support/tutor_feature_helpers.rb` (opt-in `tutor_streaming: true`
+> metadata that forces inline job execution).
 
 **Prérequis Vagues 1-4 accomplis :**
 - Migration `add_tutor_columns_to_classrooms_users_students` appliquée : colonnes `tutor_free_mode_enabled` (classrooms), `openrouter_api_key_ciphertext` (users), `use_personal_key` (students) présentes en DB

@@ -1,0 +1,39 @@
+<div class="max-w-xl">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">
+      Paramètres — <%= @classroom.name %>
+    </h1>
+    <%= link_to "← Retour à la classe",
+        teacher_classroom_path(@classroom),
+        class: "text-sm text-slate-500 dark:text-slate-400 hover:underline" %>
+  </div>
+
+  <%= form_with model: @classroom,
+                url: teacher_classroom_path(@classroom),
+                method: :patch do |f| %>
+
+    <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-5 mb-5 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-4">
+        Mode tuteur
+      </p>
+
+      <label class="flex items-start gap-3 cursor-pointer">
+        <%= f.check_box :tutor_free_mode_enabled,
+            class: "mt-1 accent-indigo-500 w-4 h-4 shrink-0" %>
+        <div>
+          <span class="text-sm font-medium text-slate-700 dark:text-slate-200">
+            Activer le tuteur en mode gratuit pour cette classe
+          </span>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Les élèves sans clé personnelle pourront utiliser le tuteur via
+            votre clé OpenRouter. Configurez votre clé OpenRouter dans
+            <%= link_to "votre profil", edit_user_registration_path,
+                class: "underline hover:text-indigo-600" %>.
+          </p>
+        </div>
+      </label>
+    </div>
+
+    <%= render(ButtonComponent.new(variant: :primary, size: :md, type: "submit")) { "Enregistrer" } %>
+  <% end %>
+</div>

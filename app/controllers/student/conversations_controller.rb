@@ -1,4 +1,5 @@
 class Student::ConversationsController < Student::BaseController
+  before_action :require_api_key, only: [ :create, :messages ]
   before_action :set_conversation, only: [ :messages, :confidence ]
 
   def create
@@ -81,5 +82,17 @@ class Student::ConversationsController < Student::BaseController
     @conversation = current_student.conversations.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Conversation introuvable." }, status: :not_found
+  end
+
+  def require_api_key
+    ResolveTutorApiKey.new(
+      student:   current_student,
+      classroom: current_student.classroom
+    ).call
+  rescue Tutor::NoApiKeyError
+    render json: {
+      error: "Configurez votre clé IA dans les réglages, ou demandez à votre enseignant d'activer le mode gratuit.",
+      settings_url: student_settings_path(access_code: params[:access_code])
+    }, status: :unprocessable_entity
   end
 end

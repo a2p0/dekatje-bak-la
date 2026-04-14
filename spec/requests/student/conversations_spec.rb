@@ -50,6 +50,46 @@ RSpec.describe "Student::Conversations", type: :request do
 
       expect(response).to have_http_status(:not_found)
     end
+
+    context "when student has no personal key but classroom free mode is enabled" do
+      let(:student) do
+        create(:student, classroom: classroom, api_key: nil, use_personal_key: false)
+      end
+
+      before do
+        classroom.update!(tutor_free_mode_enabled: true)
+        user.update!(openrouter_api_key: "or-teacher-free-key")
+      end
+
+      it "allows creating the conversation via the teacher key" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             as: :json
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "when neither a personal key nor free mode is available" do
+      let(:student) do
+        create(:student, classroom: classroom, api_key: nil, use_personal_key: false)
+      end
+
+      before do
+        classroom.update!(tutor_free_mode_enabled: false)
+      end
+
+      it "rejects with 422 and an error message pointing to the settings page" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["error"]).to be_present
+        expect(json["settings_url"]).to include("/settings")
+      end
+    end
   end
 
   describe "POST /:access_code/conversations/:id/messages" do

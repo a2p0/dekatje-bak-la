@@ -16,6 +16,6 @@ class Student::SettingsController < Student::BaseController
   private
 
   def settings_params
-    params.require(:student).permit(:default_mode, :api_provider, :api_model, :api_key, :specialty)
+    params.require(:student).permit(:default_mode, :api_provider, :api_model, :api_key, :specialty, :use_personal_key)
   end
 end
