@@ -26,7 +26,7 @@
   end_of_part_mobile_label = next_part_in_section ? "Partie suivante →" : "Fin partie →"
 %>
 
-<div data-controller="sidebar"
+<div data-controller="sidebar chat-drawer"
      class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0">
 
   <%# Backdrop (mobile only) %>
@@ -84,11 +84,12 @@
         <%= render(ProgressBarComponent.new(current: answered, total: total, color: :gradient)) %>
       </div>
       <%# Tutorat button — larger on desktop with gradient %>
-      <button data-action="click->chat#open"
-              data-chat-target="toggle"
+      <button type="button"
+              data-action="click->chat-drawer#open"
+              data-chat-drawer-toggle="true"
               aria-label="Ouvrir le tutorat IA"
               aria-expanded="false"
-              aria-controls="chat-drawer"
+              aria-controls="tutor-chat-drawer"
               class="hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]">
         💬 Tutorat
       </button>
@@ -182,11 +183,12 @@
       <span class="flex-1"></span>
     <% end %>
 
-    <button data-action="click->chat#open"
-            data-chat-target="toggle"
+    <button type="button"
+            data-action="click->chat-drawer#open"
+            data-chat-drawer-toggle="true"
             aria-label="Ouvrir le tutorat IA"
             aria-expanded="false"
-            aria-controls="chat-drawer"
+            aria-controls="tutor-chat-drawer"
             class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(99,102,241,0.3)]">
       💬 Tutorat
     </button>
@@ -211,4 +213,8 @@
     <% end %>
   </div>
 
+  <%= render "student/conversations/drawer",
+             conversation: @conversation,
+             question:     @question,
+             access_code:  params[:access_code] %>
 </div>

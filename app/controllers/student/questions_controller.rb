@@ -8,6 +8,7 @@ class Student::QuestionsController < Student::BaseController
     @part = @question.part
     @parts = filtered_parts
     @questions_in_part = @part.questions.kept.where(id: filtered_question_ids).order(:position)
+    @conversation = current_student.conversations.find_by(subject: @subject)
     @session_record.mark_seen!(@question.id)
 
     # Mark specific presentation as seen (from specific presentation page link)

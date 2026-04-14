@@ -2,18 +2,27 @@ class Student::ConversationsController < Student::BaseController
   before_action :set_conversation, only: [ :messages, :confidence ]
 
   def create
-    subject = Subject.kept.find(params[:subject_id])
+    @subject = Subject.kept.find(params[:subject_id])
 
-    conversation = current_student.conversations.find_or_initialize_by(subject: subject)
+    @conversation = current_student.conversations.find_or_initialize_by(subject: @subject)
 
-    unless conversation.persisted?
-      conversation.tutor_state = TutorState.default
-      conversation.save!
+    unless @conversation.persisted?
+      @conversation.tutor_state = TutorState.default
+      @conversation.save!
     end
 
-    conversation.activate! unless conversation.active?
+    @conversation.activate! unless @conversation.active?
 
-    render json: { conversation_id: conversation.id }
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "tutor-activation-banner",
+          partial: "student/tutor/tutor_activated",
+          locals:  { subject: @subject, access_code: params[:access_code] }
+        )
+      end
+      format.json { render json: { conversation_id: @conversation.id } }
+    end
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Sujet introuvable." }, status: :not_found
   rescue AASM::InvalidTransition => e
