@@ -37,6 +37,39 @@ RSpec.describe "Student::Settings", type: :request do
             params: { student: { api_key: "sk-test-key-123" } }
       expect(student.reload.api_key).to eq("sk-test-key-123")
     end
+
+    it "updates use_personal_key to false" do
+      patch student_settings_path(access_code: classroom.access_code),
+            params: { student: { use_personal_key: false } }
+
+      expect(student.reload.use_personal_key).to be(false)
+      expect(response).to redirect_to(student_settings_path(access_code: classroom.access_code))
+    end
+
+    it "updates use_personal_key back to true" do
+      student.update!(use_personal_key: false)
+
+      patch student_settings_path(access_code: classroom.access_code),
+            params: { student: { use_personal_key: true } }
+
+      expect(student.reload.use_personal_key).to be(true)
+    end
+  end
+
+  describe "GET /settings with free-mode classroom" do
+    let(:classroom) { create(:classroom, tutor_free_mode_enabled: true) }
+
+    it "renders the use_personal_key checkbox" do
+      get student_settings_path(access_code: classroom.access_code)
+      expect(response.body).to include("Utiliser ma clé personnelle")
+    end
+  end
+
+  describe "GET /settings with free-mode disabled" do
+    it "does not render the use_personal_key checkbox" do
+      get student_settings_path(access_code: classroom.access_code)
+      expect(response.body).not_to include("Utiliser ma clé personnelle")
+    end
   end
 
   # API key test coverage moved to spec/requests/student/settings/api_key_tests_spec.rb
