@@ -114,7 +114,7 @@ RSpec.describe Tutor::ProcessMessage do
           name: "evaluate_spotting",
           arguments: {
             "task_type_identified" => "calcul",
-            "sources_identified"   => ["DT1"],
+            "sources_identified"   => [ "DT1" ],
             "missing_sources"      => [],
             "extra_sources"        => [],
             "feedback_message"     => "Bien repéré !",
@@ -127,7 +127,7 @@ RSpec.describe Tutor::ProcessMessage do
       before do
         FakeRubyLlm.setup_stub(
           content: "Bien repéré !",
-          tool_calls: [spotting_tool_call]
+          tool_calls: [ spotting_tool_call ]
         )
       end
 
@@ -172,7 +172,7 @@ RSpec.describe Tutor::ProcessMessage do
           arguments: {
             "task_type_identified" => "",
             "sources_identified"   => [],
-            "missing_sources"      => ["DT1"],
+            "missing_sources"      => [ "DT1" ],
             "extra_sources"        => [],
             "feedback_message"     => "Voici où se trouvent les données.",
             "relaunch_prompt"      => "",
@@ -184,7 +184,7 @@ RSpec.describe Tutor::ProcessMessage do
       before do
         FakeRubyLlm.setup_stub(
           content: "Voici où se trouvent les données.",
-          tool_calls: [forced_tool_call]
+          tool_calls: [ forced_tool_call ]
         )
       end
 
