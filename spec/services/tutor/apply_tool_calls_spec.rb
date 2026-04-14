@@ -1,0 +1,175 @@
+require "rails_helper"
+
+RSpec.describe Tutor::ApplyToolCalls do
+  let(:user)         { create(:user) }
+  let(:classroom)    { create(:classroom, owner: user) }
+  let(:student)      { create(:student, classroom: classroom) }
+  let(:exam_subject) { create(:subject, owner: user, status: :published) }
+
+  def make_conversation(phase: "reading", question_id: nil, extra_state: {})
+    state = TutorState.new(
+      current_phase:        phase,
+      current_question_id:  question_id,
+      concepts_mastered:    [],
+      concepts_to_revise:   [],
+      discouragement_level: 0,
+      question_states:      extra_state
+    )
+    create(:conversation, student: student, subject: exam_subject, tutor_state: state)
+  end
+
+  describe "tool: transition" do
+    it "allows a valid phase transition" do
+      conv = make_conversation(phase: "reading")
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "spotting", "question_id" => 1 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("spotting")
+      expect(result.value[:updated_tutor_state].current_question_id).to eq(1)
+    end
+
+    it "rejects an invalid phase string" do
+      conv = make_conversation(phase: "reading")
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "nonexistent_phase" } } ]
+      )
+      expect(result.err?).to be true
+      expect(result.error).to include("phase")
+    end
+
+    it "rejects a forbidden transition (guiding → greeting)" do
+      conv = make_conversation(phase: "guiding", question_id: 1)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "greeting", "question_id" => 1 } } ]
+      )
+      expect(result.err?).to be true
+    end
+  end
+
+  describe "tool: update_learner_model" do
+    it "adds a mastered concept" do
+      conv = make_conversation
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "update_learner_model", args: { "concept_mastered" => "énergie primaire" } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].concepts_mastered).to include("énergie primaire")
+    end
+
+    it "clamps discouragement_delta between 0 and 3" do
+      conv = make_conversation
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "update_learner_model", args: { "discouragement_delta" => -5 } } ]
+      )
+      expect(result.value[:updated_tutor_state].discouragement_level).to eq(0)
+
+      state3 = TutorState.new(
+        current_phase: "reading", current_question_id: nil,
+        concepts_mastered: [], concepts_to_revise: [],
+        discouragement_level: 3, question_states: {}
+      )
+      other_student = create(:student, classroom: classroom)
+      conv3 = create(:conversation, student: other_student, subject: exam_subject, tutor_state: state3)
+      result3 = described_class.call(
+        conversation: conv3,
+        tool_calls: [ { name: "update_learner_model", args: { "discouragement_delta" => 5 } } ]
+      )
+      expect(result3.value[:updated_tutor_state].discouragement_level).to eq(3)
+    end
+  end
+
+  describe "tool: request_hint" do
+    it "increments hints_used monotonically from 0 to 1" do
+      qs = QuestionState.new(step: "initial", hints_used: 0, last_confidence: nil, error_types: [], completed_at: nil)
+      conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "request_hint", args: { "level" => 1 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].question_states["7"].hints_used).to eq(1)
+    end
+
+    it "rejects skipping hint levels" do
+      qs = QuestionState.new(step: "initial", hints_used: 1, last_confidence: nil, error_types: [], completed_at: nil)
+      conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "request_hint", args: { "level" => 3 } } ]
+      )
+      expect(result.err?).to be true
+      expect(result.error).to include("indice")
+    end
+
+    it "rejects hint above max (5)" do
+      qs = QuestionState.new(step: "initial", hints_used: 5, last_confidence: nil, error_types: [], completed_at: nil)
+      conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "request_hint", args: { "level" => 6 } } ]
+      )
+      expect(result.err?).to be true
+    end
+  end
+
+  describe "tool: evaluate_spotting" do
+    it "requires spotting phase" do
+      conv = make_conversation(phase: "guiding", question_id: 1)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ {
+          name: "evaluate_spotting",
+          args: {
+            "task_type_identified" => "calcul",
+            "sources_identified"   => [ "DT1" ],
+            "missing_sources"      => [],
+            "extra_sources"        => [],
+            "feedback_message"     => "Bien.",
+            "relaunch_prompt"      => "",
+            "outcome"              => "success"
+          }
+        } ]
+      )
+      expect(result.err?).to be true
+      expect(result.error).to include("spotting")
+    end
+
+    it "auto-transitions to guiding on success outcome" do
+      conv = make_conversation(phase: "spotting", question_id: 3)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ {
+          name: "evaluate_spotting",
+          args: {
+            "task_type_identified" => "calcul",
+            "sources_identified"   => [ "DT1" ],
+            "missing_sources"      => [],
+            "extra_sources"        => [],
+            "feedback_message"     => "Bien.",
+            "relaunch_prompt"      => "",
+            "outcome"              => "success"
+          }
+        } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("guiding")
+    end
+  end
+
+  describe "unknown tool" do
+    it "ignores unknown tool names gracefully" do
+      conv = make_conversation
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "do_something_weird", args: {} } ]
+      )
+      expect(result.ok?).to be true
+    end
+  end
+end

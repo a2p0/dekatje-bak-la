@@ -43,6 +43,43 @@ RSpec.describe TutorState do
       expect { state.question_states["42"] = {} }.to raise_error(FrozenError)
     end
   end
+
+  describe "#to_prompt" do
+    it "includes phase and discouragement" do
+      state = TutorState.new(
+        current_phase:         "reading",
+        current_question_id:   nil,
+        concepts_mastered:     [],
+        concepts_to_revise:    [],
+        discouragement_level:  0,
+        question_states:       {}
+      )
+      prompt = state.to_prompt
+      expect(prompt).to include("Phase courante : reading.")
+      expect(prompt).to include("Niveau de découragement : 0/3.")
+    end
+
+    it "includes question context when current_question_id is set" do
+      qs = QuestionState.new(
+        step: "initial", hints_used: 2, last_confidence: 3,
+        error_types: [], completed_at: nil
+      )
+      state = TutorState.new(
+        current_phase:         "guiding",
+        current_question_id:   42,
+        concepts_mastered:     [ "énergie primaire" ],
+        concepts_to_revise:    [ "rendement" ],
+        discouragement_level:  1,
+        question_states:       { "42" => qs }
+      )
+      prompt = state.to_prompt
+      expect(prompt).to include("L'élève travaille sur la question 42.")
+      expect(prompt).to include("Concepts maîtrisés : énergie primaire.")
+      expect(prompt).to include("Points à revoir : rendement.")
+      expect(prompt).to include("Indices utilisés sur cette question : 2/5.")
+      expect(prompt).to include("Dernière confiance déclarée : 3/5.")
+    end
+  end
 end
 
 RSpec.describe QuestionState do

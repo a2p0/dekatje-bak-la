@@ -26,4 +26,18 @@ TutorState = Data.define(
       question_states:      {}.freeze
     )
   end
+
+  def to_prompt
+    lines = []
+    lines << "L'élève travaille sur la question #{current_question_id}." if current_question_id
+    lines << "Phase courante : #{current_phase}."
+    lines << "Concepts maîtrisés : #{concepts_mastered.join(', ')}." if concepts_mastered.any?
+    lines << "Points à revoir : #{concepts_to_revise.join(', ')}." if concepts_to_revise.any?
+    lines << "Niveau de découragement : #{discouragement_level}/3."
+    if (qs = question_states[current_question_id.to_s])
+      lines << "Indices utilisés sur cette question : #{qs.hints_used}/5."
+      lines << "Dernière confiance déclarée : #{qs.last_confidence}/5." if qs.last_confidence
+    end
+    lines.join("\n")
+  end
 end
