@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_225715) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
     t.bigint "owner_id", null: false
     t.string "school_year", null: false
     t.string "specialty"
+    t.boolean "tutor_free_mode_enabled", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["access_code"], name: "index_classrooms_on_access_code", unique: true
     t.index ["owner_id"], name: "index_classrooms_on_owner_id"
@@ -77,16 +78,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
 
   create_table "conversations", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.jsonb "messages", default: [], null: false
+    t.string "lifecycle_state", default: "disabled", null: false
     t.string "provider_used"
-    t.bigint "question_id", null: false
-    t.boolean "streaming", default: false, null: false
     t.bigint "student_id", null: false
+    t.bigint "subject_id", null: false
     t.integer "tokens_used", default: 0, null: false
+    t.jsonb "tutor_state", default: {}, null: false
     t.datetime "updated_at", null: false
-    t.index ["question_id"], name: "index_conversations_on_question_id"
-    t.index ["student_id", "question_id"], name: "index_conversations_on_student_id_and_question_id"
+    t.index ["student_id", "subject_id"], name: "index_conversations_on_student_id_and_subject_id", unique: true
     t.index ["student_id"], name: "index_conversations_on_student_id"
+    t.index ["subject_id"], name: "index_conversations_on_subject_id"
   end
 
   create_table "exam_sessions", force: :cascade do |t|
@@ -115,6 +116,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
     t.index ["exam_session_id"], name: "index_extraction_jobs_on_exam_session_id"
     t.index ["status"], name: "index_extraction_jobs_on_status"
     t.index ["subject_id"], name: "index_extraction_jobs_on_subject_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "chunk_index", default: 0, null: false
+    t.text "content", null: false
+    t.bigint "conversation_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "question_id"
+    t.integer "role", null: false
+    t.datetime "streaming_finished_at"
+    t.integer "tokens_in", default: 0, null: false
+    t.integer "tokens_out", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["question_id"], name: "index_messages_on_question_id"
   end
 
   create_table "parts", force: :cascade do |t|
@@ -180,7 +196,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
     t.datetime "started_at"
     t.bigint "student_id", null: false
     t.bigint "subject_id", null: false
-    t.jsonb "tutor_state", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["student_id", "subject_id"], name: "index_student_sessions_on_student_id_and_subject_id", unique: true
     t.index ["student_id"], name: "index_student_sessions_on_student_id"
@@ -199,6 +214,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
     t.string "password_digest", null: false
     t.integer "specialty"
     t.datetime "updated_at", null: false
+    t.boolean "use_personal_key", default: true, null: false
     t.string "username", null: false
     t.index ["classroom_id"], name: "index_students_on_classroom_id"
     t.index ["username", "classroom_id"], name: "index_students_on_username_and_classroom_id", unique: true
@@ -231,6 +247,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
     t.string "encrypted_password", default: "", null: false
     t.string "first_name", default: "", null: false
     t.string "last_name", default: "", null: false
+    t.string "openrouter_api_key"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
@@ -248,11 +265,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_004301) do
   add_foreign_key "classroom_subjects", "classrooms"
   add_foreign_key "classroom_subjects", "subjects"
   add_foreign_key "classrooms", "users", column: "owner_id"
-  add_foreign_key "conversations", "questions"
   add_foreign_key "conversations", "students"
+  add_foreign_key "conversations", "subjects"
   add_foreign_key "exam_sessions", "users", column: "owner_id"
   add_foreign_key "extraction_jobs", "exam_sessions"
   add_foreign_key "extraction_jobs", "subjects"
+  add_foreign_key "messages", "conversations", on_delete: :cascade
+  add_foreign_key "messages", "questions", on_delete: :nullify
   add_foreign_key "parts", "exam_sessions"
   add_foreign_key "parts", "subjects"
   add_foreign_key "questions", "parts"

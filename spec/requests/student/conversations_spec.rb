@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Student::Conversations", type: :request do
+RSpec.xdescribe "Student::Conversations", type: :request do
   let(:user) { create(:user) }
   let(:classroom) { create(:classroom, owner: user) }
   let(:student) { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }

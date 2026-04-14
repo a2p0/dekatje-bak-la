@@ -1,16 +1,33 @@
-# app/models/conversation.rb
 class Conversation < ApplicationRecord
+  include AASM
+
   belongs_to :student
-  belongs_to :question
+  belongs_to :subject
+  has_many :messages, dependent: :destroy
 
-  # belongs_to already validates presence by default in Rails 5+
+  validates :student_id, uniqueness: { scope: :subject_id }
 
-  def add_message!(role:, content:)
-    messages << { "role" => role, "content" => content, "at" => Time.current.iso8601 }
-    save!
+  attribute :tutor_state, TutorStateType.new
+
+  aasm column: :lifecycle_state do
+    state :disabled, initial: true
+    state :active
+    state :ended
+
+    event :activate do
+      transitions from: :disabled, to: :active,
+                  guard: :student_has_api_key_or_free_mode?
+    end
+
+    event :end_chat do
+      transitions from: :active, to: :ended
+    end
   end
 
-  def messages_for_api
-    messages.map { |m| { role: m["role"], content: m["content"] } }
+  private
+
+  def student_has_api_key_or_free_mode?
+    student.api_key.present? ||
+      student.classroom&.tutor_free_mode_enabled?
   end
 end

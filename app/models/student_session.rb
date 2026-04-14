@@ -89,41 +89,6 @@ class StudentSession < ApplicationRecord
     parts_in_section.all? { |p| part_completed?(p.id) }
   end
 
-  # Tutor state helpers
-
-  def question_step(question_id)
-    tutor_state.dig("question_states", question_id.to_s, "step")
-  end
-
-  def set_question_step!(question_id, step)
-    key = question_id.to_s
-    states = tutor_state["question_states"] ||= {}
-    states[key] ||= {}
-    states[key]["step"] = step
-    update!(tutor_state: tutor_state)
-  end
-
-  def store_spotting!(question_id, data)
-    key = question_id.to_s
-    states = tutor_state["question_states"] ||= {}
-    states[key] ||= {}
-    states[key]["spotting"] = data
-    update!(tutor_state: tutor_state)
-  end
-
-  def spotting_data(question_id)
-    tutor_state.dig("question_states", question_id.to_s, "spotting")
-  end
-
-  def spotting_completed?(question_id)
-    %w[feedback skipped].include?(question_step(question_id))
-  end
-
-  def tutored_active?
-    return false unless tutored?
-    tutor_state.dig("question_states").present?
-  end
-
   # Returns the parts visible to the student based on their scope selection.
   # For new-format subjects (with exam_session), filters by part_filter.
   # For legacy subjects, returns all parts.

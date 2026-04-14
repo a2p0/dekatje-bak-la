@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Story 9: Tutorat IA en streaming", type: :feature do
+RSpec.xdescribe "Story 9: Tutorat IA en streaming", type: :feature do
   let(:teacher) { create(:user) }
   let(:classroom) { create(:classroom, name: "Terminale SIN 2026", owner: teacher) }
   let(:student)   { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }

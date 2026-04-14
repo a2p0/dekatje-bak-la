@@ -40,5 +40,9 @@ module DekatjeBakLa
     config.generators.system_tests = nil
 
     config.active_job.queue_adapter = :sidekiq
+
+    # Collapse app/models/types so files inside resolve as top-level
+    # constants (e.g. TutorStateType) rather than Types::TutorStateType.
+    Rails.autoloaders.main.collapse("#{root}/app/models/types")
   end
 end

@@ -26,13 +26,7 @@
   end_of_part_mobile_label = next_part_in_section ? "Partie suivante →" : "Fin partie →"
 %>
 
-<div data-controller="sidebar chat"
-     data-chat-create-url-value="<%= student_conversations_path(access_code: params[:access_code]) %>"
-     data-chat-message-url-value=""
-     data-chat-question-id-value="<%= @question.id %>"
-     data-chat-has-api-key-value="<%= current_student.api_key.present? %>"
-     data-chat-settings-url-value="<%= student_settings_path(access_code: params[:access_code]) %>"
-     data-chat-conversation-id-value="<%= @conversation&.id %>"
+<div data-controller="sidebar"
      class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0">
 
   <%# Backdrop (mobile only) %>
@@ -232,6 +226,4 @@
     <% end %>
   </div>
 
-  <%# Chat drawer %>
-  <%= render "student/questions/chat_drawer", conversation: @conversation %>
 </div>

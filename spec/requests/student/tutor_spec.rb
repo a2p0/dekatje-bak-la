@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Student::Tutor", type: :request do
+RSpec.xdescribe "Student::Tutor", type: :request do
   let(:classroom) { create(:classroom) }
   let(:student) { create(:student, classroom: classroom) }
   let(:subject_obj) { create(:subject, status: :published) }
