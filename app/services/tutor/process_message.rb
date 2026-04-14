@@ -44,6 +44,14 @@ module Tutor
       )
       return llm_result if llm_result.err?
 
+      if @conversation.tutor_state.current_phase == "spotting"
+        filter_result = FilterSpottingOutput.call(
+          message:    assistant_msg,
+          llm_output: llm_result.value[:full_content]
+        )
+        return filter_result if filter_result.err?
+      end
+
       parse_result = ParseToolCalls.call(tool_calls: llm_result.value[:tool_calls])
       return parse_result if parse_result.err?
 
@@ -52,6 +60,15 @@ module Tutor
         tool_calls:   parse_result.value[:parsed]
       )
       return apply_result if apply_result.err?
+
+      spotting_tool = parse_result.value[:parsed].find { |t| t[:name] == "evaluate_spotting" }
+      if spotting_tool
+        InjectDataHints.call(
+          conversation: @conversation,
+          question:     @question,
+          outcome:      spotting_tool[:args]["outcome"].to_s
+        )
+      end
 
       update_result = UpdateTutorState.call(
         conversation: @conversation,

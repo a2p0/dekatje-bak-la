@@ -47,15 +47,15 @@
           )
         }
       )
-      create(:conversation, student: student, subject: subject,
-             tutor_state: spotting_state)
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: spotting_state)
     end
 
     subject(:result) do
       described_class.call(
         conversation:  spotting_conversation,
         question:      question,
-        student_input: "<student_input>Je pense que c'est dans l'énoncé.</student_input>"
+        student_input: "Je pense que c'est dans l'énoncé."
       )
     end
 
@@ -87,12 +87,12 @@
         discouragement_level: 0,
         question_states:      {}
       )
-      reading_conv = create(:conversation, student: student, subject: subject,
-                             tutor_state: reading_state)
+      reading_conv = create(:conversation, student: student, subject: exam_subject,
+                             lifecycle_state: "active", tutor_state: reading_state)
       r = described_class.call(
         conversation:  reading_conv,
         question:      question,
-        student_input: "<student_input>test</student_input>"
+        student_input: "test"
       )
       expect(r.value[:system_prompt]).not_to include("PHASE REPÉRAGE")
     end
@@ -175,8 +175,8 @@
     let(:user)         { create(:user) }
     let(:classroom)    { create(:classroom, owner: user) }
     let(:student)      { create(:student, classroom: classroom) }
-    let(:subject)      { create(:subject, owner: user, status: :published) }
-    let(:part)         { create(:part, subject: subject) }
+    let(:exam_subject) { create(:subject, owner: user, status: :published) }
+    let(:part)         { create(:part, subject: exam_subject) }
     let(:question)     { create(:question, part: part) }
     let(:conversation) do
       state = TutorState.new(
@@ -187,7 +187,8 @@
         discouragement_level: 0,
         question_states:      {}
       )
-      create(:conversation, student: student, subject: subject, tutor_state: state)
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: state)
     end
     let(:assistant_msg) do
       create(:message, conversation: conversation, role: :assistant,
@@ -269,8 +270,8 @@
             discouragement_level: 0,
             question_states:      {}
           )
-          guiding_conv = create(:conversation, student: student, subject: subject,
-                                tutor_state: guiding_state)
+          guiding_conv = create(:conversation, student: student, subject: exam_subject,
+                                lifecycle_state: "active", tutor_state: guiding_state)
           guiding_msg = create(:message, conversation: guiding_conv, role: :assistant,
                                content: "original", chunk_index: 0)
 
@@ -496,10 +497,10 @@
   RSpec.describe Tutor::InjectDataHints do
     let(:user)      { create(:user) }
     let(:classroom) { create(:classroom, owner: user) }
-    let(:student)   { create(:student, classroom: classroom) }
-    let(:subject)   { create(:subject, owner: user, status: :published) }
-    let(:part)      { create(:part, subject: subject) }
-    let(:question)  { create(:question, part: part) }
+    let(:student)      { create(:student, classroom: classroom) }
+    let(:exam_subject) { create(:subject, owner: user, status: :published) }
+    let(:part)         { create(:part, subject: exam_subject) }
+    let(:question)     { create(:question, part: part) }
     let!(:answer) do
       create(:answer, question: question,
         correction_text: "Car = 56,73 l",
@@ -509,7 +510,8 @@
         ])
     end
     let(:conversation) do
-      create(:conversation, student: student, subject: subject)
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active")
     end
 
     shared_examples "injects data_hints" do |outcome_value|
@@ -707,8 +709,8 @@
           )
         }
       )
-      create(:conversation, student: student, subject: subject,
-             tutor_state: state)
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: state)
     end
 
     context "when LLM output contains a forbidden DT reference" do
@@ -723,7 +725,7 @@
         result = described_class.call(
           conversation: spotting_conversation,
           question:     question,
-          raw_input:    "Je ne sais pas."
+          student_input: "Je ne sais pas."
         )
         expect(result.ok?).to be true
         assistant_msg = spotting_conversation.messages.reload.find { |m| m.role == "assistant" }
@@ -764,7 +766,7 @@
         described_class.call(
           conversation: spotting_conversation,
           question:     question,
-          raw_input:    "Les données sont dans un document technique."
+          student_input: "Les données sont dans un document technique."
         )
       end
 
@@ -772,7 +774,7 @@
         described_class.call(
           conversation: spotting_conversation,
           question:     question,
-          raw_input:    "Les données sont dans un document technique."
+          student_input: "Les données sont dans un document technique."
         )
         expect(spotting_conversation.reload.tutor_state.current_phase).to eq("guiding")
       end
@@ -781,7 +783,7 @@
         described_class.call(
           conversation: spotting_conversation,
           question:     question,
-          raw_input:    "Les données sont dans un document technique."
+          student_input: "Les données sont dans un document technique."
         )
         sys_msg = spotting_conversation.messages.reload.find { |m| m.role == "system" }
         expect(sys_msg).to be_present
@@ -816,7 +818,7 @@
         described_class.call(
           conversation: spotting_conversation,
           question:     question,
-          raw_input:    "Je ne sais vraiment pas."
+          student_input: "Je ne sais vraiment pas."
         )
         sys_msg = spotting_conversation.messages.reload.find { |m| m.role == "system" }
         expect(sys_msg).to be_present

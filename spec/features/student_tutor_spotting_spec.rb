@@ -1,9 +1,13 @@
 require "rails_helper"
 
-RSpec.xdescribe "Tuteur guidé : micro-tâches de repérage", type: :feature do
-  let(:teacher) { create(:user) }
+# Scenarios pending Vague 4 — UI Hotwire drawer
+# (data-chat-connected attribute and drawer targets are added in Vague 4).
+# The backend pipeline for spotting is fully covered by the unit spec
+# spec/services/tutor/process_message_spec.rb.
+RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :feature do
+  let(:teacher)   { create(:user) }
   let(:classroom) { create(:classroom, name: "Terminale SIN 2026", owner: teacher) }
-  let(:student) { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }
+  let(:student)   { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }
   let(:exam_session) do
     create(:exam_session, owner: teacher,
       common_presentation: "La société CIME fabrique des véhicules électriques.")
@@ -32,140 +36,141 @@ RSpec.xdescribe "Tuteur guidé : micro-tâches de repérage", type: :feature do
   end
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
 
+  let!(:tutored_session) do
+    create(:student_session,
+      student: student, subject: subject_record,
+      mode: :tutored, progression: {})
+  end
+
+  let!(:spotting_conversation) do
+    spotting_state = TutorState.new(
+      current_phase:        "spotting",
+      current_question_id:  question.id,
+      concepts_mastered:    [],
+      concepts_to_revise:   [],
+      discouragement_level: 0,
+      question_states:      {
+        question.id.to_s => QuestionState.new(
+          step: "initial", hints_used: 0, last_confidence: nil,
+          error_types: [], completed_at: nil
+        )
+      }
+    )
+    create(:conversation,
+      student: student, subject: subject_record,
+      lifecycle_state: "active", tutor_state: spotting_state)
+  end
+
   def visit_question_page
     visit student_question_path(
       access_code: classroom.access_code,
-      subject_id: subject_record.id,
-      id: question.id
+      subject_id:  subject_record.id,
+      id:          question.id
     )
+    expect(page).to have_css("[data-chat-connected='true']", wait: 10)
   end
 
-  context "en mode tuteur" do
-    let!(:tutored_session) do
-      create(:student_session,
-        student: student, subject: subject_record,
-        mode: :tutored, progression: {},
-        tutor_state: {})
-    end
-
-    before do
-      login_as_student(student, classroom)
-    end
-
-    scenario "l'encart 'Avant de répondre' s'affiche et bloque la correction", js: true do
-      visit_question_page
-
-      expect(page).to have_text("Avant de répondre")
-      expect(page).to have_button("Vérifier")
-      expect(page).not_to have_button("Voir la correction")
-    end
-
-    scenario "sélectionner le bon type et les bonnes sources affiche un feedback positif", js: true do
-      visit_question_page
-
-      choose("Calculer une valeur")
-      check("Document Technique (DT)")
-      check("Mise en situation")
-      click_button "Vérifier"
-
-      expect(page).to have_text("Avant de répondre — résultats", wait: 5)
-      expect(page).to have_text("✓")
-    end
-
-    scenario "sélectionner un mauvais type affiche le type incorrect et le bon", js: true do
-      visit_question_page
-
-      # Pick any wrong radio option (not "Calculer une valeur")
-      wrong_option = all("input[name='task_type']").find { |r| r.value != "calculation" }
-      wrong_option.click
-      check("Document Technique (DT)")
-      check("Mise en situation")
-      click_button "Vérifier"
-
-      expect(page).to have_text("Avant de répondre — résultats", wait: 5)
-      expect(page).to have_text("✗")
-      expect(page).to have_text("Bonne réponse")
-      expect(page).to have_text("Calculer une valeur")
-    end
-
-    scenario "oublier une source affiche un avertissement avec la location", js: true do
-      visit_question_page
-
-      choose("Calculer une valeur")
-      check("Document Technique (DT)")
-      # Ne pas cocher "Mise en situation"
-      click_button "Vérifier"
-
-      expect(page).to have_text("Avant de répondre — résultats", wait: 5)
-      expect(page).to have_text("⚠")
-      expect(page).to have_text("mise_en_situation")
-      expect(page).to have_text("distance 186 km")
-    end
-
-    scenario "cocher une source en trop affiche 'non nécessaire'", js: true do
-      visit_question_page
-
-      choose("Calculer une valeur")
-      check("Document Technique (DT)")
-      check("Mise en situation")
-      check("Énoncé de la question")
-      click_button "Vérifier"
-
-      expect(page).to have_text("Avant de répondre — résultats", wait: 5)
-      expect(page).to have_text("non nécessaire")
-      expect(page).to have_text("enonce")
-    end
-
-    scenario "cliquer 'passer' fait disparaître l'encart et affiche la correction", js: true do
-      visit_question_page
-
-      expect(page).to have_text("Avant de répondre")
-      click_on "passer"
-
-      expect(page).to have_button("Voir la correction", wait: 5)
-      expect(page).not_to have_button("Vérifier")
-    end
-
-    scenario "revisiter une question avec spotting déjà fait affiche le feedback", js: true do
-      tutored_session.update!(tutor_state: {
-        "question_states" => {
-          question.id.to_s => {
-            "step" => "feedback",
-            "spotting" => {
-              "task_type_answer" => "calculation",
-              "task_type_correct" => true,
-              "sources_answer" => [ "dt", "mise_en_situation" ],
-              "sources_correct" => [ "dt", "mise_en_situation" ],
-              "sources_missed" => [],
-              "sources_extra" => [],
-              "completed_at" => Time.current.iso8601
-            }
-          }
-        }
-      })
-
-      visit_question_page
-
-      expect(page).to have_text("Avant de répondre — résultats")
-      expect(page).to have_css(".text-emerald-600, .dark\\:text-emerald-400", text: "✓")
-      expect(page).to have_button("Voir la correction")
-      expect(page).not_to have_button("Vérifier")
-    end
+  def open_tutor_drawer
+    click_button "Tutorat"
+    expect(page).to have_css("[data-chat-target='drawer'].translate-x-0", visible: :all, wait: 5)
   end
 
-  context "en mode autonome" do
-    let!(:autonomous_session) do
-      create(:student_session,
-        student: student, subject: subject_record,
-        mode: :autonomous, progression: {})
-    end
+  before { login_as_student(student, classroom) }
 
-    scenario "l'encart de repérage ne s'affiche pas", js: true do
-      login_as_student(student, classroom)
-      visit_question_page
+  scenario "le tuteur demande où trouver les données à l'entrée en phase spotting", js: true do
+    FakeRubyLlm.setup_stub(
+      content: "Où penses-tu trouver les informations pour cette question ?",
+      tool_calls: []
+    )
 
-      expect(page).not_to have_text("Avant de répondre")
-      expect(page).to have_button("Voir la correction")
-    end
+    visit_question_page
+    open_tutor_drawer
+
+    input = find("[data-chat-target='input']", visible: :all)
+    input.fill_in(with: "Bonjour")
+    find("[data-chat-target='sendButton']", visible: :all).click
+
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer).to have_text("Où penses-tu trouver les informations", wait: 10)
+  end
+
+  scenario "une réponse correcte déclenche l'affichage du DataHintsComponent", js: true do
+    success_tool_call = double("RubyLLM::ToolCall",
+      name: "evaluate_spotting",
+      arguments: {
+        "task_type_identified" => "calcul",
+        "sources_identified"   => [ "DT1", "mise_en_situation" ],
+        "missing_sources"      => [],
+        "extra_sources"        => [],
+        "feedback_message"     => "Bien repéré !",
+        "relaunch_prompt"      => "",
+        "outcome"              => "success"
+      }
+    )
+    FakeRubyLlm.setup_stub(
+      content: "Bien repéré ! Les données sont effectivement dans la documentation.",
+      tool_calls: [ success_tool_call ]
+    )
+
+    visit_question_page
+    open_tutor_drawer
+
+    input = find("[data-chat-target='input']", visible: :all)
+    input.fill_in(with: "Je pense que les données sont dans les documents techniques et la mise en situation.")
+    find("[data-chat-target='sendButton']", visible: :all).click
+
+    expect(page).to have_css(".data-hints-card", wait: 10)
+    expect(page).to have_text("DT1", wait: 5)
+    expect(page).to have_text("tableau Consommation moyenne")
+    expect(page).to have_text("mise_en_situation")
+    expect(page).to have_text("distance 186 km")
+  end
+
+  scenario "3 relances échouées → forced_reveal → DataHintsComponent affiché", js: true do
+    forced_tool_call = double("RubyLLM::ToolCall",
+      name: "evaluate_spotting",
+      arguments: {
+        "task_type_identified" => "",
+        "sources_identified"   => [],
+        "missing_sources"      => [ "DT1", "mise_en_situation" ],
+        "extra_sources"        => [],
+        "feedback_message"     => "Je vais t'indiquer où se trouvaient les données.",
+        "relaunch_prompt"      => "",
+        "outcome"              => "forced_reveal"
+      }
+    )
+    FakeRubyLlm.setup_stub(
+      content: "Je vais t'indiquer où se trouvaient les données.",
+      tool_calls: [ forced_tool_call ]
+    )
+
+    visit_question_page
+    open_tutor_drawer
+
+    input = find("[data-chat-target='input']", visible: :all)
+    input.fill_in(with: "Je ne sais vraiment pas.")
+    find("[data-chat-target='sendButton']", visible: :all).click
+
+    expect(page).to have_css(".data-hints-card", wait: 10)
+    expect(page).to have_text("DT1")
+    expect(page).to have_text("tableau Consommation moyenne")
+  end
+
+  scenario "le filtre regex remplace un output LLM contenant 'DT1' par un relance neutre", js: true do
+    FakeRubyLlm.setup_stub(
+      content: "Les données se trouvent dans DT1, tableau page 3.",
+      tool_calls: []
+    )
+
+    visit_question_page
+    open_tutor_drawer
+
+    input = find("[data-chat-target='input']", visible: :all)
+    input.fill_in(with: "Je pense que c'est dans l'énoncé.")
+    find("[data-chat-target='sendButton']", visible: :all).click
+
+    drawer = find("[data-chat-target='drawer']", visible: :all)
+    expect(drawer).to have_text("Reformule ta réponse", wait: 10)
+    expect(drawer).not_to have_text("DT1")
   end
 end
