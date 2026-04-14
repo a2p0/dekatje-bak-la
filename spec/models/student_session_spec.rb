@@ -210,5 +210,4 @@ RSpec.describe StudentSession, type: :model do
       expect(ss.unanswered_questions).to be_empty
     end
   end
-
 end
