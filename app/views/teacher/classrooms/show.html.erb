@@ -75,6 +75,11 @@
           variant: :ghost, size: :sm) do %>
       Exporter Markdown
     <% end %>
+    <%= render ButtonComponent.new(
+          href: edit_teacher_classroom_path(@classroom),
+          variant: :ghost, size: :sm) do %>
+      Paramètres
+    <% end %>
   </div>
 </div>
 

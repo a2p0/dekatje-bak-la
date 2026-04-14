@@ -43,6 +43,59 @@ RSpec.describe "Teacher::Classrooms", type: :request do
     end
   end
 
+  describe "GET /teacher/classrooms/:id/edit" do
+    let(:classroom) { create(:classroom, owner: user) }
+
+    it "returns 200" do
+      get edit_teacher_classroom_path(classroom)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "redirects for classroom owned by another teacher" do
+      other_classroom = create(:classroom)
+      get edit_teacher_classroom_path(other_classroom)
+      expect(response).to redirect_to(teacher_root_path)
+    end
+  end
+
+  describe "PATCH /teacher/classrooms/:id" do
+    let(:classroom) { create(:classroom, owner: user, tutor_free_mode_enabled: false) }
+
+    it "updates tutor_free_mode_enabled to true" do
+      patch teacher_classroom_path(classroom),
+            params: { classroom: { tutor_free_mode_enabled: true } }
+
+      expect(classroom.reload.tutor_free_mode_enabled).to be(true)
+      expect(response).to redirect_to(teacher_classroom_path(classroom))
+    end
+
+    it "updates tutor_free_mode_enabled back to false" do
+      classroom.update!(tutor_free_mode_enabled: true)
+
+      patch teacher_classroom_path(classroom),
+            params: { classroom: { tutor_free_mode_enabled: false } }
+
+      expect(classroom.reload.tutor_free_mode_enabled).to be(false)
+    end
+
+    it "ignores unpermitted params (strong params guard)" do
+      other_teacher = create(:user, confirmed_at: Time.current)
+
+      patch teacher_classroom_path(classroom),
+            params: { classroom: { tutor_free_mode_enabled: true, owner_id: other_teacher.id } }
+
+      expect(classroom.reload.owner_id).to eq(user.id)
+    end
+
+    it "redirects for classroom owned by another teacher" do
+      other_classroom = create(:classroom)
+      patch teacher_classroom_path(other_classroom),
+            params: { classroom: { tutor_free_mode_enabled: true } }
+
+      expect(response).to redirect_to(teacher_root_path)
+    end
+  end
+
   describe "unauthenticated" do
     before { sign_out user }
 

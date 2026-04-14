@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   namespace :teacher do
     root to: "classrooms#index"
 
-    resources :classrooms, only: [ :index, :new, :create, :show ] do
+    resources :classrooms, only: [ :index, :new, :create, :show, :edit, :update ] do
       resources :students, only: [ :index, :new, :create ], shallow: true do
         resource :password_reset, only: [ :create ], module: "students"
       end
