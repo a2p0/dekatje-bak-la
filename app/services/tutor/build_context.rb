@@ -27,6 +27,11 @@ module Tutor
       %<learner_model>s
 
       Outils disponibles : transition, update_learner_model, request_hint, evaluate_spotting.
+
+      [DÉMARRAGE DE CONVERSATION]
+      Si c'est le tout premier message de la conversation (aucun message assistant antérieur),
+      commence par un greeting bref (1 phrase) avant de poser la première question pédagogique.
+      Sinon, réponds directement au message de l'élève selon la phase courante.
     PROMPT
 
     SPOTTING_SECTION = <<~PROMPT.freeze

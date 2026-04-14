@@ -44,6 +44,11 @@ RSpec.describe Tutor::BuildContext do
     expect(result.value[:system_prompt]).to include("Phase courante")
   end
 
+  it "instructs the LLM to greet on the first message" do
+    expect(result.value[:system_prompt]).to include("DÉMARRAGE DE CONVERSATION")
+    expect(result.value[:system_prompt]).to include("greeting")
+  end
+
   it "returns a messages array" do
     expect(result.value[:messages]).to be_an(Array)
   end
