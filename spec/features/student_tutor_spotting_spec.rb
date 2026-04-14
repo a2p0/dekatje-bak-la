@@ -1,24 +1,11 @@
 require "rails_helper"
 
-# Pending — these 4 scenarios exercise the full LLM -> ActionCable ->
-# DOM pipeline, which requires two pieces of test infrastructure that
-# are NOT part of Vague 4:
-#
-#   1. An async ActionCable adapter in test (currently `adapter: test`
-#      which is a no-op for broadcasts reaching the browser);
-#   2. Inline execution of ProcessTutorMessageJob so the pipeline runs
-#      synchronously during the Capybara scenario.
-#
-# The Vague 4 backend (CallLlm, BroadcastMessage, ProcessMessage,
-# FilterSpottingOutput, InjectDataHints) is fully covered by unit
-# specs under spec/services/tutor/. The Vague 4 UI wiring (drawer
-# open/close, targets, data-chat-connected gate) is covered by
-# spec/features/student_tutor_chat_spec.rb.
-#
-# Reactivate this describe block once Vague 5 wires up async cable +
-# inline jobs for feature specs.
+# Full LLM → ActionCable → DOM pipeline scenarios.
+# Vague 5 wired up async cable (config/cable.yml) + inline jobs
+# (spec/support/tutor_feature_helpers.rb). Each scenario opts in via
+# `tutor_streaming: true`.
 RSpec.describe "Tuteur guidé : phase de repérage conversationnelle",
-               type: :feature, skip: "Vague 5: needs async ActionCable adapter + inline jobs in feature specs" do
+               type: :feature, tutor_streaming: true do
   let(:teacher)   { create(:user) }
   let(:classroom) { create(:classroom, name: "Terminale SIN 2026", owner: teacher) }
   let(:student)   { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }
