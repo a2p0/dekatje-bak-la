@@ -37,7 +37,7 @@ RSpec.describe TutorStateType do
         hash = {
           "current_phase"        => "chat",
           "current_question_id"  => 42,
-          "concepts_mastered"    => ["énergie"],
+          "concepts_mastered"    => [ "énergie" ],
           "concepts_to_revise"   => [],
           "discouragement_level" => 1,
           "question_states"      => {}
@@ -46,7 +46,7 @@ RSpec.describe TutorStateType do
         expect(result).to be_a(TutorState)
         expect(result.current_phase).to eq("chat")
         expect(result.current_question_id).to eq(42)
-        expect(result.concepts_mastered).to eq(["énergie"])
+        expect(result.concepts_mastered).to eq([ "énergie" ])
         expect(result.discouragement_level).to eq(1)
       end
 
@@ -121,13 +121,13 @@ RSpec.describe TutorStateType do
     it "deserialize(serialize(state)) equals the original state for a populated state" do
       qs = QuestionState.new(
         step: 3, hints_used: 2, last_confidence: 4,
-        error_types: ["calcul", "unit"], completed_at: "2026-04-13T10:00:00Z"
+        error_types: [ "calcul", "unit" ], completed_at: "2026-04-13T10:00:00Z"
       )
       original = TutorState.new(
         current_phase:        "chat",
         current_question_id:  7,
-        concepts_mastered:    ["énergie primaire"],
-        concepts_to_revise:   ["rendement"],
+        concepts_mastered:    [ "énergie primaire" ],
+        concepts_to_revise:   [ "rendement" ],
         discouragement_level: 2,
         question_states:      { "7" => qs }
       )

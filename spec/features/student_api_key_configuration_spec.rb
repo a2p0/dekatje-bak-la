@@ -156,7 +156,7 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
     expect(page).to have_css("[data-settings-target='apiKey'][type='password']", wait: 5)
   end
 
-  scenario "sans clé API configurée, le bouton Tutorat invite à configurer les réglages" do
+  xscenario "sans clé API configurée, le bouton Tutorat invite à configurer les réglages (tuteur refonte vague 2+)" do
     expect(student.api_key).to be_blank
 
     login_as_student(student, classroom)

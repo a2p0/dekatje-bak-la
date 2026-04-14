@@ -54,5 +54,4 @@ class Student::QuestionsController < Student::BaseController
   def filtered_question_ids
     @filtered_question_ids ||= Question.for_parts(filtered_parts).pluck(:id)
   end
-
 end

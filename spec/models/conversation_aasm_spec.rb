@@ -113,7 +113,7 @@ RSpec.describe Conversation, type: :model do
       new_state = TutorState.new(
         current_phase:        "chat",
         current_question_id:  nil,
-        concepts_mastered:    ["énergie"],
+        concepts_mastered:    [ "énergie" ],
         concepts_to_revise:   [],
         discouragement_level: 0,
         question_states:      {}
@@ -121,7 +121,7 @@ RSpec.describe Conversation, type: :model do
       conversation.update!(tutor_state: new_state)
       conversation.reload
       expect(conversation.tutor_state.current_phase).to eq("chat")
-      expect(conversation.tutor_state.concepts_mastered).to eq(["énergie"])
+      expect(conversation.tutor_state.concepts_mastered).to eq([ "énergie" ])
     end
   end
 

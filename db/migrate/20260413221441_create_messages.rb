@@ -11,7 +11,7 @@ class CreateMessages < ActiveRecord::Migration[8.1]
       t.datetime   :streaming_finished_at
       t.timestamps
 
-      t.index [:conversation_id, :created_at]
+      t.index [ :conversation_id, :created_at ]
     end
 
     add_foreign_key :messages, :questions, column: :question_id, on_delete: :nullify

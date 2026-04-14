@@ -10,7 +10,7 @@ class RefactorConversationsForTutorRedesign < ActiveRecord::Migration[8.1]
     remove_column :conversations, :streaming, :boolean, default: false, null: false
 
     # Remove old per-question unique index before changing the FK
-    remove_index :conversations, column: [:student_id, :question_id],
+    remove_index :conversations, column: [ :student_id, :question_id ],
                  name: "index_conversations_on_student_id_and_question_id"
 
     # Change question_id from NOT NULL FK to nullable (conversations no longer
@@ -29,7 +29,7 @@ class RefactorConversationsForTutorRedesign < ActiveRecord::Migration[8.1]
     add_column :conversations, :tutor_state, :jsonb, null: false, default: {}
 
     # New unique index: one conversation per (student, subject)
-    add_index :conversations, [:student_id, :subject_id], unique: true,
+    add_index :conversations, [ :student_id, :subject_id ], unique: true,
               name: "index_conversations_on_student_id_and_subject_id"
   end
 end

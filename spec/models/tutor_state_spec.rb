@@ -52,7 +52,7 @@ RSpec.describe QuestionState do
         step: 1,
         hints_used: 2,
         last_confidence: 4,
-        error_types: ["calcul"],
+        error_types: [ "calcul" ],
         completed_at: nil
       )
     end
@@ -70,7 +70,7 @@ RSpec.describe QuestionState do
     end
 
     it "stores error_types" do
-      expect(qs.error_types).to eq(["calcul"])
+      expect(qs.error_types).to eq([ "calcul" ])
     end
   end
 end
