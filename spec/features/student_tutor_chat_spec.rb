@@ -1,102 +1,109 @@
-# spec/features/student_tutor_chat_spec.rb
 require "rails_helper"
 
-RSpec.xdescribe "Story 10: Chat adaptatif avec contexte de reperage", type: :feature do
-  let(:teacher) { create(:user) }
+RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
+  let(:teacher)   { create(:user) }
   let(:classroom) { create(:classroom, name: "Terminale SIN 2026", owner: teacher) }
-  let(:student)   { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }
+  let(:student) do
+    create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic)
+  end
   let(:subject_record) do
     create(:subject,
       status: :published,
-      owner: teacher,
-      specific_presentation: "La societe CIME fabrique des vehicules electriques.")
+      owner:  teacher,
+      specific_presentation: "La société CIME fabrique des véhicules électriques.")
   end
-
   let(:part) do
     create(:part, :specific,
       subject: subject_record,
-      number: 1,
-      title: "Transport et developpement durable",
+      number:  1,
+      title:   "Transport et développement durable",
       objective_text: "Comparer les modes de transport.",
       position: 1)
   end
-
   let!(:question) do
     create(:question,
-      part: part,
-      number: "1.1",
-      label: "Calculer la consommation en litres pour 186 km.",
-      points: 2,
+      part:     part,
+      number:   "1.1",
+      label:    "Calculer la consommation en litres pour 186 km.",
+      points:   2,
       position: 1)
   end
-
   let!(:answer) do
     create(:answer,
-      question: question,
+      question:        question,
       correction_text: "Car = 56,73 l",
-      explanation_text: "Formule Consommation x Distance / 100")
+      explanation_text: "Formule Consommation × Distance / 100")
   end
-
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
 
   def visit_question_page
     visit student_question_path(
       access_code: classroom.access_code,
-      subject_id: subject_record.id,
-      id: question.id
+      subject_id:  subject_record.id,
+      id:          question.id
     )
   end
 
-  context "en mode tutorat avec la correction affichee" do
-    let(:tutored_session) do
-      create(:student_session,
-        student: student,
-        subject: subject_record,
-        mode: :tutored,
-        progression: { question.id.to_s => { "answered" => true } },
-        tutor_state: {
-          "question_states" => {
-            question.id.to_s => { "step" => "feedback" }
-          }
-        }
+  context "when a conversation exists (tutor activated)" do
+    let!(:active_conversation) do
+      create(:conversation,
+        student:         student,
+        subject:         subject_record,
+        lifecycle_state: "active",
+        tutor_state:     TutorState.default)
+    end
+
+    before do
+      login_as_student(student, classroom)
+      visit_question_page
+    end
+
+    scenario "clicking the Tutorat button slides the drawer into view", js: true do
+      expect(page).to have_css("[data-chat-connected='true']", wait: 10)
+
+      find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
+
+      expect(page).to have_css(
+        "[data-chat-drawer-target='drawer'].translate-x-0",
+        visible: :all, wait: 5
       )
+      expect(page).to have_css("[data-tutor-chat-target='input']", visible: :all)
+      expect(page).to have_css("[data-tutor-chat-target='sendButton']", visible: :all)
     end
 
-    scenario "le lien 'Expliquer la correction' est visible apres la correction", js: true do
-      tutored_session
-      login_as_student(student, classroom)
-      visit_question_page
+    scenario "closing the drawer slides it back out", js: true do
+      expect(page).to have_css("[data-chat-connected='true']", wait: 10)
 
-      expect(page).to have_button("Expliquer la correction")
-    end
+      find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
+      expect(page).to have_css(
+        "[data-chat-drawer-target='drawer'].translate-x-0",
+        visible: :all, wait: 5
+      )
 
-    scenario "cliquer sur 'Expliquer la correction' ouvre le chat drawer", js: true do
-      tutored_session
-      login_as_student(student, classroom)
-      visit_question_page
+      find("button[aria-label='Fermer le tutorat']").click
 
-      click_button "Expliquer la correction"
-
-      expect(page).to have_css("[data-chat-target='drawer']", visible: true)
+      expect(page).to have_css(
+        "[data-chat-drawer-target='drawer'].translate-x-full",
+        visible: :all, wait: 5
+      )
     end
   end
 
-  context "en mode autonome avec la correction affichee" do
-    let(:autonomous_session) do
-      create(:student_session,
-        student: student,
-        subject: subject_record,
-        mode: :autonomous,
-        progression: { question.id.to_s => { "answered" => true } }
-      )
-    end
-
-    scenario "le lien 'Expliquer la correction' n'est PAS visible en mode autonome", js: true do
-      autonomous_session
+  context "when no conversation exists yet" do
+    before do
       login_as_student(student, classroom)
       visit_question_page
+    end
 
-      expect(page).not_to have_button("Expliquer la correction")
+    scenario "the drawer is present but the input is disabled until activation", js: true do
+      find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
+
+      expect(page).to have_css(
+        "[data-chat-drawer-target='drawer'].translate-x-0",
+        visible: :all, wait: 5
+      )
+      input = find("[data-tutor-chat-target='input']", visible: :all)
+      expect(input[:disabled]).to be_truthy
     end
   end
 end

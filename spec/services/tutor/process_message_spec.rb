@@ -46,8 +46,16 @@ RSpec.describe Tutor::ProcessMessage do
     result
     expect(ActionCable.server).to have_received(:broadcast).with(
       "conversation_#{conversation.id}",
-      anything
+      hash_including(type: "done")
     )
+  end
+
+  it "also broadcasts chunk-level token events during streaming" do
+    result
+    expect(ActionCable.server).to have_received(:broadcast).with(
+      "conversation_#{conversation.id}",
+      hash_including(type: "token")
+    ).at_least(:once)
   end
 
   it "returns err for blank input" do

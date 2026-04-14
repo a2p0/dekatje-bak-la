@@ -1,0 +1,23 @@
+<% role = message.role.to_s %>
+
+<% if role == "user" %>
+  <div class="self-end bg-gradient-to-br from-indigo-500 to-violet-500 text-white px-3 py-2 rounded-2xl rounded-br-sm max-w-[85%] text-sm leading-relaxed break-words"
+       data-message-id="<%= message.id %>"
+       data-message-role="user">
+    <%= message.content %>
+  </div>
+
+<% elsif role == "assistant" %>
+  <div class="self-start bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-2xl rounded-bl-sm max-w-[85%] text-sm leading-relaxed break-words"
+       data-message-id="<%= message.id %>"
+       data-message-role="assistant">
+    <%= message.content %>
+  </div>
+
+<% elsif role == "system" %>
+  <div class="self-center text-xs italic text-slate-400 dark:text-slate-500 text-center max-w-[85%]"
+       data-message-id="<%= message.id %>"
+       data-message-role="system">
+    <%= message.content %>
+  </div>
+<% end %>

@@ -1,10 +1,24 @@
 require "rails_helper"
 
-# Scenarios pending Vague 4 — UI Hotwire drawer
-# (data-chat-connected attribute and drawer targets are added in Vague 4).
-# The backend pipeline for spotting is fully covered by the unit spec
-# spec/services/tutor/process_message_spec.rb.
-RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :feature do
+# Pending — these 4 scenarios exercise the full LLM -> ActionCable ->
+# DOM pipeline, which requires two pieces of test infrastructure that
+# are NOT part of Vague 4:
+#
+#   1. An async ActionCable adapter in test (currently `adapter: test`
+#      which is a no-op for broadcasts reaching the browser);
+#   2. Inline execution of ProcessTutorMessageJob so the pipeline runs
+#      synchronously during the Capybara scenario.
+#
+# The Vague 4 backend (CallLlm, BroadcastMessage, ProcessMessage,
+# FilterSpottingOutput, InjectDataHints) is fully covered by unit
+# specs under spec/services/tutor/. The Vague 4 UI wiring (drawer
+# open/close, targets, data-chat-connected gate) is covered by
+# spec/features/student_tutor_chat_spec.rb.
+#
+# Reactivate this describe block once Vague 5 wires up async cable +
+# inline jobs for feature specs.
+RSpec.describe "Tuteur guidé : phase de repérage conversationnelle",
+               type: :feature, skip: "Vague 5: needs async ActionCable adapter + inline jobs in feature specs" do
   let(:teacher)   { create(:user) }
   let(:classroom) { create(:classroom, name: "Terminale SIN 2026", owner: teacher) }
   let(:student)   { create(:student, classroom: classroom, api_key: "sk-test", api_provider: :anthropic) }
@@ -36,12 +50,6 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
   end
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
 
-  let!(:tutored_session) do
-    create(:student_session,
-      student: student, subject: subject_record,
-      mode: :tutored, progression: {})
-  end
-
   let!(:spotting_conversation) do
     spotting_state = TutorState.new(
       current_phase:        "spotting",
@@ -51,7 +59,7 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
       discouragement_level: 0,
       question_states:      {
         question.id.to_s => QuestionState.new(
-          step: "initial", hints_used: 0, last_confidence: nil,
+          step: 0, hints_used: 0, last_confidence: nil,
           error_types: [], completed_at: nil
         )
       }
@@ -71,13 +79,13 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
   end
 
   def open_tutor_drawer
-    click_button "Tutorat"
-    expect(page).to have_css("[data-chat-target='drawer'].translate-x-0", visible: :all, wait: 5)
+    find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
+    expect(page).to have_css("[data-chat-drawer-target='drawer'].translate-x-0", visible: :all, wait: 5)
   end
 
   before { login_as_student(student, classroom) }
 
-  scenario "le tuteur demande où trouver les données à l'entrée en phase spotting", js: true do
+  scenario "le tuteur répond à une question en phase spotting", js: true do
     FakeRubyLlm.setup_stub(
       content: "Où penses-tu trouver les informations pour cette question ?",
       tool_calls: []
@@ -86,11 +94,10 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
     visit_question_page
     open_tutor_drawer
 
-    input = find("[data-chat-target='input']", visible: :all)
-    input.fill_in(with: "Bonjour")
-    find("[data-chat-target='sendButton']", visible: :all).click
+    find("[data-tutor-chat-target='input']", visible: :all).set("Bonjour")
+    find("[data-tutor-chat-target='sendButton']", visible: :all).click
 
-    drawer = find("[data-chat-target='drawer']", visible: :all)
+    drawer = find("[data-chat-drawer-target='drawer']", visible: :all)
     expect(drawer).to have_text("Où penses-tu trouver les informations", wait: 10)
   end
 
@@ -115,9 +122,10 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
     visit_question_page
     open_tutor_drawer
 
-    input = find("[data-chat-target='input']", visible: :all)
-    input.fill_in(with: "Je pense que les données sont dans les documents techniques et la mise en situation.")
-    find("[data-chat-target='sendButton']", visible: :all).click
+    find("[data-tutor-chat-target='input']", visible: :all).set(
+      "Je pense que les données sont dans les documents techniques et la mise en situation."
+    )
+    find("[data-tutor-chat-target='sendButton']", visible: :all).click
 
     expect(page).to have_css(".data-hints-card", wait: 10)
     expect(page).to have_text("DT1", wait: 5)
@@ -126,7 +134,7 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
     expect(page).to have_text("distance 186 km")
   end
 
-  scenario "3 relances échouées → forced_reveal → DataHintsComponent affiché", js: true do
+  scenario "forced_reveal → DataHintsComponent affiché", js: true do
     forced_tool_call = double("RubyLLM::ToolCall",
       name: "evaluate_spotting",
       arguments: {
@@ -147,16 +155,15 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
     visit_question_page
     open_tutor_drawer
 
-    input = find("[data-chat-target='input']", visible: :all)
-    input.fill_in(with: "Je ne sais vraiment pas.")
-    find("[data-chat-target='sendButton']", visible: :all).click
+    find("[data-tutor-chat-target='input']", visible: :all).set("Je ne sais vraiment pas.")
+    find("[data-tutor-chat-target='sendButton']", visible: :all).click
 
     expect(page).to have_css(".data-hints-card", wait: 10)
     expect(page).to have_text("DT1")
     expect(page).to have_text("tableau Consommation moyenne")
   end
 
-  scenario "le filtre regex remplace un output LLM contenant 'DT1' par un relance neutre", js: true do
+  scenario "le filtre regex remplace un output LLM contenant 'DT1' par une relance neutre", js: true do
     FakeRubyLlm.setup_stub(
       content: "Les données se trouvent dans DT1, tableau page 3.",
       tool_calls: []
@@ -165,11 +172,10 @@ RSpec.xdescribe "Tuteur guidé : phase de repérage conversationnelle", type: :f
     visit_question_page
     open_tutor_drawer
 
-    input = find("[data-chat-target='input']", visible: :all)
-    input.fill_in(with: "Je pense que c'est dans l'énoncé.")
-    find("[data-chat-target='sendButton']", visible: :all).click
+    find("[data-tutor-chat-target='input']", visible: :all).set("Je pense que c'est dans l'énoncé.")
+    find("[data-tutor-chat-target='sendButton']", visible: :all).click
 
-    drawer = find("[data-chat-target='drawer']", visible: :all)
+    drawer = find("[data-chat-drawer-target='drawer']", visible: :all)
     expect(drawer).to have_text("Reformule ta réponse", wait: 10)
     expect(drawer).not_to have_text("DT1")
   end
