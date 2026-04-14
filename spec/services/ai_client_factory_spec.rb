@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.xdescribe "AiClientFactory (removed in vague1)" do
+RSpec.describe AiClientFactory do
   describe ".build" do
     it "builds a client for anthropic provider" do
       client = described_class.build(provider: :anthropic, api_key: "sk-test")
