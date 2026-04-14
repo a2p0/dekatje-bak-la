@@ -51,7 +51,8 @@ Rails.application.routes.draw do
       controller: "student/settings/api_key_tests"
     resources :conversations, only: [ :create ], controller: "student/conversations" do
       member do
-        post :messages
+        post  :messages
+        patch :confidence
       end
     end
   end

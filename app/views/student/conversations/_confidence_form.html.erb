@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "confidence-form-#{question_id}" do %>
+  <div class="self-start mt-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 max-w-[90%]"
+       data-controller="confidence-form"
+       data-confidence-form-url-value="<%= confidence_student_conversation_path(access_code: access_code, id: conversation.id) %>">
+    <p class="text-xs font-medium text-slate-600 dark:text-slate-400 mb-3">
+      À quel point étais-tu sûr(e) de ta réponse ?
+    </p>
+    <div class="flex gap-2 flex-wrap">
+      <% confidence_labels = {
+        1 => "Très peu sûr",
+        2 => "Peu sûr",
+        3 => "Moyennement sûr",
+        4 => "Assez sûr",
+        5 => "Très sûr"
+      } %>
+      <% (1..5).each do |level| %>
+        <button type="button"
+                value="<%= level %>"
+                data-confidence-form-target="button"
+                data-action="click->confidence-form#submit"
+                title="<%= confidence_labels[level] %>"
+                class="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:border-indigo-400 hover:text-indigo-600 transition-colors cursor-pointer bg-white dark:bg-slate-800">
+          <%= level %>
+        </button>
+      <% end %>
+    </div>
+    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-2">
+      1 = <%= confidence_labels[1] %> &nbsp;·&nbsp; 5 = <%= confidence_labels[5] %>
+    </p>
+  </div>
+<% end %>

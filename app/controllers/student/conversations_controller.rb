@@ -1,5 +1,5 @@
 class Student::ConversationsController < Student::BaseController
-  before_action :set_conversation, only: [ :messages ]
+  before_action :set_conversation, only: [ :messages, :confidence ]
 
   def create
     subject = Subject.kept.find(params[:subject_id])
@@ -38,6 +38,32 @@ class Student::ConversationsController < Student::BaseController
     render json: { status: "ok" }
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Question introuvable." }, status: :not_found
+  end
+
+  def confidence
+    level = params[:level].to_i
+    unless (1..5).cover?(level)
+      return render json: { error: "Niveau invalide (1-5 requis)." },
+                    status: :unprocessable_entity
+    end
+
+    q_id = @conversation.tutor_state.current_question_id
+    state = @conversation.tutor_state.question_states[q_id.to_s] if q_id
+    unless state
+      return render json: { error: "Question courante introuvable." },
+                    status: :unprocessable_entity
+    end
+
+    updated_state = state.with(last_confidence: level)
+    new_ts = @conversation.tutor_state.with(
+      question_states: @conversation.tutor_state.question_states.merge(q_id.to_s => updated_state)
+    )
+    @conversation.update!(tutor_state: new_ts)
+
+    @conversation.give_feedback! if @conversation.may_give_feedback?
+
+    @question_id = q_id
+    render "student/conversations/confidence", formats: [ :turbo_stream ]
   end
 
   private
