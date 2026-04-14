@@ -122,21 +122,6 @@
       <p class="text-slate-800 dark:text-slate-100 text-sm leading-relaxed mb-2"><%= @question.label %></p>
     </div>
 
-    <%# Spotting card (tutored mode only) %>
-    <% if @session_record.tutored? && @question.answer %>
-      <% if !@session_record.spotting_completed?(@question.id) %>
-        <%= render "student/tutor/spotting_card",
-            question: @question, subject: @subject,
-            session_record: @session_record, access_code: params[:access_code] %>
-      <% else %>
-        <% spotting = @session_record.spotting_data(@question.id) %>
-        <% if spotting %>
-          <%= render "student/tutor/spotting_feedback",
-              question: @question, spotting: spotting %>
-        <% end %>
-      <% end %>
-    <% end %>
-
     <%# Correction + data hints area %>
     <%= turbo_frame_tag "question_#{@question.id}_correction" do %>
       <% if @session_record.answered?(@question.id) %>
