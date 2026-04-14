@@ -2,39 +2,348 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **🔧 Patch 2026-04-14 — corrections de dérive post-Vague 3**
+>
+> Le plan original a été écrit avant la finalisation de Vague 3. Cinq dérives corrigées :
+>
+> 1. **AASM lifecycle** — code réel = `disabled / active / ended`. Patch : renommer `ended` → `done` (migration data), et ajouter `validating`, `feedback`. Traité dans la nouvelle **Task 0**.
+> 2. **BroadcastMessage shape** — code réel diffuse `{ message: {...} }` ; plan attend `{ type:, ... }`. Patch : enveloppe typée `{ type: "done", message: {...} }`. Traité dans **Task 0**.
+> 3. **Streaming token-par-token** — n'existe pas encore. `TutorStreamJob` n'existe pas ; le streaming arrive de `Tutor::CallLlm` (pipeline RubyLLM). Patch : **Task 1 réécrite** pour modifier `CallLlm` (pattern hybride : broadcast `{ type: "token" }` à chaque chunk persisté, puis `{ type: "done" }` en fin via `BroadcastMessage`).
+> 4. **Mocks de spec** — plan mocke `AiClientFactory` ; code actuel utilise `RubyLLM::Chat.ask(&block)`. Patch : Task 1 mocke `RubyLLM::Chat` (via `FakeRubyLlm.setup_stub` déjà en place).
+> 5. **Task 4 (confidence)** — la signature `Tutor::ProcessMessage.call(tool_name:, tool_args:)` n'existe pas. Patch : l'action `confidence` déclenche la transition AASM `validating!` → `feedback!` directement (les states existent maintenant grâce à Task 0) et n'invoque pas le pipeline.
+
 **Goal:** Construire l'interface Hotwire complète du tuteur : drawer chat persistant, streaming temps réel via ActionCable, optimistic UI, formulaire d'auto-évaluation inline, et bouton d'activation depuis la page sujet.
 
-**Architecture:** Trois Stimulus controllers (`chat-drawer`, `tutor-chat`, `confidence-form`). Le drawer est un état UI pur — aucune mutation lifecycle. Le streaming arrive via `ActionCable` sur `TutorChannel` (stream `conversation_{id}`). `TutorStreamJob` diffuse des messages typés `{ type: "token"|"done"|"data_hints"|"error", ... }`. La route `PATCH /conversations/:id/confidence` met à jour `question_states[q_id].last_confidence` et déclenche `ApplyToolCalls` pour avancer le lifecycle.
+**Architecture:** Trois Stimulus controllers (`chat-drawer`, `tutor-chat`, `confidence-form`). Le drawer est un état UI pur — aucune mutation lifecycle. Le streaming arrive via `ActionCable` sur `ConversationChannel` (stream `conversation_{id}`). Les broadcasts sont typés `{ type: "token"|"done"|"data_hints"|"error", ... }`. `Tutor::CallLlm` diffuse `type: "token"` à chaque chunk persisté, `Tutor::BroadcastMessage` diffuse `type: "done"` à la fin du pipeline. La route `PATCH /conversations/:id/confidence` met à jour `question_states[q_id].last_confidence` et déclenche la transition AASM `validating → feedback`.
 
 **Tech Stack:** Rails 8, Hotwire (Turbo Frames + Turbo Streams), Stimulus, ActionCable, ViewComponent, Capybara (E2E)
 
 **Prérequis Vague 3 accomplie :**
 - `Message` model (table `messages`, colonnes `role`, `content`, `conversation_id`, `chunk_index`, `streaming_finished_at`)
-- `Conversation` model avec AASM lifecycle (`lifecycle_state`: `disabled / active / validating / feedback / done`)
+- `Conversation` model avec AASM lifecycle (`lifecycle_state`: `disabled / active / ended` — **étendu par Task 0 ci-dessous à `disabled / active / validating / feedback / done`**)
 - `TutorState` typed Data class + `QuestionState` nested type
-- `Tutor::ProcessMessage` pipeline (7 étapes: BuildContext → CallLlm → FilterSpottingOutput → ParseToolCalls → ApplyToolCalls → UpdateTutorState → BroadcastMessage)
-- `Tutor::BroadcastMessage` service (`ActionCable.server.broadcast(...)`)
+- `Tutor::ProcessMessage` pipeline (7 étapes: ValidateInput → BuildContext → CallLlm → FilterSpottingOutput → ParseToolCalls → ApplyToolCalls → UpdateTutorState → BroadcastMessage)
+- `Tutor::BroadcastMessage` service (`ActionCable.server.broadcast(...)`) — **shape modifié par Task 0 pour être typé**
+- `Tutor::CallLlm` service (streaming via `RubyLLM::Chat.ask(&block)`, persistance par chunks) — **modifié par Task 1 pour broadcast token-par-chunk**
 - `ConversationChannel` (streams depuis `"conversation_{id}"`)
 - `DataHintsComponent` ViewComponent
 - `InjectDataHints` service
 - `spec/support/fake_ruby_llm.rb` avec `FakeRubyLlm.setup_stub`
 - `Classroom#tutor_free_mode_enabled` column (boolean, depuis Vague 1)
 - `Conversation` appartient à `(student, subject)` — une conversation par (student, subject)
+- `ProcessTutorMessageJob` (job qui appelle `Tutor::ProcessMessage.call`) — **pas de `TutorStreamJob`** dans le codebase actuel
 
 **Note sur le code existant :** Les fichiers `chat_controller.js`, `_chat_drawer.html.erb`, et les routes/actions `conversations#create`/`conversations#message` existent dans le codebase actuel mais sont basés sur l'ancienne architecture (conversation par question, `messages` JSONB). Ils ont été supprimés ou remplacés dans Vague 1. Cette vague reconstruit tout proprement à partir de la nouvelle architecture.
 
 ---
 
-## Task 1 — Mettre à jour `TutorStreamJob` pour diffuser des messages typés
+## Task 0 — Étendre l'AASM lifecycle et typer les broadcasts
 
-Le job actuel diffuse `{ token: }` et `{ done: true }`. La nouvelle architecture diffuse `{ type:, ... }` pour que le Stimulus controller puisse router sans ambiguité.
+Préparation de l'architecture pour que les tâches suivantes aient un terrain propre. Deux changements orthogonaux rassemblés dans un même commit : étendre la machine d'états `Conversation` (rename `ended` → `done` + ajout `validating` et `feedback`), et modifier `Tutor::BroadcastMessage` pour émettre une enveloppe typée `{ type: "done", message: {...} }` au lieu de `{ message: {...} }`.
 
 **Files:**
-- Modify: `app/jobs/tutor_stream_job.rb`
-- Modify: `spec/jobs/tutor_stream_job_spec.rb` (remettre en `RSpec.describe`, adapter)
-- Commit: `feat(tutor): broadcast typed messages (token/done/error) from TutorStreamJob`
+- Modify: `app/models/conversation.rb`
+- Create: `db/migrate/YYYYMMDDHHMMSS_rename_conversation_ended_to_done.rb`
+- Modify: `app/services/tutor/broadcast_message.rb`
+- Modify: `spec/models/conversation_spec.rb`
+- Modify: `spec/services/tutor/broadcast_message_spec.rb`
+- Modify: tous les fichiers (specs, fixtures, seeds) référençant `"ended"` pour le lifecycle Conversation
+- Commit: `refactor(tutor): extend conversation lifecycle (done/validating/feedback) and type broadcast envelope`
 
 ### Steps
+
+- [ ] Recenser toutes les références à `"ended"` pour le state Conversation :
+  ```bash
+  grep -rn '"ended"\|:ended\|end_chat\|lifecycle_state.*ended' \
+    app/ spec/ db/seeds/ config/ --include="*.rb" --include="*.erb"
+  ```
+  Noter chaque occurrence à mettre à jour (modèle, specs, factories, seeds).
+
+- [ ] Créer la migration de rename du state :
+  ```ruby
+  # db/migrate/YYYYMMDDHHMMSS_rename_conversation_ended_to_done.rb
+  class RenameConversationEndedToDone < ActiveRecord::Migration[8.1]
+    def up
+      execute "UPDATE conversations SET lifecycle_state = 'done' WHERE lifecycle_state = 'ended'"
+    end
+
+    def down
+      execute "UPDATE conversations SET lifecycle_state = 'ended' WHERE lifecycle_state = 'done'"
+    end
+  end
+  ```
+
+- [ ] Lancer la migration :
+  ```bash
+  bin/rails db:migrate
+  ```
+
+- [ ] Mettre à jour `app/models/conversation.rb` pour étendre l'AASM :
+  ```ruby
+  class Conversation < ApplicationRecord
+    include AASM
+
+    belongs_to :student
+    belongs_to :subject
+    has_many :messages, dependent: :destroy
+
+    validates :student_id, uniqueness: { scope: :subject_id }
+
+    attribute :tutor_state, TutorStateType.new
+
+    aasm column: :lifecycle_state do
+      state :disabled, initial: true
+      state :active
+      state :validating
+      state :feedback
+      state :done
+
+      event :activate do
+        transitions from: :disabled, to: :active,
+                    guard: :student_has_api_key_or_free_mode?
+      end
+
+      event :request_validation do
+        transitions from: :active, to: :validating
+      end
+
+      event :give_feedback do
+        transitions from: :validating, to: :feedback
+      end
+
+      event :resume do
+        transitions from: :feedback, to: :active
+      end
+
+      event :finish do
+        transitions from: [ :active, :feedback ], to: :done
+      end
+    end
+
+    private
+
+    def student_has_api_key_or_free_mode?
+      student.api_key.present? ||
+        student.classroom&.tutor_free_mode_enabled?
+    end
+  end
+  ```
+
+  **Note :** l'événement `end_chat` est supprimé au profit de `finish`. Si d'autres callers l'utilisent (à vérifier via `grep`), les mettre à jour.
+
+- [ ] Mettre à jour toutes les références `"ended"` / `:ended` / `end_chat` identifiées à l'étape 1 pour pointer vers `"done"` / `:done` / `finish`.
+
+- [ ] Mettre à jour `app/services/tutor/broadcast_message.rb` pour émettre une enveloppe typée :
+  ```ruby
+  module Tutor
+    class BroadcastMessage
+      def self.call(conversation:, message:)
+        new(conversation: conversation, message: message).call
+      end
+
+      def initialize(conversation:, message:)
+        @conversation = conversation
+        @message      = message
+      end
+
+      def call
+        ActionCable.server.broadcast(
+          "conversation_#{@conversation.id}",
+          {
+            type: "done",
+            message: {
+              id:                    @message.id,
+              role:                  @message.role,
+              content:               @message.content,
+              streaming_finished:    @message.streaming_finished_at.present?,
+              streaming_finished_at: @message.streaming_finished_at&.iso8601
+            }
+          }
+        )
+        Result.ok
+      end
+    end
+  end
+  ```
+
+- [ ] Mettre à jour `spec/services/tutor/broadcast_message_spec.rb` pour asserter la nouvelle shape (`expect(broadcasted).to include(type: "done", message: hash_including(:id))`).
+
+- [ ] Mettre à jour `spec/models/conversation_spec.rb` — vérifier que les 5 states sont présents et que chaque transition (`activate`, `request_validation`, `give_feedback`, `resume`, `finish`) fonctionne.
+
+- [ ] Lancer les specs ciblées :
+  ```bash
+  bundle exec rspec spec/models/conversation_spec.rb \
+                    spec/services/tutor/broadcast_message_spec.rb \
+                    spec/services/tutor/ \
+                    --format documentation 2>&1 | tail -20
+  ```
+  Résultat attendu : `0 failures`.
+
+- [ ] Lancer la suite de specs request + models pour confirmer qu'aucune référence `"ended"` n'a été oubliée :
+  ```bash
+  bundle exec rspec spec/requests spec/models 2>&1 | tail -5
+  ```
+
+- [ ] Commit :
+  ```bash
+  git add app/models/conversation.rb \
+          app/services/tutor/broadcast_message.rb \
+          db/migrate/*_rename_conversation_ended_to_done.rb \
+          db/schema.rb \
+          spec/
+  git commit -m "refactor(tutor): extend conversation lifecycle (done/validating/feedback) and type broadcast envelope"
+  ```
+
+---
+
+## Task 1 — Broadcast de tokens en streaming depuis `Tutor::CallLlm`
+
+`Tutor::CallLlm` persiste déjà le message assistant par chunks (toutes les ~50 tokens ou 0.25s) pendant la boucle `RubyLLM::Chat#ask`. On s'accroche à ce même rythme pour diffuser des broadcasts `{ type: "token", token: <delta>, message_id: <id> }` au fur et à mesure, pour que le Stimulus `tutor-chat` voie le message se construire en temps réel. Le broadcast final `{ type: "done", message: {...} }` est déjà émis par `Tutor::BroadcastMessage` (modifié en Task 0).
+
+Pattern **hybride par chunk** : zéro coût perf additionnel (on réutilise le rythme de persistance existant), UX "le tuteur tape" acceptable (un paragraphe apparaît toutes les ~0.25s).
+
+**Files:**
+- Modify: `app/services/tutor/call_llm.rb`
+- Modify: `spec/services/tutor/call_llm_spec.rb`
+- Commit: `feat(tutor): broadcast chunk-level token events during CallLlm streaming`
+
+### Steps
+
+- [ ] Lire d'abord le code existant :
+  ```bash
+  sed -n '1,90p' app/services/tutor/call_llm.rb
+  cat spec/services/tutor/call_llm_spec.rb | head -80
+  ```
+  Noter la boucle `chat.ask(@messages) do |chunk|` et le bloc de persistance `@student_message.update_columns(...)` qui s'exécute tous les `CHUNK_PERSIST_TOKENS` ou 0.25s.
+
+- [ ] Écrire la spec failing d'abord. Dans `spec/services/tutor/call_llm_spec.rb`, ajouter un exemple :
+
+  ```ruby
+  # Ajouter dans le bloc describe existant — utiliser FakeRubyLlm.setup_stub
+  it "broadcasts typed { type: \"token\" } events at each chunk persistence boundary" do
+    broadcasted = []
+    allow(ActionCable.server).to receive(:broadcast) do |channel, data|
+      broadcasted << data if channel == "conversation_#{conversation.id}"
+    end
+
+    # Stub RubyLLM::Chat to yield a few chunks via FakeRubyLlm helper
+    FakeRubyLlm.setup_stub(chunks: [
+      OpenStruct.new(content: "Bon", tool_calls: nil),
+      OpenStruct.new(content: "jour ", tool_calls: nil),
+      OpenStruct.new(content: "élève", tool_calls: nil)
+    ])
+
+    described_class.call(
+      conversation:    conversation,
+      system_prompt:   "...",
+      messages:        [{ role: "user", content: "Aide-moi" }],
+      student_message: assistant_msg
+    )
+
+    token_events = broadcasted.select { |d| d[:type] == "token" }
+    expect(token_events).not_to be_empty
+    expect(token_events.first).to include(type: "token", message_id: assistant_msg.id)
+    expect(token_events.first[:token]).to be_a(String)
+  end
+
+  it "broadcasts typed { type: \"error\" } when RubyLLM raises" do
+    allow(ActionCable.server).to receive(:broadcast)
+
+    FakeRubyLlm.setup_stub(raise_error: RuntimeError.new("401 Unauthorized"))
+
+    described_class.call(
+      conversation:    conversation,
+      system_prompt:   "...",
+      messages:        [{ role: "user", content: "Aide-moi" }],
+      student_message: assistant_msg
+    )
+
+    expect(ActionCable.server).to have_received(:broadcast)
+      .with("conversation_#{conversation.id}", hash_including(type: "error"))
+  end
+  ```
+
+  **Note :** si `FakeRubyLlm.setup_stub` ne supporte pas encore `raise_error:` ou `chunks:`, étendre le helper dans `spec/support/fake_ruby_llm.rb` avant d'écrire les specs. Vérifier l'API actuelle du helper.
+
+- [ ] Confirmer l'échec :
+  ```bash
+  bundle exec rspec spec/services/tutor/call_llm_spec.rb --format documentation 2>&1 | tail -15
+  ```
+  Résultat attendu : aucun broadcast `type: "token"` — CallLlm ne diffuse rien pour l'instant.
+
+- [ ] Modifier `app/services/tutor/call_llm.rb` pour s'accrocher au rythme de persistance existant et ajouter un broadcast `{ type: "token" }` à chaque chunk persisté. Adapter aussi le `rescue` pour broadcast `{ type: "error" }` avant de retourner `Result.err`.
+
+  Le changement clé : dans le bloc de persistance (qui déjà tourne tous les `CHUNK_PERSIST_TOKENS` ou 0.25s), **capturer le delta de contenu ajouté depuis le dernier flush** et le diffuser :
+
+  ```ruby
+  # Dans la boucle chat.ask :
+  response = chat.ask(@messages) do |chunk|
+    full_content << chunk.content.to_s
+    tool_calls = chunk.tool_calls if chunk.tool_calls.present?
+
+    buffer_tokens += 1
+    now = Time.current
+    if buffer_tokens >= CHUNK_PERSIST_TOKENS || (now - last_persist) >= 0.25
+      delta = full_content[last_persist_length..-1].to_s
+      @student_message.update_columns(
+        content:     full_content,
+        chunk_index: @student_message.chunk_index + buffer_tokens
+      )
+      ActionCable.server.broadcast(
+        "conversation_#{@conversation.id}",
+        { type: "token", message_id: @student_message.id, token: delta }
+      )
+      last_persist_length = full_content.length
+      buffer_tokens = 0
+      last_persist  = now
+    end
+  end
+  ```
+
+  Initialiser `last_persist_length = 0` au même endroit que `buffer_tokens = 0`.
+
+  Pour les erreurs, modifier les deux `rescue` pour diffuser avant de retourner :
+
+  ```ruby
+  rescue Tutor::NoApiKeyError => e
+    ActionCable.server.broadcast(
+      "conversation_#{@conversation.id}",
+      { type: "error", error: e.message }
+    )
+    Result.err(e.message)
+  rescue => e
+    ActionCable.server.broadcast(
+      "conversation_#{@conversation.id}",
+      { type: "error", error: "Erreur LLM : #{e.message}" }
+    )
+    Result.err("Erreur LLM : #{e.message}")
+  end
+  ```
+
+- [ ] Lancer les specs et confirmer qu'elles passent :
+  ```bash
+  bundle exec rspec spec/services/tutor/call_llm_spec.rb \
+                    spec/services/tutor/ \
+                    --format documentation 2>&1 | tail -15
+  ```
+  Résultat attendu : `0 failures`.
+
+- [ ] Lancer aussi les specs du pipeline complet pour vérifier non-régression :
+  ```bash
+  bundle exec rspec spec/services/tutor/process_message_spec.rb --format documentation 2>&1 | tail -10
+  ```
+
+- [ ] Commit :
+  ```bash
+  git add app/services/tutor/call_llm.rb \
+          spec/services/tutor/call_llm_spec.rb \
+          spec/support/fake_ruby_llm.rb
+  git commit -m "feat(tutor): broadcast chunk-level token events during CallLlm streaming"
+  ```
+
+<!-- OLD TASK 1 CONTENT ARCHIVED BELOW — TutorStreamJob fictif + mocks AiClientFactory, ne pas suivre -->
+<details>
+<summary>Contenu original Task 1 (caduc — archivé)</summary>
 
 - [ ] Écrire les specs failing d'abord. Dans `spec/jobs/tutor_stream_job_spec.rb`, remplacer `RSpec.xdescribe` par `RSpec.describe` et réécrire le contenu :
 
@@ -236,6 +545,8 @@ Le job actuel diffuse `{ token: }` et `{ done: true }`. La nouvelle architecture
   git add app/jobs/tutor_stream_job.rb spec/jobs/tutor_stream_job_spec.rb
   git commit -m "feat(tutor): broadcast typed messages (token/done/error) from TutorStreamJob"
   ```
+
+</details>
 
 ---
 
@@ -613,13 +924,8 @@ Le job actuel diffuse `{ token: }` et `{ done: true }`. La nouvelle architecture
     )
     @conversation.update!(tutor_state: new_ts)
 
-    # Trigger feedback phase transition via pipeline
-    Tutor::ProcessMessage.call(
-      conversation: @conversation,
-      student_input: nil,
-      tool_name: "transition",
-      tool_args: { phase: "feedback" }
-    )
+    # Transition AASM: validating -> feedback (states extended by Task 0)
+    @conversation.give_feedback! if @conversation.may_give_feedback?
 
     render turbo_stream: render_to_string(
       "student/conversations/confidence",
