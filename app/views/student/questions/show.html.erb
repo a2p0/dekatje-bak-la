@@ -127,7 +127,7 @@
       <% if @session_record.answered?(@question.id) %>
         <%= render "student/questions/correction",
             question: @question, subject: @subject, session_record: @session_record %>
-      <% elsif @question.answer && (!@session_record.tutored? || @session_record.spotting_completed?(@question.id)) %>
+      <% elsif @question.answer %>
         <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
           <%= button_to "Voir la correction",
               student_subject_question_correction_path(access_code: params[:access_code], subject_id: @subject.id, question_id: @question.id),
