@@ -104,4 +104,46 @@ RSpec.describe "Student::Conversations", type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe "message partial rendering" do
+    let(:conversation) do
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: TutorState.default)
+    end
+
+    def render_message(message)
+      ApplicationController.render(
+        partial: "student/conversations/message",
+        locals:  { message: message }
+      )
+    end
+
+    it "renders a user message with self-end alignment and role data-attribute" do
+      msg  = create(:message, conversation: conversation, role: :user, content: "Ma question")
+      html = render_message(msg)
+
+      expect(html).to include("Ma question")
+      expect(html).to include("self-end")
+      expect(html).to include(%(data-message-role="user"))
+      expect(html).to include(%(data-message-id="#{msg.id}"))
+    end
+
+    it "renders an assistant message with self-start alignment" do
+      msg  = create(:message, conversation: conversation, role: :assistant, content: "Ma réponse")
+      html = render_message(msg)
+
+      expect(html).to include("Ma réponse")
+      expect(html).to include("self-start")
+      expect(html).to include(%(data-message-role="assistant"))
+    end
+
+    it "renders a system message with self-center alignment" do
+      msg  = create(:message, conversation: conversation, role: :system, content: "Info système")
+      html = render_message(msg)
+
+      expect(html).to include("Info système")
+      expect(html).to include("self-center")
+      expect(html).to include(%(data-message-role="system"))
+    end
+  end
 end
