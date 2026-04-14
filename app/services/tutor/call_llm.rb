@@ -20,7 +20,10 @@ module Tutor
 
     def call
       credentials = resolve_credentials
-      return Result.err(credentials[:error]) if credentials[:error]
+      if credentials[:error]
+        broadcast_error(credentials[:error])
+        return Result.err(credentials[:error])
+      end
 
       configure_ruby_llm(credentials)
 
@@ -33,8 +36,16 @@ module Tutor
       chat.with_instructions(@system_prompt)
 
       response = chat.ask(@messages) do |chunk|
-        full_content << chunk.content.to_s
+        delta = chunk.content.to_s
+        full_content << delta
         tool_calls = chunk.tool_calls if chunk.tool_calls.present?
+
+        if delta.present?
+          ActionCable.server.broadcast(
+            "conversation_#{@conversation.id}",
+            { type: "token", message_id: @student_message.id, token: delta }
+          )
+        end
 
         buffer_tokens += 1
         now = Time.current
@@ -57,9 +68,18 @@ module Tutor
 
       Result.ok(full_content: full_content, tool_calls: Array(tool_calls))
     rescue Tutor::NoApiKeyError => e
+      broadcast_error(e.message)
       Result.err(e.message)
     rescue => e
+      broadcast_error("Erreur LLM : #{e.message}")
       Result.err("Erreur LLM : #{e.message}")
+    end
+
+    def broadcast_error(message)
+      ActionCable.server.broadcast(
+        "conversation_#{@conversation.id}",
+        { type: "error", error: message }
+      )
     end
 
     private

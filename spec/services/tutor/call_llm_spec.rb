@@ -61,5 +61,61 @@ RSpec.describe Tutor::CallLlm do
       expect(r.err?).to be true
       expect(r.error).to include("clé API")
     end
+
+    it "broadcasts a typed error event before returning err" do
+      expect(ActionCable.server).to receive(:broadcast).with(
+        "conversation_#{conversation.id}",
+        hash_including(type: "error")
+      )
+      described_class.call(
+        conversation:    conversation,
+        system_prompt:   "...",
+        messages:        [],
+        student_message: student_msg
+      )
+    end
+  end
+
+  describe "chunk-level token broadcasts" do
+    before do
+      FakeRubyLlm.setup_stub(chunks: [ "Bon", "jour ", "élève" ])
+    end
+
+    it "broadcasts a typed token event for each non-empty chunk" do
+      broadcasted = []
+      allow(ActionCable.server).to receive(:broadcast) do |channel, data|
+        broadcasted << data if channel == "conversation_#{conversation.id}"
+      end
+
+      described_class.call(
+        conversation:    conversation,
+        system_prompt:   "...",
+        messages:        [ { role: "user", content: "Aide-moi" } ],
+        student_message: student_msg
+      )
+
+      token_events = broadcasted.select { |d| d[:type] == "token" }
+      expect(token_events.map { |d| d[:token] }).to eq([ "Bon", "jour ", "élève" ])
+      expect(token_events).to all(include(message_id: student_msg.id))
+    end
+  end
+
+  describe "error broadcasts" do
+    it "broadcasts a typed error event when RubyLLM raises" do
+      FakeRubyLlm.setup_stub(raise_error: RuntimeError.new("401 Unauthorized"))
+
+      expect(ActionCable.server).to receive(:broadcast).with(
+        "conversation_#{conversation.id}",
+        hash_including(type: "error", error: a_string_including("401"))
+      )
+
+      r = described_class.call(
+        conversation:    conversation,
+        system_prompt:   "...",
+        messages:        [ { role: "user", content: "Aide-moi" } ],
+        student_message: student_msg
+      )
+      expect(r.err?).to be true
+    end
   end
 end
