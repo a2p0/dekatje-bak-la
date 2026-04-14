@@ -6,5 +6,11 @@ class Message < ApplicationRecord
 
   enum :role, { user: 0, assistant: 1, system: 2 }
 
-  validates :content, presence: true
+  validates :content, presence: true, unless: :streaming_assistant?
+
+  private
+
+  def streaming_assistant?
+    assistant? && streaming_finished_at.nil?
+  end
 end
