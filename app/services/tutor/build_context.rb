@@ -29,6 +29,25 @@ module Tutor
       Outils disponibles : transition, update_learner_model, request_hint, evaluate_spotting.
     PROMPT
 
+    SPOTTING_SECTION = <<~PROMPT.freeze
+
+      [PHASE REPÉRAGE — RÈGLES SPÉCIFIQUES]
+      L'élève doit identifier en langage libre où se trouvent les données utiles pour cette question.
+      Tu évalues sa réponse via l'outil evaluate_spotting.
+
+      Niveaux de relance progressifs :
+      - Niveau 1 (première question) : question ouverte, ex. "Où penses-tu trouver les informations pour cette question ?"
+      - Niveau 2 (si raté) : nature conceptuelle, ex. "Réfléchis au type de données dont tu as besoin : caractéristique du véhicule ? information sur le trajet ?"
+      - Niveau 3 (si raté encore) : structure BAC, ex. "Dans un sujet BAC STI2D, les caractéristiques techniques sont regroupées dans une certaine catégorie de documents."
+
+      INTERDIT ABSOLU pendant le repérage :
+      - Mentionner des noms précis de documents (DT1, DT2, DR1, etc.)
+      - Donner des valeurs chiffrées issues de la correction
+      - Indiquer la localisation exacte dans les documents
+
+      Après 3 relances échouées : utiliser outcome "forced_reveal" pour débloquer l'élève.
+    PROMPT
+
     def self.call(conversation:, question:, student_input:)
       new(conversation: conversation, question: question, student_input: student_input).call
     end
@@ -55,6 +74,8 @@ module Tutor
         correction_text:  answer&.correction_text.to_s,
         learner_model:    @conversation.tutor_state.to_prompt
       )
+
+      system_prompt += SPOTTING_SECTION if @conversation.tutor_state.current_phase == "spotting"
 
       messages = @conversation.messages
                               .order(:created_at)
