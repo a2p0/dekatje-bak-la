@@ -60,7 +60,7 @@ module Tutor
 
     def call
       part    = @question.part
-      subject = part.subject
+      subject = @conversation.subject
       answer  = @question.answer
 
       system_prompt = format(

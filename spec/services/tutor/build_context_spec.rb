@@ -123,4 +123,44 @@ RSpec.describe Tutor::BuildContext do
       expect(r.value[:system_prompt]).not_to include("PHASE REPÉRAGE")
     end
   end
+
+  context "when the question belongs to a common part (Part#subject_id is nil)" do
+    let(:exam_session) { create(:exam_session, owner: user, title: "Sujet CIME") }
+    let(:exam_subject) do
+      create(:subject,
+             owner:        user,
+             exam_session: exam_session,
+             status:       :published,
+             specialty:    :SIN)
+    end
+    let(:common_part) do
+      # Common part is owned by the exam_session, not a subject
+      create(:part, subject: nil, exam_session: exam_session,
+             title: "Partie commune", objective_text: "Objectif commun")
+    end
+    let(:common_question) do
+      create(:question, part: common_part, label: "Question commune")
+    end
+    let!(:common_answer) do
+      create(:answer, question: common_question, correction_text: "Réponse commune")
+    end
+    let(:conversation) do
+      create(:conversation, student: student, subject: exam_subject,
+             tutor_state: TutorState.default)
+    end
+
+    it "resolves the subject from the conversation, not from part.subject" do
+      expect(common_part.subject).to be_nil
+
+      result = described_class.call(
+        conversation:  conversation,
+        question:      common_question,
+        student_input: "test"
+      )
+
+      expect(result.ok?).to be true
+      expect(result.value[:system_prompt]).to include("Sujet CIME")
+      expect(result.value[:system_prompt]).to include("SIN")
+    end
+  end
 end
