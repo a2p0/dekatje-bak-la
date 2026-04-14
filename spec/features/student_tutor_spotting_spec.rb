@@ -33,6 +33,12 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle", type: :fe
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
 
   let!(:tutored_session) do
+    create(:student_session,
+      student: student, subject: subject_record,
+      mode: :tutored, progression: {})
+  end
+
+  let!(:spotting_conversation) do
     spotting_state = TutorState.new(
       current_phase:        "spotting",
       current_question_id:  question.id,
@@ -46,10 +52,9 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle", type: :fe
         )
       }
     )
-    create(:student_session,
+    create(:conversation,
       student: student, subject: subject_record,
-      mode: :tutored, progression: {},
-      tutor_state: spotting_state)
+      lifecycle_state: "active", tutor_state: spotting_state)
   end
 
   def visit_question_page
@@ -90,7 +95,7 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle", type: :fe
       name: "evaluate_spotting",
       arguments: {
         "task_type_identified" => "calcul",
-        "sources_identified"   => ["DT1", "mise_en_situation"],
+        "sources_identified"   => [ "DT1", "mise_en_situation" ],
         "missing_sources"      => [],
         "extra_sources"        => [],
         "feedback_message"     => "Bien repéré !",
@@ -100,7 +105,7 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle", type: :fe
     )
     FakeRubyLlm.setup_stub(
       content: "Bien repéré ! Les données sont effectivement dans la documentation.",
-      tool_calls: [success_tool_call]
+      tool_calls: [ success_tool_call ]
     )
 
     visit_question_page
@@ -123,7 +128,7 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle", type: :fe
       arguments: {
         "task_type_identified" => "",
         "sources_identified"   => [],
-        "missing_sources"      => ["DT1", "mise_en_situation"],
+        "missing_sources"      => [ "DT1", "mise_en_situation" ],
         "extra_sources"        => [],
         "feedback_message"     => "Je vais t'indiquer où se trouvaient les données.",
         "relaunch_prompt"      => "",
@@ -132,7 +137,7 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle", type: :fe
     )
     FakeRubyLlm.setup_stub(
       content: "Je vais t'indiquer où se trouvaient les données.",
-      tool_calls: [forced_tool_call]
+      tool_calls: [ forced_tool_call ]
     )
 
     visit_question_page
