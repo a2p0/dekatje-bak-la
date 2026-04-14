@@ -26,6 +26,24 @@
   </div>
 
   <div class="field">
+    <p><%= f.label :openrouter_api_key, "Clé OpenRouter (mode tuteur gratuit)" %></p>
+    <p>
+      <%= f.password_field :openrouter_api_key,
+          value: "",
+          placeholder: resource.openrouter_api_key.present? ?
+            "••••••••#{resource.openrouter_api_key.last(4)}" :
+            "or-...",
+          autocomplete: "off" %>
+    </p>
+    <% if resource.openrouter_api_key.present? %>
+      <p><small>Clé configurée (se terminant par <code><%= resource.openrouter_api_key.last(4) %></code>).
+      Laissez vide pour conserver la clé actuelle, ou entrez une nouvelle clé pour la remplacer.</small></p>
+    <% else %>
+      <p><small>Optionnel. Nécessaire pour activer le mode tuteur gratuit pour vos classes.</small></p>
+    <% end %>
+  </div>
+
+  <div class="field">
     <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
     <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
   </div>
