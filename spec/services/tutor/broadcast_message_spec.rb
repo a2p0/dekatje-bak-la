@@ -16,10 +16,13 @@ RSpec.describe Tutor::BroadcastMessage do
            chunk_index:  0)
   end
 
-  it "broadcasts to the conversation channel and returns ok" do
+  it "broadcasts a typed done envelope to the conversation channel and returns ok" do
     expect(ActionCable.server).to receive(:broadcast).with(
       "conversation_#{conversation.id}",
-      hash_including(message: hash_including(content: message.content))
+      hash_including(
+        type:    "done",
+        message: hash_including(content: message.content)
+      )
     )
     result = described_class.call(conversation: conversation, message: message)
     expect(result.ok?).to be true

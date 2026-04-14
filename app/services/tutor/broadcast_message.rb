@@ -13,6 +13,7 @@ module Tutor
       ActionCable.server.broadcast(
         "conversation_#{@conversation.id}",
         {
+          type: "done",
           message: {
             id:                    @message.id,
             role:                  @message.role,

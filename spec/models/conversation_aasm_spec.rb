@@ -82,10 +82,39 @@ RSpec.describe Conversation, type: :model do
         conversation.activate!
       end
 
-      it "transitions to ended via end_chat!" do
-        expect { conversation.end_chat! }.to change {
+      it "transitions active → validating via request_validation!" do
+        expect { conversation.request_validation! }.to change {
           conversation.lifecycle_state
-        }.from("active").to("ended")
+        }.from("active").to("validating")
+      end
+
+      it "transitions validating → feedback via give_feedback!" do
+        conversation.request_validation!
+        expect { conversation.give_feedback! }.to change {
+          conversation.lifecycle_state
+        }.from("validating").to("feedback")
+      end
+
+      it "transitions feedback → active via resume!" do
+        conversation.request_validation!
+        conversation.give_feedback!
+        expect { conversation.resume! }.to change {
+          conversation.lifecycle_state
+        }.from("feedback").to("active")
+      end
+
+      it "transitions active → done via finish!" do
+        expect { conversation.finish! }.to change {
+          conversation.lifecycle_state
+        }.from("active").to("done")
+      end
+
+      it "transitions feedback → done via finish!" do
+        conversation.request_validation!
+        conversation.give_feedback!
+        expect { conversation.finish! }.to change {
+          conversation.lifecycle_state
+        }.from("feedback").to("done")
       end
     end
   end
