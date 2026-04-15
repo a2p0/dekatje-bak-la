@@ -34,6 +34,12 @@ module Tutor
 
       chat = RubyLLM::Chat.new(model: credentials[:model])
       chat.with_instructions(@system_prompt)
+      chat.with_tools(
+        Tutor::Tools::TransitionTool,
+        Tutor::Tools::UpdateLearnerModelTool,
+        Tutor::Tools::RequestHintTool,
+        Tutor::Tools::EvaluateSpottingTool
+      )
 
       response = chat.ask(@messages) do |chunk|
         delta = chunk.content.to_s
