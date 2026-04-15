@@ -19,6 +19,25 @@ RSpec.describe Tutor::ApplyToolCalls do
   end
 
   describe "tool: transition" do
+    it "allows idle → greeting (FR-009)" do
+      conv = make_conversation(phase: "idle")
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "greeting" } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("greeting")
+    end
+
+    it "rejects idle → reading (only greeting is allowed from idle)" do
+      conv = make_conversation(phase: "idle")
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "reading" } } ]
+      )
+      expect(result.err?).to be true
+    end
+
     it "allows a valid phase transition" do
       conv = make_conversation(phase: "reading")
       result = described_class.call(

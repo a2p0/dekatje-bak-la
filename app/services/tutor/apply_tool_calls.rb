@@ -3,6 +3,7 @@ module Tutor
     ALLOWED_PHASES = %w[greeting reading spotting guiding validating feedback ended].freeze
 
     TRANSITION_MATRIX = {
+      "idle"       => %w[greeting],
       "greeting"   => %w[reading],
       "reading"    => %w[spotting],
       "spotting"   => %w[guiding],
