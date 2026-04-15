@@ -19,7 +19,8 @@ class ResolveTutorApiKey
 
     if @classroom.tutor_free_mode_enabled? && @classroom.owner.openrouter_api_key.present?
       key = @classroom.owner.openrouter_api_key
-      return { api_key: key, provider: "openrouter", model: DEFAULT_MODEL["openrouter"] }
+      model = @student.api_model.presence || DEFAULT_MODEL["openrouter"]
+      return { api_key: key, provider: "openrouter", model: model }
     end
 
     raise Tutor::NoApiKeyError

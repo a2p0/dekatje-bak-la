@@ -17,30 +17,21 @@ on:
         required: false
         default: ""
         type: string
-      tutor_provider:
-        description: "Tutor AI provider"
+      tutor_model:
+        description: "OpenRouter model id for the tutor"
         required: false
-        default: "anthropic"
-        type: choice
-        options:
-          - anthropic
-          - openrouter
-      student_provider:
-        description: "Simulated student AI provider"
+        default: "openai/gpt-4o-mini"
+        type: string
+      student_model:
+        description: "OpenRouter model id for the simulated student"
         required: false
-        default: "anthropic"
-        type: choice
-        options:
-          - anthropic
-          - openrouter
-      judge_provider:
-        description: "Judge AI provider"
+        default: "openai/gpt-4o-mini"
+        type: string
+      judge_model:
+        description: "OpenRouter model id for the judge"
         required: false
-        default: "anthropic"
-        type: choice
-        options:
-          - anthropic
-          - openrouter
+        default: "anthropic/claude-sonnet-4"
+        type: string
 
 jobs:
   simulate:
@@ -65,7 +56,6 @@ jobs:
       DATABASE_URL: postgresql://dekatje:dekatje_dev@localhost:5432/dekatje_bak_la_test
       RAILS_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
@@ -86,12 +76,9 @@ jobs:
         env:
           TURNS: ${{ inputs.turns }}
           PROFILES: ${{ inputs.profiles }}
-          TUTOR_PROVIDER: ${{ inputs.tutor_provider }}
-          TUTOR_KEY: ${{ inputs.tutor_provider == 'openrouter' && secrets.OPENROUTER_API_KEY || secrets.ANTHROPIC_API_KEY }}
-          STUDENT_PROVIDER: ${{ inputs.student_provider }}
-          STUDENT_KEY: ${{ inputs.student_provider == 'openrouter' && secrets.OPENROUTER_API_KEY || secrets.ANTHROPIC_API_KEY }}
-          JUDGE_PROVIDER: ${{ inputs.judge_provider }}
-          JUDGE_KEY: ${{ inputs.judge_provider == 'openrouter' && secrets.OPENROUTER_API_KEY || secrets.ANTHROPIC_API_KEY }}
+          TUTOR_MODEL: ${{ inputs.tutor_model }}
+          STUDENT_MODEL: ${{ inputs.student_model }}
+          JUDGE_MODEL: ${{ inputs.judge_model }}
         run: bundle exec rake "tutor:simulate[${{ inputs.subject_id }}]"
 
       - name: Upload simulation reports
