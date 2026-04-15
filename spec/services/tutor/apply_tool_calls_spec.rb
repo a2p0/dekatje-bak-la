@@ -29,13 +29,14 @@ RSpec.describe Tutor::ApplyToolCalls do
       expect(result.value[:updated_tutor_state].current_phase).to eq("greeting")
     end
 
-    it "rejects idle → reading (only greeting is allowed from idle)" do
+    it "silently ignores idle → reading (only greeting is allowed from idle)" do
       conv = make_conversation(phase: "idle")
       result = described_class.call(
         conversation: conv,
         tool_calls: [ { name: "transition", args: { "phase" => "reading" } } ]
       )
-      expect(result.err?).to be true
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("idle")
     end
 
     it "allows a valid phase transition" do
@@ -49,23 +50,24 @@ RSpec.describe Tutor::ApplyToolCalls do
       expect(result.value[:updated_tutor_state].current_question_id).to eq(1)
     end
 
-    it "rejects an invalid phase string" do
+    it "silently ignores an invalid phase string (state unchanged)" do
       conv = make_conversation(phase: "reading")
       result = described_class.call(
         conversation: conv,
         tool_calls: [ { name: "transition", args: { "phase" => "nonexistent_phase" } } ]
       )
-      expect(result.err?).to be true
-      expect(result.error).to include("phase")
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("reading")
     end
 
-    it "rejects a forbidden transition (guiding → greeting)" do
+    it "silently ignores a forbidden transition (state unchanged)" do
       conv = make_conversation(phase: "guiding", question_id: 1)
       result = described_class.call(
         conversation: conv,
         tool_calls: [ { name: "transition", args: { "phase" => "greeting", "question_id" => 1 } } ]
       )
-      expect(result.err?).to be true
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("guiding")
     end
   end
 
@@ -115,30 +117,31 @@ RSpec.describe Tutor::ApplyToolCalls do
       expect(result.value[:updated_tutor_state].question_states["7"].hints_used).to eq(1)
     end
 
-    it "rejects skipping hint levels" do
+    it "silently ignores skipped hint levels (hints_used unchanged)" do
       qs = QuestionState.new(step: "initial", hints_used: 1, last_confidence: nil, error_types: [], completed_at: nil)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
         tool_calls: [ { name: "request_hint", args: { "level" => 3 } } ]
       )
-      expect(result.err?).to be true
-      expect(result.error).to include("indice")
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].question_states["7"].hints_used).to eq(1)
     end
 
-    it "rejects hint above max (5)" do
+    it "silently ignores hint above max (5)" do
       qs = QuestionState.new(step: "initial", hints_used: 5, last_confidence: nil, error_types: [], completed_at: nil)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
         tool_calls: [ { name: "request_hint", args: { "level" => 6 } } ]
       )
-      expect(result.err?).to be true
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].question_states["7"].hints_used).to eq(5)
     end
   end
 
   describe "tool: evaluate_spotting" do
-    it "requires spotting phase" do
+    it "silently ignores evaluate_spotting outside spotting phase (state unchanged)" do
       conv = make_conversation(phase: "guiding", question_id: 1)
       result = described_class.call(
         conversation: conv,
@@ -155,8 +158,8 @@ RSpec.describe Tutor::ApplyToolCalls do
           }
         } ]
       )
-      expect(result.err?).to be true
-      expect(result.error).to include("spotting")
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("guiding")
     end
 
     it "auto-transitions to guiding on success outcome" do

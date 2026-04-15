@@ -28,7 +28,10 @@ module Tutor
     def call
       @tool_calls.each do |tc|
         result = apply_one(tc[:name], tc[:args] || {})
-        return result if result.err?
+        if result.err?
+          Rails.logger.warn("[Tutor::ApplyToolCalls] ignored invalid tool call #{tc[:name].inspect}: #{result.error}")
+          next
+        end
         @state = result.value[:updated_tutor_state]
       end
       Result.ok(updated_tutor_state: @state)
