@@ -40,12 +40,14 @@ module Tutor
         Tutor::Tools::RequestHintTool,
         Tutor::Tools::EvaluateSpottingTool
       )
+      chat.on_tool_call { |tc| tool_calls << tc }
 
       response = chat.ask(@messages) do |chunk|
         delta = chunk.content.to_s
         full_content << delta
         if chunk.tool_calls.present?
-          tool_calls = chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls
+          chunk_tcs = chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls
+          Array(chunk_tcs).each { |tc| tool_calls << tc unless tool_calls.include?(tc) }
         end
 
         if delta.present?
