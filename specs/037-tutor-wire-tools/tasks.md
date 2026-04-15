@@ -30,8 +30,8 @@ Rails fullstack monolithe (constitution §I) :
 
 **Purpose** : vérifications préalables — pas de dépendance à installer, pas de migration.
 
-- [ ] T001 Vérifier que `ruby_llm` est déclaré dans `Gemfile` et que `bundle install` passe (baseline CI verte sur `main`) — commande : `bundle check` à la racine
-- [ ] T002 Créer le dossier `app/services/tutor/tools/` (vide, sera peuplé par les US)
+- [X] T001 Vérifier que `ruby_llm` est déclaré dans `Gemfile` et que `bundle install` passe (baseline CI verte sur `main`) — commande : `bundle check` à la racine
+- [X] T002 Créer le dossier `app/services/tutor/tools/` (vide, sera peuplé par les US)
 
 ---
 
@@ -41,11 +41,11 @@ Rails fullstack monolithe (constitution §I) :
 
 **⚠️ CRITICAL** : bloque toute US. Doit être validé par `bundle exec rspec spec/services/tutor/parse_tool_calls_spec.rb spec/support/fake_ruby_llm.rb` (red → green local) avant de commencer les US.
 
-- [ ] T003 Étendre `spec/support/fake_ruby_llm.rb` pour stubber `RubyLLM::Chat#with_tool` et `#with_tools` (no-op renvoyant `nil` sur varargs + kwargs). Doit rester rétro-compatible avec tous les specs existants.
-- [ ] T004 [P] Ajouter une spec à `spec/services/tutor/parse_tool_calls_spec.rb` couvrant le cas où `tool_calls` est un `Hash` keyé par id (shape réelle de `ruby_llm` en streaming) — doit échouer avant T005.
-- [ ] T005 Adapter `app/services/tutor/call_llm.rb` ligne ~41 pour extraire les **valeurs** du Hash `chunk.tool_calls` (ex. `Array(chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls)`) afin que `ParseToolCalls` reçoive une Array plate. Spec T004 doit passer.
-- [ ] T005a [P] Ajouter une spec dans `spec/services/tutor/apply_tool_calls_spec.rb` : transition `idle → greeting` doit être **autorisée**, transition `idle → reading` doit rester **refusée** (FR-009). Doit échouer avant T005b.
-- [ ] T005b Modifier `app/services/tutor/apply_tool_calls.rb:5-12` pour ajouter `"idle" => %w[greeting]` dans `TRANSITION_MATRIX`. Spec T005a passe. FR-009 satisfait.
+- [X] T003 Étendre `spec/support/fake_ruby_llm.rb` pour stubber `RubyLLM::Chat#with_tool` et `#with_tools` (no-op renvoyant `nil` sur varargs + kwargs). Doit rester rétro-compatible avec tous les specs existants.
+- [X] T004 [P] Ajouter une spec à `spec/services/tutor/parse_tool_calls_spec.rb` couvrant le cas où `tool_calls` est un `Hash` keyé par id (shape réelle de `ruby_llm` en streaming) — doit échouer avant T005.
+- [X] T005 Adapter `app/services/tutor/call_llm.rb` ligne ~41 pour extraire les **valeurs** du Hash `chunk.tool_calls` (ex. `Array(chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls)`) afin que `ParseToolCalls` reçoive une Array plate. Spec T004 doit passer.
+- [X] T005a [P] Ajouter une spec dans `spec/services/tutor/apply_tool_calls_spec.rb` : transition `idle → greeting` doit être **autorisée**, transition `idle → reading` doit rester **refusée** (FR-009). Doit échouer avant T005b.
+- [X] T005b Modifier `app/services/tutor/apply_tool_calls.rb:5-12` pour ajouter `"idle" => %w[greeting]` dans `TRANSITION_MATRIX`. Spec T005a passe. FR-009 satisfait.
 
 **Checkpoint** : fondations en place — les US peuvent démarrer en parallèle. Sans T005b, les US1-4 seraient testables mais non fonctionnelles en bout de chaîne (première transition refusée).
 
@@ -61,15 +61,15 @@ Rails fullstack monolithe (constitution §I) :
 
 > Les specs T006-T008 doivent ÉCHOUER avant T009-T011.
 
-- [ ] T006 [P] [US1] Créer `spec/services/tutor/tools/transition_tool_spec.rb` : vérifier `description`, `param :phase` (string, required), `param :question_id` (integer, optional), `#execute(phase:, question_id: nil)` renvoie `{ok: true, recorded: {phase:, question_id:}}`.
-- [ ] T007 [P] [US1] Mettre à jour `spec/services/tutor/call_llm_spec.rb` : `expect_any_instance_of(RubyLLM::Chat).to receive(:with_tools).with(Tutor::Tools::TransitionTool, Tutor::Tools::UpdateLearnerModelTool, Tutor::Tools::RequestHintTool, Tutor::Tools::EvaluateSpottingTool)`.
-- [ ] T008 [P] [US1] Mettre à jour `spec/services/tutor/build_context_spec.rb` : vérifier que la nouvelle section `[UTILISATION DES OUTILS — OBLIGATOIRE]` est bien présente dans le `system_prompt` retourné.
+- [X] T006 [P] [US1] Créer `spec/services/tutor/tools/transition_tool_spec.rb` : vérifier `description`, `param :phase` (string, required), `param :question_id` (integer, optional), `#execute(phase:, question_id: nil)` renvoie `{ok: true, recorded: {phase:, question_id:}}`.
+- [X] T007 [P] [US1] Mettre à jour `spec/services/tutor/call_llm_spec.rb` : `expect_any_instance_of(RubyLLM::Chat).to receive(:with_tools).with(Tutor::Tools::TransitionTool, Tutor::Tools::UpdateLearnerModelTool, Tutor::Tools::RequestHintTool, Tutor::Tools::EvaluateSpottingTool)`.
+- [X] T008 [P] [US1] Mettre à jour `spec/services/tutor/build_context_spec.rb` : vérifier que la nouvelle section `[UTILISATION DES OUTILS — OBLIGATOIRE]` est bien présente dans le `system_prompt` retourné.
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Créer `app/services/tutor/tools/transition_tool.rb` (sous-classe `RubyLLM::Tool`, DSL conforme contrats/tools.md §1, `#execute` renvoie `{ok: true, recorded: {phase:, question_id:}}`). Spec T006 passe.
-- [ ] T010 [US1] Modifier `app/services/tutor/call_llm.rb` : ajouter `chat.with_tools(Tutor::Tools::TransitionTool, Tutor::Tools::UpdateLearnerModelTool, Tutor::Tools::RequestHintTool, Tutor::Tools::EvaluateSpottingTool)` après `chat.with_instructions(@system_prompt)` et avant `chat.ask(...)`. Spec T007 passe (les 4 classes doivent exister en coquilles vides — voir US2-4).
-- [ ] T011 [US1] Modifier `app/services/tutor/build_context.rb` : ajouter la constante `TOOLS_SECTION` (texte défini dans research.md §Décision 4) et l'inclure dans le `system_prompt` après le bloc `[CORRECTION CONFIDENTIELLE]`. Spec T008 passe.
+- [X] T009 [P] [US1] Créer `app/services/tutor/tools/transition_tool.rb` (sous-classe `RubyLLM::Tool`, DSL conforme contrats/tools.md §1, `#execute` renvoie `{ok: true, recorded: {phase:, question_id:}}`). Spec T006 passe.
+- [X] T010 [US1] Modifier `app/services/tutor/call_llm.rb` : ajouter `chat.with_tools(Tutor::Tools::TransitionTool, Tutor::Tools::UpdateLearnerModelTool, Tutor::Tools::RequestHintTool, Tutor::Tools::EvaluateSpottingTool)` après `chat.with_instructions(@system_prompt)` et avant `chat.ask(...)`. Spec T007 passe (les 4 classes doivent exister en coquilles vides — voir US2-4).
+- [X] T011 [US1] Modifier `app/services/tutor/build_context.rb` : ajouter la constante `TOOLS_SECTION` (texte défini dans research.md §Décision 4) et l'inclure dans le `system_prompt` après le bloc `[CORRECTION CONFIDENTIELLE]`. Spec T008 passe.
 
 **Checkpoint** : `TransitionTool` câblé et fonctionnel. Le pipeline `ProcessMessage` peut faire progresser les phases via un mock de `tool_calls`.
 
@@ -83,11 +83,11 @@ Rails fullstack monolithe (constitution §I) :
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Créer `spec/services/tutor/tools/update_learner_model_tool_spec.rb` : vérifier DSL (3 params optionnels typés), `#execute(**args)` renvoie accusé.
+- [X] T012 [P] [US2] Créer `spec/services/tutor/tools/update_learner_model_tool_spec.rb` : vérifier DSL (3 params optionnels typés), `#execute(**args)` renvoie accusé.
 
 ### Implementation for User Story 2
 
-- [ ] T013 [P] [US2] Créer `app/services/tutor/tools/update_learner_model_tool.rb` (DSL conforme contrats/tools.md §2). Spec T012 passe.
+- [X] T013 [P] [US2] Créer `app/services/tutor/tools/update_learner_model_tool.rb` (DSL conforme contrats/tools.md §2). Spec T012 passe.
 
 **Checkpoint** : `UpdateLearnerModelTool` câblé ; le LLM peut enrichir le modèle de l'élève.
 
@@ -101,11 +101,11 @@ Rails fullstack monolithe (constitution §I) :
 
 ### Tests for User Story 3
 
-- [ ] T014 [P] [US3] Créer `spec/services/tutor/tools/request_hint_tool_spec.rb` : vérifier DSL (`level: integer, required`), `#execute(level:)` renvoie accusé.
+- [X] T014 [P] [US3] Créer `spec/services/tutor/tools/request_hint_tool_spec.rb` : vérifier DSL (`level: integer, required`), `#execute(level:)` renvoie accusé.
 
 ### Implementation for User Story 3
 
-- [ ] T015 [P] [US3] Créer `app/services/tutor/tools/request_hint_tool.rb` (DSL conforme contrats/tools.md §3). Spec T014 passe.
+- [X] T015 [P] [US3] Créer `app/services/tutor/tools/request_hint_tool.rb` (DSL conforme contrats/tools.md §3). Spec T014 passe.
 
 **Checkpoint** : `RequestHintTool` câblé.
 
@@ -119,11 +119,11 @@ Rails fullstack monolithe (constitution §I) :
 
 ### Tests for User Story 4
 
-- [ ] T016 [P] [US4] Créer `spec/services/tutor/tools/evaluate_spotting_tool_spec.rb` : vérifier DSL (`outcome: string, required`, enum documenté), `#execute(outcome:)` renvoie accusé.
+- [X] T016 [P] [US4] Créer `spec/services/tutor/tools/evaluate_spotting_tool_spec.rb` : vérifier DSL (`outcome: string, required`, enum documenté), `#execute(outcome:)` renvoie accusé.
 
 ### Implementation for User Story 4
 
-- [ ] T017 [P] [US4] Créer `app/services/tutor/tools/evaluate_spotting_tool.rb` (DSL conforme contrats/tools.md §4). Spec T016 passe.
+- [X] T017 [P] [US4] Créer `app/services/tutor/tools/evaluate_spotting_tool.rb` (DSL conforme contrats/tools.md §4). Spec T016 passe.
 
 **Checkpoint** : `EvaluateSpottingTool` câblé. Les 4 outils sont opérationnels.
 
@@ -133,11 +133,11 @@ Rails fullstack monolithe (constitution §I) :
 
 **Purpose** : intégration, vérification globale, préparation PR.
 
-- [ ] T018 Ajouter dans `spec/services/tutor/process_message_spec.rb` deux scénarios d'intégration : (a) "LLM appelle `transition` depuis idle via tool_calls → phase avance à `greeting`" (chunk mocké avec `tool_calls: [Struct(name: "transition", arguments: {"phase" => "greeting"})]`) ; (b) "streaming mixte : chunks texte + chunk tool_calls → broadcast par chunk préservé" (couvre FR-008).
-- [ ] T019 [P] Lancer localement `bundle exec rspec spec/services/tutor/ spec/support/fake_ruby_llm.rb` en best-effort (constitution §IV : CI = autorité, local = workaround). Si échec sur `student_tutor_full_flow_spec.rb` ou `student_tutor_spotting_spec.rb`, noter pour correction mais ne pas bloquer — T023 CI tranche.
-- [ ] T020 [P] Vérifier `bundle exec rubocop` (0 offense sur les fichiers modifiés).
+- [X] T018 Ajouter dans `spec/services/tutor/process_message_spec.rb` deux scénarios d'intégration : (a) "LLM appelle `transition` depuis idle via tool_calls → phase avance à `greeting`" (chunk mocké avec `tool_calls: [Struct(name: "transition", arguments: {"phase" => "greeting"})]`) ; (b) "streaming mixte : chunks texte + chunk tool_calls → broadcast par chunk préservé" (couvre FR-008).
+- [X] T019 [P] Lancer localement `bundle exec rspec spec/services/tutor/ spec/support/fake_ruby_llm.rb` en best-effort (constitution §IV : CI = autorité, local = workaround). Si échec sur `student_tutor_full_flow_spec.rb` ou `student_tutor_spotting_spec.rb`, noter pour correction mais ne pas bloquer — T023 CI tranche.
+- [X] T020 [P] Vérifier `bundle exec rubocop` (0 offense sur les fichiers modifiés).
 - [ ] T021 Dérouler `specs/037-tutor-wire-tools/quickstart.md` §1-§2 (vérification locale rapide). Documenter tout écart dans `specs/037-tutor-wire-tools/NOTES.md` si besoin.
-- [ ] T022 Commit(s) conventionnels séparés par concern (constitution §VI.6) : `feat(tutor): define 4 RubyLLM::Tool classes`, `feat(tutor): wire tools to chat in CallLlm`, `feat(tutor): add mandatory tool-usage instructions to system prompt`, `test(tutor): extend FakeRubyLlm to stub with_tools` (adapter selon regroupement réel).
+- [X] T022 Commit(s) conventionnels séparés par concern (constitution §VI.6) : `feat(tutor): define 4 RubyLLM::Tool classes`, `feat(tutor): wire tools to chat in CallLlm`, `feat(tutor): add mandatory tool-usage instructions to system prompt`, `test(tutor): extend FakeRubyLlm to stub with_tools` (adapter selon regroupement réel).
 - [ ] T023 Push branche `037-tutor-wire-tools` et ouvrir PR vers `main`. Attendre CI verte avant tout merge (constitution §IV.CI, §VI.5).
 - [ ] T024 Post-merge : déclencher manuellement le workflow GitHub Actions `tutor_simulation.yml` et comparer les scores au baseline 2026-04-15 (SC-001 à SC-004). Consigner le résultat dans la mémoire projet (update `project_tutor_tools_not_wired.md` → statut RÉSOLU ou follow-up).
 
