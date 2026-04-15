@@ -38,7 +38,9 @@ module Tutor
       response = chat.ask(@messages) do |chunk|
         delta = chunk.content.to_s
         full_content << delta
-        tool_calls = chunk.tool_calls if chunk.tool_calls.present?
+        if chunk.tool_calls.present?
+          tool_calls = chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls
+        end
 
         if delta.present?
           ActionCable.server.broadcast(

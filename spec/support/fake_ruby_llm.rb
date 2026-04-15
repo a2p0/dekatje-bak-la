@@ -18,6 +18,14 @@ module FakeRubyLlm
                 .any_instance_recorder_for(RubyLLM::Chat)
                 .stub(:with_instructions) { |*_args| nil }
 
+    RSpec::Mocks.space
+                .any_instance_recorder_for(RubyLLM::Chat)
+                .stub(:with_tool) { |*_args| nil }
+
+    RSpec::Mocks.space
+                .any_instance_recorder_for(RubyLLM::Chat)
+                .stub(:with_tools) { |*_args, **_kwargs| nil }
+
     if raise_error
       RSpec::Mocks.space
                   .any_instance_recorder_for(RubyLLM::Chat)
