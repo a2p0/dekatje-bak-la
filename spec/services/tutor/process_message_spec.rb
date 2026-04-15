@@ -208,4 +208,30 @@ RSpec.describe Tutor::ProcessMessage do
       end
     end
   end
+
+  describe "end-to-end tool-call wiring" do
+    it "advances the tutor phase from idle to greeting when the LLM calls `transition`" do
+      tc = double("ToolCall", name: "transition", arguments: { "phase" => "greeting" })
+      FakeRubyLlm.setup_stub(content: "Bonjour !", tool_calls: [ tc ])
+
+      expect(conversation.tutor_state.current_phase).to eq("idle")
+      result
+      expect(result.ok?).to be true
+      expect(conversation.reload.tutor_state.current_phase).to eq("greeting")
+    end
+
+    it "preserves chunk-level token broadcasts while capturing tool_calls (FR-008)" do
+      tc = double("ToolCall", name: "transition", arguments: { "phase" => "greeting" })
+      # chunks stub: FakeRubyLlm joins chunks and sets tool_calls on the final chunk
+      FakeRubyLlm.setup_stub(chunks: [ "Bon", "jour ", "élève" ], tool_calls: [ tc ])
+
+      result
+
+      expect(ActionCable.server).to have_received(:broadcast).with(
+        "conversation_#{conversation.id}",
+        hash_including(type: "token")
+      ).at_least(3).times
+      expect(conversation.reload.tutor_state.current_phase).to eq("greeting")
+    end
+  end
 end
