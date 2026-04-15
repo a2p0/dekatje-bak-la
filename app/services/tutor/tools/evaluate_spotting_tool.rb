@@ -14,6 +14,10 @@ module Tutor
             desc: "Résultat du repérage : success, failure ou forced_reveal",
             required: true
 
+      def name
+        "evaluate_spotting"
+      end
+
       def execute(outcome:)
         { ok: true, recorded: { outcome: outcome } }
       end

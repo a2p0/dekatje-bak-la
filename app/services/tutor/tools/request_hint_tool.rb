@@ -12,6 +12,10 @@ module Tutor
             desc: "Niveau d'indice entre 1 et 5, strictement monotone",
             required: true
 
+      def name
+        "request_hint"
+      end
+
       def execute(level:)
         { ok: true, recorded: { level: level } }
       end

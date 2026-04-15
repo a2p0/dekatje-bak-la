@@ -22,6 +22,10 @@ module Tutor
             desc: "Variation du découragement (typique -1, 0, +1). Clampé [0, 3] côté serveur.",
             required: false
 
+      def name
+        "update_learner_model"
+      end
+
       def execute(concept_mastered: nil, concept_to_revise: nil, discouragement_delta: nil)
         {
           ok: true,

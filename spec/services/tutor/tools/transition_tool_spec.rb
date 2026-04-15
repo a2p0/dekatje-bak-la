@@ -5,6 +5,10 @@ RSpec.describe Tutor::Tools::TransitionTool do
     expect(described_class.ancestors).to include(RubyLLM::Tool)
   end
 
+  it "exposes a stable short name to the LLM" do
+    expect(described_class.new.name).to eq("transition")
+  end
+
   describe "#execute" do
     it "returns an ack with recorded phase only" do
       result = described_class.new.execute(phase: "greeting")

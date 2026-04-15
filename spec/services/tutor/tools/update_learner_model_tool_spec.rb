@@ -5,6 +5,10 @@ RSpec.describe Tutor::Tools::UpdateLearnerModelTool do
     expect(described_class.ancestors).to include(RubyLLM::Tool)
   end
 
+  it "exposes a stable short name to the LLM" do
+    expect(described_class.new.name).to eq("update_learner_model")
+  end
+
   describe "#execute" do
     it "returns ack with an empty call" do
       result = described_class.new.execute
