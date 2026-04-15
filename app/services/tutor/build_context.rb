@@ -26,7 +26,18 @@ module Tutor
       [LEARNER MODEL]
       %<learner_model>s
 
-      Outils disponibles : transition, update_learner_model, request_hint, evaluate_spotting.
+      [UTILISATION DES OUTILS — OBLIGATOIRE]
+      Tu DOIS invoquer l'outil `transition` à chaque changement de phase.
+      Depuis la phase `idle`, ton premier appel DOIT être
+      `transition(phase: "greeting")`, puis progresser via la matrice :
+      greeting→reading→spotting→guiding→validating→feedback→ended.
+      Tu DOIS invoquer `update_learner_model` quand tu identifies un
+      concept maîtrisé, à revoir, ou quand le moral de l'élève change.
+      En phase `guiding`, tu DOIS invoquer `request_hint` (niveau 1
+      d'abord, puis 2, etc., jamais de saut) avant de formuler un indice.
+      En phase `spotting`, tu DOIS invoquer `evaluate_spotting` pour
+      conclure la phase. Un message sans appel d'outil approprié =
+      workflow rompu.
 
       [DÉMARRAGE DE CONVERSATION]
       Si c'est le tout premier message de la conversation (aucun message assistant antérieur),
