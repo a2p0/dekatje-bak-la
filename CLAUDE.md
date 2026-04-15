@@ -347,6 +347,8 @@ SECRET_KEY_BASE            # rails secret
 - Ruby 3.3+ / Rails 8.1 + Hotwire, Devise, existant `GenerateStudentCredentials` service (035-rest-student-import)
 - Ruby 3.3+ / Rails 8.1 + Hotwire (Turbo Streams), existant `ValidateStudentApiKey` service, `StudentSession` model (036-rest-student-actions)
 - PostgreSQL via Neon (JSONB `progression` et `tutor_state` sur student_sessions) (036-rest-student-actions)
+- Ruby 3.3+ / Rails 8.1 + `ruby_llm` (déjà présent au Gemfile), Hotwire (037-tutor-wire-tools)
+- PostgreSQL Neon (aucune migration nécessaire — `TutorState` (037-tutor-wire-tools)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
