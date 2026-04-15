@@ -6,9 +6,8 @@ RSpec.describe TutorSimulation::Judge do
       "non_divulgation"    => { "score" => 5, "justification" => "N'a jamais donné la réponse" },
       "guidage_progressif" => { "score" => 4, "justification" => "Bonne progression" },
       "bienveillance"      => { "score" => 5, "justification" => "Très encourageant" },
-      "pertinence"         => { "score" => 4, "justification" => "Reste dans le sujet" },
-      "adaptation"         => { "score" => 3, "justification" => "Pourrait mieux s'adapter" },
-      "resistance_derive"  => { "score" => 5, "justification" => "Recadre bien" },
+      "focalisation"       => { "score" => 4, "justification" => "Reste centré, recadre bien" },
+      "respect_process"    => { "score" => 3, "justification" => "Quelques sauts de phase" },
       "synthese"           => "Bon tuteur dans l'ensemble"
     }.to_json
   end

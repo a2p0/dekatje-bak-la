@@ -1,32 +1,39 @@
 namespace :tutor do
   desc <<~DESC
-    Simulate a full student-tutor interaction on a subject and evaluate quality.
+    Simulate a full student-tutor conversation through the real
+    Tutor::ProcessMessage pipeline and evaluate quality.
 
     Usage:
       rake tutor:simulate[SUBJECT_ID]
 
-    Environment variables:
-      TURNS             Max conversation turns per question (default: 5)
-      PROFILES          Comma-separated profiles (default: all)
-                        Available: bon_eleve, eleve_moyen, eleve_en_difficulte, eleve_paresseux, eleve_hors_sujet
-      TUTOR_PROVIDER    AI provider for the tutor (default: anthropic)
-      TUTOR_MODEL       AI model for the tutor (default: provider default)
-      TUTOR_KEY         API key for the tutor (default: ANTHROPIC_API_KEY)
-      STUDENT_PROVIDER  AI provider for the simulated student (default: anthropic)
-      STUDENT_MODEL     AI model for the simulated student (default: provider default)
-      STUDENT_KEY       API key for the simulated student (default: ANTHROPIC_API_KEY)
-      JUDGE_PROVIDER    AI provider for the judge (default: anthropic)
-      JUDGE_MODEL       AI model for the judge (default: provider default)
-      JUDGE_KEY         API key for the judge (default: ANTHROPIC_API_KEY)
+    Required env:
+      OPENROUTER_API_KEY  Single OpenRouter key used for tutor, student and judge.
+
+    Optional env:
+      TURNS               Max conversation turns per question (default: 5)
+      PROFILES            Comma-separated profiles (default: all)
+                          Available: bon_eleve, eleve_moyen, eleve_en_difficulte,
+                                     eleve_paresseux, eleve_hors_sujet
+      QUESTIONS           Comma-separated question numbers to limit the run
+                          (e.g. "1.1,1.2"). Default: all questions of the subject.
+      TUTOR_MODEL         OpenRouter model id for the tutor
+                          (default: openai/gpt-4o-mini)
+      STUDENT_MODEL       OpenRouter model id for the simulated student
+                          (default: openai/gpt-4o-mini)
+      JUDGE_MODEL         OpenRouter model id for the judge
+                          (default: anthropic/claude-sonnet-4)
 
     Examples:
       rake tutor:simulate[42]
-      rake tutor:simulate[42] TURNS=3 PROFILES=bon_eleve,eleve_paresseux
-      rake tutor:simulate[42] TUTOR_PROVIDER=openrouter TUTOR_MODEL=mistralai/mistral-large-2512
+      rake tutor:simulate[1] TURNS=2 PROFILES=bon_eleve QUESTIONS=1.1
+      rake tutor:simulate[42] TUTOR_MODEL=mistralai/mistral-large-2512
   DESC
   task :simulate, [ :subject_id ] => :environment do |_t, args|
     subject_id = args[:subject_id] || ENV["SUBJECT_ID"]
     abort "Usage: rake tutor:simulate[SUBJECT_ID]" unless subject_id
+
+    api_key = ENV["OPENROUTER_API_KEY"]
+    abort "Set OPENROUTER_API_KEY in env" if api_key.blank?
 
     subject = Subject.find_by(id: subject_id)
     abort "Subject ##{subject_id} not found" unless subject
@@ -34,8 +41,10 @@ namespace :tutor do
     questions_count = subject.parts.flat_map { |p| p.questions.kept }.size
     abort "Subject ##{subject_id} has no questions" if questions_count.zero?
 
-    max_turns = (ENV["TURNS"] || 5).to_i
-    fallback_key = ENV["ANTHROPIC_API_KEY"]
+    max_turns     = (ENV["TURNS"] || 5).to_i
+    tutor_model   = ENV.fetch("TUTOR_MODEL",   "openai/gpt-4o-mini")
+    student_model = ENV.fetch("STUDENT_MODEL", "openai/gpt-4o-mini")
+    judge_model   = ENV.fetch("JUDGE_MODEL",   "anthropic/claude-sonnet-4")
 
     profiles = if ENV["PROFILES"]
       ENV["PROFILES"].split(",").map(&:strip)
@@ -43,31 +52,20 @@ namespace :tutor do
       TutorSimulation::StudentSimulator::PROFILES.keys.map(&:to_s)
     end
 
-    tutor_client = AiClientFactory.build(
-      provider: ENV.fetch("TUTOR_PROVIDER", "anthropic"),
-      api_key:  ENV.fetch("TUTOR_KEY", fallback_key),
-      model:    ENV["TUTOR_MODEL"]
-    )
+    question_numbers = ENV["QUESTIONS"]&.split(",")&.map(&:strip)
 
-    student_client = AiClientFactory.build(
-      provider: ENV.fetch("STUDENT_PROVIDER", "anthropic"),
-      api_key:  ENV.fetch("STUDENT_KEY", fallback_key),
-      model:    ENV["STUDENT_MODEL"]
-    )
-
-    judge_client = AiClientFactory.build(
-      provider: ENV.fetch("JUDGE_PROVIDER", "anthropic"),
-      api_key:  ENV.fetch("JUDGE_KEY", fallback_key),
-      model:    ENV["JUDGE_MODEL"]
-    )
+    student_client = AiClientFactory.build(provider: :openrouter, api_key: api_key, model: student_model)
+    judge_client   = AiClientFactory.build(provider: :openrouter, api_key: api_key, model: judge_model)
 
     runner = TutorSimulation::Runner.new(
-      subject:        subject,
-      profiles:       profiles,
-      max_turns:      max_turns,
-      tutor_client:   tutor_client,
-      student_client: student_client,
-      judge_client:   judge_client
+      subject:          subject,
+      profiles:         profiles,
+      max_turns:        max_turns,
+      api_key:          api_key,
+      tutor_model:      tutor_model,
+      student_client:   student_client,
+      judge_client:     judge_client,
+      question_numbers: question_numbers
     )
 
     runner.run

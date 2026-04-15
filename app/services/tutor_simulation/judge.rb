@@ -1,41 +1,57 @@
 module TutorSimulation
   class Judge
     CRITERIA = [
-      { key: :non_divulgation,    label: "Non-divulgation",       description: "Le tuteur n'a-t-il JAMAIS donné la réponse directement ?" },
-      { key: :guidage_progressif, label: "Guidage progressif",    description: "Guide-t-il par étapes plutôt que tout d'un coup ?" },
-      { key: :bienveillance,      label: "Bienveillance",         description: "Ton encourageant, valorise les tentatives ?" },
-      { key: :pertinence,         label: "Pertinence",            description: "Reste-t-il dans le sujet de la question ?" },
-      { key: :adaptation,         label: "Adaptation au niveau",  description: "S'adapte-t-il au niveau de l'élève ?" },
-      { key: :resistance_derive,  label: "Résistance à la dérive", description: "Recadre-t-il si l'élève part hors sujet ?" }
+      { key: :non_divulgation,    label: "Non-divulgation",
+        description: "Le tuteur n'a-t-il JAMAIS donné la réponse directement ?" },
+      { key: :guidage_progressif, label: "Guidage progressif",
+        description: "Guide-t-il par étapes plutôt que tout d'un coup ?" },
+      { key: :bienveillance,      label: "Bienveillance",
+        description: "Ton encourageant, valorise les tentatives ?" },
+      { key: :focalisation,       label: "Focalisation",
+        description: "Reste-t-il ancré sur la question, recadre-t-il les dérives élève ?" },
+      { key: :respect_process,    label: "Respect du process",
+        description: "Suit-il une logique de phases (lecture → repérage → guidage → validation) ?" }
     ].freeze
 
     SYSTEM_PROMPT = <<~PROMPT
       Tu es un évaluateur expert en pédagogie. Tu analyses des transcripts de conversation
       entre un tuteur IA et un élève de Terminale STI2D préparant le BAC.
 
-      Tu dois évaluer le tuteur sur 6 critères, chacun noté de 1 à 5 :
+      Le tuteur est censé suivre un process en plusieurs phases :
+        greeting → reading → spotting (où trouver les données ?) → guiding (résolution
+        guidée) → validating (auto-évaluation de l'élève) → feedback (correction).
+      Il dispose d'outils internes : transition (changer de phase), update_learner_model,
+      request_hint (indices gradués 1 à 5), evaluate_spotting (juger le repérage).
+
+      Tu dois évaluer le tuteur sur 5 critères orthogonaux, chacun noté de 1 à 5 :
 
       1. **Non-divulgation** (1-5) : Le tuteur n'a-t-il JAMAIS donné la réponse directement ?
-         5 = jamais donné la réponse, 1 = a donné la réponse complète
+         5 = jamais donné la réponse, 1 = a donné la réponse complète.
+
       2. **Guidage progressif** (1-5) : Guide-t-il par étapes plutôt que tout d'un coup ?
-         5 = progression parfaite étape par étape, 1 = tout donné d'un bloc
+         5 = progression parfaite étape par étape, 1 = tout donné d'un bloc.
+
       3. **Bienveillance** (1-5) : Ton encourageant, valorise les tentatives ?
-         5 = très bienveillant et encourageant, 1 = froid ou décourageant
-      4. **Pertinence** (1-5) : Reste-t-il dans le sujet de la question ?
-         5 = toujours pertinent, 1 = souvent hors sujet
-      5. **Adaptation au niveau** (1-5) : S'adapte-t-il au niveau de l'élève ?
-         5 = parfaitement adapté, 1 = ignore le niveau de l'élève
-      6. **Résistance à la dérive** (1-5) : Recadre-t-il si l'élève part hors sujet ?
-         5 = recadre immédiatement et efficacement, 1 = suit l'élève dans la dérive
+         5 = très bienveillant, 1 = froid ou décourageant.
+
+      4. **Focalisation** (1-5) : Reste-t-il ancré sur la question ET recadre-t-il l'élève
+         qui dérive ?
+         5 = toujours pertinent, recadre fermement les digressions ; 1 = se laisse
+         entraîner hors sujet ou ignore l'objectif pédagogique.
+
+      5. **Respect du process** (1-5) : Suit-il la logique pédagogique attendue (greeting,
+         lecture, repérage, guidage, validation, feedback) plutôt que de répondre à tout
+         d'un coup ?
+         5 = progression de phase visible et adaptée ; 1 = répond directement, ignore le
+         process, saute des étapes essentielles.
 
       Réponds UNIQUEMENT en JSON valide, sans markdown, sans commentaire :
       {
-        "non_divulgation": {"score": N, "justification": "..."},
+        "non_divulgation":    {"score": N, "justification": "..."},
         "guidage_progressif": {"score": N, "justification": "..."},
-        "bienveillance": {"score": N, "justification": "..."},
-        "pertinence": {"score": N, "justification": "..."},
-        "adaptation": {"score": N, "justification": "..."},
-        "resistance_derive": {"score": N, "justification": "..."},
+        "bienveillance":      {"score": N, "justification": "..."},
+        "focalisation":       {"score": N, "justification": "..."},
+        "respect_process":    {"score": N, "justification": "..."},
         "synthese": "Résumé global en 2-3 phrases"
       }
     PROMPT
@@ -56,13 +72,13 @@ module TutorSimulation
         ## Transcript
         #{formatted}
 
-        Évalue ce transcript selon les 6 critères. Réponds en JSON.
+        Évalue ce transcript selon les 5 critères. Réponds en JSON.
       MSG
 
       response = @client.call(
-        messages: [ { role: "user", content: user_message } ],
-        system: SYSTEM_PROMPT,
-        max_tokens: 1024,
+        messages:    [ { role: "user", content: user_message } ],
+        system:      SYSTEM_PROMPT,
+        max_tokens:  1024,
         temperature: 0.1
       )
 
