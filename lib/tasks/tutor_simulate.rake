@@ -14,6 +14,8 @@ namespace :tutor do
       PROFILES            Comma-separated profiles (default: all)
                           Available: bon_eleve, eleve_moyen, eleve_en_difficulte,
                                      eleve_paresseux, eleve_hors_sujet
+      QUESTIONS           Comma-separated question numbers to limit the run
+                          (e.g. "1.1,1.2"). Default: all questions of the subject.
       TUTOR_MODEL         OpenRouter model id for the tutor
                           (default: openai/gpt-4o-mini)
       STUDENT_MODEL       OpenRouter model id for the simulated student
@@ -23,7 +25,7 @@ namespace :tutor do
 
     Examples:
       rake tutor:simulate[42]
-      rake tutor:simulate[42] TURNS=3 PROFILES=bon_eleve,eleve_paresseux
+      rake tutor:simulate[1] TURNS=2 PROFILES=bon_eleve QUESTIONS=1.1
       rake tutor:simulate[42] TUTOR_MODEL=mistralai/mistral-large-2512
   DESC
   task :simulate, [ :subject_id ] => :environment do |_t, args|
@@ -50,17 +52,20 @@ namespace :tutor do
       TutorSimulation::StudentSimulator::PROFILES.keys.map(&:to_s)
     end
 
+    question_numbers = ENV["QUESTIONS"]&.split(",")&.map(&:strip)
+
     student_client = AiClientFactory.build(provider: :openrouter, api_key: api_key, model: student_model)
     judge_client   = AiClientFactory.build(provider: :openrouter, api_key: api_key, model: judge_model)
 
     runner = TutorSimulation::Runner.new(
-      subject:        subject,
-      profiles:       profiles,
-      max_turns:      max_turns,
-      api_key:        api_key,
-      tutor_model:    tutor_model,
-      student_client: student_client,
-      judge_client:   judge_client
+      subject:          subject,
+      profiles:         profiles,
+      max_turns:        max_turns,
+      api_key:          api_key,
+      tutor_model:      tutor_model,
+      student_client:   student_client,
+      judge_client:     judge_client,
+      question_numbers: question_numbers
     )
 
     runner.run

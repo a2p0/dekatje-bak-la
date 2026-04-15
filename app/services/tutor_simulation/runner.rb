@@ -11,16 +11,18 @@ module TutorSimulation
       tutor_model:,
       student_client:,
       judge_client:,
-      output_dir: nil
+      output_dir: nil,
+      question_numbers: nil
     )
-      @subject         = subject
-      @profiles        = profiles.map(&:to_sym)
-      @max_turns       = max_turns
-      @api_key         = api_key
-      @tutor_model     = tutor_model
-      @student_client  = student_client
-      @judge_client    = judge_client
-      @output_dir      = output_dir || Rails.root.join("tmp", "tutor_simulations", Time.current.strftime("%Y%m%d_%H%M%S"))
+      @subject          = subject
+      @profiles         = profiles.map(&:to_sym)
+      @max_turns        = max_turns
+      @api_key          = api_key
+      @tutor_model      = tutor_model
+      @student_client   = student_client
+      @judge_client     = judge_client
+      @question_numbers = question_numbers&.map(&:to_s)
+      @output_dir       = output_dir || Rails.root.join("tmp", "tutor_simulations", Time.current.strftime("%Y%m%d_%H%M%S"))
     end
 
     def run
@@ -28,6 +30,8 @@ module TutorSimulation
 
       sim_classroom = ensure_sim_classroom
       questions     = @subject.parts.order(:position).flat_map { |p| p.questions.kept.order(:position) }
+      questions     = questions.select { |q| @question_numbers.include?(q.number.to_s) } if @question_numbers&.any?
+      abort "No questions match QUESTIONS=#{@question_numbers.inspect}" if questions.empty?
 
       puts "=== Simulation tuteur : #{@subject.title} ==="
       puts "    #{questions.size} questions, #{@profiles.size} profils, #{@max_turns} tours max"
