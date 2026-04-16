@@ -178,4 +178,91 @@ RSpec.describe TutorSimulation::StructuralMetrics do
       end
     end
   end
+
+  describe "#dt_dr_leak_count_non_spotting" do
+    let(:leak_student) { create(:student, classroom: classroom) }
+    let(:leak_subject) { create(:subject, owner: user, status: :published) }
+    let(:leak_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+    let(:leak_conversation) do
+      create(:conversation, student: leak_student, subject: leak_subject,
+             lifecycle_state: "active", tutor_state: leak_tutor_state)
+    end
+
+    subject(:leak_metrics) do
+      described_class.compute(conversation: leak_conversation, phase_per_turn: phase_per_turn)
+    end
+
+    context "with 2 messages mentioning DT1 in guiding phase" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant, content: "Regarde DT1 pour la valeur.")
+        create(:message, conversation: leak_conversation, role: :assistant, content: "Compare avec DR2 aussi.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding guiding] }
+
+      it "returns 2" do
+        expect(leak_metrics[:dt_dr_leak_count_non_spotting]).to eq(2)
+      end
+    end
+
+    context "with a DT1 mention during spotting phase" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant, content: "Regarde DT1 pour la valeur.")
+      end
+
+      let(:phase_per_turn) { %w[idle spotting] }
+
+      it "does not count it (leak only outside spotting)" do
+        expect(leak_metrics[:dt_dr_leak_count_non_spotting]).to eq(0)
+      end
+    end
+  end
+
+  describe "#short_message_ratio" do
+    let(:short_student) { create(:student, classroom: classroom) }
+    let(:short_subject) { create(:subject, owner: user, status: :published) }
+    let(:short_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+    let(:short_conversation) do
+      create(:conversation, student: short_student, subject: short_subject,
+             lifecycle_state: "active", tutor_state: short_tutor_state)
+    end
+
+    subject(:short_metrics) do
+      described_class.compute(conversation: short_conversation)
+    end
+
+    context "with 4 of 5 assistant messages under 60 words" do
+      before do
+        long_msg = ("mot " * 80).strip
+        4.times do
+          create(:message, conversation: short_conversation, role: :assistant, content: "Message court.")
+        end
+        create(:message, conversation: short_conversation, role: :assistant, content: long_msg)
+      end
+
+      it "returns 0.8" do
+        expect(short_metrics[:short_message_ratio]).to eq(0.8)
+      end
+    end
+
+    context "with no assistant messages" do
+      it "returns 0.0 (sentinel)" do
+        expect(short_metrics[:short_message_ratio]).to eq(0.0)
+      end
+    end
+  end
 end

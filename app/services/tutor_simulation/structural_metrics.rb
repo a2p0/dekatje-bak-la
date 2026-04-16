@@ -37,8 +37,10 @@ module TutorSimulation
         hints_used:                @conversation.tutor_state.question_states.values.sum { |qs| qs.hints_used.to_i },
         message_count_assistant:   @assistant_messages.count,
         message_count_user:        @conversation.messages.where(role: :user).count,
-        first_turn_with_transition: first_turn_with_transition,
-        action_verb_ratio_guiding:  action_verb_ratio_guiding
+        first_turn_with_transition:    first_turn_with_transition,
+        action_verb_ratio_guiding:     action_verb_ratio_guiding,
+        dt_dr_leak_count_non_spotting: dt_dr_leak_count_non_spotting,
+        short_message_ratio:           short_message_ratio
       }
     end
 
@@ -74,6 +76,32 @@ module TutorSimulation
       first_word = content.to_s.strip.downcase.split(/\s+/).first.to_s
       first_word = first_word.gsub(/[[:punct:]]+$/, "")
       ACTION_VERBS.include?(first_word)
+    end
+
+    # Counts assistant messages mentioning DT<n> or DR<n> outside the
+    # spotting phase (which is the only phase where citing doc names is
+    # legitimate). When phase_per_turn is missing, counts ALL matches as
+    # a diagnostic fallback.
+    def dt_dr_leak_count_non_spotting
+      if @phase_per_turn.nil?
+        return @assistant_messages.to_a.count { |m| m.content.to_s.match?(DT_DR_REGEX) }
+      end
+
+      @assistant_messages.to_a.each_with_index.count do |msg, idx|
+        phase = @phase_per_turn[idx + 1]
+        phase && phase != "spotting" && msg.content.to_s.match?(DT_DR_REGEX)
+      end
+    end
+
+    # Ratio of assistant messages whose word count is <= 60
+    # (matches the prompt rule "Maximum 60 mots par message").
+    # Returns 0.0 when there are no assistant messages (sentinel — avoids
+    # bruiting global_summary averages).
+    def short_message_ratio
+      return 0.0 if @assistant_messages.empty?
+
+      short = @assistant_messages.count { |m| m.content.to_s.split(/\s+/).size <= SHORT_MESSAGE_WORD_THRESHOLD }
+      (short.to_f / @assistant_messages.count).round(2)
     end
 
 

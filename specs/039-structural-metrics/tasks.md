@@ -123,16 +123,16 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 
 ### Tests for User Story 4 (TDD) ⚠️
 
-- [ ] T027 [P] [US4] Ajouter spec "counts 2 DT1/DT2 leaks in guiding phase" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C9).
-- [ ] T028 [P] [US4] Ajouter spec "does not count DT leaks during spotting" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C10).
-- [ ] T029 [P] [US4] Ajouter spec "returns 0.80 when 4 of 5 assistant messages are ≤ 60 words" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C11).
-- [ ] T030 [P] [US4] Ajouter spec "returns 0.0 short_message_ratio when no assistant messages exist" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C12, sentinelle I5).
+- [X] T027 [P] [US4] Ajouter spec "counts 2 DT1/DT2 leaks in guiding phase" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C9).
+- [X] T028 [P] [US4] Ajouter spec "does not count DT leaks during spotting" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C10).
+- [X] T029 [P] [US4] Ajouter spec "returns 0.80 when 4 of 5 assistant messages are ≤ 60 words" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C11).
+- [X] T030 [P] [US4] Ajouter spec "returns 0.0 short_message_ratio when no assistant messages exist" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C12, sentinelle I5).
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Implémenter la méthode privée `dt_dr_leak_count_non_spotting` dans `TutorSimulation::StructuralMetrics` (itère sur `assistant_messages` zippés avec `phase_per_turn`, compte ceux dont la phase n'est pas `spotting` ET dont le contenu matche `DT_DR_REGEX`). Si `phase_per_turn` absent, retourner le compteur sur **tous** les messages (compte les leaks potentiels sans discrimination). Ajouter la clé au hash. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
-- [ ] T032 [US4] Implémenter la méthode privée `short_message_ratio` dans `TutorSimulation::StructuralMetrics` (ratio des messages assistant dont `split(/\s+/).size <= SHORT_MESSAGE_WORD_THRESHOLD`). Sentinelle `0.0` si aucun message. Ajouter la clé au hash. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
-- [ ] T033 [US4] Vérifier que T027-T030 passent : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
+- [X] T031 [US4] Implémenter la méthode privée `dt_dr_leak_count_non_spotting` dans `TutorSimulation::StructuralMetrics` (itère sur `assistant_messages` zippés avec `phase_per_turn`, compte ceux dont la phase n'est pas `spotting` ET dont le contenu matche `DT_DR_REGEX`). Si `phase_per_turn` absent, retourner le compteur sur **tous** les messages (compte les leaks potentiels sans discrimination). Ajouter la clé au hash. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
+- [X] T032 [US4] Implémenter la méthode privée `short_message_ratio` dans `TutorSimulation::StructuralMetrics` (ratio des messages assistant dont `split(/\s+/).size <= SHORT_MESSAGE_WORD_THRESHOLD`). Sentinelle `0.0` si aucun message. Ajouter la clé au hash. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
+- [X] T033 [US4] Vérifier que T027-T030 passent : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
 
 **Checkpoint**: Les 4 nouvelles métriques sont exposées dans `structural_metrics` et sérialisées dans `raw.json`.
 
