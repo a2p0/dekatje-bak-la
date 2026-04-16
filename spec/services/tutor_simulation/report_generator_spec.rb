@@ -30,14 +30,18 @@ RSpec.describe TutorSimulation::ReportGenerator do
                 { "role" => "assistant", "content" => "Commençons par les données ?" }
               ],
               structural_metrics: {
-                final_phase:              "spotting",
-                phase_rank:               3,
-                avg_message_length_words: 25.0,
-                open_question_ratio:      0.8,
-                regex_intercepts:         0,
-                hints_used:               1,
-                message_count_assistant:  3,
-                message_count_user:       3
+                final_phase:                   "spotting",
+                phase_rank:                    3,
+                avg_message_length_words:      25.0,
+                open_question_ratio:           0.8,
+                regex_intercepts:              0,
+                hints_used:                    1,
+                message_count_assistant:       3,
+                message_count_user:            3,
+                first_turn_with_transition:    2,
+                action_verb_ratio_guiding:     0.67,
+                dt_dr_leak_count_non_spotting: 1,
+                short_message_ratio:           0.9
               },
               evaluation: {
                 "non_divulgation"    => { "score" => 5, "justification" => "OK" },
@@ -95,6 +99,45 @@ RSpec.describe TutorSimulation::ReportGenerator do
       expect(md).to include("Bienveillance")
       expect(md).to include("Focalisation")
       expect(md).to include("Respect du process")
+    end
+
+    context "when evaluation is marked skipped (SKIP_JUDGE=1)" do
+      let(:skipped_data) do
+        deep = Marshal.load(Marshal.dump(simulation_data))
+        deep[:results][0][:profiles][0][:evaluation] = { "skipped" => true }
+        deep
+      end
+
+      it "renders a 'Juge désactivé' notice instead of the scores table" do
+        md = described_class.new(skipped_data).to_markdown
+
+        expect(md).to include("Juge désactivé")
+        expect(md).not_to include("Non-divulgation")
+        expect(md).not_to include("5/5")
+      end
+    end
+
+    it "renders the 4 new structural metrics per profile" do
+      md = described_class.new(simulation_data).to_markdown
+
+      expect(md).to include("1er tour avec transition")
+      expect(md).to include("verbes d'action en guiding")
+      expect(md).to include("Leaks DT/DR hors spotting")
+      expect(md).to include("messages ≤ 60 mots")
+    end
+
+    it "includes average of non-nil first_turn_with_transition in global summary" do
+      mixed_data = Marshal.load(Marshal.dump(simulation_data))
+      mixed_data[:results][0][:profiles] << Marshal.load(Marshal.dump(mixed_data[:results][0][:profiles][0]))
+      mixed_data[:results][0][:profiles][0][:profile_label] = "Profil A"
+      mixed_data[:results][0][:profiles][1][:profile_label] = "Profil B"
+      mixed_data[:results][0][:profiles][0][:structural_metrics][:first_turn_with_transition] = 2
+      mixed_data[:results][0][:profiles][1][:structural_metrics][:first_turn_with_transition] = nil
+
+      md = described_class.new(mixed_data).to_markdown
+
+      expect(md).to include("1er tour transition moyen")
+      expect(md).to match(/1er tour transition moyen.*2\.0/m)
     end
   end
 end

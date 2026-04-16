@@ -349,6 +349,10 @@ SECRET_KEY_BASE            # rails secret
 - PostgreSQL via Neon (JSONB `progression` et `tutor_state` sur student_sessions) (036-rest-student-actions)
 - Ruby 3.3+ / Rails 8.1 + `ruby_llm` (déjà présent au Gemfile), Hotwire (037-tutor-wire-tools)
 - PostgreSQL Neon (aucune migration nécessaire — `TutorState` (037-tutor-wire-tools)
+- Ruby 3.3+ / Rails 8.1 + `ruby_llm` (tutor + sim), rake (sim driver), (038-tutor-prompt-tuning)
+- PostgreSQL Neon (aucune migration). (038-tutor-prompt-tuning)
+- Ruby 3.3+, Rails 8.1 + RSpec (tests), FactoryBot (fixtures). Services existants : (039-structural-metrics)
+- N/A — feature in-memory only (pas de migration, pas de nouvelle table). (039-structural-metrics)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage

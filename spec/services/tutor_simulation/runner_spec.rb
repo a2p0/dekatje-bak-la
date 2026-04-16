@@ -89,4 +89,52 @@ RSpec.describe TutorSimulation::Runner do
     expect(profile_result[:structural_metrics]).to include(:final_phase, :phase_rank, :open_question_ratio)
     expect(profile_result[:evaluation]["non_divulgation"]["score"]).to eq(5)
   end
+
+  describe "SKIP_JUDGE guard" do
+    let(:runner) do
+      described_class.new(
+        subject:        exam_subject,
+        profiles:       [ "bon_eleve" ],
+        max_turns:      1,
+        api_key:        "or-test",
+        tutor_model:    "openai/gpt-4o-mini",
+        student_client: student_client,
+        judge_client:   judge_client,
+        output_dir:     Dir.mktmpdir
+      )
+    end
+
+    context "when SKIP_JUDGE=1" do
+      before { ENV["SKIP_JUDGE"] = "1" }
+      after  { ENV.delete("SKIP_JUDGE") }
+
+      it "does not call the judge client" do
+        expect(judge_client).not_to receive(:call)
+        runner.run
+      end
+
+      it "marks evaluation as skipped in each profile result" do
+        data = runner.run
+        profile_result = data[:results].first[:profiles].first
+        expect(profile_result[:evaluation]).to eq("skipped" => true)
+      end
+    end
+
+    context "when SKIP_JUDGE is absent" do
+      it "calls the judge client normally (backward compat)" do
+        runner.run
+        expect(judge_client).to have_received(:call).at_least(:once)
+      end
+    end
+
+    context "when SKIP_JUDGE=0" do
+      before { ENV["SKIP_JUDGE"] = "0" }
+      after  { ENV.delete("SKIP_JUDGE") }
+
+      it "treats it as absent (strict == '1')" do
+        runner.run
+        expect(judge_client).to have_received(:call).at_least(:once)
+      end
+    end
+  end
 end

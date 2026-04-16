@@ -1,6 +1,7 @@
 module Tutor
   class CallLlm
     CHUNK_PERSIST_TOKENS = 50
+    MAX_TOKENS           = 2048
 
     def self.call(conversation:, system_prompt:, messages:, student_message:)
       new(
@@ -34,6 +35,7 @@ module Tutor
 
       chat = RubyLLM::Chat.new(model: credentials[:model])
       chat.with_instructions(@system_prompt)
+      chat.with_params(max_tokens: MAX_TOKENS)
       chat.with_tools(
         Tutor::Tools::TransitionTool,
         Tutor::Tools::UpdateLearnerModelTool,

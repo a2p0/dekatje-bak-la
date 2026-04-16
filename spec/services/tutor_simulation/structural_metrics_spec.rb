@@ -64,4 +64,205 @@ RSpec.describe TutorSimulation::StructuralMetrics do
     expect(metrics[:message_count_assistant]).to eq(2)
     expect(metrics[:message_count_user]).to eq(2)
   end
+
+  describe "#first_turn_with_transition (H1)" do
+    subject(:metrics_with_phases) do
+      described_class.compute(conversation: conversation, phase_per_turn: phase_per_turn)
+    end
+
+    context "when transition happens at turn 1" do
+      let(:phase_per_turn) { %w[idle greeting reading] }
+
+      it "returns 1" do
+        expect(metrics_with_phases[:first_turn_with_transition]).to eq(1)
+      end
+    end
+
+    context "when transition happens at turn 3" do
+      let(:phase_per_turn) { %w[idle idle idle greeting] }
+
+      it "returns 3" do
+        expect(metrics_with_phases[:first_turn_with_transition]).to eq(3)
+      end
+    end
+
+    context "when phase stays idle for the whole conversation" do
+      let(:phase_per_turn) { %w[idle idle idle] }
+
+      it "returns nil" do
+        expect(metrics_with_phases[:first_turn_with_transition]).to be_nil
+      end
+    end
+
+    context "when phase_per_turn is not provided (backward compat)" do
+      it "returns nil" do
+        expect(metrics[:first_turn_with_transition]).to be_nil
+      end
+    end
+  end
+
+  describe "#action_verb_ratio_guiding (H2)" do
+    # Use isolated student + subject to avoid conflict with the global
+    # conversation created in the outer `let(:conversation)` (student_id is
+    # unique per subject on Conversation).
+    let(:h2_student)  { create(:student, classroom: classroom) }
+    let(:h2_subject)  { create(:subject, owner: user, status: :published) }
+
+    let(:h2_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+
+    let(:conversation_in_guiding) do
+      create(:conversation, student: h2_student, subject: h2_subject,
+             lifecycle_state: "active", tutor_state: h2_tutor_state)
+    end
+
+    subject(:metrics_with_phases) do
+      described_class.compute(conversation: conversation_in_guiding, phase_per_turn: phase_per_turn)
+    end
+
+    context "when 2 of 3 guiding messages start with an action verb" do
+      before do
+        # 3 assistant messages, all emitted during guiding phase
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Identifie la valeur de λ dans le DT1.")
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Et si tu comparais cette valeur à la norme ?")
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Calcule maintenant la résistance thermique.")
+      end
+
+      # 3 turns, so phase_per_turn has 4 elements; phases AFTER each turn = guiding
+      let(:phase_per_turn) { %w[spotting guiding guiding guiding] }
+
+      it "returns 0.67" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(0.67)
+      end
+    end
+
+    context "when guiding phase is never reached" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Bonjour, on commence ?")
+      end
+
+      let(:phase_per_turn) { %w[idle greeting] }
+
+      it "returns nil" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to be_nil
+      end
+    end
+
+    context "when a guiding message starts with lowercase and leading whitespace" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "  identifie la valeur précise.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding] }
+
+      it "counts it as action verb (case-insensitive + trim)" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(1.0)
+      end
+    end
+
+    context "when a guiding message starts with a verb followed by punctuation" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Identifie, dans le DT1, la valeur.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding] }
+
+      it "counts it as action verb (strip trailing punctuation of first word)" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(1.0)
+      end
+    end
+  end
+
+  describe "#dt_dr_leak_count_non_spotting" do
+    let(:leak_student) { create(:student, classroom: classroom) }
+    let(:leak_subject) { create(:subject, owner: user, status: :published) }
+    let(:leak_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+    let(:leak_conversation) do
+      create(:conversation, student: leak_student, subject: leak_subject,
+             lifecycle_state: "active", tutor_state: leak_tutor_state)
+    end
+
+    subject(:leak_metrics) do
+      described_class.compute(conversation: leak_conversation, phase_per_turn: phase_per_turn)
+    end
+
+    context "with 2 messages mentioning DT1 in guiding phase" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant, content: "Regarde DT1 pour la valeur.")
+        create(:message, conversation: leak_conversation, role: :assistant, content: "Compare avec DR2 aussi.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding guiding] }
+
+      it "returns 2" do
+        expect(leak_metrics[:dt_dr_leak_count_non_spotting]).to eq(2)
+      end
+    end
+
+    context "with a DT1 mention during spotting phase" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant, content: "Regarde DT1 pour la valeur.")
+      end
+
+      let(:phase_per_turn) { %w[idle spotting] }
+
+      it "does not count it (leak only outside spotting)" do
+        expect(leak_metrics[:dt_dr_leak_count_non_spotting]).to eq(0)
+      end
+    end
+  end
+
+  describe "#short_message_ratio" do
+    let(:short_student) { create(:student, classroom: classroom) }
+    let(:short_subject) { create(:subject, owner: user, status: :published) }
+    let(:short_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+    let(:short_conversation) do
+      create(:conversation, student: short_student, subject: short_subject,
+             lifecycle_state: "active", tutor_state: short_tutor_state)
+    end
+
+    subject(:short_metrics) do
+      described_class.compute(conversation: short_conversation)
+    end
+
+    context "with 4 of 5 assistant messages under 60 words" do
+      before do
+        long_msg = ("mot " * 80).strip
+        4.times do
+          create(:message, conversation: short_conversation, role: :assistant, content: "Message court.")
+        end
+        create(:message, conversation: short_conversation, role: :assistant, content: long_msg)
+      end
+
+      it "returns 0.8" do
+        expect(short_metrics[:short_message_ratio]).to eq(0.8)
+      end
+    end
+
+    context "with no assistant messages" do
+      it "returns 0.0 (sentinel)" do
+        expect(short_metrics[:short_message_ratio]).to eq(0.0)
+      end
+    end
+  end
 end
