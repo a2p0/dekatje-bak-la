@@ -32,12 +32,12 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 
 **⚠️ CRITICAL**: Les user stories US1, US2, US4 dépendent de la disponibilité de `phase_per_turn` depuis le `Runner`. US3 est indépendant.
 
-- [ ] T001 [P] Lire `app/services/tutor_simulation/runner.rb` et confirmer l'emplacement exact d'insertion de la capture `phase_per_turn` (dans `simulate_profile`, après `conversation.reload` à la ligne 127). Aucune modification à ce stade — juste valider le point d'insertion.
-- [ ] T002 [P] Lire `app/services/tutor_simulation/structural_metrics.rb` et confirmer que la constante `PHASE_RANK` existante est réutilisable. Pas de modification.
-- [ ] T003 Étendre `TutorSimulation::Runner#simulate_profile` pour capturer `phase_per_turn` in-memory (initialiser avec la phase de départ, pousser `conversation.reload.tutor_state.current_phase` après chaque tour), puis passer ce tableau à `StructuralMetrics.compute(conversation:, phase_per_turn: phase_per_turn)`. Fichier : `app/services/tutor_simulation/runner.rb`.
-- [ ] T004 Mettre à jour la signature de `TutorSimulation::StructuralMetrics` pour accepter `compute(conversation:, phase_per_turn: nil)` et stocker l'argument dans une ivar `@phase_per_turn`. Rester rétrocompatible : si `phase_per_turn` absent, les métriques dépendantes (US1, US2) retournent `nil`. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
-- [ ] T005 [P] Ajouter les constantes privées `ACTION_VERBS`, `DT_DR_REGEX`, `SHORT_MESSAGE_WORD_THRESHOLD` à `TutorSimulation::StructuralMetrics`. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
-- [ ] T006 Vérifier que les 6 specs existants dans `spec/services/tutor_simulation/structural_metrics_spec.rb` passent toujours après T004-T005 (rétrocompat SC-004). Commande : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
+- [X] T001 [P] Lire `app/services/tutor_simulation/runner.rb` et confirmer l'emplacement exact d'insertion de la capture `phase_per_turn` (dans `simulate_profile`, après `conversation.reload` à la ligne 127). Aucune modification à ce stade — juste valider le point d'insertion.
+- [X] T002 [P] Lire `app/services/tutor_simulation/structural_metrics.rb` et confirmer que la constante `PHASE_RANK` existante est réutilisable. Pas de modification.
+- [X] T003 Étendre `TutorSimulation::Runner#simulate_profile` pour capturer `phase_per_turn` in-memory (initialiser avec la phase de départ, pousser `conversation.reload.tutor_state.current_phase` après chaque tour), puis passer ce tableau à `StructuralMetrics.compute(conversation:, phase_per_turn: phase_per_turn)`. Fichier : `app/services/tutor_simulation/runner.rb`.
+- [X] T004 Mettre à jour la signature de `TutorSimulation::StructuralMetrics` pour accepter `compute(conversation:, phase_per_turn: nil)` et stocker l'argument dans une ivar `@phase_per_turn`. Rester rétrocompatible : si `phase_per_turn` absent, les métriques dépendantes (US1, US2) retournent `nil`. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
+- [X] T005 [P] Ajouter les constantes privées `ACTION_VERBS`, `DT_DR_REGEX`, `SHORT_MESSAGE_WORD_THRESHOLD` à `TutorSimulation::StructuralMetrics`. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
+- [X] T006 Vérifier que les 6 specs existants dans `spec/services/tutor_simulation/structural_metrics_spec.rb` passent toujours après T004-T005 (rétrocompat SC-004). Commande : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
 
 **Checkpoint**: Foundation prête. `phase_per_turn` circule de Runner vers StructuralMetrics. Aucune nouvelle métrique n'est encore calculée. Les tests existants passent.
 

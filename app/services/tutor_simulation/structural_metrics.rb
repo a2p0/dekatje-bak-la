@@ -13,12 +13,17 @@ module TutorSimulation
       "ended"      => 7
     }.freeze
 
-    def self.compute(conversation:)
-      new(conversation: conversation).compute
+    ACTION_VERBS = %w[identifie repère cite relève compare calcule].freeze
+    DT_DR_REGEX  = /\b(?:DT|DR)\d+\b/i.freeze
+    SHORT_MESSAGE_WORD_THRESHOLD = 60
+
+    def self.compute(conversation:, phase_per_turn: nil)
+      new(conversation: conversation, phase_per_turn: phase_per_turn).compute
     end
 
-    def initialize(conversation:)
+    def initialize(conversation:, phase_per_turn: nil)
       @conversation = conversation
+      @phase_per_turn = phase_per_turn
       @assistant_messages = conversation.messages.where(role: :assistant).order(:created_at)
     end
 
