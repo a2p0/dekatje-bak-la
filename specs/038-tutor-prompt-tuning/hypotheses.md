@@ -115,3 +115,27 @@ Après chaque sim, incrémenter :
 - **Scores** : rank _._, non-div _._, guid _._, bienv _._, focal _._, proc _._
 - **SC validés** : SC-001 ☐, SC-002 ☐, SC-003 ☐, SC-004 ☐, SC-005 ☐, SC-006 ☐, SC-007 ☐, SC-008 ☐
 - **Budget dépensé** : $_._ / $2
+
+## Méthodologie D — metrics structurelles (follow-up 2026-04-16)
+
+Le bruit juge ±0.50 pt sur n=6 a rendu les verdicts H1/H2 inconclusifs.
+**Feature 039 livre l'instrument de mesure** — cf. [specs/039-structural-metrics/spec.md](../039-structural-metrics/spec.md).
+
+4 nouvelles métriques déterministes (σ ≈ 0.01) sont désormais disponibles
+dans `TutorSimulation::StructuralMetrics` :
+
+- `first_turn_with_transition` → gate H1
+- `action_verb_ratio_guiding`  → gate H2
+- `dt_dr_leak_count_non_spotting`
+- `short_message_ratio`
+
+Un guard `SKIP_JUDGE=1` dans `TutorSimulation::Runner` divise le coût sim
+par ~2 (judge consomme ~50% du budget). Permet d'itérer H1/H2 sous le
+cap budget SC-007 via des sims sans juge.
+
+**Protocole de reprise** :
+1. Re-appliquer H1 (cherry-pick `95737db`), lancer sim avec SKIP_JUDGE=1,
+   comparer `first_turn_with_transition` baseline vs H1. Verdict
+   déterministe sans juge.
+2. Idem H2 (cherry-pick `3a2895f`), comparer `action_verb_ratio_guiding`.
+3. Sim finale de validation avec juge pour les hypothèses KEEP.
