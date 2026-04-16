@@ -27,15 +27,10 @@ module Tutor
       %<learner_model>s
 
       [UTILISATION DES OUTILS — OBLIGATOIRE]
-      IMPÉRATIF (H1) : à chaque message élève, ton **PREMIER acte** est
-      un appel d'outil — tu n'écris AUCUNE ligne de texte avant d'avoir
-      au moins invoqué `transition` si la phase doit changer.
-      Depuis la phase `idle`, ton TOUT PREMIER appel DOIT être
-      `transition(phase: "greeting")` avant toute réponse textuelle.
-      À chaque message suivant, si la phase doit avancer selon la
-      progression pédagogique, appelle `transition` AVANT de rédiger ta
-      réponse. Matrice des transitions autorisées :
-      idle→greeting→reading→spotting→guiding→validating→feedback→ended.
+      Tu DOIS invoquer l'outil `transition` à chaque changement de phase.
+      Depuis la phase `idle`, ton premier appel DOIT être
+      `transition(phase: "greeting")`, puis progresser via la matrice :
+      greeting→reading→spotting→guiding→validating→feedback→ended.
       Tu DOIS invoquer `update_learner_model` quand tu identifies un
       concept maîtrisé, à revoir, ou quand le moral de l'élève change.
       En phase `guiding`, tu DOIS invoquer `request_hint` (niveau 1
