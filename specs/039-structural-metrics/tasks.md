@@ -75,15 +75,15 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 
 ### Tests for User Story 2 (TDD) ⚠️
 
-- [ ] T013 [P] [US2] Ajouter spec "returns 0.67 when 2 of 3 guiding messages start with action verb" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C6). Le spec doit créer des messages assistant réels avec un `phase_per_turn` cohérent.
-- [ ] T014 [P] [US2] Ajouter spec "returns nil when guiding phase is never reached" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C7).
-- [ ] T015 [P] [US2] Ajouter spec "matches case-insensitive with leading whitespace" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C8 — message "  identifie ..." en minuscule).
-- [ ] T016 [P] [US2] Ajouter spec "matches verb followed by punctuation (Identifie,)" dans `spec/services/tutor_simulation/structural_metrics_spec.rb`.
+- [X] T013 [P] [US2] Ajouter spec "returns 0.67 when 2 of 3 guiding messages start with action verb" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C6). Le spec doit créer des messages assistant réels avec un `phase_per_turn` cohérent.
+- [X] T014 [P] [US2] Ajouter spec "returns nil when guiding phase is never reached" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C7).
+- [X] T015 [P] [US2] Ajouter spec "matches case-insensitive with leading whitespace" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C8 — message "  identifie ..." en minuscule).
+- [X] T016 [P] [US2] Ajouter spec "matches verb followed by punctuation (Identifie,)" dans `spec/services/tutor_simulation/structural_metrics_spec.rb`.
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Implémenter la méthode privée `action_verb_ratio_guiding` dans `TutorSimulation::StructuralMetrics` (split + downcase + strip ponctuation finale, matching contre `ACTION_VERBS`). La correspondance message↔phase se fait via `phase_per_turn` aligné sur les messages assistant. Ajouter la clé au hash retourné. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
-- [ ] T018 [US2] Vérifier que T013-T016 passent : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
+- [X] T017 [US2] Implémenter la méthode privée `action_verb_ratio_guiding` dans `TutorSimulation::StructuralMetrics` (split + downcase + strip ponctuation finale, matching contre `ACTION_VERBS`). La correspondance message↔phase se fait via `phase_per_turn` aligné sur les messages assistant. Ajouter la clé au hash retourné. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
+- [X] T018 [US2] Vérifier que T013-T016 passent : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
 
 **Checkpoint**: `action_verb_ratio_guiding` opérationnelle. H1 + H2 sont toutes deux mesurables. MVP livré.
 

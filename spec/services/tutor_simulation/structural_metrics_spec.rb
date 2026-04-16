@@ -100,4 +100,82 @@ RSpec.describe TutorSimulation::StructuralMetrics do
       end
     end
   end
+
+  describe "#action_verb_ratio_guiding (H2)" do
+    # Use isolated student + subject to avoid conflict with the global
+    # conversation created in the outer `let(:conversation)` (student_id is
+    # unique per subject on Conversation).
+    let(:h2_student)  { create(:student, classroom: classroom) }
+    let(:h2_subject)  { create(:subject, owner: user, status: :published) }
+
+    let(:h2_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+
+    let(:conversation_in_guiding) do
+      create(:conversation, student: h2_student, subject: h2_subject,
+             lifecycle_state: "active", tutor_state: h2_tutor_state)
+    end
+
+    subject(:metrics_with_phases) do
+      described_class.compute(conversation: conversation_in_guiding, phase_per_turn: phase_per_turn)
+    end
+
+    context "when 2 of 3 guiding messages start with an action verb" do
+      before do
+        # 3 assistant messages, all emitted during guiding phase
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Identifie la valeur de λ dans le DT1.")
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Et si tu comparais cette valeur à la norme ?")
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Calcule maintenant la résistance thermique.")
+      end
+
+      # 3 turns, so phase_per_turn has 4 elements; phases AFTER each turn = guiding
+      let(:phase_per_turn) { %w[spotting guiding guiding guiding] }
+
+      it "returns 0.67" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(0.67)
+      end
+    end
+
+    context "when guiding phase is never reached" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Bonjour, on commence ?")
+      end
+
+      let(:phase_per_turn) { %w[idle greeting] }
+
+      it "returns nil" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to be_nil
+      end
+    end
+
+    context "when a guiding message starts with lowercase and leading whitespace" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "  identifie la valeur précise.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding] }
+
+      it "counts it as action verb (case-insensitive + trim)" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(1.0)
+      end
+    end
+
+    context "when a guiding message starts with a verb followed by punctuation" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Identifie, dans le DT1, la valeur.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding] }
+
+      it "counts it as action verb (strip trailing punctuation of first word)" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(1.0)
+      end
+    end
+  end
 end
