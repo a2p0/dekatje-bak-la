@@ -33,7 +33,7 @@ Monolithe Rails 8. Structure standard :
 
 **Purpose**: Aucun setup nécessaire. Branche `041-teacher-p0-bugs` déjà créée, aucune gem, aucune migration, aucun composant à scaffold.
 
-- [ ] T001 Vérifier que la branche `041-teacher-p0-bugs` est bien checkout (`git branch --show-current` doit retourner `041-teacher-p0-bugs`)
+- [X] T001 Vérifier que la branche `041-teacher-p0-bugs` est bien checkout (`git branch --show-current` doit retourner `041-teacher-p0-bugs`)
 
 ---
 
@@ -55,15 +55,15 @@ Monolithe Rails 8. Structure standard :
 
 ### Tests for User Story 1 (TDD — écrire d'abord, vérifier qu'ils échouent)
 
-- [ ] T002 [P] [US1] Écrire feature spec Capybara dans `spec/features/teacher/classroom_credentials_download_spec.rb` vérifiant que le bouton "Télécharger la fiche PDF" est présent et pointe sur `teacher_classroom_export_path(classroom, format: :pdf)` quand `@generated_credentials` est injecté en session
+- [X] T002 [P] [US1] Écrire feature spec Capybara dans `spec/features/teacher/classroom_credentials_download_spec.rb` vérifiant que le bouton "Télécharger la fiche PDF" est présent et pointe sur `teacher_classroom_export_path(classroom, format: :pdf)` quand `@generated_credentials` est injecté en session
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Modifier `app/views/teacher/classrooms/show.html.erb` : ajouter un `ButtonComponent` variant `:primary` size `:sm` texte "Télécharger la fiche PDF" lié à `teacher_classroom_export_path(@classroom, format: :pdf)` à l'intérieur du bloc `if @generated_credentials.present?` (juste après la table des credentials, avant la fermeture du `<div>` ambre)
+- [X] T003 [US1] Modifier `app/views/teacher/classrooms/show.html.erb` : ajouter un `ButtonComponent` variant `:primary` size `:sm` texte "Télécharger la fiche PDF" lié à `teacher_classroom_export_path(@classroom, format: :pdf)` à l'intérieur du bloc `if @generated_credentials.present?` (juste après la table des credentials, avant la fermeture du `<div>` ambre)
 
-- [ ] T004 [US1] Vérifier que T002 passe maintenant en vert (run local + CI)
+- [X] T004 [US1] Vérifier que T002 passe maintenant en vert (run local + CI)
 
-- [ ] T005 [US1] Commit : `feat(teacher): add credentials PDF download button in generated banner` (un seul commit pour US1)
+- [X] T005 [US1] Commit : `feat(teacher): add credentials PDF download button in generated banner` (un seul commit pour US1)
 
 **Checkpoint**: US1 complète et déployable en MVP.
 
