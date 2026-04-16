@@ -99,17 +99,17 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 
 ### Tests for User Story 3 (TDD) ⚠️
 
-- [ ] T019 [P] [US3] Ajouter spec "does not call judge when SKIP_JUDGE=1" dans `spec/services/tutor_simulation/runner_spec.rb` avec `instance_double(TutorSimulation::Judge)` + `expect(fake_judge).not_to receive(:evaluate)` (contract R1).
-- [ ] T020 [P] [US3] Ajouter spec "marks evaluation as skipped in profile result" dans `spec/services/tutor_simulation/runner_spec.rb` (contract R2).
-- [ ] T021 [P] [US3] Ajouter spec "calls judge normally when SKIP_JUDGE is absent" dans `spec/services/tutor_simulation/runner_spec.rb` (contract R3).
-- [ ] T022 [P] [US3] Ajouter spec "treats SKIP_JUDGE=0 as absent" dans `spec/services/tutor_simulation/runner_spec.rb` (contract R4).
-- [ ] T023 [P] [US3] Ajouter spec "renders 'Juge désactivé' when evaluation['skipped'] is true" dans `spec/services/tutor_simulation/report_generator_spec.rb` (contract G2).
+- [X] T019 [P] [US3] Ajouter spec "does not call judge when SKIP_JUDGE=1" dans `spec/services/tutor_simulation/runner_spec.rb` avec `instance_double(TutorSimulation::Judge)` + `expect(fake_judge).not_to receive(:evaluate)` (contract R1).
+- [X] T020 [P] [US3] Ajouter spec "marks evaluation as skipped in profile result" dans `spec/services/tutor_simulation/runner_spec.rb` (contract R2).
+- [X] T021 [P] [US3] Ajouter spec "calls judge normally when SKIP_JUDGE is absent" dans `spec/services/tutor_simulation/runner_spec.rb` (contract R3).
+- [X] T022 [P] [US3] Ajouter spec "treats SKIP_JUDGE=0 as absent" dans `spec/services/tutor_simulation/runner_spec.rb` (contract R4).
+- [X] T023 [P] [US3] Ajouter spec "renders 'Juge désactivé' when evaluation['skipped'] is true" dans `spec/services/tutor_simulation/report_generator_spec.rb` (contract G2).
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Implémenter le guard `SKIP_JUDGE` dans `TutorSimulation::Runner#simulate_profile` : `evaluation = ENV["SKIP_JUDGE"] == "1" ? { "skipped" => true } : judge_transcript(...)`. Fichier : `app/services/tutor_simulation/runner.rb`.
-- [ ] T025 [US3] Étendre `TutorSimulation::ReportGenerator#render_qualitative` pour traiter le cas `evaluation&.dig("skipped") == true` AVANT le cas `"error"` et le cas tableau de scores. Rendre un message markdown lisible. Fichier : `app/services/tutor_simulation/report_generator.rb`.
-- [ ] T026 [US3] Vérifier que T019-T023 passent : `bundle exec rspec spec/services/tutor_simulation/runner_spec.rb spec/services/tutor_simulation/report_generator_spec.rb`.
+- [X] T024 [US3] Implémenter le guard `SKIP_JUDGE` dans `TutorSimulation::Runner#simulate_profile` : `evaluation = ENV["SKIP_JUDGE"] == "1" ? { "skipped" => true } : judge_transcript(...)`. Fichier : `app/services/tutor_simulation/runner.rb`.
+- [X] T025 [US3] Étendre `TutorSimulation::ReportGenerator#render_qualitative` pour traiter le cas `evaluation&.dig("skipped") == true` AVANT le cas `"error"` et le cas tableau de scores. Rendre un message markdown lisible. Fichier : `app/services/tutor_simulation/report_generator.rb`.
+- [X] T026 [US3] Vérifier que T019-T023 passent : `bundle exec rspec spec/services/tutor_simulation/runner_spec.rb spec/services/tutor_simulation/report_generator_spec.rb`.
 
 **Checkpoint**: SKIP_JUDGE opérationnel. Budget sim divisé par ~2 lors des itérations sans juge.
 

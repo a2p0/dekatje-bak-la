@@ -69,6 +69,12 @@ module TutorSimulation
         return
       end
 
+      if evaluation&.dig("skipped")
+        lines << "> ⊙ Juge désactivé (SKIP_JUDGE=1) — évaluation qualitative non disponible."
+        lines << ""
+        return
+      end
+
       return unless evaluation
 
       lines << "**Évaluation qualitative (juge LLM)**"

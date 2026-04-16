@@ -96,5 +96,21 @@ RSpec.describe TutorSimulation::ReportGenerator do
       expect(md).to include("Focalisation")
       expect(md).to include("Respect du process")
     end
+
+    context "when evaluation is marked skipped (SKIP_JUDGE=1)" do
+      let(:skipped_data) do
+        deep = Marshal.load(Marshal.dump(simulation_data))
+        deep[:results][0][:profiles][0][:evaluation] = { "skipped" => true }
+        deep
+      end
+
+      it "renders a 'Juge désactivé' notice instead of the scores table" do
+        md = described_class.new(skipped_data).to_markdown
+
+        expect(md).to include("Juge désactivé")
+        expect(md).not_to include("Non-divulgation")
+        expect(md).not_to include("5/5")
+      end
+    end
   end
 end

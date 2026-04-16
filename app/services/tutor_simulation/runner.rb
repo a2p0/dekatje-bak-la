@@ -132,8 +132,13 @@ module TutorSimulation
 
       structural = StructuralMetrics.compute(conversation: conversation, phase_per_turn: phase_per_turn)
 
-      puts "    Évaluation..."
-      evaluation = judge_transcript(question, profile, simulator.profile_label, transcript)
+      evaluation = if ENV["SKIP_JUDGE"] == "1"
+        puts "    Juge désactivé (SKIP_JUDGE=1)"
+        { "skipped" => true }
+      else
+        puts "    Évaluation..."
+        judge_transcript(question, profile, simulator.profile_label, transcript)
+      end
 
       {
         profile:               profile.to_s,
