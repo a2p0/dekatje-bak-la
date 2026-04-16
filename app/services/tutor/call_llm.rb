@@ -34,11 +34,21 @@ module Tutor
 
       chat = RubyLLM::Chat.new(model: credentials[:model])
       chat.with_instructions(@system_prompt)
+      chat.with_tools(
+        Tutor::Tools::TransitionTool,
+        Tutor::Tools::UpdateLearnerModelTool,
+        Tutor::Tools::RequestHintTool,
+        Tutor::Tools::EvaluateSpottingTool
+      )
+      chat.on_tool_call { |tc| tool_calls << tc }
 
       response = chat.ask(@messages) do |chunk|
         delta = chunk.content.to_s
         full_content << delta
-        tool_calls = chunk.tool_calls if chunk.tool_calls.present?
+        if chunk.tool_calls.present?
+          chunk_tcs = chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls
+          Array(chunk_tcs).each { |tc| tool_calls << tc unless tool_calls.include?(tc) }
+        end
 
         if delta.present?
           ActionCable.server.broadcast(

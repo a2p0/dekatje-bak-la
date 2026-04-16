@@ -28,6 +28,17 @@ RSpec.describe Tutor::ParseToolCalls do
       end
     end
 
+    context "when tool_calls already came from CallLlm as a flat array (post-adapter)" do
+      let(:tc_a) { double("TC", name: "transition", arguments: { "phase" => "greeting" }) }
+      let(:tc_b) { double("TC", name: "request_hint", arguments: { "level" => 1 }) }
+
+      it "normalizes each entry" do
+        result = described_class.call(tool_calls: [ tc_a, tc_b ])
+        expect(result.value[:parsed].length).to eq(2)
+        expect(result.value[:parsed].first[:name]).to eq("transition")
+      end
+    end
+
     context "with multiple tool calls" do
       let(:tc1) { double("TC1", name: "transition", arguments: { "phase" => "guiding" }) }
       let(:tc2) { double("TC2", name: "update_learner_model", arguments: { "concept_mastered" => "énergie" }) }

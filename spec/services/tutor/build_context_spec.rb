@@ -49,6 +49,15 @@ RSpec.describe Tutor::BuildContext do
     expect(result.value[:system_prompt]).to include("greeting")
   end
 
+  it "includes the mandatory tool-usage instructions (FR-004)" do
+    prompt = result.value[:system_prompt]
+    expect(prompt).to include("UTILISATION DES OUTILS — OBLIGATOIRE")
+    expect(prompt).to include("transition")
+    expect(prompt).to include("update_learner_model")
+    expect(prompt).to include("request_hint")
+    expect(prompt).to include("evaluate_spotting")
+  end
+
   it "returns a messages array" do
     expect(result.value[:messages]).to be_an(Array)
   end

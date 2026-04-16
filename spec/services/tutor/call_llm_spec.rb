@@ -27,6 +27,35 @@ RSpec.describe Tutor::CallLlm do
     expect(result.ok?).to be true
   end
 
+  it "registers the 4 tutor tools on the chat before asking" do
+    expect_any_instance_of(RubyLLM::Chat).to receive(:with_tools).with(
+      Tutor::Tools::TransitionTool,
+      Tutor::Tools::UpdateLearnerModelTool,
+      Tutor::Tools::RequestHintTool,
+      Tutor::Tools::EvaluateSpottingTool
+    ).and_return(nil)
+
+    described_class.call(
+      conversation:    conversation,
+      system_prompt:   "...",
+      messages:        [ { role: "user", content: "Hi" } ],
+      student_message: student_msg
+    )
+  end
+
+  it "flattens tool_calls when the LLM returns them as a Hash keyed by id" do
+    tc = double("TC", name: "transition", arguments: { "phase" => "greeting" })
+    FakeRubyLlm.setup_stub(content: "bonjour", tool_calls: { "call_1" => tc })
+
+    r = described_class.call(
+      conversation:    conversation,
+      system_prompt:   "...",
+      messages:        [ { role: "user", content: "Hi" } ],
+      student_message: student_msg
+    )
+    expect(r.value[:tool_calls]).to eq([ tc ])
+  end
+
   it "returns the full content" do
     expect(result.value[:full_content]).to eq("Qu'est-ce que tu as essayé jusqu'ici ?")
   end

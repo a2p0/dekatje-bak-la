@@ -46,13 +46,13 @@ namespace :tutor do
     student_model = ENV.fetch("STUDENT_MODEL", "openai/gpt-4o-mini")
     judge_model   = ENV.fetch("JUDGE_MODEL",   "anthropic/claude-sonnet-4")
 
-    profiles = if ENV["PROFILES"]
+    profiles = if ENV["PROFILES"].present?
       ENV["PROFILES"].split(",").map(&:strip)
     else
       TutorSimulation::StudentSimulator::PROFILES.keys.map(&:to_s)
     end
 
-    question_numbers = ENV["QUESTIONS"]&.split(",")&.map(&:strip)
+    question_numbers = ENV["QUESTIONS"].presence&.split(",")&.map(&:strip)
 
     student_client = AiClientFactory.build(provider: :openrouter, api_key: api_key, model: student_model)
     judge_client   = AiClientFactory.build(provider: :openrouter, api_key: api_key, model: judge_model)
