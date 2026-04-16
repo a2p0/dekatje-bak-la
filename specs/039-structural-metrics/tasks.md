@@ -142,11 +142,11 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 
 **Purpose**: Les 4 nouvelles métriques doivent apparaître dans `report.md` (par profil + résumé global). Sans cette phase, les métriques sont dans `raw.json` mais invisibles à la lecture humaine.
 
-- [ ] T034 [P] Ajouter spec "render_structural includes the 4 new metrics" dans `spec/services/tutor_simulation/report_generator_spec.rb` (contract G1).
-- [ ] T035 [P] Ajouter spec "global_summary averages non-nil first_turn_with_transition" dans `spec/services/tutor_simulation/report_generator_spec.rb` (contract G3).
-- [ ] T036 Étendre `TutorSimulation::ReportGenerator#render_structural` avec 4 lignes de tableau pour les nouvelles métriques (afficher "—" pour les `nil`). Fichier : `app/services/tutor_simulation/report_generator.rb`.
-- [ ] T037 Étendre `TutorSimulation::ReportGenerator#global_summary` pour agréger les 4 nouvelles métriques (moyenne des non-nil pour ratios, somme pour leaks). Fichier : `app/services/tutor_simulation/report_generator.rb`.
-- [ ] T038 Vérifier que T034-T035 passent : `bundle exec rspec spec/services/tutor_simulation/report_generator_spec.rb`.
+- [X] T034 [P] Ajouter spec "render_structural includes the 4 new metrics" dans `spec/services/tutor_simulation/report_generator_spec.rb` (contract G1).
+- [X] T035 [P] Ajouter spec "global_summary averages non-nil first_turn_with_transition" dans `spec/services/tutor_simulation/report_generator_spec.rb` (contract G3).
+- [X] T036 Étendre `TutorSimulation::ReportGenerator#render_structural` avec 4 lignes de tableau pour les nouvelles métriques (afficher "—" pour les `nil`). Fichier : `app/services/tutor_simulation/report_generator.rb`.
+- [X] T037 Étendre `TutorSimulation::ReportGenerator#global_summary` pour agréger les 4 nouvelles métriques (moyenne des non-nil pour ratios, somme pour leaks). Fichier : `app/services/tutor_simulation/report_generator.rb`.
+- [X] T038 Vérifier que T034-T035 passent : `bundle exec rspec spec/services/tutor_simulation/report_generator_spec.rb`.
 
 **Checkpoint**: Le rapport Markdown est complet. Lecture humaine possible des 4 nouvelles métriques.
 

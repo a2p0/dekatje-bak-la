@@ -59,7 +59,15 @@ module TutorSimulation
       lines << "| Interceptions filtre regex (low = bon) | #{metrics[:regex_intercepts]} |"
       lines << "| Indices distribués | #{metrics[:hints_used]} |"
       lines << "| Messages assistant / élève | #{metrics[:message_count_assistant]} / #{metrics[:message_count_user]} |"
+      lines << "| 1er tour avec transition (H1) | #{format_value(metrics[:first_turn_with_transition])} |"
+      lines << "| % verbes d'action en guiding (H2) | #{format_value(metrics[:action_verb_ratio_guiding])} |"
+      lines << "| Leaks DT/DR hors spotting | #{metrics[:dt_dr_leak_count_non_spotting]} |"
+      lines << "| % messages ≤ 60 mots (cible ≥0.7) | #{metrics[:short_message_ratio]} |"
       lines << ""
+    end
+
+    def format_value(value)
+      value.nil? ? "—" : value
     end
 
     def render_qualitative(lines, evaluation)
@@ -115,10 +123,14 @@ module TutorSimulation
     end
 
     def global_summary
-      qualitative_scores = []
-      phase_ranks        = []
-      open_q_ratios      = []
-      regex_intercepts   = []
+      qualitative_scores   = []
+      phase_ranks          = []
+      open_q_ratios        = []
+      regex_intercepts     = []
+      first_turns          = []
+      action_verb_ratios   = []
+      dt_dr_leaks          = []
+      short_msg_ratios     = []
 
       @data[:results].each do |result|
         result[:profiles].each do |pr|
@@ -133,6 +145,10 @@ module TutorSimulation
           phase_ranks      << metrics[:phase_rank]
           open_q_ratios    << metrics[:open_question_ratio]
           regex_intercepts << metrics[:regex_intercepts]
+          first_turns          << metrics[:first_turn_with_transition] unless metrics[:first_turn_with_transition].nil?
+          action_verb_ratios   << metrics[:action_verb_ratio_guiding]  unless metrics[:action_verb_ratio_guiding].nil?
+          dt_dr_leaks          << metrics[:dt_dr_leak_count_non_spotting] if metrics.key?(:dt_dr_leak_count_non_spotting)
+          short_msg_ratios     << metrics[:short_message_ratio]        if metrics.key?(:short_message_ratio)
         end
       end
 
@@ -163,6 +179,10 @@ module TutorSimulation
         lines << "| Phase finale moyenne (rang/7) | #{(phase_ranks.sum.to_f / phase_ranks.size).round(1)} |"
         lines << "| Ratio questions ouvertes | #{(open_q_ratios.sum.to_f / open_q_ratios.size).round(2)} |"
         lines << "| Interceptions regex (somme) | #{regex_intercepts.sum} |"
+        lines << "| 1er tour transition moyen (H1, non-nil) | #{first_turns.any? ? (first_turns.sum.to_f / first_turns.size).round(1) : "—"} |"
+        lines << "| % verbes d'action moyen (H2, non-nil) | #{action_verb_ratios.any? ? (action_verb_ratios.sum.to_f / action_verb_ratios.size).round(2) : "—"} |"
+        lines << "| Leaks DT/DR totaux | #{dt_dr_leaks.sum} |"
+        lines << "| % messages ≤ 60 mots moyen | #{short_msg_ratios.any? ? (short_msg_ratios.sum.to_f / short_msg_ratios.size).round(2) : "—"} |"
         lines << ""
       end
 
