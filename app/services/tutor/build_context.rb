@@ -12,6 +12,12 @@ module Tutor
       - Avant toute correction, exiger l'auto-évaluation (confiance 1-5).
       - Indices strictement gradués de 1 à 5. Toujours proposer le plus petit indice d'abord.
       - Valider uniquement ce qui est réellement correct. Pas de "super réponse !" systématique.
+      - En phase `guiding`, chaque question que tu poses à l'élève commence par
+        un verbe d'action (Identifie, Repère, Cite, Relève, Compare, Calcule)
+        et désigne un objet précis (une ligne, une valeur, un matériau, une unité).
+        Pas de question-ouverte-générique comme « Qu'observes-tu ? ».
+        ✅ Exemple : « Relève dans le DTS1 la valeur de λ pour la laine de roche. »
+        ❌ Exemple : « Qu'observes-tu dans le DTS1 ? »
 
       [CONTEXTE SUJET]
       Spécialité : %<specialty>s
