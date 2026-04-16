@@ -53,15 +53,15 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 
 > Écrire ces tests FIRST, vérifier qu'ils ÉCHOUENT avant implémentation.
 
-- [ ] T007 [P] [US1] Ajouter spec "returns 1 when transition happens at turn 1" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C3).
-- [ ] T008 [P] [US1] Ajouter spec "returns 3 when transition happens at turn 3" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C4).
-- [ ] T009 [P] [US1] Ajouter spec "returns nil when phase_per_turn is all idle" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C5).
-- [ ] T010 [P] [US1] Ajouter spec "returns nil when phase_per_turn is not provided (backward compat)" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C2, partie first_turn_with_transition).
+- [X] T007 [P] [US1] Ajouter spec "returns 1 when transition happens at turn 1" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C3).
+- [X] T008 [P] [US1] Ajouter spec "returns 3 when transition happens at turn 3" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C4).
+- [X] T009 [P] [US1] Ajouter spec "returns nil when phase_per_turn is all idle" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C5).
+- [X] T010 [P] [US1] Ajouter spec "returns nil when phase_per_turn is not provided (backward compat)" dans `spec/services/tutor_simulation/structural_metrics_spec.rb` (contract C2, partie first_turn_with_transition).
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implémenter la méthode privée `first_turn_with_transition` dans `TutorSimulation::StructuralMetrics` selon l'algorithme de `data-model.md` § "Calcul de first_turn_with_transition". Ajouter la clé au hash retourné par `compute`. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
-- [ ] T012 [US1] Vérifier que T007-T010 passent maintenant : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
+- [X] T011 [US1] Implémenter la méthode privée `first_turn_with_transition` dans `TutorSimulation::StructuralMetrics` selon l'algorithme de `data-model.md` § "Calcul de first_turn_with_transition". Ajouter la clé au hash retourné par `compute`. Fichier : `app/services/tutor_simulation/structural_metrics.rb`.
+- [X] T012 [US1] Vérifier que T007-T010 passent maintenant : `bundle exec rspec spec/services/tutor_simulation/structural_metrics_spec.rb`.
 
 **Checkpoint**: `first_turn_with_transition` opérationnelle et testée. H1 peut être mesurée sur une prochaine sim.
 

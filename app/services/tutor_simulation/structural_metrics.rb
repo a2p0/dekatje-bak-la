@@ -36,11 +36,23 @@ module TutorSimulation
         regex_intercepts:          regex_intercept_count,
         hints_used:                @conversation.tutor_state.question_states.values.sum { |qs| qs.hints_used.to_i },
         message_count_assistant:   @assistant_messages.count,
-        message_count_user:        @conversation.messages.where(role: :user).count
+        message_count_user:        @conversation.messages.where(role: :user).count,
+        first_turn_with_transition: first_turn_with_transition
       }
     end
 
     private
+
+    def first_turn_with_transition
+      return nil if @phase_per_turn.nil?
+
+      @phase_per_turn.each_with_index do |phase, i|
+        next if i.zero?
+        return i if phase != @phase_per_turn[i - 1] && phase != "idle"
+      end
+      nil
+    end
+
 
     def avg_message_length_words
       return 0 if @assistant_messages.empty?

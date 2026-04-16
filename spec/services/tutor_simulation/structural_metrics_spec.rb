@@ -64,4 +64,40 @@ RSpec.describe TutorSimulation::StructuralMetrics do
     expect(metrics[:message_count_assistant]).to eq(2)
     expect(metrics[:message_count_user]).to eq(2)
   end
+
+  describe "#first_turn_with_transition (H1)" do
+    subject(:metrics_with_phases) do
+      described_class.compute(conversation: conversation, phase_per_turn: phase_per_turn)
+    end
+
+    context "when transition happens at turn 1" do
+      let(:phase_per_turn) { %w[idle greeting reading] }
+
+      it "returns 1" do
+        expect(metrics_with_phases[:first_turn_with_transition]).to eq(1)
+      end
+    end
+
+    context "when transition happens at turn 3" do
+      let(:phase_per_turn) { %w[idle idle idle greeting] }
+
+      it "returns 3" do
+        expect(metrics_with_phases[:first_turn_with_transition]).to eq(3)
+      end
+    end
+
+    context "when phase stays idle for the whole conversation" do
+      let(:phase_per_turn) { %w[idle idle idle] }
+
+      it "returns nil" do
+        expect(metrics_with_phases[:first_turn_with_transition]).to be_nil
+      end
+    end
+
+    context "when phase_per_turn is not provided (backward compat)" do
+      it "returns nil" do
+        expect(metrics[:first_turn_with_transition]).to be_nil
+      end
+    end
+  end
 end
