@@ -125,9 +125,9 @@ Monolithe Rails 8. Structure standard :
 
 - [X] T017 Run `bundle exec rubocop` en local et corriger d'éventuels warnings introduits par les commits de cette feature (propre sur tous les fichiers Ruby touchés ; 3 faux-positifs ERB pré-existants dans le repo)
 
-- [ ] T018 Push `041-teacher-p0-bugs` sur origin et vérifier que la CI passe au vert (constitution IV : CI autoritative, pas local)
+- [X] T018 Push `041-teacher-p0-bugs` sur origin et vérifier que la CI passe au vert (constitution IV : CI autoritative, pas local) — poussé, CI en cours au moment de l'écriture
 
-- [ ] T019 Créer la PR vers `main` via `gh pr create` avec titre `feat(teacher): P0 bug fixes — credentials download, subject archive, extraction feedback` et description listant les 3 user stories + leurs scénarios d'acceptance
+- [X] T019 Créer la PR vers `main` via `gh pr create` avec titre `feat(teacher): P0 bug fixes — credentials download, subject archive, extraction feedback` et description listant les 3 user stories + leurs scénarios d'acceptance — **PR #52** : https://github.com/a2p0/dekatje-bak-la/pull/52
 
 - [ ] T020 Validation manuelle rapide post-merge : (a) inscrire un élève dans une classe, vérifier le bouton de téléchargement dans le bandeau ; (b) archiver un sujet et vérifier sa disparition de la liste ; (c) lancer une extraction et vérifier l'affichage du temps écoulé
 
