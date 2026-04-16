@@ -161,7 +161,7 @@ description: "Task list — Metrics structurelles déterministes pour le tuning 
 - [ ] T041 Lancer une sim réelle n=2 avec `SKIP_JUDGE=1` pour validation end-to-end (SC-006) : `SKIP_JUDGE=1 OPENROUTER_API_KEY=... bundle exec rake 'tutor:simulate[1]' TURNS=3 PROFILES=bon_eleve QUESTIONS=1.1`. Vérifier que `raw.json` contient les 4 nouvelles métriques et `evaluation: { "skipped" => true }`. → **à exécuter manuellement post-merge** (requires OPENROUTER_API_KEY + seeded subject).
 - [ ] T042 Vérifier visuellement que `report.md` affiche correctement les 4 métriques par profil + dans le résumé global, et le bloc "Juge désactivé (SKIP_JUDGE=1)". → **à faire après T041**.
 - [X] T043 Ajouter une section "Méthodologie D — metrics structurelles" dans `specs/038-tutor-prompt-tuning/hypotheses.md` pointant vers `specs/039-structural-metrics/spec.md` pour la reprise du tuning H1/H2.
-- [ ] T044 Commit + push + créer la PR vers `main` (ou vers `038-tutor-prompt-tuning` si on préfère empiler). Titre PR : `feat(tutor-sim): add structural metrics for H1/H2 hypothesis testing + SKIP_JUDGE guard`.
+- [X] T044 Commit + push + créer la PR vers `main` (ou vers `038-tutor-prompt-tuning` si on préfère empiler). Titre PR : `feat(tutor-sim): add structural metrics for H1/H2 hypothesis testing + SKIP_JUDGE guard`. → **PR #51 créée** : https://github.com/a2p0/dekatje-bak-la/pull/51
 
 **Checkpoint final**: Feature mergeable. CI verte. PR prête à la review.
 
