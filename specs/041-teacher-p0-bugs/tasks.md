@@ -105,15 +105,15 @@ Monolithe Rails 8. Structure standard :
 
 ### Tests for User Story 3 (TDD)
 
-- [ ] T013 [P] [US3] Écrire feature spec dans `spec/features/teacher/extraction_status_feedback_spec.rb` couvrant deux scénarios : (a) job processing avec `updated_at = 45.seconds.ago` → page contient `#extraction-status[aria-live="polite"]` et le texte `/démarrée il y a/`, (b) fallback gracieux — si `updated_at` est stubé à nil, la page affiche "Extraction en cours" sans la mention temporelle et ne lève aucune exception
+- [X] T013 [P] [US3] Écrire feature spec dans `spec/features/teacher/extraction_status_feedback_spec.rb` couvrant deux scénarios : (a) job processing avec `updated_at = 45.seconds.ago` → page contient `#extraction-status[aria-live="polite"]` et le texte `/démarrée il y a/`, (b) fallback gracieux — si `updated_at` est stubé à nil, la page affiche "Extraction en cours" sans la mention temporelle et ne lève aucune exception
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] Modifier `app/views/teacher/subjects/_extraction_status.html.erb` : (a) ajouter `aria-live="polite" aria-atomic="true"` sur le `<div id="extraction-status">` (ligne 2), (b) dans le bloc `if job.processing?` (ligne 34-44), ajouter après "Extraction en cours…" un `<% if job.updated_at %><span class="text-slate-500 dark:text-slate-400">démarrée il y a <%= time_ago_in_words(job.updated_at) %></span><% end %>` — veiller à conserver le span dans la phrase `<p>` existante
+- [X] T014 [US3] Modifier `app/views/teacher/subjects/_extraction_status.html.erb` : (a) ajouter `aria-live="polite" aria-atomic="true"` sur le `<div id="extraction-status">` (ligne 2), (b) dans le bloc `if job.processing?` (ligne 34-44), ajouter après "Extraction en cours…" un `<% if job.updated_at %><span class="text-slate-500 dark:text-slate-400">démarrée il y a <%= time_ago_in_words(job.updated_at) %></span><% end %>` — veiller à conserver le span dans la phrase `<p>` existante
 
-- [ ] T015 [US3] Vérifier que T013 passe maintenant en vert (run local + CI)
+- [X] T015 [US3] Vérifier que T013 passe maintenant en vert (run local + CI)
 
-- [ ] T016 [US3] Commit : `feat(teacher): show elapsed time and aria-live for extraction status`
+- [X] T016 [US3] Commit : `feat(teacher): show elapsed time and aria-live for extraction status`
 
 **Checkpoint**: US3 complète. Les 3 stories (US1 + US2 + US3) sont fonctionnelles indépendamment.
 
