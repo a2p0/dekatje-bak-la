@@ -1,5 +1,5 @@
 <%# Extraction status partial %>
-<div id="extraction-status">
+<div id="extraction-status" aria-live="polite" aria-atomic="true">
   <% job = subject.extraction_job %>
   <% if job %>
     <div class="flex flex-wrap items-center gap-3 mb-2">
@@ -39,6 +39,9 @@
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
         Extraction en cours…
+        <% if job.updated_at %>
+          <span class="text-slate-500 dark:text-slate-400">démarrée il y a <%= time_ago_in_words(job.updated_at) %></span>
+        <% end %>
         <em class="not-italic text-slate-400">(la page se mettra à jour automatiquement)</em>
       </p>
     <% end %>

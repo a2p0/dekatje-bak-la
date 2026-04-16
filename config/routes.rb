@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
     resources :exam_sessions, only: [ :destroy ]
 
-    resources :subjects, only: [ :index, :new, :create, :show ] do
+    resources :subjects, only: [ :index, :new, :create, :show, :destroy ] do
       resources :parts, only: [ :show ] do
         resources :questions, only: [ :update, :destroy ], shallow: true do
           resource :validation, only: [ :create, :destroy ], module: "questions"
