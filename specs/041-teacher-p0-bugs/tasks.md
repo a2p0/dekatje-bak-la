@@ -123,7 +123,7 @@ Monolithe Rails 8. Structure standard :
 
 **Purpose**: Vérifications transverses avant PR.
 
-- [ ] T017 Run `bundle exec rubocop` en local et corriger d'éventuels warnings introduits par les commits de cette feature
+- [X] T017 Run `bundle exec rubocop` en local et corriger d'éventuels warnings introduits par les commits de cette feature (propre sur tous les fichiers Ruby touchés ; 3 faux-positifs ERB pré-existants dans le repo)
 
 - [ ] T018 Push `041-teacher-p0-bugs` sur origin et vérifier que la CI passe au vert (constitution IV : CI autoritative, pas local)
 
