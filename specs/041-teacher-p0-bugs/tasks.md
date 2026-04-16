@@ -77,21 +77,21 @@ Monolithe Rails 8. Structure standard :
 
 ### Tests for User Story 2 (TDD)
 
-- [ ] T006 [P] [US2] Écrire request spec dans `spec/requests/teacher/subjects_controller_spec.rb` couvrant trois scénarios `DELETE /teacher/subjects/:id` : (a) owner archive avec succès (`discarded_at` mis à jour, redirect vers `teacher_subjects_path`, flash notice), (b) non-owner reçoit alert "Sujet introuvable." et `discarded_at` reste nil, (c) idempotence — un second DELETE sur un sujet déjà archivé retourne alert "Sujet introuvable."
+- [X] T006 [P] [US2] Écrire request spec dans `spec/requests/teacher/subjects_controller_spec.rb` couvrant trois scénarios `DELETE /teacher/subjects/:id` : (a) owner archive avec succès (`discarded_at` mis à jour, redirect vers `teacher_subjects_path`, flash notice), (b) non-owner reçoit alert "Sujet introuvable." et `discarded_at` reste nil, (c) idempotence — un second DELETE sur un sujet déjà archivé retourne alert "Sujet introuvable." (étendu le fichier existant `subjects_spec.rb`)
 
-- [ ] T007 [P] [US2] Écrire feature spec Capybara dans `spec/features/teacher/subject_archive_spec.rb` : enseignant visite `/teacher/subjects/:id`, clique sur "Archiver le sujet", accepte la confirmation, vérifie redirect vers `/teacher/subjects` + flash "archivé" + le titre du sujet n'apparaît plus dans la liste
+- [X] T007 [P] [US2] Écrire feature spec Capybara dans `spec/features/teacher/subject_archive_spec.rb` : enseignant visite `/teacher/subjects/:id`, clique sur "Archiver le sujet", accepte la confirmation (helper `click_with_turbo_confirm`), vérifie redirect vers `/teacher/subjects` + flash "archivé" + le titre du sujet n'apparaît plus dans la liste
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Modifier `config/routes.rb` : ajouter `:destroy` à `resources :subjects` (ligne 17) dans le bloc `namespace :teacher`
+- [X] T008 [US2] Modifier `config/routes.rb` : ajouter `:destroy` à `resources :subjects` (ligne 17) dans le bloc `namespace :teacher`
 
-- [ ] T009 [US2] Modifier `app/controllers/teacher/subjects_controller.rb` : (a) étendre `before_action :set_subject` avec `:destroy`, (b) ajouter action `destroy` qui appelle `@subject.update!(discarded_at: Time.current)` + redirect vers `teacher_subjects_path` avec notice "Sujet « #{@subject.exam_session&.title || 'sans titre'} » archivé.", (c) modifier `set_subject` pour utiliser `current_teacher.subjects.kept.find_by(id: params[:id])` (filtrer les sujets archivés aussi sur `show`)
+- [X] T009 [US2] Modifier `app/controllers/teacher/subjects_controller.rb` : (a) étendre `before_action :set_subject` avec `:destroy`, (b) ajouter action `destroy` qui appelle `@subject.update!(discarded_at: Time.current)` + redirect vers `teacher_subjects_path` avec notice "Sujet « #{@subject.exam_session&.title || 'sans titre'} » archivé.", (c) modifier `set_subject` pour utiliser `current_teacher.subjects.kept.find_by(id: params[:id])` (filtrer les sujets archivés aussi sur `show`)
 
-- [ ] T010 [US2] Modifier `app/views/teacher/subjects/show.html.erb` : transformer le bloc "Back link" (ligne 106-110) en flex-between contenant le bouton "← Retour aux sujets" à gauche ET un `button_to "Archiver le sujet"` à droite, méthode `:delete`, avec `form: { data: { turbo_confirm: "Archiver ce sujet ? Il disparaîtra de votre liste." } }`, classes `text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2`
+- [X] T010 [US2] Modifier `app/views/teacher/subjects/show.html.erb` : transformer le bloc "Back link" (ligne 106-110) en flex-between contenant le bouton "← Retour aux sujets" à gauche ET un `button_to "Archiver le sujet"` à droite, méthode `:delete`, avec `form: { data: { turbo_confirm: "Archiver ce sujet ? Il disparaîtra de votre liste." } }`, classes `text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2`
 
-- [ ] T011 [US2] Vérifier que T006 et T007 passent maintenant en vert (run local + CI)
+- [X] T011 [US2] Vérifier que T006 et T007 passent maintenant en vert (run local + CI)
 
-- [ ] T012 [US2] Commit : `feat(teacher): add soft-delete archive action for subjects` (un seul commit couvrant route + controller + vue + specs)
+- [X] T012 [US2] Commit : `feat(teacher): add soft-delete archive action for subjects` (un seul commit couvrant route + controller + vue + specs)
 
 **Checkpoint**: US2 complète. US1 + US2 opérationnelles ensemble, indépendamment testables.
 

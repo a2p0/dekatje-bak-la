@@ -1,5 +1,5 @@
 class Teacher::SubjectsController < Teacher::BaseController
-  before_action :set_subject, only: [ :show ]
+  before_action :set_subject, only: [ :show, :destroy ]
 
   def index
     @subjects = current_teacher.subjects.kept.includes(:exam_session).order(created_at: :desc)
@@ -30,10 +30,17 @@ class Teacher::SubjectsController < Teacher::BaseController
     @extraction_job = @subject.extraction_job
   end
 
+  def destroy
+    title = @subject.title.presence || "sans titre"
+    @subject.update!(discarded_at: Time.current)
+    redirect_to teacher_subjects_path,
+                notice: "Sujet « #{title} » archivé."
+  end
+
   private
 
   def set_subject
-    @subject = current_teacher.subjects.find_by(id: params[:id])
+    @subject = current_teacher.subjects.kept.find_by(id: params[:id])
     redirect_to teacher_subjects_path, alert: "Sujet introuvable." unless @subject
   end
 

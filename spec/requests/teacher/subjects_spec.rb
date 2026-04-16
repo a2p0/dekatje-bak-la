@@ -85,5 +85,40 @@ RSpec.describe "Teacher::Subjects", type: :request do
 
   # Publish/unpublish coverage lives in spec/requests/teacher/subjects/publications_spec.rb
   # (refactored to RESTful Teacher::Subjects::PublicationsController#create/destroy)
-  # Archive route was removed as orphaned (no view exposed it).
+
+  describe "DELETE /teacher/subjects/:id" do
+    it "archives the subject (soft-delete) and redirects to the index" do
+      es = create(:exam_session, owner: user, title: "Sujet à archiver")
+      subject_record = create(:subject, owner: user, exam_session: es)
+
+      expect {
+        delete teacher_subject_path(subject_record)
+      }.to change { subject_record.reload.discarded_at }.from(nil)
+
+      expect(response).to redirect_to(teacher_subjects_path)
+      follow_redirect!
+      expect(response.body).to include("archivé")
+    end
+
+    it "does not archive a subject owned by another teacher" do
+      other_subject = create(:subject)
+
+      expect {
+        delete teacher_subject_path(other_subject)
+      }.not_to change { other_subject.reload.discarded_at }
+
+      expect(response).to redirect_to(teacher_subjects_path)
+      expect(flash[:alert]).to match(/introuvable/i)
+    end
+
+    it "is idempotent: a second delete on an already-archived subject returns not-found" do
+      es = create(:exam_session, owner: user, title: "Déjà archivé")
+      subject_record = create(:subject, owner: user, exam_session: es, discarded_at: 1.day.ago)
+
+      delete teacher_subject_path(subject_record)
+
+      expect(response).to redirect_to(teacher_subjects_path)
+      expect(flash[:alert]).to match(/introuvable/i)
+    end
+  end
 end
