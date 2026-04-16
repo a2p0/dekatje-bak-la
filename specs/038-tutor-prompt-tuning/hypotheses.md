@@ -52,19 +52,20 @@ _(entrées à remplir au fil des itérations — gabarit ci-dessous)_
 
 ### Baseline control
 
-- **Run sim réduite (T004)** : _(ID)_
-- **Scores attendus ≈ baseline** : rank 3.00, non-div 4.53, guid 3.00, bienv 4.00, focal 3.40, proc 2.53 (à ±0.5 près sur sim réduite 2 convs)
-- **Scores mesurés** : _(à remplir)_
-- **Verdict** : baseline reproductible ? OUI / NON (si NON, stop et diagnostic)
+- **Run sim réduite (T004)** : [24509839814](https://github.com/a2p0/dekatje-bak-la/actions/runs/24509839814), 2 convs (bon_eleve + eleve_en_difficulte, Q A.1)
+- **Scores mesurés** : rank **3.00**, non-div **5.00**, guid **3.00**, bienv **4.00**, focal **3.50**, proc **3.00**
+- **Écart vs baseline** : tous dans ±0.5, max +0.47 (non-div, proc). Phases finales : 2/2 `spotting`.
+- **Verdict** : ✅ baseline reproductible, la variance sur 2 convs justifie l'écart. OK pour démarrer H1.
 
 ### H1 — Transition systématique avant tout texte
 
 - **Critère gating** : Process, Phase rank
-- **Commit** : _(à remplir)_
-- **Run sim réduite** : _(ID)_
-- **Scores** : rank _._, non-div _._, guid _._, bienv _._, focal _._, proc _._
-- **Delta vs baseline** : _(gain/perte par critère)_
-- **Verdict** : KEEP / REVERT — _(raison)_
+- **Commit** : `95737db` (reverted in `2817c2e`)
+- **Run sim réduite** : [24521752842](https://github.com/a2p0/dekatje-bak-la/actions/runs/24521752842), n=2
+- **Scores** : rank **3.00**, non-div **4.50**, guid **3.00**, bienv **4.00**, focal **3.00**, proc **2.50**
+- **Delta vs baseline control** : rank 0, non-div −0.50, guid 0, bienv 0, focal −0.50, proc −0.50
+- **Verdict** : ❌ **REVERT**. Aucun gain sur les critères gating (Process, rank). 3 régressions ≥0.2 (non-div, focal, proc). L'IMPÉRATIF en tête de `[UTILISATION DES OUTILS]` a probablement dilué l'attention aux autres règles (hypothèse : sur n=2, signal bruité mais direction claire).
+- **Hypothèse d'interprétation** : la contrainte "pas de texte avant tool call" peut avoir rendu le tuteur plus hâtif et moins bienveillant/focus. À retester plus tard avec une formulation plus douce si besoin.
 
 ### H2 — Questions guidées avec verbe d'action + objet nommé
 
@@ -92,8 +93,8 @@ Après chaque sim, incrémenter :
 
 | Run | Type | Coût estimé | Cumul |
 |---|---|---|---|
-| T004 | réduite (2 convs) | $0.05 | $0.05 |
-| _(H1)_ | réduite | $0.05 | _._ |
+| T004 | réduite (2 convs) | $0.05 | **$0.05** ✅
+| H1 | réduite | $0.05 | **$0.10** (REVERT) |
 | _(H2)_ | réduite | $0.05 | _._ |
 | _(H3)_ | réduite | $0.05 | _._ |
 | _(H4)_ | réduite | $0.05 | _._ |
