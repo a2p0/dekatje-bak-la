@@ -52,10 +52,15 @@ _(entrées à remplir au fil des itérations — gabarit ci-dessous)_
 
 ### Baseline control
 
-- **Run sim réduite (T004)** : [24509839814](https://github.com/a2p0/dekatje-bak-la/actions/runs/24509839814), 2 convs (bon_eleve + eleve_en_difficulte, Q A.1)
-- **Scores mesurés** : rank **3.00**, non-div **5.00**, guid **3.00**, bienv **4.00**, focal **3.50**, proc **3.00**
-- **Écart vs baseline** : tous dans ±0.5, max +0.47 (non-div, proc). Phases finales : 2/2 `spotting`.
-- **Verdict** : ✅ baseline reproductible, la variance sur 2 convs justifie l'écart. OK pour démarrer H1.
+- **Run T004 (n=2, A.1)** : [24509839814](https://github.com/a2p0/dekatje-bak-la/actions/runs/24509839814)
+  - rank **3.00**, non-div **5.00**, guid **3.00**, bienv **4.00**, focal **3.50**, proc **3.00**
+- **Run variance #1 (n=6, A.1-3)** : [24523516616](https://github.com/a2p0/dekatje-bak-la/actions/runs/24523516616)
+  - rank **2.83**, non-div **4.17**, guid **2.50**, bienv **3.83**, focal **3.33**, proc **2.17**
+- **Run variance #2 (n=6, A.1-3)** : [24523524445](https://github.com/a2p0/dekatje-bak-la/actions/runs/24523524445)
+  - rank **3.17**, non-div **4.50**, guid **2.67**, bienv **4.17**, focal **3.33**, proc **2.67**
+- **Variance observée (mêmes prompts, 2 runs)** : max |Δ| = **0.50** (respect_process), 4 critères sur 6 > 0.3. Bruit juge trop fort pour tirer conclusion sur sim réduite.
+- **Baseline agrégée (n=12)** : rank **3.00**, non-div **4.33**, guid **2.58**, bienv **4.00**, focal **3.33**, proc **2.42**. À utiliser comme référence pour les prochaines itérations.
+- **Décision méthodologique** : passer à sim complète (15 convs) pour chaque H future. Coût $0.60/itération. Budget restant $1.55 → 2-3 H testables au max.
 
 ### H1 — Transition systématique avant tout texte
 
@@ -64,8 +69,7 @@ _(entrées à remplir au fil des itérations — gabarit ci-dessous)_
 - **Run sim réduite** : [24521752842](https://github.com/a2p0/dekatje-bak-la/actions/runs/24521752842), n=2
 - **Scores** : rank **3.00**, non-div **4.50**, guid **3.00**, bienv **4.00**, focal **3.00**, proc **2.50**
 - **Delta vs baseline control** : rank 0, non-div −0.50, guid 0, bienv 0, focal −0.50, proc −0.50
-- **Verdict** : ❌ **REVERT**. Aucun gain sur les critères gating (Process, rank). 3 régressions ≥0.2 (non-div, focal, proc). L'IMPÉRATIF en tête de `[UTILISATION DES OUTILS]` a probablement dilué l'attention aux autres règles (hypothèse : sur n=2, signal bruité mais direction claire).
-- **Hypothèse d'interprétation** : la contrainte "pas de texte avant tool call" peut avoir rendu le tuteur plus hâtif et moins bienveillant/focus. À retester plus tard avec une formulation plus douce si besoin.
+- **Verdict** : ❌ **REVERT** prématurément — **à revisiter**. Variance test ultérieure a révélé que |Δ| = 0.5 tombe dans le bruit juge (max observé en sim 6 convs identiques). H1 n'est donc **ni confirmée ni infirmée** par ce run. À retester en sim complète (15 convs) si budget permet.
 
 ### H2 — Questions guidées avec verbe d'action + objet nommé
 
@@ -95,7 +99,9 @@ Après chaque sim, incrémenter :
 |---|---|---|---|
 | T004 | réduite (2 convs) | $0.05 | **$0.05** ✅
 | H1 | réduite | $0.05 | **$0.10** (REVERT) |
-| _(H2)_ | réduite | $0.05 | _._ |
+| H2 | réduite | $0.05 | **$0.15** (REVERT prématuré, inconclusif) |
+| Variance #1 | réduite 6 convs | $0.15 | $0.30 |
+| Variance #2 | réduite 6 convs | $0.15 | **$0.45** |
 | _(H3)_ | réduite | $0.05 | _._ |
 | _(H4)_ | réduite | $0.05 | _._ |
 | _(H5)_ | réduite | $0.05 | _._ |
