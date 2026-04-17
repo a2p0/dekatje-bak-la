@@ -53,15 +53,23 @@ Rails.application.configure do
   # The Solid suite (solid_cache / solid_queue / solid_cable) is left unconfigured
   # on purpose — see docs/deployment/cache-store.md for the evaluation and the
   # migration sketch if we ever want to move off Redis.
-  config.cache_store = :redis_cache_store, {
-    url: ENV.fetch("REDIS_URL"),
-    namespace: "cache",
-    expires_in: 1.day,
-    reconnect_attempts: 1,
-    error_handler: ->(method:, returning:, exception:) {
-      Rails.logger.error("[cache] #{method} failed (#{exception.class}: #{exception.message}) — returning #{returning.inspect}")
+  #
+  # `SECRET_KEY_BASE_DUMMY=1` is set during Dockerfile `assets:precompile` — the
+  # build has no Redis, so we fall back to :null_store (no cache) to let the
+  # precompile walk the environment without exploding.
+  if ENV["SECRET_KEY_BASE_DUMMY"]
+    config.cache_store = :null_store
+  else
+    config.cache_store = :redis_cache_store, {
+      url: ENV.fetch("REDIS_URL"),
+      namespace: "cache",
+      expires_in: 1.day,
+      reconnect_attempts: 1,
+      error_handler: ->(method:, returning:, exception:) {
+        Rails.logger.error("[cache] #{method} failed (#{exception.class}: #{exception.message}) — returning #{returning.inspect}")
+      }
     }
-  }
+  end
 
   # Use Sidekiq for background jobs (extraction, tutoring, streaming).
   config.active_job.queue_adapter = :sidekiq
