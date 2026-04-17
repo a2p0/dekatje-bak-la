@@ -21,7 +21,8 @@ produire le gain pour être conservée (règle KEEP).
 |---|---|---|
 | H1 (transition avant texte) | Process, Phase rank | Non-div, Bienveillance |
 | H2 (verbe+objet en guiding) | Guidage | Non-div, Bienveillance |
-| H3 (refus méta) | Focalisation | Bienveillance |
+| H3a (pas de fuite d'état interne) | Focalisation | Bienveillance |
+| H3b (refus méta hors-sujet) | Focalisation | Bienveillance |
 | H4 (validation conditionnelle) | Focalisation, Non-div | Bienveillance |
 | H5 (request_hint systématique) | Guidage, Phase rank | Non-div |
 
@@ -96,10 +97,40 @@ _(entrées à remplir au fil des itérations — gabarit ci-dessous)_
 - Verdict : ✅ **KEEP**. Gate guidage +1.02 ≫ 0.30. Non-div dans le bruit.
   Bonus : respect_process +0.61, focalisation stabilisée.
 
-### H3 — Refus net de la méta-discussion
+### H3a — Pas de fuite d'état interne (priorité 1)
 
 - **Critère gating** : Focalisation
-- _(reste idem)_
+- **Non-régression** : Bienveillance
+- **Branche** : `041-tutor-H3a`
+- **Métrique déterministe** : `internal_state_leak_count` (nouveau, commit `ccb4395`)
+
+**Diagnostic baseline** (run [24559542458](https://github.com/a2p0/dekatje-bak-la/actions/runs/24559542458), 4 convs, SKIP_JUDGE, sonnet-4.6) :
+4 transcripts lus (eleve_hors_sujet × A.1/A.2 + eleve_moyen × A.1/A.2).
+Cause primaire identifiée pour focalisation 3.37 : le tuteur **narre
+son propre state machine** à l'élève (3/4 convs).
+
+Exemples de fuites observées :
+- « Je vois que la phase est déjà en 'reading'. Continuons ! »
+- « Je suis en phase **reading** — passons au repérage. »
+- « Je suis en phase **spotting** — je dois évaluer si l'élève... »
+
+**Fix** (commit `43ecb38`) : ajout dans `[RÈGLES PÉDAGOGIQUES]` :
+> « Ne JAMAIS mentionner à l'élève ton état interne, les noms de phases
+> (greeting, reading, spotting, guiding, validating, feedback, transition)
+> ni le fait que tu utilises des outils. »
+
+### H3b — Refus net méta-discussion hors-sujet (priorité 2)
+
+- **Critère gating** : Focalisation
+- **Non-régression** : Bienveillance
+- **Status** : en attente (à tester après H3a pour isoler les effets)
+
+**Diagnostic** : le tuteur tolère trop poliment les distractions
+(« Le match, c'est pour après le bac 😄 ») et **acknowledge + continue**
+au lieu d'ignorer sec. L'élève apprend que la méta-discussion est tolérée.
+
+**Fix prévu** : règle prompt « Si hors-sujet (sport/jeu/météo/IA/toi),
+UNE SEULE relance : 'Revenons à {question}'. Deuxième tentative : ignorer. »
 
 ### H4 — Validation conditionnelle
 
@@ -122,12 +153,15 @@ Après chaque sim, incrémenter :
 | H2 | réduite | $0.05 | **$0.15** (REVERT prématuré, inconclusif) |
 | Variance #1 | réduite 6 convs | $0.15 | $0.30 |
 | Variance #2 | réduite 6 convs | $0.15 | **$0.45** |
-| _(H3)_ | réduite | $0.05 | _._ |
-| _(H4)_ | réduite | $0.05 | _._ |
-| _(H5)_ | réduite | $0.05 | _._ |
-| T025 | complète (15 convs) | $0.60 | _._ |
+| _(H3a)_ | réduite SKIP_JUDGE (4 convs) | $0.80 | _._ |
+| _(H3a validation)_ | complète juge (15 convs) | $3.00 | _._ |
+| _(H3b)_ | réduite | $0.80 | _._ |
+| _(H4)_ | réduite | $0.80 | _._ |
+| _(H5)_ | réduite | $0.80 | _._ |
 
-**Cap SC-007** : $2. Si dépassé sans SC atteints → stop + documenter.
+**Cap SC-007 révisé** : $5 par hypothèse (coûts réels recalibrés post-H2 :
+~$1.63/sim complète avec juge × facteur 2 pour tool-use, soit ~$3/sim complète).
+Si dépassé sans SC atteints → stop + documenter.
 
 ## Run de validation complète
 
