@@ -177,6 +177,30 @@ RSpec.describe TutorSimulation::StructuralMetrics do
         expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(1.0)
       end
     end
+
+    context "when a guiding message contains an action verb in a later sentence" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Je comprends ta difficulté. Repère la valeur de λ dans le DT1.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding] }
+
+      it "counts it (any sentence starting with an action verb)" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(1.0)
+      end
+    end
+
+    context "when a guiding message has no sentence starting with an action verb" do
+      before do
+        create(:message, conversation: conversation_in_guiding, role: :assistant, content: "Tu fais du bon travail. C'est super.")
+      end
+
+      let(:phase_per_turn) { %w[spotting guiding] }
+
+      it "returns 0.0" do
+        expect(metrics_with_phases[:action_verb_ratio_guiding]).to eq(0.0)
+      end
+    end
   end
 
   describe "#dt_dr_leak_count_non_spotting" do

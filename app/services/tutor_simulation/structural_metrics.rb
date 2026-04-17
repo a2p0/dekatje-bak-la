@@ -68,14 +68,16 @@ module TutorSimulation
       end
       return nil if guiding_messages.empty?
 
-      matching = guiding_messages.count { |msg, _idx| starts_with_action_verb?(msg.content) }
+      matching = guiding_messages.count { |msg, _idx| has_sentence_starting_with_action_verb?(msg.content) }
       (matching.to_f / guiding_messages.size).round(2)
     end
 
-    def starts_with_action_verb?(content)
-      first_word = content.to_s.strip.downcase.split(/\s+/).first.to_s
-      first_word = first_word.gsub(/[[:punct:]]+$/, "")
-      ACTION_VERBS.include?(first_word)
+    def has_sentence_starting_with_action_verb?(content)
+      content.to_s.split(/(?<=[.!?])\s+/).any? do |sentence|
+        first_word = sentence.strip.downcase.split(/\s+/).first.to_s
+        first_word = first_word.gsub(/[[:punct:]]+$/, "")
+        ACTION_VERBS.include?(first_word)
+      end
     end
 
     # Counts assistant messages mentioning DT<n> or DR<n> outside the

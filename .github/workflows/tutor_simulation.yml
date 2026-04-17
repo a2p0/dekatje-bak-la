@@ -37,6 +37,11 @@ on:
         required: false
         default: "anthropic/claude-sonnet-4"
         type: string
+      skip_judge:
+        description: "Skip LLM judge (deterministic structural metrics only)"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   simulate:
@@ -85,6 +90,7 @@ jobs:
           TUTOR_MODEL: ${{ inputs.tutor_model }}
           STUDENT_MODEL: ${{ inputs.student_model }}
           JUDGE_MODEL: ${{ inputs.judge_model }}
+          SKIP_JUDGE: ${{ inputs.skip_judge && '1' || '' }}
         run: bundle exec rake "tutor:simulate[${{ inputs.subject_id }}]"
 
       - name: Upload simulation reports
