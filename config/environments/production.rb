@@ -46,8 +46,22 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Replace the default in-process memory cache store with a durable alternative.
-  config.cache_store = :solid_cache_store
+  # Redis-backed cache, shared with Sidekiq's REDIS_URL. Used by rack-attack
+  # throttle counters and any Rails.cache lookup. Redis is already a hard
+  # dependency of the stack (Sidekiq) so this adds no operational surface.
+  #
+  # The Solid suite (solid_cache / solid_queue / solid_cable) is left unconfigured
+  # on purpose — see docs/deployment/cache-store.md for the evaluation and the
+  # migration sketch if we ever want to move off Redis.
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL"),
+    namespace: "cache",
+    expires_in: 1.day,
+    reconnect_attempts: 1,
+    error_handler: ->(method:, returning:, exception:) {
+      Rails.logger.error("[cache] #{method} failed (#{exception.class}: #{exception.message}) — returning #{returning.inspect}")
+    }
+  }
 
   # Use Sidekiq for background jobs (extraction, tutoring, streaming).
   config.active_job.queue_adapter = :sidekiq
