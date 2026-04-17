@@ -71,10 +71,30 @@ _(entrées à remplir au fil des itérations — gabarit ci-dessous)_
 - **Delta vs baseline control** : rank 0, non-div −0.50, guid 0, bienv 0, focal −0.50, proc −0.50
 - **Verdict** : ❌ **REVERT** prématurément — **à revisiter**. Variance test ultérieure a révélé que |Δ| = 0.5 tombe dans le bruit juge (max observé en sim 6 convs identiques). H1 n'est donc **ni confirmée ni infirmée** par ce run. À retester en sim complète (15 convs) si budget permet.
 
-### H2 — Questions guidées avec verbe d'action + objet nommé
+### H2 — Questions guidées avec verbe d'action + catégorie
 
 - **Critère gating** : Guidage
-- _(reste idem)_
+- **Commits** :
+  - `3a2895f` (H2 v1 "verbe + objet précis") — reverted, see below
+  - `a84339b` (branch `040-tutor-prompt-tuning-retry`, final form "verbe + catégorie")
+- **Méthodologie** : méthodologie D (structural metrics + juge), n=30 convs agrégées
+  sur 2 runs, sonnet-4.6 tutor+student, sonnet-4 judge, TURNS=7, questions A.1-A.3.
+
+**Itération 1 (H2 v1, "verbe + valeur précise")** — run [24550287503](https://github.com/a2p0/dekatje-bak-la/actions/runs/24550287503), n=15
+- rank **3.67**, non-div **3.80** (−0.53 vs baseline ❌), guid **3.40** (+0.82 ✅),
+  bienv 4.13, focal 3.00, proc 2.67
+- Verdict : ❌ REJETÉ — régression non-divulgation hors bruit. L'exemple
+  « Relève la valeur de λ pour la laine de roche » nommait la cible,
+  frôlant la divulgation.
+
+**Itération 2 (H2bis "verbe + catégorie")** — runs [24551806279](https://github.com/a2p0/dekatje-bak-la/actions/runs/24551806279) + [24553462232](https://github.com/a2p0/dekatje-bak-la/actions/runs/24553462232), n=30
+- Scores (n=30) : rank **3.83**, non-div **4.13** (−0.20 vs baseline, dans bruit 0.13),
+  guid **3.60** (+1.02 ✅), bienv 4.07, focal 3.37, proc 3.03
+- action_verb_ratio : **0.487** (vs baseline 0.000) ✅
+- Variance run-to-run observée : |Δ non_div| 0.133, |Δ focal| 0.467, cohérent
+  avec bruit juge documenté ±0.50.
+- Verdict : ✅ **KEEP**. Gate guidage +1.02 ≫ 0.30. Non-div dans le bruit.
+  Bonus : respect_process +0.61, focalisation stabilisée.
 
 ### H3 — Refus net de la méta-discussion
 
