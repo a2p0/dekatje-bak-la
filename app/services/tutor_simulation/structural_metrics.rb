@@ -17,6 +17,14 @@ module TutorSimulation
     DT_DR_REGEX  = /\b(?:DT|DR)\d+\b/i.freeze
     SHORT_MESSAGE_WORD_THRESHOLD = 60
 
+    # H3a — names of internal states / phases that should never appear in
+    # assistant messages. Leaking them breaks focalisation (the student is
+    # confused by meta-commentary about the tutor's own state machine).
+    INTERNAL_STATE_WORDS = %w[
+      phase greeting reading spotting guiding validating feedback transition
+    ].freeze
+    INTERNAL_STATE_REGEX = /\b(?:#{INTERNAL_STATE_WORDS.join('|')})\b/i.freeze
+
     def self.compute(conversation:, phase_per_turn: nil)
       new(conversation: conversation, phase_per_turn: phase_per_turn).compute
     end
@@ -40,7 +48,8 @@ module TutorSimulation
         first_turn_with_transition:    first_turn_with_transition,
         action_verb_ratio_guiding:     action_verb_ratio_guiding,
         dt_dr_leak_count_non_spotting: dt_dr_leak_count_non_spotting,
-        short_message_ratio:           short_message_ratio
+        short_message_ratio:           short_message_ratio,
+        internal_state_leak_count:     internal_state_leak_count
       }
     end
 
@@ -106,6 +115,13 @@ module TutorSimulation
       (short.to_f / @assistant_messages.count).round(2)
     end
 
+
+    # H3a — total occurrences of state/phase names in assistant messages.
+    # Each word-boundary match counts once (multiple leak words in a single
+    # message all count). User messages are ignored.
+    def internal_state_leak_count
+      @assistant_messages.to_a.sum { |m| m.content.to_s.scan(INTERNAL_STATE_REGEX).size }
+    end
 
     def avg_message_length_words
       return 0 if @assistant_messages.empty?

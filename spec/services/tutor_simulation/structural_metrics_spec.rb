@@ -249,6 +249,92 @@ RSpec.describe TutorSimulation::StructuralMetrics do
     end
   end
 
+  describe "#internal_state_leak_count (H3a)" do
+    let(:leak_student) { create(:student, classroom: classroom) }
+    let(:leak_subject) { create(:subject, owner: user, status: :published) }
+    let(:leak_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+    let(:leak_conversation) do
+      create(:conversation, student: leak_student, subject: leak_subject,
+             lifecycle_state: "active", tutor_state: leak_tutor_state)
+    end
+
+    subject(:leak_metrics) { described_class.compute(conversation: leak_conversation) }
+
+    context "with no leak" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Quelle valeur trouves-tu pour la conductivité ?")
+      end
+
+      it "returns 0" do
+        expect(leak_metrics[:internal_state_leak_count]).to eq(0)
+      end
+    end
+
+    context "with a single leak word ('spotting')" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Je suis en spotting, évaluons ta réponse.")
+      end
+
+      it "returns 1" do
+        expect(leak_metrics[:internal_state_leak_count]).to eq(1)
+      end
+    end
+
+    context "with multiple leak words in one message" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Passons au reading puis au spotting.")
+      end
+
+      it "counts each leak word once" do
+        expect(leak_metrics[:internal_state_leak_count]).to eq(2)
+      end
+    end
+
+    context "with leak in user message" do
+      before do
+        create(:message, conversation: leak_conversation, role: :user,
+               content: "C'est quoi la phase spotting ?")
+      end
+
+      it "ignores user messages" do
+        expect(leak_metrics[:internal_state_leak_count]).to eq(0)
+      end
+    end
+
+    context "with leak words embedded in other words" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "La phrase contient spottingtool (should not match).")
+      end
+
+      it "only matches whole words (word boundaries)" do
+        # "phrase" does not match "phase", "spottingtool" does not match "spotting"
+        expect(leak_metrics[:internal_state_leak_count]).to eq(0)
+      end
+    end
+
+    context "with case-insensitive match" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Je passe en GUIDING maintenant.")
+      end
+
+      it "matches case-insensitively" do
+        expect(leak_metrics[:internal_state_leak_count]).to eq(1)
+      end
+    end
+  end
+
   describe "#short_message_ratio" do
     let(:short_student) { create(:student, classroom: classroom) }
     let(:short_subject) { create(:subject, owner: user, status: :published) }
