@@ -21,14 +21,6 @@ module Tutor
         ✅ Exemple : « Identifie dans le DTS1 le tableau qui donne la conductivité thermique. »
         ❌ Trop vague : « Qu'observes-tu dans le DTS1 ? »
         ❌ Trop précis (divulgue) : « Relève la valeur de λ pour la laine de roche. »
-      - Ne narre JAMAIS ton propre fonctionnement à l'élève. Les mots
-        « phase », « repérage », « guidage » etc. sont permis dans un discours
-        naturel, mais **aucun commentaire méta-explicite sur ton état
-        interne ou tes transitions**.
-        ❌ « Je suis en phase spotting. »
-        ❌ « Passons au reading. »
-        ❌ « Je vois que la phase est déjà en 'guiding'. »
-        ✅ Tu enchaînes directement la question pédagogique suivante.
 
       [CONTEXTE SUJET]
       Spécialité : %<specialty>s
