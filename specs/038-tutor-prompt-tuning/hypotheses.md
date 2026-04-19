@@ -21,7 +21,8 @@ produire le gain pour être conservée (règle KEEP).
 |---|---|---|
 | H1 (transition avant texte) | Process, Phase rank | Non-div, Bienveillance |
 | H2 (verbe+objet en guiding) | Guidage | Non-div, Bienveillance |
-| H3 (refus méta) | Focalisation | Bienveillance |
+| H3a (pas de fuite d'état interne) | Focalisation | Bienveillance |
+| H3b (refus méta hors-sujet) | Focalisation | Bienveillance |
 | H4 (validation conditionnelle) | Focalisation, Non-div | Bienveillance |
 | H5 (request_hint systématique) | Guidage, Phase rank | Non-div |
 
@@ -96,10 +97,67 @@ _(entrées à remplir au fil des itérations — gabarit ci-dessous)_
 - Verdict : ✅ **KEEP**. Gate guidage +1.02 ≫ 0.30. Non-div dans le bruit.
   Bonus : respect_process +0.61, focalisation stabilisée.
 
-### H3 — Refus net de la méta-discussion
+### H3a — Pas de fuite d'état interne (priorité 1)
 
 - **Critère gating** : Focalisation
-- _(reste idem)_
+- **Non-régression** : Bienveillance
+- **Branche** : `041-tutor-H3a`
+- **Métrique déterministe** : `internal_state_leak_count` (nouveau, commit `ccb4395`)
+
+**Diagnostic baseline** (run [24559542458](https://github.com/a2p0/dekatje-bak-la/actions/runs/24559542458), 4 convs, SKIP_JUDGE, sonnet-4.6) :
+4 transcripts lus (eleve_hors_sujet × A.1/A.2 + eleve_moyen × A.1/A.2).
+Cause primaire identifiée pour focalisation 3.37 : le tuteur **narre
+son propre state machine** à l'élève (3/4 convs).
+
+Exemples de fuites observées :
+- « Je vois que la phase est déjà en 'reading'. Continuons ! »
+- « Je suis en phase **reading** — passons au repérage. »
+- « Je suis en phase **spotting** — je dois évaluer si l'élève... »
+
+**Fix** (commit `43ecb38`) : ajout dans `[RÈGLES PÉDAGOGIQUES]` :
+> « Ne JAMAIS mentionner à l'élève ton état interne, les noms de phases
+> (greeting, reading, spotting, guiding, validating, feedback, transition)
+> ni le fait que tu utilises des outils. »
+
+**Verdict H3a v1** — Run juge [24562227105](https://github.com/a2p0/dekatje-bak-la/actions/runs/24562227105), n=15 :
+rank **3.47**, non-div **4.00** (−0.13), guid **3.27** (−0.33 ⚠️), bienv **3.80**
+(−0.27 ⚠️), focal **3.07** (−0.30 ⚠️), proc **2.53** (−0.50 ⚠️).
+`internal_state_leak_count` = 0 ✅ (gate structural atteint).
+❌ **NOT KEEP** — régression généralisée sur 4/5 critères (dans le bruit juge
+±0.50 mais tendance cohérente). La règle absolue bannissant tous les mots
+d'état force le tuteur à contourner sa structure de raisonnement,
+détériorant la qualité globale.
+
+**Fix H3a soft** (commits `3b00055` + `39d05d3`) : règle ciblée sur la
+narration explicite uniquement (`"Je suis en phase X"`, `"Passons au Y"`)
+plutôt qu'un ban absolu. Métrique refactorisée en `state_narration_count`.
+
+**Verdict H3a soft** — Run juge [24566362549](https://github.com/a2p0/dekatje-bak-la/actions/runs/24566362549), n=15 :
+rank **3.67**, non-div **4.07** (−0.06), guid **3.33** (−0.27 ⚠️), bienv
+**3.73** (−0.34 ⚠️), **focal 3.53 (+0.16)** ✅ sens correct mais sous gate
++0.30, proc **2.67** (−0.36 ⚠️). `state_narration_count` = 2 (0.13/conv) ✅
+gate structural OK. ❌ **NOT KEEP** — focal dans bon sens mais insuffisant,
+bienv régresse au-delà du seuil 0.20.
+
+**Décision finale (2026-04-19)** : **REVERT** les modifs prompt H3a v1 +
+soft. **CONSERVER** la métrique `state_narration_count` comme instrument
+diagnostique pour les futures itérations (remplace `internal_state_leak_count`).
+Pivot vers une **stack de guards déterministes** pour critères vérifiables
+(branche 042 : LeakDetector + scope bullets), cf. research deep-dive
+2026-04-19 (mémoire `reference_verifiable_criteria_guards.md`).
+
+### H3b — Refus net méta-discussion hors-sujet (priorité 2)
+
+- **Critère gating** : Focalisation
+- **Non-régression** : Bienveillance
+- **Status** : en attente (à tester après H3a pour isoler les effets)
+
+**Diagnostic** : le tuteur tolère trop poliment les distractions
+(« Le match, c'est pour après le bac 😄 ») et **acknowledge + continue**
+au lieu d'ignorer sec. L'élève apprend que la méta-discussion est tolérée.
+
+**Fix prévu** : règle prompt « Si hors-sujet (sport/jeu/météo/IA/toi),
+UNE SEULE relance : 'Revenons à {question}'. Deuxième tentative : ignorer. »
 
 ### H4 — Validation conditionnelle
 
@@ -122,12 +180,15 @@ Après chaque sim, incrémenter :
 | H2 | réduite | $0.05 | **$0.15** (REVERT prématuré, inconclusif) |
 | Variance #1 | réduite 6 convs | $0.15 | $0.30 |
 | Variance #2 | réduite 6 convs | $0.15 | **$0.45** |
-| _(H3)_ | réduite | $0.05 | _._ |
-| _(H4)_ | réduite | $0.05 | _._ |
-| _(H5)_ | réduite | $0.05 | _._ |
-| T025 | complète (15 convs) | $0.60 | _._ |
+| _(H3a)_ | réduite SKIP_JUDGE (4 convs) | $0.80 | _._ |
+| _(H3a validation)_ | complète juge (15 convs) | $3.00 | _._ |
+| _(H3b)_ | réduite | $0.80 | _._ |
+| _(H4)_ | réduite | $0.80 | _._ |
+| _(H5)_ | réduite | $0.80 | _._ |
 
-**Cap SC-007** : $2. Si dépassé sans SC atteints → stop + documenter.
+**Cap SC-007 révisé** : $5 par hypothèse (coûts réels recalibrés post-H2 :
+~$1.63/sim complète avec juge × facteur 2 pour tool-use, soit ~$3/sim complète).
+Si dépassé sans SC atteints → stop + documenter.
 
 ## Run de validation complète
 

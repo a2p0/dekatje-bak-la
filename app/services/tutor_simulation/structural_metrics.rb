@@ -17,6 +17,22 @@ module TutorSimulation
     DT_DR_REGEX  = /\b(?:DT|DR)\d+\b/i.freeze
     SHORT_MESSAGE_WORD_THRESHOLD = 60
 
+    # H3a soft — patterns of explicit state-machine narration in assistant
+    # messages. Only explicit meta-commentary about the tutor's own state is
+    # caught; the underlying words remain usable in ordinary discourse.
+    STATE_TARGETS = %w[
+      greeting reading spotting guiding validating feedback transition repérage
+    ].freeze
+    STATE_NARRATION_PATTERNS = [
+      /je\s+suis\s+(?:en|dans)\s+(?:la\s+)?(?:phase|état|étape|niveau)\b/i,
+      /je\s+passe\s+(?:en|au|à)\s+(?:la\s+phase\s+)?(?:#{STATE_TARGETS.join('|')})\b/i,
+      /passons?\s+(?:en|au|à)\s+(?:la\s+phase\s+)?(?:#{STATE_TARGETS.join('|')})\b/i,
+      /la\s+phase\s+(?:est|devient|passe)\b/i,
+      /je\s+vois\s+que\s+la\s+phase\b/i,
+      /on\s+(?:est|passe)\s+(?:en|au|à)\s+(?:la\s+phase\s+)?(?:#{STATE_TARGETS.join('|')})\b/i,
+      /tu\s+es\s+(?:en|dans)\s+(?:la\s+)?phase\b/i
+    ].freeze
+
     def self.compute(conversation:, phase_per_turn: nil)
       new(conversation: conversation, phase_per_turn: phase_per_turn).compute
     end
@@ -40,7 +56,8 @@ module TutorSimulation
         first_turn_with_transition:    first_turn_with_transition,
         action_verb_ratio_guiding:     action_verb_ratio_guiding,
         dt_dr_leak_count_non_spotting: dt_dr_leak_count_non_spotting,
-        short_message_ratio:           short_message_ratio
+        short_message_ratio:           short_message_ratio,
+        state_narration_count:         state_narration_count
       }
     end
 
@@ -106,6 +123,17 @@ module TutorSimulation
       (short.to_f / @assistant_messages.count).round(2)
     end
 
+
+    # H3a soft — counts explicit state-machine narration patterns in
+    # assistant messages. Only "Je suis en phase X", "Passons au Y", etc.
+    # trigger; the underlying words in other contexts are ignored.
+    # User messages are ignored.
+    def state_narration_count
+      @assistant_messages.to_a.sum do |m|
+        content = m.content.to_s
+        STATE_NARRATION_PATTERNS.sum { |pat| content.scan(pat).size }
+      end
+    end
 
     def avg_message_length_words
       return 0 if @assistant_messages.empty?

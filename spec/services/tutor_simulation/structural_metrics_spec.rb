@@ -249,6 +249,103 @@ RSpec.describe TutorSimulation::StructuralMetrics do
     end
   end
 
+  describe "#state_narration_count (H3a soft)" do
+    let(:leak_student) { create(:student, classroom: classroom) }
+    let(:leak_subject) { create(:subject, owner: user, status: :published) }
+    let(:leak_tutor_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  nil,
+        concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
+        question_states:      {}
+      )
+    end
+    let(:leak_conversation) do
+      create(:conversation, student: leak_student, subject: leak_subject,
+             lifecycle_state: "active", tutor_state: leak_tutor_state)
+    end
+
+    subject(:leak_metrics) { described_class.compute(conversation: leak_conversation) }
+
+    context "with no narration" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Quelle valeur trouves-tu pour la conductivité ?")
+      end
+
+      it "returns 0" do
+        expect(leak_metrics[:state_narration_count]).to eq(0)
+      end
+    end
+
+    context "with 'je suis en phase spotting'" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Je suis en phase spotting, évaluons ta réponse.")
+      end
+
+      it "returns 1" do
+        expect(leak_metrics[:state_narration_count]).to eq(1)
+      end
+    end
+
+    context "with 'passons au reading'" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Passons au reading maintenant.")
+      end
+
+      it "returns 1" do
+        expect(leak_metrics[:state_narration_count]).to eq(1)
+      end
+    end
+
+    context "with overlapping narration patterns in one message" do
+      before do
+        # Matches both /je vois que la phase/ AND /la phase est/
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Je vois que la phase est déjà en reading.")
+      end
+
+      it "counts each pattern match (metric measures density)" do
+        expect(leak_metrics[:state_narration_count]).to eq(2)
+      end
+    end
+
+    context "with plain mention of 'phase' in normal discourse" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "Le calcul se fait en deux phases distinctes.")
+      end
+
+      it "does not trigger (word alone is fine)" do
+        expect(leak_metrics[:state_narration_count]).to eq(0)
+      end
+    end
+
+    context "with narration in user message" do
+      before do
+        create(:message, conversation: leak_conversation, role: :user,
+               content: "Je suis en phase de révision.")
+      end
+
+      it "ignores user messages" do
+        expect(leak_metrics[:state_narration_count]).to eq(0)
+      end
+    end
+
+    context "with case-insensitive narration" do
+      before do
+        create(:message, conversation: leak_conversation, role: :assistant,
+               content: "JE PASSE EN GUIDING maintenant.")
+      end
+
+      it "matches case-insensitively" do
+        expect(leak_metrics[:state_narration_count]).to eq(1)
+      end
+    end
+  end
+
   describe "#short_message_ratio" do
     let(:short_student) { create(:student, classroom: classroom) }
     let(:short_subject) { create(:subject, owner: user, status: :published) }
