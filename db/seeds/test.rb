@@ -60,6 +60,23 @@ unless exam_session.common_parts.any?
   subject.update_column(:status, Subject.statuses[:published])
 end
 
+# Populate structured_correction for specific part A (043 POC).
+# Files are kept in db/seeds/development/043_structured_correction/ and
+# applied in the test seed so CI simulations can exercise the enriched prompt.
+structured_dir = Rails.root.join("db", "seeds", "development", "043_structured_correction")
+part_a = subject.parts.specific.find_by(number: "A")
+if part_a
+  part_a.questions.each do |q|
+    json_path = structured_dir.join("#{q.number}.json")
+    next unless File.exist?(json_path)
+    next if q.answer&.structured_correction.present?
+
+    q.answer&.update_column(:structured_correction, JSON.parse(File.read(json_path)))
+  end
+  populated = part_a.questions.joins(:answer).where.not(answers: { structured_correction: nil }).count
+  puts "  043 POC: #{populated} questions with structured_correction populated"
+end
+
 # Create classroom + link
 classroom = Classroom.find_or_initialize_by(access_code: "test-sim")
 classroom.assign_attributes(name: "Test Simulation", school_year: "2025", specialty: "SIN", owner: teacher)

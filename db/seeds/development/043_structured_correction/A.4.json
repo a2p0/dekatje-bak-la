@@ -1,0 +1,65 @@
+{
+  "input_data": [
+    {
+      "name": "résistance thermique minimale cible (murs/plancher bas)",
+      "value": "6,66 m²·K·W-1",
+      "source": "question_context"
+    },
+    {
+      "name": "résistance thermique de la paroi murale actuelle",
+      "value": "5,62 m²·K·W-1",
+      "source": "question_context"
+    },
+    {
+      "name": "conductivité thermique de la laine de roche",
+      "value": "λLDR = 0,034 W·m-1·K-1",
+      "source": "DTS1"
+    },
+    {
+      "name": "épaisseur de laine de roche déjà en place (couches existantes)",
+      "value": "100 + 80 = 180 mm",
+      "source": "DTS1"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "résistance thermique supplémentaire nécessaire",
+      "value": "1,04 m²·K·W-1",
+      "reasoning": "ΔR = Rmin − Rparoi murale = 6,66 − 5,62 = 1,04 m²·K·W-1"
+    },
+    {
+      "name": "épaisseur supplémentaire de laine de roche à ajouter",
+      "value": "3,55 cm soit 40 mm",
+      "reasoning": "e = ΔR × λ = 1,04 × 0,034 = 0,03536 m ≈ 3,55 cm, arrondi à 40 mm"
+    },
+    {
+      "name": "épaisseur totale de laine de roche",
+      "value": "220 mm",
+      "reasoning": "épaisseur totale = 100 + 80 + 40 = 220 mm"
+    }
+  ],
+  "intermediate_steps": [
+    "Identifier la résistance thermique manquante en calculant la différence entre Rmin = 6,66 m²·K·W-1 et Rparoi murale = 5,62 m²·K·W-1",
+    "Appliquer la formule e = ΔR × λ avec λ = 0,034 W·m-1·K-1 pour obtenir l'épaisseur supplémentaire en mètres",
+    "Convertir le résultat en centimètres ou millimètres et arrondir à la valeur commerciale supérieure (multiple de 10 mm)",
+    "Additionner les épaisseurs de laine de roche existantes (100 mm + 80 mm) à l'épaisseur supplémentaire arrondie pour obtenir l'épaisseur totale"
+  ],
+  "common_errors": [
+    {
+      "error": "Utiliser la formule R = e/λ en cherchant e à partir de Rmin seul, sans soustraire la résistance déjà existante de la paroi",
+      "remediation": "Calculer d'abord la résistance manquante ΔR = Rmin − Rparoi murale, puis appliquer e = ΔR × λ"
+    },
+    {
+      "error": "Inverser la formule et diviser par λ au lieu de multiplier (confondre e = R × λ et e = R / λ)",
+      "remediation": "Partir de R = e/λ et isoler e : e = R × λ (multiplier par λ)"
+    },
+    {
+      "error": "Oublier d'arrondir l'épaisseur calculée à une valeur commerciale supérieure (40 mm au lieu de 35,5 mm)",
+      "remediation": "Toujours arrondir à la valeur supérieure pour garantir que la résistance minimale est bien atteinte"
+    },
+    {
+      "error": "Ne pas additionner les épaisseurs existantes pour donner l'épaisseur totale finale",
+      "remediation": "Ajouter l'épaisseur supplémentaire aux couches déjà en place : 100 + 80 + 40 = 220 mm"
+    }
+  ]
+}

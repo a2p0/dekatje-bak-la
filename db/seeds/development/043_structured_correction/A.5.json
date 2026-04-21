@@ -1,0 +1,50 @@
+{
+  "input_data": [
+    {
+      "name": "définition et critères de l'Ic construction",
+      "value": "impact sur le changement climatique associé aux composants (cycle de vie des matériaux) et au chantier, exprimé en kg eq. CO2·m²",
+      "source": "DTS2"
+    },
+    {
+      "name": "unité de l'Ic construction",
+      "value": "kg eq. CO2·m²",
+      "source": "DTS2"
+    },
+    {
+      "name": "composantes de l'Ic construction",
+      "value": "composants (produits de construction et équipements, sur l'ensemble du cycle de vie) + chantier (mise en œuvre)",
+      "source": "DTS2"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "éléments caractérisant l'Ic construction",
+      "value": "L'Ic construction est conditionné par l'impact des matériaux sur l'ensemble de leur cycle de vie et par l'impact du chantier (mise en œuvre)",
+      "reasoning": "Lecture directe du DTS2 : Ic construction = impact 'composants' (analyse du cycle de vie des produits de construction et équipements) + impact 'chantier' (mise en œuvre)"
+    }
+  ],
+  "intermediate_steps": [
+    "Repérer dans le DTS2 la ligne ou la case correspondant à l'Ic construction dans le tableau des paramètres RE 2020",
+    "Identifier les deux composantes mentionnées : l'impact des matériaux/composants et l'impact du chantier",
+    "Préciser que l'impact des matériaux est évalué sur l'ensemble du cycle de vie (analyse du cycle de vie — ACV)",
+    "Reformuler en indiquant que ces deux éléments (cycle de vie des composants + chantier) conditionnent la valeur de l'Ic construction"
+  ],
+  "common_errors": [
+    {
+      "error": "Ne mentionner que l'impact des matériaux sans citer l'impact du chantier",
+      "remediation": "Relire attentivement le DTS2 : l'Ic construction regroupe explicitement deux composantes, les matériaux ET le chantier"
+    },
+    {
+      "error": "Confondre Ic construction avec d'autres indicateurs RE 2020 (ex : Ic énergie ou Bbio)",
+      "remediation": "Vérifier dans le tableau du DTS2 que l'on se trouve bien sur la ligne 'Ic construction' et non sur une autre ligne"
+    },
+    {
+      "error": "Oublier de préciser que l'impact des matériaux est évalué sur l'ensemble du cycle de vie",
+      "remediation": "La notion d'analyse du cycle de vie (ACV) est centrale : il ne s'agit pas seulement de la fabrication, mais de toutes les phases de vie du matériau"
+    },
+    {
+      "error": "Donner une réponse trop vague sans s'appuyer sur les termes du DTS2",
+      "remediation": "Utiliser le vocabulaire exact du document : 'composants', 'cycle de vie', 'chantier', 'kg eq. CO2·m²'"
+    }
+  ]
+}
