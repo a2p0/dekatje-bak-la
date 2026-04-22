@@ -14,8 +14,7 @@ RSpec.describe Tutor::FilterSpottingOutput do
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      {}
-    )
+      question_states:      {}, welcome_sent: false)
     create(:conversation, student: student, subject: exam_subject,
            lifecycle_state: "active", tutor_state: state)
   end
@@ -97,8 +96,7 @@ RSpec.describe Tutor::FilterSpottingOutput do
           concepts_mastered:    [],
           concepts_to_revise:   [],
           discouragement_level: 0,
-          question_states:      {}
-        )
+          question_states:      {}, welcome_sent: false)
         guiding_conv = create(:conversation, student: student, subject: exam_subject,
                               lifecycle_state: "active", tutor_state: guiding_state)
         guiding_msg = create(:message, conversation: guiding_conv, role: :assistant,

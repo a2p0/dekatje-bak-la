@@ -156,10 +156,8 @@ RSpec.describe "Student::Conversations", type: :request do
         question_states:      {
           question.id.to_s => QuestionState.new(
             step: 0, hints_used: 0, last_confidence: nil,
-            error_types: [], completed_at: nil
-          )
-        }
-      )
+            error_types: [], completed_at: nil, intro_seen: false)
+        }, welcome_sent: false)
     end
 
     let!(:conversation) do

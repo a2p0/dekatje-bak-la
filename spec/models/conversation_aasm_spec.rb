@@ -145,8 +145,7 @@ RSpec.describe Conversation, type: :model do
         concepts_mastered:    [ "énergie" ],
         concepts_to_revise:   [],
         discouragement_level: 0,
-        question_states:      {}
-      )
+        question_states:      {}, welcome_sent: false)
       conversation.update!(tutor_state: new_state)
       conversation.reload
       expect(conversation.tutor_state.current_phase).to eq("chat")

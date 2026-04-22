@@ -83,10 +83,8 @@ RSpec.describe Tutor::BuildContext do
         question_states:      {
           question.id.to_s => QuestionState.new(
             step: "initial", hints_used: 0, last_confidence: nil,
-            error_types: [], completed_at: nil
-          )
-        }
-      )
+            error_types: [], completed_at: nil, intro_seen: false)
+        }, welcome_sent: false)
       create(:conversation, student: student, subject: exam_subject,
              lifecycle_state: "active", tutor_state: spotting_state)
     end
@@ -125,8 +123,7 @@ RSpec.describe Tutor::BuildContext do
         concepts_mastered:    [],
         concepts_to_revise:   [],
         discouragement_level: 0,
-        question_states:      {}
-      )
+        question_states:      {}, welcome_sent: false)
       reading_conv = create(:conversation, student: student, subject: exam_subject,
                              lifecycle_state: "active", tutor_state: reading_state)
       r = described_class.call(

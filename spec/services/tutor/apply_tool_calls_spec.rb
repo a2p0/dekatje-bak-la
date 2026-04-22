@@ -13,8 +13,7 @@ RSpec.describe Tutor::ApplyToolCalls do
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      extra_state
-    )
+      question_states:      extra_state, welcome_sent: false)
     create(:conversation, student: student, subject: exam_subject, tutor_state: state)
   end
 
@@ -93,8 +92,7 @@ RSpec.describe Tutor::ApplyToolCalls do
       state3 = TutorState.new(
         current_phase: "reading", current_question_id: nil,
         concepts_mastered: [], concepts_to_revise: [],
-        discouragement_level: 3, question_states: {}
-      )
+        discouragement_level: 3, question_states: {}, welcome_sent: false)
       other_student = create(:student, classroom: classroom)
       conv3 = create(:conversation, student: other_student, subject: exam_subject, tutor_state: state3)
       result3 = described_class.call(
@@ -107,7 +105,7 @@ RSpec.describe Tutor::ApplyToolCalls do
 
   describe "tool: request_hint" do
     it "increments hints_used monotonically from 0 to 1" do
-      qs = QuestionState.new(step: "initial", hints_used: 0, last_confidence: nil, error_types: [], completed_at: nil)
+      qs = QuestionState.new(step: "initial", hints_used: 0, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
@@ -118,7 +116,7 @@ RSpec.describe Tutor::ApplyToolCalls do
     end
 
     it "silently ignores skipped hint levels (hints_used unchanged)" do
-      qs = QuestionState.new(step: "initial", hints_used: 1, last_confidence: nil, error_types: [], completed_at: nil)
+      qs = QuestionState.new(step: "initial", hints_used: 1, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
@@ -129,7 +127,7 @@ RSpec.describe Tutor::ApplyToolCalls do
     end
 
     it "silently ignores hint above max (5)" do
-      qs = QuestionState.new(step: "initial", hints_used: 5, last_confidence: nil, error_types: [], completed_at: nil)
+      qs = QuestionState.new(step: "initial", hints_used: 5, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,

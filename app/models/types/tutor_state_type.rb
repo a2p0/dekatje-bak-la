@@ -23,7 +23,8 @@ class TutorStateType < ActiveRecord::Type::Json
       "concepts_mastered"    => tutor_state.concepts_mastered,
       "concepts_to_revise"   => tutor_state.concepts_to_revise,
       "discouragement_level" => tutor_state.discouragement_level,
-      "question_states"      => serialize_question_states(tutor_state.question_states)
+      "question_states"      => serialize_question_states(tutor_state.question_states),
+      "welcome_sent"         => tutor_state.welcome_sent
     )
   end
 
@@ -46,7 +47,8 @@ class TutorStateType < ActiveRecord::Type::Json
         hints_used:       qs_hash["hints_used"] || 0,
         last_confidence:  qs_hash["last_confidence"],
         error_types:      Array(qs_hash["error_types"]),
-        completed_at:     qs_hash["completed_at"]
+        completed_at:     qs_hash["completed_at"],
+        intro_seen:       qs_hash["intro_seen"] || false
       )
     end
 
@@ -56,7 +58,8 @@ class TutorStateType < ActiveRecord::Type::Json
       concepts_mastered:    Array(hash["concepts_mastered"]),
       concepts_to_revise:   Array(hash["concepts_to_revise"]),
       discouragement_level: hash["discouragement_level"] || 0,
-      question_states:      question_states
+      question_states:      question_states,
+      welcome_sent:         hash["welcome_sent"] || false
     )
   end
 
@@ -67,7 +70,8 @@ class TutorStateType < ActiveRecord::Type::Json
         "hints_used"      => qs.hints_used,
         "last_confidence" => qs.last_confidence,
         "error_types"     => qs.error_types,
-        "completed_at"    => qs.completed_at
+        "completed_at"    => qs.completed_at,
+        "intro_seen"      => qs.intro_seen
       }
     end
   end
