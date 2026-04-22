@@ -47,6 +47,13 @@
         </tbody>
       </table>
     </div>
+    <div class="mt-3">
+      <%= render ButtonComponent.new(
+            href: teacher_classroom_export_path(@classroom, format: :pdf),
+            variant: :primary, size: :sm) do %>
+        Télécharger la fiche PDF
+      <% end %>
+    </div>
   </div>
 <% end %>
 
