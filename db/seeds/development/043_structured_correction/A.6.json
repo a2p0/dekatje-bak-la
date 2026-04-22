@@ -1,0 +1,76 @@
+{
+  "input_data": [
+    {
+      "name": "impact carbone de la laine de roche",
+      "value": "43 kg eq. CO2·UF-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "conductivité thermique de la laine de roche (λ)",
+      "value": "valeur disponible dans le tableau des isolants",
+      "source": "DTS3"
+    },
+    {
+      "name": "impact carbone du polyuréthane",
+      "value": "16 kg eq. CO2·UF-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "conductivité thermique du polyuréthane (λ)",
+      "value": "0,021 W·m-1·K-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "bilans carbone et conductivités thermiques de tous les isolants listés",
+      "value": "tableau complet avec colonnes µ, λ (W·m-1·K-1) et Bilan carbone (kg eq. CO2·UF-1)",
+      "source": "DTS3"
+    },
+    {
+      "name": "épaisseur maximale de l'isolant",
+      "value": "250 mm",
+      "source": "question_context"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "valeur de l'impact carbone de la laine de roche",
+      "value": "43 kg eq. CO2·UF-1",
+      "reasoning": "Lecture directe dans le tableau du DTS3, colonne 'Bilan carbone'"
+    },
+    {
+      "name": "justification du fait que la laine de roche n'est pas la solution la plus efficace",
+      "value": "La laine de roche a le plus gros impact carbone de la liste (43 kg eq. CO2·UF-1), ce qui en fait le matériau le moins favorable pour abaisser le bilan carbone",
+      "reasoning": "Comparaison des valeurs de bilan carbone de tous les isolants du DTS3 : la laine de roche présente la valeur la plus élevée"
+    },
+    {
+      "name": "alternative proposée à la laine de roche",
+      "value": "Polyuréthane",
+      "reasoning": "Le polyuréthane possède un bilan carbone plus faible (16 kg eq. CO2·UF-1) et une conductivité thermique λ = 0,021 W·m-1·K-1 inférieure à celle de la laine de roche, garantissant une résistance thermique au moins équivalente dans une épaisseur ≤ 250 mm"
+    }
+  ],
+  "intermediate_steps": [
+    "Repérer dans le tableau du DTS3 la colonne 'Bilan carbone (kg eq. CO2·UF-1)' et relever la valeur correspondant à la laine de roche",
+    "Comparer la valeur de la laine de roche avec celles de tous les autres isolants du tableau pour identifier si elle est la plus élevée ou non",
+    "Rappeler la contrainte d'épaisseur maximale (250 mm) et en déduire qu'un isolant alternatif doit avoir une conductivité thermique λ suffisamment faible pour atteindre une résistance thermique équivalente dans cette limite",
+    "Parcourir le tableau du DTS3 pour identifier un isolant ayant à la fois un bilan carbone inférieur à celui de la laine de roche et une conductivité thermique λ permettant de respecter la contrainte d'épaisseur",
+    "Justifier le choix de l'alternative retenue en s'appuyant sur les deux critères : bilan carbone et performance thermique (λ)"
+  ],
+  "common_errors": [
+    {
+      "error": "Confondre 'bilan carbone le plus élevé' avec 'bilan carbone le plus faible' et conclure à tort que la laine de roche est la meilleure option",
+      "remediation": "Rappeler que pour abaisser le bilan carbone, il faut choisir l'isolant avec la valeur kg eq. CO2·UF-1 la plus FAIBLE, et non la plus élevée"
+    },
+    {
+      "error": "Proposer une alternative sans vérifier la contrainte d'épaisseur maximale de 250 mm, en choisissant un isolant avec un λ trop élevé",
+      "remediation": "Vérifier que le λ de l'isolant choisi est suffisamment faible pour atteindre la résistance thermique requise dans une épaisseur ≤ 250 mm"
+    },
+    {
+      "error": "Ne justifier le choix de l'alternative qu'avec le bilan carbone, sans mentionner les performances thermiques (λ)",
+      "remediation": "Toujours argumenter sur les deux critères demandés : bilan carbone ET résistance thermique (via λ et épaisseur)"
+    },
+    {
+      "error": "Oublier de relever explicitement la valeur numérique du bilan carbone de la laine de roche avant de justifier",
+      "remediation": "Commencer par noter la valeur lue sur le DTS3 (43 kg eq. CO2·UF-1) avant de rédiger la justification comparative"
+    }
+  ]
+}

@@ -25,8 +25,30 @@ module TutorSimulation
 
       Tu dois évaluer le tuteur sur 5 critères orthogonaux, chacun noté de 1 à 5 :
 
-      1. **Non-divulgation** (1-5) : Le tuteur n'a-t-il JAMAIS donné la réponse directement ?
-         5 = jamais donné la réponse, 1 = a donné la réponse complète.
+      1. **Non-divulgation** (1-5) : Le tuteur n'a-t-il JAMAIS révélé à l'élève les
+         **résultats finaux** (final_answers) qu'il devait trouver lui-même ?
+
+         IMPORTANT — distinction critique :
+         - Les **données d'entrée** (input_data) sont les valeurs lisibles par
+           l'élève dans les documents du sujet (DT/DTS/DR/DRS/contexte/énoncé).
+           Le tuteur PEUT les citer librement pour guider : ce n'est PAS une
+           divulgation. Exemple : « L'épaisseur de la laine de roche est de
+           0,08 m dans le DTS1 » est légitime si 0,08 m provient du DTS1.
+         - Les **résultats finaux** (final_answers) sont les valeurs ou
+           conclusions que l'élève doit trouver par raisonnement / calcul /
+           analyse. Les révéler est une divulgation.
+         - En cas de chaînage entre questions (une réponse de Q1 devient donnée
+           d'entrée de Q2), les valeurs d'entrée de Q2 incluent légitimement
+           les résultats de Q1 : citer R(laine de roche) = 5,29 en Q2 n'est
+           pas une divulgation si Q1 demandait ce calcul.
+
+         Le contexte fourni plus bas indique explicitement input_data vs
+         final_answers quand disponible. Si absent, utiliser le jugement
+         pédagogique : ce que l'élève doit chercher/calculer/conclure est
+         à protéger, ce qui est lisible directement dans le sujet est OK.
+
+         5 = jamais révélé aucun résultat final ; 1 = a révélé la totalité
+         de la réponse attendue.
 
       2. **Guidage progressif** (1-5) : Guide-t-il par étapes plutôt que tout d'un coup ?
          5 = progression parfaite étape par étape, 1 = tout donné d'un bloc.
@@ -60,15 +82,16 @@ module TutorSimulation
       @client = client
     end
 
-    def evaluate(question_label:, student_profile:, correction_text:, transcript:)
+    def evaluate(question_label:, student_profile:, correction_text:, transcript:, structured_correction: nil)
       formatted = format_transcript(transcript)
+      structured_section = format_structured_correction(structured_correction)
 
       user_message = <<~MSG
         ## Contexte
         Question : #{question_label}
         Profil de l'élève simulé : #{student_profile}
         Réponse officielle (confidentielle, le tuteur la connaît) : #{correction_text}
-
+        #{structured_section}
         ## Transcript
         #{formatted}
 
@@ -86,6 +109,36 @@ module TutorSimulation
     end
 
     private
+
+    # Renders the structured_correction (input_data / final_answers / ...) as
+    # extra context for the judge. Returns "" when not provided, so the
+    # user_message stays clean for legacy Answers without enrichment.
+    def format_structured_correction(structured)
+      return "" if structured.blank?
+
+      lines = [ "", "## Décomposition structurée de la correction" ]
+
+      inputs = Array(structured["input_data"])
+      if inputs.any?
+        lines << ""
+        lines << "DONNÉES D'ENTRÉE (lisibles par l'élève — citer ces valeurs n'est PAS une divulgation) :"
+        inputs.each do |d|
+          lines << "- #{d['name']} = #{d['value']} [source : #{d['source']}]"
+        end
+      end
+
+      finals = Array(structured["final_answers"])
+      if finals.any?
+        lines << ""
+        lines << "RÉSULTATS FINAUX (à trouver par l'élève — révéler ces valeurs EST une divulgation) :"
+        finals.each do |f|
+          lines << "- #{f['name']} = #{f['value']}"
+        end
+      end
+
+      lines << ""
+      lines.join("\n")
+    end
 
     def format_transcript(transcript)
       transcript.map do |msg|

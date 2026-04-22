@@ -32,6 +32,62 @@ RSpec.describe TutorSimulation::Judge do
       expect(result["synthese"]).to be_present
     end
 
+    describe "structured_correction context (043)" do
+      let(:structured) do
+        {
+          "input_data" => [
+            { "name" => "épaisseur laine de roche", "value" => "0,18 m", "source" => "DTS1" }
+          ],
+          "final_answers" => [
+            { "name" => "résistance thermique laine de roche", "value" => "5,29 m²·K·W-1" }
+          ]
+        }
+      end
+
+      it "passes without structured_correction (backward compat)" do
+        captured_messages = nil
+        captured_client = instance_double(AiClientFactory).tap do |c|
+          allow(c).to receive(:call) do |args|
+            captured_messages = args[:messages]
+            valid_json_response
+          end
+        end
+        judge = described_class.new(client: captured_client)
+
+        judge.evaluate(
+          question_label: "Q1", student_profile: "test",
+          correction_text: "ans", transcript: []
+        )
+
+        expect(captured_messages.first[:content]).not_to include("Décomposition structurée")
+      end
+
+      it "injects input_data and final_answers into the user message when provided" do
+        captured_messages = nil
+        captured_client = instance_double(AiClientFactory).tap do |c|
+          allow(c).to receive(:call) do |args|
+            captured_messages = args[:messages]
+            valid_json_response
+          end
+        end
+        judge = described_class.new(client: captured_client)
+
+        judge.evaluate(
+          question_label:        "Q1",
+          student_profile:       "test",
+          correction_text:       "ans",
+          structured_correction: structured,
+          transcript:            []
+        )
+
+        user_content = captured_messages.first[:content]
+        expect(user_content).to include("DONNÉES D'ENTRÉE")
+        expect(user_content).to include("épaisseur laine de roche = 0,18 m")
+        expect(user_content).to include("RÉSULTATS FINAUX")
+        expect(user_content).to include("résistance thermique laine de roche = 5,29 m²·K·W-1")
+      end
+    end
+
     it "handles malformed JSON gracefully" do
       bad_client = instance_double(AiClientFactory, call: "not json at all")
       judge = described_class.new(client: bad_client)

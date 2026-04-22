@@ -138,6 +138,88 @@ RSpec.describe Tutor::BuildContext do
     end
   end
 
+  describe "structured_correction section (043)" do
+    let(:structured) do
+      {
+        "input_data" => [
+          { "name" => "épaisseur laine de roche", "value" => "0,18 m", "source" => "DTS1" },
+          { "name" => "conductivité laine de roche", "value" => "0,034 W·m-1·K-1", "source" => "DTS1" }
+        ],
+        "final_answers" => [
+          { "name" => "résistance thermique laine de roche", "value" => "5,29 m²·K·W-1",
+            "reasoning" => "R = e/λ = 0,18/0,034" }
+        ],
+        "intermediate_steps" => [
+          "Identifier les composants de la paroi dans le DTS1",
+          "Appliquer R = e/λ pour chaque couche"
+        ],
+        "common_errors" => [
+          { "error" => "Oublier la conversion cm→m", "remediation" => "Toujours convertir en mètres" }
+        ]
+      }
+    end
+
+    context "when structured_correction is present" do
+      before { answer.update!(structured_correction: structured) }
+
+      it "includes the [CORRECTION STRUCTURÉE] header" do
+        expect(result.value[:system_prompt]).to include("[CORRECTION STRUCTURÉE — GUIDE PÉDAGOGIQUE]")
+      end
+
+      it "includes the [DONNÉES DU SUJET] section with input_data values" do
+        prompt = result.value[:system_prompt]
+        expect(prompt).to include("[DONNÉES DU SUJET — TU PEUX LES CITER LIBREMENT")
+        expect(prompt).to include("épaisseur laine de roche : 0,18 m [source : DTS1]")
+      end
+
+      it "includes the [RÉSULTATS FINAUX] section with final_answer names and values" do
+        prompt = result.value[:system_prompt]
+        expect(prompt).to include("[RÉSULTATS FINAUX — NE JAMAIS RÉVÉLER")
+        expect(prompt).to include("résistance thermique laine de roche = 5,29 m²·K·W-1")
+        expect(prompt).to include("R = e/λ = 0,18/0,034")
+      end
+
+      it "includes the [ÉTAPES DE RAISONNEMENT] section in order" do
+        prompt = result.value[:system_prompt]
+        expect(prompt).to include("[ÉTAPES DE RAISONNEMENT ATTENDUES]")
+        expect(prompt).to include("1. Identifier les composants")
+        expect(prompt).to include("2. Appliquer R = e/λ")
+      end
+
+      it "includes the [ERREURS FRÉQUENTES] section with error and remediation" do
+        prompt = result.value[:system_prompt]
+        expect(prompt).to include("[ERREURS FRÉQUENTES À SURVEILLER]")
+        expect(prompt).to include("Oublier la conversion cm→m")
+        expect(prompt).to include("Toujours convertir en mètres")
+      end
+    end
+
+    context "when structured_correction is nil (backward compat)" do
+      before { answer.update!(structured_correction: nil) }
+
+      it "does NOT include the [CORRECTION STRUCTURÉE] header" do
+        expect(result.value[:system_prompt]).not_to include("[CORRECTION STRUCTURÉE")
+      end
+
+      it "still falls back to the legacy correction_text section" do
+        expect(result.value[:system_prompt]).to include("CORRECTION CONFIDENTIELLE")
+        expect(result.value[:system_prompt]).to include("P = 230 × 2 = 460 W")
+      end
+    end
+
+    context "when structured_correction has only input_data" do
+      before { answer.update!(structured_correction: { "input_data" => structured["input_data"] }) }
+
+      it "includes the input_data section but skips empty ones" do
+        prompt = result.value[:system_prompt]
+        expect(prompt).to include("[DONNÉES DU SUJET")
+        expect(prompt).not_to include("[RÉSULTATS FINAUX")
+        expect(prompt).not_to include("[ÉTAPES DE RAISONNEMENT")
+        expect(prompt).not_to include("[ERREURS FRÉQUENTES")
+      end
+    end
+  end
+
   context "when the question belongs to a common part (Part#subject_id is nil)" do
     let(:exam_session) { create(:exam_session, owner: user, title: "Sujet CIME") }
     let(:exam_subject) do

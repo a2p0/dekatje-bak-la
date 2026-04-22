@@ -54,6 +54,13 @@ module Tutor
       Sinon, réponds directement au message de l'élève selon la phase courante.
     PROMPT
 
+    STRUCTURED_INTRO = <<~PROMPT.freeze
+
+      [CORRECTION STRUCTURÉE — GUIDE PÉDAGOGIQUE]
+      Cette question a été pré-analysée pour toi. Utilise cette structure pour guider
+      l'élève efficacement sans divulguer les résultats finaux.
+    PROMPT
+
     SPOTTING_SECTION = <<~PROMPT.freeze
 
       [PHASE REPÉRAGE — RÈGLES SPÉCIFIQUES]
@@ -100,6 +107,7 @@ module Tutor
         learner_model:    @conversation.tutor_state.to_prompt
       )
 
+      system_prompt += build_structured_section(answer&.structured_correction) if answer&.structured_correction.present?
       system_prompt += SPOTTING_SECTION if @conversation.tutor_state.current_phase == "spotting"
 
       messages = @conversation.messages
@@ -108,6 +116,62 @@ module Tutor
                               .map { |m| { role: m.role, content: m.content } }
 
       Result.ok(system_prompt: system_prompt, messages: messages)
+    end
+
+    private
+
+    # Rend la correction structurée (input_data, final_answers, intermediate_steps,
+    # common_errors) sous forme de sections lisibles par le tuteur LLM.
+    # Contract crucial : les `input_data` sont explicitement autorisées à la citation
+    # (données brutes du sujet, accessibles à l'élève), alors que les `final_answers`
+    # sont strictement interdites (résultats à trouver par l'élève).
+    def build_structured_section(structured)
+      section = STRUCTURED_INTRO.dup
+
+      inputs = Array(structured["input_data"])
+      if inputs.any?
+        section += "\n[DONNÉES DU SUJET — TU PEUX LES CITER LIBREMENT POUR GUIDER L'ÉLÈVE]\n"
+        inputs.each do |d|
+          name   = d["name"].to_s
+          value  = d["value"].to_s
+          source = d["source"].to_s
+          section += "- #{name} : #{value} [source : #{source}]\n"
+        end
+      end
+
+      finals = Array(structured["final_answers"])
+      if finals.any?
+        section += "\n[RÉSULTATS FINAUX — NE JAMAIS RÉVÉLER À L'ÉLÈVE]\n"
+        section += "Ces valeurs doivent être TROUVÉES par l'élève, jamais énoncées ni paraphrasées.\n"
+        finals.each do |f|
+          name      = f["name"].to_s
+          value     = f["value"].to_s
+          reasoning = f["reasoning"].to_s
+          section += "- #{name} = #{value}\n"
+          section += "  (raisonnement attendu : #{reasoning})\n" if reasoning.present?
+        end
+      end
+
+      steps = Array(structured["intermediate_steps"])
+      if steps.any?
+        section += "\n[ÉTAPES DE RAISONNEMENT ATTENDUES]\n"
+        steps.each_with_index do |s, i|
+          section += "#{i + 1}. #{s}\n"
+        end
+      end
+
+      errors = Array(structured["common_errors"])
+      if errors.any?
+        section += "\n[ERREURS FRÉQUENTES À SURVEILLER]\n"
+        errors.each do |e|
+          err = e["error"].to_s
+          rem = e["remediation"].to_s
+          section += "- #{err}\n"
+          section += "  → #{rem}\n" if rem.present?
+        end
+      end
+
+      section
     end
   end
 end

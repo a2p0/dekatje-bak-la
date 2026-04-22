@@ -1,0 +1,65 @@
+{
+  "input_data": [
+    {
+      "name": "conductivité thermique du polyuréthane (λ)",
+      "value": "0,021 W·m-1·K-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "bilan carbone du polyuréthane",
+      "value": "16 kg eq. CO2·UF-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "bilan carbone de la laine de roche",
+      "value": "43 kg eq. CO2·UF-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "résistance thermique minimale requise par la RE 2020 pour les parois murales",
+      "value": "6,66 m²·K·W-1",
+      "source": "DTS3"
+    },
+    {
+      "name": "isolant choisi",
+      "value": "polyuréthane",
+      "source": "question_precedente"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "contribution du polyuréthane à la RE 2020 — critère thermique",
+      "value": "La faible conductivité thermique du polyuréthane (λ = 0,021 W·m-1·K-1) permet d'atteindre la résistance thermique minimale requise (≥ 6,66 m²·K·W-1) avec une épaisseur compatible avec le bâtiment.",
+      "reasoning": "Comparaison de λ du polyuréthane avec les autres isolants du DTS3 et vérification que R = e/λ peut atteindre 6,66 m²·K·W-1 avec une épaisseur acceptable (< 250 mm)"
+    },
+    {
+      "name": "contribution du polyuréthane à la RE 2020 — critère bilan carbone",
+      "value": "Le bilan carbone du polyuréthane (16 kg eq. CO2·UF-1) est bien inférieur à celui de la laine de roche (43 kg eq. CO2·UF-1), ce qui contribue à réduire l'Ic construction du bâtiment CIME.",
+      "reasoning": "Comparaison directe des bilans carbone des matériaux isolants dans le DTS3 : 16 < 43 kg eq. CO2·UF-1"
+    }
+  ],
+  "intermediate_steps": [
+    "Identifier les deux critères de la RE 2020 concernés : la résistance thermique minimale des parois (≥ 6,66 m²·K·W-1) et le bilan carbone (Ic construction) le plus faible possible.",
+    "Relever dans le DTS3 la conductivité thermique du polyuréthane (λ = 0,021 W·m-1·K-1) et vérifier qu'elle permet d'atteindre R ≥ 6,66 m²·K·W-1 avec une épaisseur réaliste via la relation R = e/λ.",
+    "Relever dans le DTS3 le bilan carbone du polyuréthane (16 kg eq. CO2·UF-1) et le comparer à celui des autres isolants (ex. laine de roche : 43 kg eq. CO2·UF-1).",
+    "Conclure en expliquant que le polyuréthane satisfait simultanément les deux exigences de la RE 2020 : performance thermique suffisante et bilan carbone réduit."
+  ],
+  "common_errors": [
+    {
+      "error": "Ne mentionner qu'un seul critère RE 2020 (uniquement thermique ou uniquement carbone)",
+      "remediation": "La RE 2020 impose deux types d'exigences : la performance énergétique (résistance thermique) ET l'impact environnemental (bilan carbone) ; les deux doivent être argumentés."
+    },
+    {
+      "error": "Affirmer que le polyuréthane est le meilleur isolant sans s'appuyer sur les valeurs chiffrées du DTS3",
+      "remediation": "Toujours citer les valeurs de λ et de bilan carbone issues du DTS3 pour justifier le choix de manière quantitative."
+    },
+    {
+      "error": "Confondre conductivité thermique (λ) et résistance thermique (R) : croire qu'un λ élevé est favorable",
+      "remediation": "Un λ faible signifie que le matériau conduit peu la chaleur, donc il isole mieux ; R = e/λ augmente quand λ diminue."
+    },
+    {
+      "error": "Ne pas relier le bilan carbone à l'indicateur Ic construction de la RE 2020",
+      "remediation": "Préciser que la RE 2020 limite l'Ic construction (impact carbone du bâtiment) et qu'un bilan carbone faible de l'isolant contribue directement à respecter ce seuil."
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "input_data": [
+    {
+      "name": "résistance thermique globale calculée (question A.2)",
+      "value": "5,61 m²·K·W-1",
+      "source": "question_precedente"
+    },
+    {
+      "name": "valeur simulée minimale Rmin murs/pl bas",
+      "value": "6,66 m²·K·W-1",
+      "source": "question_context"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "conclusion sur la cohérence de la résistance thermique calculée",
+      "value": "Non, la résistance thermique calculée n'est pas en cohérence : 5,61 m²·K·W-1 < 6,66 m²·K·W-1, il y a un écart de performance",
+      "reasoning": "Comparaison directe : 6,66 m²·K·W-1 ≥ Rtot = 5,61 m²·K·W-1 → la valeur calculée est inférieure à la valeur minimale imposée, la paroi ne respecte pas la RE 2020"
+    },
+    {
+      "name": "solutions pour respecter le critère Rmin",
+      "value": "Utiliser un isolant plus performant (λ plus petit) et/ou augmenter l'épaisseur de l'isolant",
+      "reasoning": "R = e/λ : pour augmenter R, on peut diminuer λ (isolant plus performant) ou augmenter e (épaisseur plus importante), ou combiner les deux"
+    }
+  ],
+  "intermediate_steps": [
+    "Identifier les deux valeurs à comparer : la résistance thermique calculée en A.2 (5,61 m²·K·W-1) et la valeur simulée minimale Rmin (6,66 m²·K·W-1)",
+    "Comparer les deux valeurs en posant l'inégalité : vérifier si Rtot ≥ Rmin ou Rtot < Rmin",
+    "Conclure sur la conformité : si Rtot < Rmin, la paroi ne respecte pas la réglementation et un écart de performance existe",
+    "Rappeler la relation R = e/λ pour identifier les paramètres sur lesquels agir afin d'augmenter la résistance thermique",
+    "Proposer des solutions concrètes en jouant sur e (épaisseur) et/ou λ (conductivité thermique de l'isolant)"
+  ],
+  "common_errors": [
+    {
+      "error": "Inverser le sens de l'inégalité et conclure à tort que la paroi est conforme",
+      "remediation": "Vérifier que Rtot doit être supérieure ou égale à Rmin ; ici 5,61 < 6,66 donc la paroi n'est PAS conforme"
+    },
+    {
+      "error": "Proposer uniquement une solution (par exemple seulement augmenter l'épaisseur) sans mentionner l'alternative sur λ",
+      "remediation": "Penser à la formule R = e/λ : deux leviers existent, e et λ, et ils peuvent être combinés"
+    },
+    {
+      "error": "Confondre λ et R : dire qu'il faut un isolant avec un λ plus grand pour améliorer l'isolation",
+      "remediation": "Un λ plus petit signifie un matériau moins conducteur donc plus isolant, ce qui augmente R = e/λ"
+    },
+    {
+      "error": "Oublier de quantifier ou de justifier l'écart de performance",
+      "remediation": "Mentionner explicitement les deux valeurs et leur différence (6,66 − 5,61 = 1,05 m²·K·W-1) pour montrer l'ampleur de l'écart"
+    }
+  ]
+}

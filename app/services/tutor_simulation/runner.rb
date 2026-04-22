@@ -185,10 +185,11 @@ module TutorSimulation
     def judge_transcript(question, profile, profile_label, transcript)
       judge = Judge.new(client: @judge_client)
       judge.evaluate(
-        question_label:  question.label,
-        student_profile: profile_label,
-        correction_text: question.answer&.correction_text.to_s,
-        transcript:      transcript
+        question_label:        question.label,
+        student_profile:       profile_label,
+        correction_text:       question.answer&.correction_text.to_s,
+        structured_correction: question.answer&.structured_correction,
+        transcript:            transcript
       )
     rescue => e
       puts "    ⚠ Erreur juge: #{e.message}"

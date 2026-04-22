@@ -1,0 +1,60 @@
+{
+  "input_data": [
+    {
+      "name": "résistance thermique de surface extérieure (Rse)",
+      "value": "0,04 m²·K·W-1",
+      "source": "question_precedente"
+    },
+    {
+      "name": "résistance thermique de la laine de roche",
+      "value": "5,29 m²·K·W-1",
+      "source": "question_precedente"
+    },
+    {
+      "name": "résistance thermique de l'OSB",
+      "value": "0,07 m²·K·W-1",
+      "source": "question_precedente"
+    },
+    {
+      "name": "résistance thermique du pin",
+      "value": "0,08 m²·K·W-1",
+      "source": "question_precedente"
+    },
+    {
+      "name": "résistance thermique de surface intérieure (Rsi)",
+      "value": "0,13 m²·K·W-1",
+      "source": "question_precedente"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "résistance thermique globale de la paroi murale",
+      "value": "5,61 m²·K·W-1",
+      "reasoning": "Rparoi = ΣRi = Rse + R(laine de roche) + R(OSB) + R(pin) + Rsi = 0,04 + 5,29 + 0,07 + 0,08 + 0,13"
+    }
+  ],
+  "intermediate_steps": [
+    "Identifier toutes les couches de la paroi et leurs résistances thermiques issues de la question A.1",
+    "Rappeler que pour des couches en série, la résistance thermique globale est la somme des résistances individuelles : Rparoi = ΣRi",
+    "Additionner les cinq résistances thermiques : Rse, R(laine de roche), R(OSB), R(pin) et Rsi",
+    "Vérifier la cohérence de l'unité du résultat (m²·K·W-1)"
+  ],
+  "common_errors": [
+    {
+      "error": "Oublier d'inclure les résistances superficielles Rse et/ou Rsi dans la somme",
+      "remediation": "Les résistances de surface extérieure et intérieure font partie intégrante de la résistance thermique globale de la paroi ; toujours les inclure dans le calcul de ΣRi"
+    },
+    {
+      "error": "Utiliser une formule de résistances en parallèle (1/Rparoi = Σ1/Ri) au lieu de la somme en série",
+      "remediation": "Les couches d'une paroi plane sont traversées successivement par le flux thermique : elles sont en série, donc Rparoi = ΣRi"
+    },
+    {
+      "error": "Erreur d'arrondi ou de report d'une valeur issue de la question A.1",
+      "remediation": "Reprendre exactement les valeurs calculées en A.1 sans les arrondir davantage avant de les sommer"
+    },
+    {
+      "error": "Oublier une couche (par exemple le pin ou l'OSB) dans la somme",
+      "remediation": "Lister méthodiquement toutes les couches de la paroi de l'extérieur vers l'intérieur avant d'effectuer la somme"
+    }
+  ]
+}

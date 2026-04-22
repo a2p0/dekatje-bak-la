@@ -1,0 +1,96 @@
+{
+  "input_data": [
+    {
+      "name": "résistance superficielle extérieure Rse",
+      "value": "0,04 m²·K·W-1",
+      "source": "DRS1"
+    },
+    {
+      "name": "résistance superficielle intérieure Rsi",
+      "value": "0,13 m²·K·W-1",
+      "source": "DRS1"
+    },
+    {
+      "name": "épaisseur de la laine de roche (première couche)",
+      "value": "0,08 m",
+      "source": "DTS1"
+    },
+    {
+      "name": "épaisseur de la laine de roche (deuxième couche)",
+      "value": "0,1 m",
+      "source": "DTS1"
+    },
+    {
+      "name": "conductivité thermique de la laine de roche",
+      "value": "0,034 W·m-1·K-1",
+      "source": "DTS1"
+    },
+    {
+      "name": "épaisseur de l'OSB",
+      "value": "0,01 m",
+      "source": "DTS1"
+    },
+    {
+      "name": "conductivité thermique de l'OSB",
+      "value": "0,144 W·m-1·K-1",
+      "source": "DTS1"
+    },
+    {
+      "name": "épaisseur du Pin",
+      "value": "0,01 m",
+      "source": "DTS1"
+    },
+    {
+      "name": "conductivité thermique du Pin",
+      "value": "0,13 W·m-1·K-1",
+      "source": "DTS1"
+    }
+  ],
+  "final_answers": [
+    {
+      "name": "épaisseur totale de la laine de roche",
+      "value": "0,18 m",
+      "reasoning": "Addition des deux couches de laine de roche : 0,08 + 0,1 = 0,18 m"
+    },
+    {
+      "name": "résistance thermique de la laine de roche",
+      "value": "5,29 m²·K·W-1",
+      "reasoning": "R = e/λ = 0,18/0,034 = 5,29 m²·K·W-1"
+    },
+    {
+      "name": "résistance thermique de l'OSB",
+      "value": "0,07 m²·K·W-1",
+      "reasoning": "R = e/λ = 0,01/0,144 = 0,07 m²·K·W-1"
+    },
+    {
+      "name": "résistance thermique du Pin",
+      "value": "0,08 m²·K·W-1",
+      "reasoning": "R = e/λ = 0,01/0,13 = 0,08 m²·K·W-1"
+    }
+  ],
+  "intermediate_steps": [
+    "Identifier dans le DTS1 les couches de la paroi prises en compte dans le calcul (laine de roche, OSB, Pin) et celles à ignorer (pare-vapeur, pare-pluie, lame d'air ventilée, bardage aluminium)",
+    "Pour la laine de roche, additionner les épaisseurs des deux couches indiquées dans le DTS1 afin d'obtenir l'épaisseur totale",
+    "Appliquer la formule R = e/λ pour chaque couche en utilisant l'épaisseur (en mètres) et la conductivité thermique correspondante issues du DTS1",
+    "Reporter les valeurs de Rse et Rsi déjà renseignées dans le DRS1 sans les recalculer",
+    "Compléter le tableau du DRS1 avec les résistances thermiques calculées pour chaque couche"
+  ],
+  "common_errors": [
+    {
+      "error": "Oublier d'additionner les deux couches de laine de roche et n'utiliser qu'une seule épaisseur (0,08 m ou 0,1 m) dans le calcul",
+      "remediation": "Vérifier dans le DTS1 si un matériau apparaît en plusieurs couches et sommer toutes ses épaisseurs avant d'appliquer R = e/λ"
+    },
+    {
+      "error": "Inclure dans le calcul des couches non prises en compte (pare-vapeur, pare-pluie, lame d'air ventilée, bardage aluminium)",
+      "remediation": "Lire attentivement le DTS1 qui précise quelles couches sont exclues du calcul de résistance thermique"
+    },
+    {
+      "error": "Inverser e et λ dans la formule en calculant λ/e au lieu de e/λ",
+      "remediation": "Mémoriser que R = e/λ : l'épaisseur (en m) est au numérateur et la conductivité (en W·m-1·K-1) au dénominateur"
+    },
+    {
+      "error": "Utiliser l'épaisseur en centimètres au lieu de la convertir en mètres avant le calcul",
+      "remediation": "Toujours convertir les épaisseurs en mètres (diviser par 100 si elles sont données en cm) avant d'appliquer la formule"
+    }
+  ]
+}
