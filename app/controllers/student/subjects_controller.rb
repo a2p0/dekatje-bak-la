@@ -66,6 +66,8 @@ class Student::SubjectsController < Student::BaseController
     if (first_visit || returning_from_part) && !@session_record.all_parts_completed? && !explicit_navigation
       @parts = all_parts
       @first_question = first_incomplete_part_question(all_parts)
+      existing_conv = current_student.conversations.find_by(subject: @subject, lifecycle_state: "active")
+      @auto_open_drawer = existing_conv && !existing_conv.tutor_state.welcome_sent
       return render :show
     end
 

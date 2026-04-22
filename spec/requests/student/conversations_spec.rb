@@ -16,6 +16,10 @@ RSpec.describe "Student::Conversations", type: :request do
   end
 
   describe "POST /:access_code/conversations" do
+    before do
+      allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
+    end
+
     it "creates a conversation for the subject and returns conversation_id" do
       post student_conversations_path(access_code: classroom.access_code),
            params: { subject_id: exam_subject.id },
@@ -305,6 +309,74 @@ RSpec.describe "Student::Conversations", type: :request do
       expect(html).to include("Info système")
       expect(html).to include("self-center")
       expect(html).to include(%(data-message-role="system"))
+    end
+  end
+
+  describe "POST #create — welcome message (044)" do
+    before do
+      allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
+    end
+
+    context "when welcome has not been sent yet (welcome_sent: false)" do
+      it "calls BuildWelcomeMessage" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(Tutor::BuildWelcomeMessage).to have_received(:call).once
+      end
+
+      it "includes a turbo-stream replace for the activation banner" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(response.body).to include("turbo-stream")
+        expect(response.body).to include("tutor-activation-banner")
+      end
+
+      it "includes a turbo-stream dispatch for drawer-open event" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(response.body).to include("tutor:drawer-open")
+      end
+    end
+
+    context "when welcome has already been sent (welcome_sent: true)" do
+      before do
+        create(:conversation, student: student, subject: exam_subject,
+               lifecycle_state: "active",
+               tutor_state: TutorState.default.with(welcome_sent: true))
+      end
+
+      it "does not call BuildWelcomeMessage again" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(Tutor::BuildWelcomeMessage).not_to have_received(:call)
+      end
+    end
+  end
+
+  describe "PATCH #mark_intro_seen (044)" do
+    let!(:conversation) do
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: TutorState.default)
+    end
+
+    it "sets intro_seen to true for the given question and returns 200" do
+      patch mark_intro_seen_student_conversation_path(
+              access_code: classroom.access_code,
+              id: conversation.id
+            ),
+            params: { question_id: question.id }
+
+      expect(response).to have_http_status(:ok)
+      qs = conversation.reload.tutor_state.question_states[question.id.to_s]
+      expect(qs&.intro_seen).to eq(true)
     end
   end
 end

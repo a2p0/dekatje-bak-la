@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       member do
         post  :messages
         patch :confidence
+        patch :mark_intro_seen
       end
     end
   end

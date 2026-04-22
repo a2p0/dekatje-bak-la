@@ -54,6 +54,13 @@
                  access_code: params[:access_code] %>
     <% end %>
 
+    <%# Auto-open drawer if tutor active but welcome not yet sent (page reload case) %>
+    <% if @auto_open_drawer %>
+      <div data-controller="auto-dispatch"
+           data-auto-dispatch-event-value="tutor:drawer-open"
+           class="hidden"></div>
+    <% end %>
+
     <%# Scope change link (for new-format subjects with scope already selected) %>
     <% if @session_record.requires_scope_selection? && @session_record.scope_selected? %>
       <div class="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
