@@ -21,6 +21,12 @@ class ExtractQuestionsJob < ApplicationJob
     provider_used = subject.owner.api_key.present? ? :teacher : :server
     job.update!(status: :done, raw_json: raw_response, provider_used: provider_used)
 
+    begin
+      EnrichAllAnswers.call(subject: subject.reload, api_key: resolved.api_key, provider: resolved.provider)
+    rescue => e
+      Rails.logger.warn("[ExtractQuestionsJob] EnrichAllAnswers failed: #{e.message}")
+    end
+
     broadcast_extraction_status(subject)
   rescue => e
     job&.update!(status: :failed, error_message: e.message, raw_json: raw_response)

@@ -7,12 +7,14 @@ RSpec.describe ExtractQuestionsJob, type: :job do
   let(:resolved_key) { ResolveApiKey::Result.new(api_key: "sk-test", provider: :anthropic) }
   let(:raw_response) { '{"presentation":"Test","parts":[]}' }
   let(:extracted_data) { { "presentation" => "Test", "parts" => [] } }
+  let(:enrich_result) { { enriched: 0, skipped: 0, errors: 0 } }
 
   before do
     extraction_job
     allow(ResolveApiKey).to receive(:call).and_return(resolved_key)
     allow(ExtractQuestionsFromPdf).to receive(:call).and_return([ raw_response, extracted_data ])
     allow(PersistExtractedData).to receive(:call).and_return(subject_obj)
+    allow(EnrichAllAnswers).to receive(:call).and_return(enrich_result)
     allow(Turbo::StreamsChannel).to receive(:broadcast_replace_to)
   end
 
@@ -43,6 +45,34 @@ RSpec.describe ExtractQuestionsJob, type: :job do
         subject: subject_obj,
         data: extracted_data
       )
+    end
+
+    it "calls EnrichAllAnswers after successful extraction" do
+      described_class.perform_now(subject_obj.id)
+      expect(EnrichAllAnswers).to have_received(:call).with(
+        subject: anything,
+        api_key: "sk-test",
+        provider: :anthropic
+      )
+    end
+
+    it "marks the job done before calling EnrichAllAnswers" do
+      call_order = []
+      allow(extraction_job).to receive(:update!).and_call_original
+      allow(EnrichAllAnswers).to receive(:call) do
+        call_order << :enrich_called
+        call_order << extraction_job.reload.status.to_sym
+        enrich_result
+      end
+
+      described_class.perform_now(subject_obj.id)
+      expect(call_order).to eq([ :enrich_called, :done ])
+    end
+
+    it "keeps job done even if EnrichAllAnswers raises" do
+      allow(EnrichAllAnswers).to receive(:call).and_raise(StandardError, "enrichment failed")
+      described_class.perform_now(subject_obj.id)
+      expect(extraction_job.reload.status).to eq("done")
     end
 
     it "broadcasts Turbo Stream updates to subject channel" do
