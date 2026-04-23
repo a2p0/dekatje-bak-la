@@ -31,8 +31,7 @@ class Student::ConversationsController < Student::BaseController
             "tutor-activation-banner",
             partial: "student/tutor/tutor_activated",
             locals:  { subject: @subject, access_code: params[:access_code] }
-          ),
-          turbo_stream.action(:dispatch_event, "chat-drawer", { name: "tutor:drawer-open" })
+          )
         ]
       end
       format.json { render json: { conversation_id: @conversation.id } }
