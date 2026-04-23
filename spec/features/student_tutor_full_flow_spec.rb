@@ -53,7 +53,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      {}, welcome_sent: false)
+      question_states:      {}, welcome_sent: true)
   end
 
   def fake_tool_call(name:, arguments: {})
@@ -212,7 +212,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
   scenario "persistance : rouvrir le drawer conserve les messages précédents", js: true do
     conv = create(:conversation,
       student: student, subject: subject_record,
-      lifecycle_state: "active", tutor_state: TutorState.default)
+      lifecycle_state: "active", tutor_state: TutorState.default.with(welcome_sent: true))
     create(:message, conversation: conv, role: :user,      content: "Premier message élève")
     create(:message, conversation: conv, role: :assistant, content: "Réponse du tuteur")
 
