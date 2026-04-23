@@ -334,7 +334,6 @@ RSpec.describe "Student::Conversations", type: :request do
         expect(response.body).to include("turbo-stream")
         expect(response.body).to include("tutor-activation-banner")
       end
-
     end
 
     context "when welcome has already been sent (welcome_sent: true)" do
