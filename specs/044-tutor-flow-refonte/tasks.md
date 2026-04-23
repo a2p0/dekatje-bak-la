@@ -15,16 +15,16 @@
 
 **Purpose**: Migration + extensions modèles — bloque tout le reste.
 
-- [ ] T001 Créer migration `db/migrate/YYYYMMDD_add_kind_to_messages.rb` — `add_column :messages, :kind, :integer, default: 0, null: false` (réversible)
-- [ ] T002 Étendre `TutorState` dans `app/models/tutor_state.rb` — ajouter `welcome_sent` (default: false) au `Data.define` et mettre à jour `TutorState.default`
-- [ ] T003 Étendre `QuestionState` dans `app/models/tutor_state.rb` — ajouter `intro_seen` (default: false) au `Data.define`
-- [ ] T004 Ajouter `enum :kind, { normal: 0, welcome: 1, intro: 2 }` dans `app/models/message.rb`
-- [ ] T005 Rétrocompatibilité `TutorStateType` dans `app/models/types/tutor_state_type.rb` — vérifier que `welcome_sent` et `intro_seen` sont lus avec `fetch(:welcome_sent, false)` / `fetch(:intro_seen, false)` pour les enregistrements existants
+- [x] T001 Créer migration `db/migrate/YYYYMMDD_add_kind_to_messages.rb` — `add_column :messages, :kind, :integer, default: 0, null: false` (réversible)
+- [x] T002 Étendre `TutorState` dans `app/models/tutor_state.rb` — ajouter `welcome_sent` (default: false) au `Data.define` et mettre à jour `TutorState.default`
+- [x] T003 Étendre `QuestionState` dans `app/models/tutor_state.rb` — ajouter `intro_seen` (default: false) au `Data.define`
+- [x] T004 Ajouter `enum :kind, { normal: 0, welcome: 1, intro: 2 }` dans `app/models/message.rb`
+- [x] T005 Rétrocompatibilité `TutorStateType` dans `app/models/types/tutor_state_type.rb` — vérifier que `welcome_sent` et `intro_seen` sont lus avec `fetch(:welcome_sent, false)` / `fetch(:intro_seen, false)` pour les enregistrements existants
 
 **Specs Phase 1** (écrire failing AVANT T002-T005) :
 
-- [ ] T006 [P] Spec `spec/models/tutor_state_spec.rb` — `welcome_sent` default false, `TutorState.default` valide, rétrocompatibilité JSONB sans la clé
-- [ ] T007 [P] Spec `spec/models/message_spec.rb` — enum kind présent, default `:normal`, valeurs `:welcome` et `:intro` valides
+- [x] T006 [P] Spec `spec/models/tutor_state_spec.rb` — `welcome_sent` default false, `TutorState.default` valide, rétrocompatibilité JSONB sans la clé
+- [x] T007 [P] Spec `spec/models/message_spec.rb` — enum kind présent, default `:normal`, valeurs `:welcome` et `:intro` valides
 
 **Checkpoint** : `db:migrate` + `db:rollback` propres, modèles chargent sans erreur, specs T006-T007 passent.
 
@@ -38,8 +38,8 @@
 
 ### Specs US1 (écrire failing AVANT implémentation)
 
-- [ ] T008 [P] [US1] Spec `spec/services/tutor/build_welcome_message_spec.rb` — 4 cas : LLM success (content contient title + n_questions), LLM failure (fallback statique sans exception), message persisté avec `kind: :welcome`, `welcome_sent` mis à true dans TutorState
-- [ ] T009 [P] [US1] Spec `spec/requests/student/conversations_spec.rb` — `POST #create` avec tuteur non activé : welcome message créé, Turbo Stream replace banner, Turbo Stream dispatch drawer-open ; `POST #create` avec welcome déjà envoyé : pas de doublon
+- [x] T008 [P] [US1] Spec `spec/services/tutor/build_welcome_message_spec.rb` — 4 cas : LLM success (content contient title + n_questions), LLM failure (fallback statique sans exception), message persisté avec `kind: :welcome`, `welcome_sent` mis à true dans TutorState
+- [x] T009 [P] [US1] Spec `spec/requests/student/conversations_spec.rb` — `POST #create` avec tuteur non activé : welcome message créé, Turbo Stream replace banner, Turbo Stream dispatch drawer-open ; `POST #create` avec welcome déjà envoyé : pas de doublon
 
 ### Implémentation US1
 
