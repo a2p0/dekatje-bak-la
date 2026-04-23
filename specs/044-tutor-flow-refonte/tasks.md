@@ -11,159 +11,121 @@
 
 ---
 
-## Phase 1 : Setup — Fondation (bloquant)
+## Phase 1 : Setup — Fondation (bloquant) ✅ DONE
 
-**Purpose**: Migration + extensions modèles — bloque tout le reste.
-
-- [x] T001 Créer migration `db/migrate/YYYYMMDD_add_kind_to_messages.rb` — `add_column :messages, :kind, :integer, default: 0, null: false` (réversible)
-- [x] T002 Étendre `TutorState` dans `app/models/tutor_state.rb` — ajouter `welcome_sent` (default: false) au `Data.define` et mettre à jour `TutorState.default`
-- [x] T003 Étendre `QuestionState` dans `app/models/tutor_state.rb` — ajouter `intro_seen` (default: false) au `Data.define`
-- [x] T004 Ajouter `enum :kind, { normal: 0, welcome: 1, intro: 2 }` dans `app/models/message.rb`
-- [x] T005 Rétrocompatibilité `TutorStateType` dans `app/models/types/tutor_state_type.rb` — vérifier que `welcome_sent` et `intro_seen` sont lus avec `fetch(:welcome_sent, false)` / `fetch(:intro_seen, false)` pour les enregistrements existants
-
-**Specs Phase 1** (écrire failing AVANT T002-T005) :
-
-- [x] T006 [P] Spec `spec/models/tutor_state_spec.rb` — `welcome_sent` default false, `TutorState.default` valide, rétrocompatibilité JSONB sans la clé
-- [x] T007 [P] Spec `spec/models/message_spec.rb` — enum kind présent, default `:normal`, valeurs `:welcome` et `:intro` valides
-
-**Checkpoint** : `db:migrate` + `db:rollback` propres, modèles chargent sans erreur, specs T006-T007 passent.
+- [x] T001 Créer migration `add_kind_to_messages`
+- [x] T002 Étendre `TutorState` — `welcome_sent`
+- [x] T003 Étendre `QuestionState` — `intro_seen`
+- [x] T004 Ajouter `enum :kind` dans `Message`
+- [x] T005 Rétrocompatibilité `TutorStateType`
+- [x] T006 [P] Spec `tutor_state_spec.rb`
+- [x] T007 [P] Spec `message_spec.rb`
 
 ---
 
-## Phase 2 : User Story 1 — Activation et accueil automatique (P1) 🎯 MVP
+## Phase 2 : Nettoyage page sujet (US1) ✅ DONE (partiel — pivot appliqué)
 
-**Goal**: Clic sur "Activer le tuteur" → drawer s'ouvre automatiquement + message d'accueil dans le drawer. Si tuteur déjà actif au chargement : idem.
+- [x] T012 Supprimer bouton "Commencer" dans `_tutor_activated.html.erb`
 
-**Independent Test**: Activer le tuteur sur un sujet → vérifier que le drawer s'ouvre et qu'un message d'accueil (contenant le titre du sujet) est visible.
+**Pivot 2026-04-23** : T008-T011, T013-T014 remplacés par Phase 3 ci-dessous.
+`conversations#create` ne génère plus le welcome depuis la page sujet.
+Le `turbo_stream.append(auto-dispatch)` ajouté en Phase 2 est à supprimer (voir T101).
 
-### Specs US1 (écrire failing AVANT implémentation)
+---
 
-- [x] T008 [P] [US1] Spec `spec/services/tutor/build_welcome_message_spec.rb` — 4 cas : LLM success (content contient title + n_questions), LLM failure (fallback statique sans exception), message persisté avec `kind: :welcome`, `welcome_sent` mis à true dans TutorState
-- [x] T009 [P] [US1] Spec `spec/requests/student/conversations_spec.rb` — `POST #create` avec tuteur non activé : welcome message créé, Turbo Stream replace banner, Turbo Stream dispatch drawer-open ; `POST #create` avec welcome déjà envoyé : pas de doublon
+## Phase 3 : Indicateur tuteur page sujet (US1 — nouveau) 🎯 MVP
+
+**Goal**: Remplacer le bloc d'activation par un indicateur d'état statique : "Tuteur actif / disponible / indisponible — [Paramétrer]". Aucun bouton d'activation.
+
+### Specs (écrire failing AVANT implémentation)
+
+- [ ] T100 [P] [US1] Spec `spec/requests/student/subjects_spec.rb` — `GET #show` : état "indisponible" (pas de clé, pas de free mode) ; état "disponible" (clé présente, pas de conversation) ; état "actif" (conversation active OU `use_personal_key`) ; aucun bouton "Activer le tuteur" dans le DOM.
 
 ### Implémentation US1
 
-- [ ] T010 [US1] Créer `app/services/tutor/build_welcome_message.rb` — appel LLM RubyLLM (1 phrase, temperature 0.7, max_tokens 30, timeout 8s), template slot-fill, fallback statique `"Lance-toi quand tu es prêt !"`, persist `Message(kind: :welcome)`, update `TutorState#welcome_sent = true` via `UpdateTutorState`
-- [ ] T011 [US1] Modifier `app/controllers/student/conversations_controller.rb#create` — après `activate!`, appeler `Tutor::BuildWelcomeMessage` si `!session_record.tutor_state.welcome_sent` ; ajouter second Turbo Stream dispatch `tutor:drawer-open` ; gérer erreur LLM sans bloquer le flow
-- [ ] T012 [US1] Modifier `app/views/student/tutor/_tutor_activated.html.erb` — supprimer le bouton "Commencer" (garder uniquement la confirmation visuelle "Tuteur activé ✓")
-- [ ] T013 [US1] Modifier `app/views/student/subjects/show.html.erb` — ajouter auto-open conditionnel via attribut Stimulus si `@conversation && !@session_record.tutor_state.welcome_sent` (cas tuteur déjà actif au chargement de page)
-- [ ] T014 [US1] Modifier `app/javascript/controllers/chat_drawer_controller.js` — ajouter handler pour l'événement custom `tutor:drawer-open` (écoute `window` ou élément parent, appelle `this.open()`)
+- [ ] T101 [US1] Nettoyer `app/controllers/student/conversations_controller.rb#create` — supprimer le `turbo_stream.append` auto-dispatch ; la méthode reste mais ne dispatche plus d'événement drawer depuis ce point.
+- [ ] T102 [US1] Modifier `app/views/student/tutor/_tutor_banner.html.erb` — remplacer le contenu par l'indicateur tri-état : "Tuteur indisponible — [Paramétrer]" / "Tuteur disponible" / "Tuteur actif". Supprimer le formulaire d'activation.
+- [ ] T103 [US1] Adapter `app/controllers/student/subjects_controller.rb` — calculer `@tutor_status` (`:unavailable`, `:available`, `:active`) et l'exposer à la vue. Condition "actif" : conversation active sur ce sujet OU `current_student.use_personal_key?`.
 
-**Checkpoint US1** : Feature Capybara scenario 1 passe — activation → drawer ouvert → message d'accueil visible. Scenario 4 passe — retour sur page sujet avec welcome déjà envoyé → drawer reste fermé.
+**Checkpoint US1** : Page sujet affiche le bon état tuteur sans bouton d'activation. T100 passe.
 
 ---
 
-## Phase 3 : User Story 2 — Bouton "Commencer" unique et navigation (P1)
+## Phase 4 : Bouton "Commencer" unique (US2) 🎯 MVP
 
-**Goal**: Un seul bouton "Commencer" en bas de la page sujet, pointant vers la première question non traitée.
+**Goal**: Un seul bouton "Commencer" sur la page sujet, navigation vers la première question non traitée.
 
-**Independent Test**: Vérifier page sujet — un seul bouton "Commencer" visible. Cliquer → redirige vers Q1.1 (ou première non traitée si progression partielle).
+> Note: T012 (suppression bouton dans `_tutor_activated`) déjà fait. Cette phase valide et corrige si nécessaire.
 
-> Note: T012 (suppression bouton dans `_tutor_activated`) est déjà réalisé en Phase 2. Cette phase valide et teste le comportement de navigation.
+### Specs
 
-### Specs US2 (écrire failing AVANT implémentation)
-
-- [ ] T015 [US2] Spec `spec/requests/student/subjects_spec.rb` (ou feature spec) — `GET #show` avec tuteur activé : un seul bouton "Commencer" dans le DOM ; lien pointe vers Q1.1 quand aucune question traitée ; lien pointe vers Q1.3 quand Q1.1 et Q1.2 traitées ; pour sujet spécifique seul, lien pointe vers A.1
+- [ ] T015 [US2] Spec `spec/requests/student/subjects_spec.rb` (ajouter cas) — `GET #show` : un seul bouton "Commencer" dans le DOM ; lien vers Q1.1 sans progression ; lien vers Q1.3 si Q1.1+Q1.2 traitées ; lien vers A.1 pour sujet spécifique seul.
 
 ### Implémentation US2
 
-- [ ] T016a [US2] Lire `app/views/student/subjects/show.html.erb` et `app/controllers/student/subjects_controller.rb` — vérifier que `@first_question` est bien la première question **non traitée** (via `StudentSession#progression`) et non systématiquement Q1.1
-- [ ] T016b [US2] Si la spec T015 échoue sur le cas "progression partielle" : corriger la logique dans `app/controllers/student/subjects_controller.rb` pour utiliser `session_record.first_undone_question` ou équivalent ; sinon, T016b est no-op
+- [ ] T016a [US2] Lire `app/views/student/subjects/show.html.erb` et `subjects_controller.rb` — vérifier que `@first_question` est la première question **non traitée** (via `StudentSession#progression`).
+- [ ] T016b [US2] Si T015 échoue sur le cas "progression partielle" : corriger `subjects_controller.rb` pour utiliser la bonne logique ; sinon no-op.
 
-**Checkpoint US2** : Un seul bouton "Commencer" sur la page sujet dans tous les états (tuteur actif ou non). Navigation correcte selon progression.
+**Checkpoint US2** : Un seul bouton "Commencer", navigation correcte selon progression.
 
 ---
 
-## Phase 4 : User Story 3 — Badge intro-question et message contextuel (P2)
+## Phase 5 : Activation depuis page question + messages (US3) 🎯 MVP
 
-**Goal**: Sur la page question avec tuteur actif, badge visible → ouverture drawer → message intro-question déjà présent (avec hint ou concept).
+**Goal**: Clic sur [Tutorat] → drawer s'ouvre immédiatement (spinner) → conversation créée si besoin → welcome (si nouveau) → intro-question (si première visite) → badge si intro non vue.
 
-**Independent Test**: Charger page question avec tuteur actif → badge visible sur bouton "Tutorat" → ouvrir drawer → message intro présent et contient hint/concept sans valeur finale.
+### Specs (écrire failing AVANT implémentation)
 
-### Specs US3 (écrire failing AVANT implémentation)
-
-- [ ] T017 [P] [US3] Spec `spec/services/tutor/build_intro_message_spec.rb` — 5 cas : avec `data_hints` (slot data_hint rempli), avec `structured_correction.input_data` sans data_hints (slot concept rempli), avec `correction_text` uniquement (ni data_hints ni structured_correction — edge case spec.md), sans aucune donnée (formulation générique), message persisté avec `kind: :intro` et `role: :assistant`
-- [ ] T018 [P] [US3] Spec `spec/requests/student/questions_spec.rb` — `GET #show` avec conversation active et intro absent : intro message créé ; `GET #show` avec intro déjà présent : pas de doublon ; `GET #show` sans conversation : pas d'intro, `@has_intro_badge` false
-- [ ] T019 [P] [US3] Spec `spec/requests/student/conversations_spec.rb` — `PATCH #mark_intro_seen` : `intro_seen` mis à true dans TutorState pour la question, 200 OK
+- [ ] T200 [P] [US3] Spec `spec/services/tutor/build_welcome_message_spec.rb` — 4 cas : LLM success, LLM failure (fallback), message persisté `kind: :welcome`, `welcome_sent = true`.
+- [ ] T201 [P] [US3] Spec `spec/services/tutor/build_intro_message_spec.rb` — 5 cas : avec `data_hints`, avec `structured_correction.input_data`, avec `correction_text` seul, sans aucune donnée (générique), message persisté `kind: :intro`.
+- [ ] T202 [P] [US3] Spec `spec/requests/student/questions_spec.rb` — `GET #show` avec conversation et intro absent : intro créé ; avec intro présent : pas de doublon ; sans conversation : `@has_intro_badge` false.
+- [ ] T203 [P] [US3] Spec `spec/requests/student/conversations_spec.rb` — `POST #create` depuis page question : conversation créée, welcome généré, Turbo Stream ouvre drawer ; `POST #create` avec welcome déjà envoyé : pas de doublon.
 
 ### Implémentation US3
 
-- [ ] T020 [US3] Créer `app/services/tutor/build_intro_message.rb` — template slot-fill déterministe (zéro LLM) : sélection hint via `answer.data_hints.first` > `structured_correction["input_data"].first` > générique ; template : `"Question [N] — [label]. Pour progresser, cherche [hint_or_concept]. Je suis là si tu as besoin d'aide — sinon, lance-toi."` ; persist `Message(kind: :intro, role: :assistant)` ; vérifie doublon avant de créer
-- [ ] T021 [US3] Modifier `app/controllers/student/questions_controller.rb#show` — si `@conversation` présent ET `!intro_message_exists?(@question)` : appeler `Tutor::BuildIntroMessage` ; calculer `@has_intro_badge = intro_pending?` (intro présent et `!intro_seen?`)
-- [ ] T022 [US3] Ajouter action `mark_intro_seen` dans `app/controllers/student/conversations_controller.rb` — met à jour `TutorState` : `question_states[question_id].with(intro_seen: true)` via `UpdateTutorState` ; répond `head :ok`
-- [ ] T023 [US3] Ajouter route `patch :mark_intro_seen` dans `config/routes.rb` sous la ressource `conversations`
-- [ ] T024 [US3] Modifier `app/views/student/questions/show.html.erb` — ajouter badge/dot sur le bouton "Tutorat" si `@has_intro_badge` (ex: badge rouge ou indicateur "💬") ; aria-label mis à jour : `"Ouvrir le tutorat IA — message en attente"`
-- [ ] T025 [US3] Modifier `app/javascript/controllers/chat_drawer_controller.js#open` — après ouverture, si `dataset.conversationId` et `dataset.questionId` présents : fetch `PATCH mark_intro_seen` avec `question_id` pour marquer intro vu
+- [ ] T210 [US3] Créer `app/services/tutor/build_welcome_message.rb` — appel LLM (1 phrase, temperature 0.7, max_tokens 30, timeout 8s), template slot-fill, fallback statique, persist `Message(kind: :welcome)`, `UpdateTutorState` avec `welcome_sent: true`.
+- [ ] T211 [US3] Créer `app/services/tutor/build_intro_message.rb` — déterministe (zéro LLM), template slot-fill, priorité hint : `data_hints.first` > `structured_correction["input_data"].first` > générique ; persist `Message(kind: :intro, role: :assistant)` ; idempotent (vérifie doublon avant création).
+- [ ] T212 [US3] Modifier `app/controllers/student/conversations_controller.rb#create` — répondre immédiatement en Turbo Stream (ouvrir drawer), appeler `BuildWelcomeMessage` si `!welcome_sent`, appeler `BuildIntroMessage` si `question_id` présent et `!intro_seen`.
+- [ ] T213 [US3] Modifier `app/controllers/student/questions_controller.rb#show` — si conversation active et `!intro_message_exists?` : appeler `BuildIntroMessage` ; calculer `@has_intro_badge` (`intro généré ET !intro_seen`).
+- [ ] T214 [US3] Ajouter action `mark_intro_seen` dans `conversations_controller.rb` — met à jour `TutorState` : `question_states[question_id].intro_seen = true` via `UpdateTutorState` ; `head :ok`.
+- [ ] T215 [US3] Ajouter route `patch :mark_intro_seen` dans `config/routes.rb`.
+- [ ] T216 [US3] Modifier `app/views/student/questions/show.html.erb` — wirer le clic [Tutorat] pour appeler `conversations#create` (si pas de conversation) ou simplement ouvrir le drawer (si déjà active) ; afficher spinner pendant la création ; badge sur bouton si `@has_intro_badge`.
+- [ ] T217 [US3] Modifier `app/javascript/controllers/chat_drawer_controller.js` — après ouverture, si `dataset.questionId` : fetch `PATCH mark_intro_seen` pour marquer intro vue.
 
-**Checkpoint US3** : Feature Capybara scenarios 3, 4, 5 passent — badge visible, intro dans drawer, badge absent au retour, élève peut répondre directement sans ouvrir drawer.
-
----
-
-## Phase 5 : Feature Specs E2E et Polish
-
-**Purpose**: Tests Capybara complets + nettoyage.
-
-- [ ] T026 Créer `spec/features/student/tutor_flow_spec.rb` avec les 5 scenarios :
-  - Scenario 1 : Activation → drawer ouvert → message d'accueil visible (contient titre sujet)
-  - Scenario 2 : Retour page sujet après welcome → drawer reste fermé
-  - Scenario 3 : Page question avec tuteur actif → badge visible → ouverture drawer → intro présent
-  - Scenario 4 : Retour page question après ouverture drawer → badge absent
-  - Scenario 5 : Élève tape réponse directement sans ouvrir drawer → envoi OK
-- [ ] T027 [P] Vérifier `app/views/student/conversations/_drawer.html.erb` — les messages `kind: :welcome` et `kind: :intro` s'affichent correctement dans la boucle existante (aucune modification nécessaire si oui, sinon adapter le rendu)
-- [ ] T028 [P] Vérifier `app/views/student/subjects/show.html.erb` — confirmer qu'aucun vestige du bouton "Commencer" de `_tutor_activated` n'est rendu dans aucun chemin de code
-- [ ] T029 Lancer CI complet — vérifier 0 régression sur les specs existantes tuteur (process_message, build_context, E2E flow existant)
-- [ ] T030 QA manuelle SC-002/SC-003 en navigateur — mesurer visuellement : drawer ouvert < 1s post-clic activation (hors LLM) ; message d'accueil visible < 5s (LLM inclus) ; documenter le résultat dans la PR description
+**Checkpoint US3** : Clic [Tutorat] → drawer ouvert < 1s → messages visibles < 5s → badge disparaît après ouverture.
 
 ---
 
-## Dépendances et ordre d'exécution
+## Phase 6 : Feature Specs E2E et Polish
 
-### Dépendances entre phases
-
-- **Phase 1** (Setup) : aucune dépendance — commencer immédiatement
-- **Phase 2** (US1) : dépend de Phase 1 complète
-- **Phase 3** (US2) : dépend de T012 (Phase 2) — peut démarrer dès T012 terminé
-- **Phase 4** (US3) : dépend de Phase 1 — indépendante de US1/US2 côté services ; dépend de T011 pour le controller conversations
-- **Phase 5** (Polish) : dépend de Phases 2, 3, 4
-
-### Dans chaque phase
-
-- Specs (T00X) : écrire AVANT l'implémentation, vérifier qu'elles FAIL
-- Modèles avant services, services avant controllers, controllers avant vues
-- Commit après chaque tâche ou groupe logique cohérent (constitution VI.6)
-
-### Opportunités de parallélisme
-
-- T006 et T007 (specs modèles) : parallèles entre eux
-- T008 et T009 (specs US1) : parallèles entre eux
-- T017, T018, T019 (specs US3) : parallèles entre eux
-- T027 et T028 (polish vues) : parallèles entre eux
+- [ ] T300 Créer `spec/features/student/tutor_flow_spec.rb` avec 5 scenarios :
+  - Scenario 1 : première activation → drawer ouvert → welcome + intro visible
+  - Scenario 2 : retour sur même question → drawer ouvert → pas de doublon
+  - Scenario 3 : navigation vers autre question → intro nouvelle question visible
+  - Scenario 4 : élève sans clé → bouton "Tutorat" absent
+  - Scenario 5 : élève poste réponse directement sans ouvrir drawer → envoi OK
+- [ ] T301 [P] Vérifier `_drawer.html.erb` — messages `kind: :welcome` et `kind: :intro` s'affichent correctement dans la boucle existante.
+- [ ] T302 [P] Vérifier `subjects/show.html.erb` — aucun vestige de l'ancien bouton "Activer".
+- [ ] T303 Lancer CI complet — 0 régression sur specs tuteur existantes.
+- [ ] T304 QA manuelle SC-002/SC-003 en navigateur.
 
 ---
 
-## Stratégie d'implémentation
+## Dépendances
 
-### MVP (US1 + US2 uniquement)
-
-1. Phase 1 complète (T001-T007)
-2. Phase 2 US1 (T008-T014) → valider scenario 1 en navigateur
-3. Phase 3 US2 (T015-T016) → valider bouton unique
-4. **STOP** : PR partielle si MVP suffisant
-
-### Livraison complète
-
-1. Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5
-2. Sim validation (SC-004/SC-005) après merge
-
----
+- Phase 3 : aucune dépendance (nettoyage)
+- Phase 4 : indépendante de Phase 3
+- Phase 5 : dépend de Phase 1 (done) ; T212 dépend de T210
+- Phase 6 : dépend de Phases 3, 4, 5
 
 ## Résumé
 
-| Phase | Tâches | Parallelisables |
+| Phase | Tâches | Status |
 |---|---|---|
-| Phase 1 — Setup | T001-T007 | T006, T007 |
-| Phase 2 — US1 Activation | T008-T014 | T008, T009 |
-| Phase 3 — US2 Bouton | T015-T016 | — |
-| Phase 4 — US3 Intro-question | T017-T025 | T017, T018, T019 |
-| Phase 5 — Polish/E2E | T026-T029 | T027, T028 |
-| **Total** | **29 tâches** | **9 parallèles** |
+| Phase 1 — Setup | T001-T007 | ✅ DONE |
+| Phase 2 — Nettoyage partiel | T012 | ✅ DONE |
+| Phase 3 — Indicateur sujet | T100-T103 | ⏳ |
+| Phase 4 — Bouton Commencer | T015-T016b | ⏳ |
+| Phase 5 — Activation question | T200-T217 | ⏳ |
+| Phase 6 — E2E Polish | T300-T304 | ⏳ |
+| **Total restant** | **~22 tâches** | |

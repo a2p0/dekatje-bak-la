@@ -2,127 +2,141 @@
 
 **Feature Branch**: `044-tutor-flow-refonte`
 **Created**: 2026-04-22
+**Last amended**: 2026-04-23 — pivot activation depuis page question (plus depuis page sujet)
 **Status**: Draft
+
+## Pivot 2026-04-23
+
+L'activation du tuteur est déplacée de la page sujet vers la page question.
+Raison architecturale : le drawer tuteur n'existe que sur `questions/show` — dispatcher un événement depuis `subjects/show` tirait dans le vide.
+
+**Ce qui change :**
+- US1 (activation page sujet + drawer auto-open) → remplacée par le nouveau comportement ci-dessous
+- US2 (bouton "Commencer" unique) → conservée, simplifiée (T012 déjà fait)
+- US3 (badge intro-question) → conservée, intégrée au flux d'activation
+
+**Dépréciation UX renommage "Tutorat"** : noté, différé post-MVP.
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 — Activation du tuteur et accueil automatique (Priority: P1)
+### User Story 1 — Indicateur tuteur sur la page sujet (Priority: P1)
 
-Un élève arrive sur la page d'un sujet et active le tuteur. Dès l'activation, le drawer s'ouvre automatiquement et un message d'accueil personnalisé s'affiche, sans qu'il n'ait à faire d'autre action.
+La page sujet affiche l'état du tuteur pour l'élève, sans bouton d'activation. L'activation se fait depuis la page question.
 
-**Why this priority**: C'est le point d'entrée principal du tuteur. Si l'accueil ne se déclenche pas, toute la valeur de la feature est perdue.
-
-**Independent Test**: Activer le tuteur sur un sujet, vérifier que le drawer s'ouvre et qu'un message d'accueil apparaît dans le drawer.
+**Why this priority**: L'élève doit savoir si le tuteur est disponible avant de choisir sa question.
 
 **Acceptance Scenarios**:
 
-1. **Given** un élève authentifié sur la page d'un sujet, tuteur non encore activé, **When** il clique sur [Activer le tuteur], **Then** le drawer s'ouvre automatiquement et un message d'accueil s'affiche dans le drawer.
-2. **Given** un élève sur la page d'un sujet avec le tuteur déjà activé (clé API élève ou mode free), **When** la page se charge, **Then** le drawer s'ouvre automatiquement et un message d'accueil s'affiche (si pas encore vu pour ce sujet).
-3. **Given** un élève avec le tuteur activé par défaut (free mode classe), **When** il arrive sur la page sujet, **Then** le drawer s'ouvre et le message d'accueil apparaît sans qu'il ait eu à cliquer sur "Activer".
-4. **Given** un élève qui revient sur une page sujet après avoir déjà reçu le message d'accueil, **When** la page se charge, **Then** le drawer reste fermé (pas de re-déclenchement intrusif).
+1. **Given** un élève sans clé API et sans free mode activé, **When** il arrive sur la page sujet, **Then** il voit "Tuteur indisponible — [Paramétrer]" avec un lien vers les paramètres.
+2. **Given** un élève avec clé API (ou free mode) et aucune conversation active sur ce sujet, **When** il arrive sur la page sujet, **Then** il voit "Tuteur disponible".
+3. **Given** un élève avec une conversation active sur ce sujet (ou `use_personal_key` activé par défaut), **When** il arrive sur la page sujet, **Then** il voit "Tuteur actif".
+4. **Given** n'importe quel état, **When** la page sujet s'affiche, **Then** aucun bouton "Activer le tuteur" n'est présent.
 
 ---
 
-### User Story 2 — Bouton "Commencer" unique et navigation vers la première question non traitée (Priority: P1)
+### User Story 2 — Bouton "Commencer" unique et navigation (Priority: P1)
 
-L'élève dispose d'un seul bouton "Commencer" en bas de la page sujet. Ce bouton l'emmène directement vers la première question non traitée du sujet.
+L'élève dispose d'un seul bouton "Commencer" sur la page sujet, pointant vers la première question non traitée.
 
-**Why this priority**: Le doublon actuel est un bug visible qui crée de la confusion. La navigation vers la première question non traitée est essentielle en cas de reprise.
-
-**Independent Test**: Vérifier qu'un seul bouton "Commencer" est présent sur la page, et qu'il pointe vers la bonne question selon la progression.
+**Independent Test**: Un seul bouton "Commencer" visible, lien correct selon progression.
 
 **Acceptance Scenarios**:
 
-1. **Given** un élève sur la page sujet avec le tuteur activé, **When** la page s'affiche, **Then** un seul bouton "Commencer" est visible (en bas de page uniquement — plus de doublon dans la bannière d'activation).
-2. **Given** un élève qui n'a traité aucune question, **When** il clique sur [Commencer], **Then** il est redirigé vers la question 1.1 (ou A.1 pour un sujet spécifique seul).
-3. **Given** un élève qui a déjà traité Q1.1 et Q1.2, **When** il clique sur [Commencer], **Then** il est redirigé vers Q1.3 (première question non traitée).
-4. **Given** un sujet spécifique seul (pas de partie commune), **When** l'élève clique sur [Commencer], **Then** il est redirigé vers A.1.
+1. **Given** n'importe quel état tuteur, **When** la page sujet s'affiche, **Then** un seul bouton "Commencer" est visible (le bouton dans `_tutor_activated` a déjà été supprimé en Phase 2).
+2. **Given** un élève sans progression, **When** il clique sur [Commencer], **Then** il est redirigé vers Q1.1 (ou A.1 pour sujet spécifique seul).
+3. **Given** un élève ayant traité Q1.1 et Q1.2, **When** il clique sur [Commencer], **Then** il est redirigé vers Q1.3.
 
 ---
 
-### User Story 3 — Message intro-question à l'ouverture du drawer sur la page question (Priority: P2)
+### User Story 3 — Activation du tuteur et messages depuis la page question (Priority: P1)
 
-Sur la page d'une question, l'élève voit un badge signalant qu'un message du tuteur l'attend. En ouvrant le drawer, le message intro-question est déjà présent — il contextualise la question sans donner la réponse.
+Sur la page question, l'élève clique sur le bouton "Tutorat". Le drawer s'ouvre immédiatement avec un indicateur de chargement, puis les messages apparaissent : message d'accueil (si première activation sur ce sujet) + message intro-question (si première visite de cette question).
 
-**Why this priority**: Ajoute de la valeur pédagogique à chaque question sans être intrusif (le drawer reste fermé par défaut). Dépend de la P1 fonctionnelle mais peut être spécifié et testé séparément.
+**Why this priority**: C'est le nouveau point d'entrée unique du tuteur. Toute la valeur de la feature est ici.
 
-**Independent Test**: Charger une page question avec tuteur actif, vérifier le badge, ouvrir le drawer, vérifier la présence et le contenu du message intro.
+**Independent Test**: Cliquer sur "Tutorat" depuis une page question → drawer s'ouvre immédiatement → messages arrivent.
 
 **Acceptance Scenarios**:
 
-1. **Given** un élève avec tuteur actif sur une page question, **When** la page se charge, **Then** le drawer est fermé et un badge signale qu'un message attend.
-2. **Given** un élève sur une page question avec badge visible, **When** il ouvre le drawer, **Then** le message intro-question est déjà présent (pré-généré).
-3. **Given** un message intro-question, **When** l'élève l'ouvre, **Then** le message mentionne la question et un indice sur où trouver les données — sans donner aucune valeur finale.
-4. **Given** un élève qui a déjà ouvert le drawer pour cette question, **When** il revient sur la page, **Then** le badge est absent (message déjà vu) et le drawer reste fermé.
-5. **Given** un élève arrivant sur une page question avec une réponse déjà formulée, **When** la page se charge, **Then** il peut saisir et envoyer sa réponse directement sans interagir avec le drawer.
+1. **Given** un élève avec tuteur disponible, aucune conversation sur ce sujet, première visite de Q1.1, **When** il clique sur [Tutorat], **Then** le drawer s'ouvre immédiatement (spinner visible), la conversation est créée, le message d'accueil apparaît, puis le message intro-question Q1.1 apparaît.
+2. **Given** un élève avec une conversation déjà active, première visite de Q2.3, **When** il clique sur [Tutorat] sur Q2.3, **Then** le drawer s'ouvre, pas de nouveau message d'accueil, le message intro-question Q2.3 apparaît.
+3. **Given** un élève revenant sur Q1.1 (déjà visitée, intro vue), **When** il clique sur [Tutorat], **Then** le drawer s'ouvre avec l'historique de la conversation — pas de nouveau message intro.
+4. **Given** un élève sans clé API et sans free mode, **When** il arrive sur la page question, **Then** le bouton "Tutorat" n'est pas affiché (comportement existant conservé).
+5. **Given** un élève avec tuteur disponible, **When** il arrive sur une page question avec intro déjà générée mais pas encore vue, **Then** un badge/indicateur est visible sur le bouton "Tutorat" sans ouvrir le drawer.
 
 ---
 
 ### Edge Cases
 
-- Que se passe-t-il si la génération LLM du message d'accueil échoue (timeout, erreur provider) ? → Fallback sur un message statique par défaut, sans erreur visible.
-- Que se passe-t-il si `structured_correction` est NULL pour une question ? → Le message intro utilise `correction_text` comme fallback pour extraire le concept clé.
-- Que se passe-t-il si l'élève n'a pas de clé API et que le free mode n'est pas activé ? → Le drawer tuteur n'est pas affiché ; le banner "Activer le tuteur" n'apparaît pas.
-- Que se passe-t-il si toutes les questions sont déjà traitées et que l'élève clique sur [Commencer] ? → Navigation vers la page de complétion (comportement existant inchangé).
-- Que se passe-t-il si `data_hints` et `structured_correction` sont tous deux absents ? → Le message intro utilise une formulation générique ("cherche dans l'énoncé et les documents techniques").
+- **LLM timeout** sur `BuildWelcomeMessage` → fallback statique, drawer reste ouvert, l'élève peut continuer.
+- **LLM timeout** sur `BuildIntroMessage` (zéro LLM — déterministe) → N/A.
+- **`structured_correction` NULL** pour une question → message intro utilise `correction_text` comme fallback, sinon formulation générique.
+- **Aucune clé API** → bouton "Tutorat" absent, indicateur "Indisponible — Paramétrer" sur page sujet.
+- **Toutes les questions traitées** → bouton "Commencer" pointe vers page de complétion (comportement existant inchangé).
+- **`data_hints` et `structured_correction` absents** → message intro utilise formulation générique ("cherche dans l'énoncé et les documents techniques").
+- **Double clic** sur [Tutorat] → idempotent, pas de double conversation ni de double message.
+
+---
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-**Activation et accueil :**
+**Indicateur page sujet :**
 
-- **FR-001**: À l'activation du tuteur (clic sur le bouton ou tuteur déjà actif au chargement de page), le drawer DOIT s'ouvrir automatiquement.
-- **FR-002**: À la première ouverture du drawer sur un sujet donné, un message d'accueil DOIT être envoyé automatiquement dans la conversation.
-- **FR-003**: Le message d'accueil NE DOIT PAS solliciter de réponse de l'élève — il est encourageant et ne pose pas de question. Un élève arrivant avec une réponse formulée peut la poster directement sans interaction préalable.
-- **FR-004**: Le message d'accueil NE DOIT PAS se ré-afficher si l'élève revient sur la page sujet après l'avoir déjà reçu.
+- **FR-001**: La page sujet DOIT afficher un indicateur d'état tuteur : "Tuteur indisponible — [Paramétrer]" / "Tuteur disponible" / "Tuteur actif". Aucun bouton d'activation.
+- **FR-002**: "Tuteur actif" = conversation active sur ce sujet OU `student.use_personal_key` = true avec clé présente.
+- **FR-003**: "Tuteur indisponible" = pas de clé API élève ET pas de free mode activé par l'enseignant.
+- **FR-004**: "Tuteur disponible" = clé disponible (perso ou free mode) mais aucune conversation active sur ce sujet.
+
+**Activation depuis page question :**
+
+- **FR-005**: Le clic sur [Tutorat] DOIT ouvrir le drawer immédiatement avec un indicateur de chargement (spinner ou "...").
+- **FR-006**: Si aucune conversation n'existe pour ce sujet, `conversations#create` DOIT être appelé, la conversation créée, et `BuildWelcomeMessage` appelé (si `!welcome_sent`).
+- **FR-007**: `BuildIntroMessage` DOIT être appelé si l'intro pour cette question n'a pas encore été générée (`!intro_seen` dans `QuestionState`).
+- **FR-008**: Les messages d'accueil et intro-question SONT envoyés de façon séquentielle — welcome d'abord, intro ensuite.
+- **FR-009**: Le message d'accueil NE DOIT PAS se ré-afficher si la conversation existe déjà (`welcome_sent = true`).
+- **FR-010**: L'intro-question NE DOIT PAS se ré-afficher si déjà générée pour cette question (`intro_seen = true`).
+
+**Messages — contenu :**
+
+- **FR-011**: Message d'accueil template : "Bonjour ! Tu vas travailler sur [SUJET] ([N_QUESTIONS] questions). [PHRASE_ENCOURAGEMENT]" — `PHRASE_ENCOURAGEMENT` générée par LLM (courte, non-sollicitante), fallback statique si erreur.
+- **FR-012**: Message intro-question template : "Question [N] — [LABEL]. Pour progresser, cherche [DATA_HINT ou CONCEPT]. Je suis là si tu as besoin d'aide — sinon, lance-toi."
+- **FR-013**: `BuildIntroMessage` est déterministe (zéro LLM). Priorité hint : `data_hints.first` > `structured_correction["input_data"].first` > formulation générique.
+- **FR-014**: Les messages d'accueil et intro-question NE DOIVENT PAS solliciter de réponse de l'élève (contrainte `phase_rank`).
+
+**Badge intro-question :**
+
+- **FR-015**: Un badge visuel DOIT être affiché sur le bouton "Tutorat" si un message intro a été généré mais pas encore vu (`intro_seen = false`).
+- **FR-016**: Le badge DOIT disparaître après ouverture du drawer (appel `PATCH mark_intro_seen`).
 
 **Bouton Commencer :**
 
-- **FR-005**: Un seul bouton "Commencer" DOIT exister sur la page sujet, positionné en bas de page. Le bouton présent dans la bannière d'activation DOIT être supprimé.
-- **FR-006**: Le bouton "Commencer" DOIT rediriger vers la première question non traitée du périmètre actif (common+specific ou specific seul selon la sélection de scope).
-- **FR-007**: Pour un sujet commun ou complet, la première question non traitée DOIT être Q1.1 (ou la suivante si déjà traitée). Pour un sujet spécifique seul, ce DOIT être A.1.
-
-**Intro-question :**
-
-- **FR-008**: Sur chaque page question avec tuteur actif, un indicateur visuel (badge) DOIT signaler qu'un message intro-question attend dans le drawer.
-- **FR-009**: Le drawer DOIT rester fermé par défaut sur la page question. L'élève choisit de l'ouvrir.
-- **FR-010**: À l'ouverture du drawer sur une page question, le message intro-question DOIT être déjà présent dans la conversation.
-- **FR-011**: Le message intro-question NE DOIT PAS révéler de valeur finale (résultat, choix correct). Il DOIT pointer vers une donnée d'entrée ou un concept clé.
-- **FR-012**: Le message intro-question NE DOIT PAS solliciter de réponse. L'élève peut ignorer le drawer et répondre directement.
-- **FR-013**: Si `data_hints` est disponible, le message intro DOIT utiliser le premier data_hint. Sinon, il DOIT utiliser le premier élément de `structured_correction.input_data` si disponible, sinon une formulation générique.
-
-**Messages — forme slot-fill :**
-
-- **FR-014**: Le message d'accueil DOIT suivre le template : "Bonjour ! Tu vas travailler sur [SUJET] ([N_QUESTIONS] questions). [PHRASE_ENCOURAGEMENT]" où `PHRASE_ENCOURAGEMENT` est une phrase générée par LLM, non-sollicitante.
-- **FR-015**: Le message intro-question DOIT suivre le template : "Question [N] — [QUESTION_LABEL]. Pour progresser, cherche [DATA_HINT ou CONCEPT]. Je suis là si tu as besoin d'aide — sinon, lance-toi." Les slots fixes sont remplis côté serveur.
-- **FR-016**: En cas d'échec LLM pour la génération de `PHRASE_ENCOURAGEMENT`, un message de fallback statique DOIT être utilisé sans erreur visible pour l'élève.
+- **FR-017**: Un seul bouton "Commencer" sur la page sujet, pointant vers la première question non traitée du périmètre actif.
 
 ### Key Entities
 
-- **Conversation** : Conversation tuteur liée à un couple (student_session, question). Le message d'accueil est rattaché à la conversation de la première question (ou à un objet dédié — à décider en phase plan).
-- **Message** : Message dans une conversation (rôle assistant ou user). Les messages d'accueil et intro-question sont de rôle `assistant`, générés automatiquement.
-- **StudentSession** : Trace la progression de l'élève et si le message d'accueil a déjà été envoyé pour un sujet donné.
-- **TutorState** : État du tuteur. Étendu pour tracer le flag `welcome_sent` par sujet.
+- **Conversation** : liée à (student, subject). `welcome_sent` dans `TutorState`. Un seul objet Conversation par (student, subject).
+- **Message** : `kind` enum — `normal`, `welcome`, `intro`. Rôle `assistant`.
+- **TutorState** : `welcome_sent` (bool), `question_states[question_id].intro_seen` (bool).
+
+---
 
 ## Success Criteria *(mandatory)*
 
-### Measurable Outcomes
-
-- **SC-001**: L'élève ne voit jamais deux boutons "Commencer" simultanément sur la page sujet.
-- **SC-002**: Le drawer s'ouvre en moins d'une seconde après le clic sur "Activer le tuteur" (hors génération LLM).
-- **SC-003**: Le message d'accueil s'affiche dans le drawer dans les 5 secondes suivant l'activation (génération LLM incluse).
-- **SC-004**: Le message intro-question ne contient aucune valeur finale — validé par sim tuteur (non-divulgation ≥ baseline 4.07).
-- **SC-005**: Zéro régression sur le critère `phase_rank` en sim : un élève arrivant avec une réponse formulée peut la poster au premier tour sans être bloqué par une question du tuteur.
-- **SC-006**: Le badge/indicateur sur la page question est visible sans ouvrir le drawer.
-- **SC-007**: En cas d'échec LLM, l'élève voit un message de fallback et peut continuer normalement sans interruption du flow.
+- **SC-001**: Zéro doublon de bouton "Commencer" sur la page sujet.
+- **SC-002**: Le drawer s'ouvre en moins d'une seconde après le clic sur [Tutorat] (hors génération LLM).
+- **SC-003**: Le message d'accueil s'affiche dans le drawer dans les 5 secondes (LLM inclus).
+- **SC-004**: Le message intro-question ne contient aucune valeur finale — validé par sim (non-divulgation ≥ baseline 4.07).
+- **SC-005**: Zéro régression `phase_rank` : l'élève peut poster sa réponse au premier tour sans être bloqué.
+- **SC-006**: Le badge est visible sur le bouton "Tutorat" sans ouvrir le drawer.
+- **SC-007**: En cas d'échec LLM welcome, fallback visible et flow non interrompu.
 
 ## Assumptions
 
-- Le tuteur n'est visible que pour les élèves éligibles (clé API perso ou free mode activé par l'enseignant) — comportement existant conservé sans modification.
-- Le tracking "message d'accueil déjà vu" s'appuie sur `TutorState` ou un flag dans `StudentSession#tutor_state` JSONB — choix définitif en phase plan.
-- La "conversation sujet" (pour le message d'accueil) peut être rattachée à la première question du sujet ou à un objet `Conversation` de type `subject_welcome` — à décider en phase plan.
-- Les messages d'accueil et intro-question ne sont pas streamés token par token (messages courts, réponse complète attendue).
-- La logique de "première question non traitée" s'appuie sur `StudentSession#progression` existant.
-- La contrainte phase_rank (greeting non-sollicitant) est implémentée comme règle de prompt côté LLM, pas comme guard actif — validée par sim après implémentation.
-- La génération LLM du slot `PHRASE_ENCOURAGEMENT` utilise un appel séparé léger (pas le pipeline tuteur complet).
+- `conversations#create` reste le point d'entrée HTTP — son déclencheur change (bouton question, pas sujet).
+- La "première question non traitée" s'appuie sur `StudentSession#progression` existant.
+- Les messages welcome/intro ne sont pas streamés token par token (réponse complète).
+- La contrainte `phase_rank` est validée par sim après implémentation, pas par guard actif.
