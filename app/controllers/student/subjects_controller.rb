@@ -145,7 +145,7 @@ class Student::SubjectsController < Student::BaseController
   def first_incomplete_part_question(all_parts)
     part = all_parts.find { |p| !@session_record.part_completed?(p.id) }
     part ||= all_parts.first
-    part&.questions&.kept&.order(:position)&.first
+    part ? @session_record.first_undone_question(part) : nil
   end
 
   def resolve_tutor_status

@@ -61,6 +61,45 @@ RSpec.describe "Student::Subjects", type: :request do
   # - spec/requests/student/subjects/completions_spec.rb
   # (refactored to RESTful Student::Subjects::PartCompletionsController / CompletionsController)
 
+  describe "GET /subjects/:id — bouton Commencer (T015)" do
+    let!(:part) { create(:part, :specific, subject: subject_obj, position: 1) }
+    let!(:q1) { create(:question, part: part, position: 1) }
+    let!(:q2) { create(:question, part: part, position: 2) }
+    let!(:q3) { create(:question, part: part, position: 3) }
+
+    def get_show
+      get student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
+    end
+
+    it "affiche un seul bouton Commencer" do
+      get_show
+      expect(response.body.scan("Commencer").size).to eq(1)
+    end
+
+    it "pointe vers Q1 quand aucune question traitée" do
+      get_show
+      expect(response.body).to include(
+        student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: q1.id)
+      )
+    end
+
+    it "redirige vers Q3 quand Q1 et Q2 sont traitées (progression partielle sans partie complète)" do
+      session = student.student_sessions.find_or_create_by!(subject: subject_obj) do |ss|
+        ss.mode = :autonomous
+        ss.started_at = Time.current
+        ss.last_activity_at = Time.current
+      end
+      session.mark_answered!(q1.id)
+      session.mark_answered!(q2.id)
+      session.save!
+
+      get_show
+      expect(response).to redirect_to(
+        student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: q3.id)
+      )
+    end
+  end
+
   describe "GET /subjects/:id — tutor status indicator (T100)" do
     let!(:part) { create(:part, :specific, subject: subject_obj, position: 1) }
     let!(:question) { create(:question, part: part, position: 1) }
