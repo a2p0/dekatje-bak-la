@@ -33,15 +33,6 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
 
   before { login_as_student(student, classroom) }
 
-  scenario "activation : clic 'Activer le tuteur' crée une conversation et remplace le banner",
-           js: true,
-           pending: "044 pivot — l'activation se fait depuis la page question, pas la page sujet" do
-    visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-    expect(page).to have_button("Activer le tuteur")
-    click_button "Activer le tuteur"
-    expect(page).to have_text("Mode tuteur activé", wait: 5)
-  end
-
 
   # Helper — build a TutorState anchored on the current question with a
   # given starting phase. Required because TutorState.default starts in
