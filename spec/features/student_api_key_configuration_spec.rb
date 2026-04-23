@@ -155,26 +155,4 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
     find("[data-action='click->settings#toggleApiKey']").click
     expect(page).to have_css("[data-settings-target='apiKey'][type='password']", wait: 5)
   end
-
-  xscenario "sans clé API configurée, le bouton Tutorat invite à configurer les réglages (tuteur refonte vague 2+)" do
-    expect(student.api_key).to be_blank
-
-    login_as_student(student, classroom)
-    visit student_question_path(
-      access_code: classroom.access_code,
-      subject_id: subject_record.id,
-      id: question.id
-    )
-
-    # Wait for the Stimulus chat controller to actually connect
-    expect(page).to have_css("[data-chat-connected='true']", wait: 10)
-
-    # The Tutorat button triggers a native JS confirm() via chat_controller.open()
-    accept_confirm do
-      click_button "Tutorat"
-    end
-
-    expect(page).to have_current_path(student_settings_path(access_code: classroom.access_code), wait: 5)
-    expect(page).to have_content("Réglages")
-  end
 end
