@@ -9,6 +9,7 @@ class Student::QuestionsController < Student::BaseController
     @parts = filtered_parts
     @questions_in_part = @part.questions.kept.where(id: filtered_question_ids).order(:position)
     @conversation = current_student.conversations.find_by(subject: @subject)
+    @tutor_available = tutor_available?
     @session_record.mark_seen!(@question.id)
 
     # Mark specific presentation as seen (from specific presentation page link)
@@ -42,6 +43,11 @@ class Student::QuestionsController < Student::BaseController
       redirect_to student_root_path(access_code: params[:access_code]),
                   alert: "Question introuvable."
     end
+  end
+
+  def tutor_available?
+    (current_student.use_personal_key? && current_student.api_key.present?) ||
+      (@classroom.tutor_free_mode_enabled? && @classroom.owner.openrouter_api_key.present?)
   end
 
   def filtered_parts

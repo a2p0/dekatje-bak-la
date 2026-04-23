@@ -24,15 +24,36 @@ class Student::ConversationsController < Student::BaseController
       @conversation.reload
     end
 
+    if params[:question_id].present?
+      @intro_question = Question.kept.find_by(id: params[:question_id].to_i)
+      Tutor::BuildIntroMessage.call(question: @intro_question, conversation: @conversation) if @intro_question
+      @conversation.reload
+    end
+
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: [
-          turbo_stream.replace(
+        streams = []
+
+        if params[:question_id].present?
+          @question_for_drawer = Question.kept.find_by(id: params[:question_id].to_i)
+          streams << turbo_stream.replace(
+            "tutor-chat-drawer",
+            partial: "student/conversations/drawer",
+            locals:  {
+              conversation: @conversation,
+              question:     @question_for_drawer || @subject.questions.first,
+              access_code:  params[:access_code]
+            }
+          )
+        else
+          streams << turbo_stream.replace(
             "tutor-activation-banner",
             partial: "student/tutor/tutor_activated",
             locals:  { subject: @subject, access_code: params[:access_code] }
           )
-        ]
+        end
+
+        render turbo_stream: streams
       end
       format.json { render json: { conversation_id: @conversation.id } }
     end

@@ -372,4 +372,66 @@ RSpec.describe "Student::Conversations", type: :request do
       expect(qs&.intro_seen).to eq(true)
     end
   end
+
+  describe "POST #create — intro message on question page (T201)" do
+    before do
+      allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
+      allow(Tutor::BuildIntroMessage).to receive(:call).and_return(Tutor::Result.ok)
+    end
+
+    context "when question_id is provided and intro not yet seen" do
+      it "calls BuildIntroMessage" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id, question_id: question.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(Tutor::BuildIntroMessage).to have_received(:call).once
+      end
+
+      it "returns a turbo-stream response" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id, question_id: question.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("turbo-stream")
+      end
+    end
+
+    context "when question_id is provided and intro already seen" do
+      before do
+        existing_ts = TutorState.default.with(
+          question_states: {
+            question.id.to_s => QuestionState.new(
+              step: 0, hints_used: 0, last_confidence: nil,
+              error_types: [], completed_at: nil, intro_seen: true
+            )
+          }
+        )
+        create(:conversation, student: student, subject: exam_subject,
+               lifecycle_state: "active", tutor_state: existing_ts)
+      end
+
+      it "does not create a duplicate intro message (idempotent)" do
+        allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
+
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id, question_id: question.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        conv = Conversation.find_by(student: student, subject: exam_subject)
+        expect(conv.messages.where(kind: :intro).count).to eq(0)
+      end
+    end
+
+    context "when no question_id is provided" do
+      it "does not call BuildIntroMessage" do
+        post student_conversations_path(access_code: classroom.access_code),
+             params: { subject_id: exam_subject.id },
+             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+        expect(Tutor::BuildIntroMessage).not_to have_received(:call)
+      end
+    end
+  end
 end
