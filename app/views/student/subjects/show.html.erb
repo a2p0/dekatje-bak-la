@@ -47,18 +47,11 @@
   <% else %>
     <%# === MISE EN SITUATION + PARTS OVERVIEW (standard flow) === %>
 
-    <%# Tutor activation banner — only for autonomous students with an API key %>
-    <% if @session_record.autonomous? && current_student.api_key.present? %>
+    <%# Tutor status indicator (always shown for autonomous students) %>
+    <% if @session_record.autonomous? %>
       <%= render "student/tutor/tutor_banner",
-                 subject: @subject,
+                 tutor_status: @tutor_status,
                  access_code: params[:access_code] %>
-    <% end %>
-
-    <%# Auto-open drawer if tutor active but welcome not yet sent (page reload case) %>
-    <% if @auto_open_drawer %>
-      <div data-controller="auto-dispatch"
-           data-auto-dispatch-event-value="tutor:drawer-open"
-           class="hidden"></div>
     <% end %>
 
     <%# Scope change link (for new-format subjects with scope already selected) %>

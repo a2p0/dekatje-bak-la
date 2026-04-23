@@ -66,8 +66,7 @@ class Student::SubjectsController < Student::BaseController
     if (first_visit || returning_from_part) && !@session_record.all_parts_completed? && !explicit_navigation
       @parts = all_parts
       @first_question = first_incomplete_part_question(all_parts)
-      existing_conv = current_student.conversations.find_by(subject: @subject, lifecycle_state: "active")
-      @auto_open_drawer = existing_conv && !existing_conv.tutor_state.welcome_sent
+      @tutor_status = resolve_tutor_status
       return render :show
     end
 
@@ -147,6 +146,15 @@ class Student::SubjectsController < Student::BaseController
     part = all_parts.find { |p| !@session_record.part_completed?(p.id) }
     part ||= all_parts.first
     part&.questions&.kept&.order(:position)&.first
+  end
+
+  def resolve_tutor_status
+    has_key = (current_student.use_personal_key? && current_student.api_key.present?) ||
+              (@classroom.tutor_free_mode_enabled? && @classroom.owner.openrouter_api_key.present?)
+    return :unavailable unless has_key
+
+    active_conv = current_student.conversations.find_by(subject: @subject, lifecycle_state: "active")
+    active_conv ? :active : :available
   end
 
   def target_part(all_parts)

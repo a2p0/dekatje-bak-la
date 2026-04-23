@@ -335,13 +335,6 @@ RSpec.describe "Student::Conversations", type: :request do
         expect(response.body).to include("tutor-activation-banner")
       end
 
-      it "includes a turbo-stream dispatch for drawer-open event" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(response.body).to include("tutor:drawer-open")
-      end
     end
 
     context "when welcome has already been sent (welcome_sent: true)" do
