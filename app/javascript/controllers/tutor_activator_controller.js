@@ -24,6 +24,7 @@ export default class extends Controller {
     })
       .then(r => r.text())
       .then(html => window.Turbo?.renderStreamMessage(html))
+      .then(() => new Promise(resolve => setTimeout(resolve, 50)))
       .then(() => this.#openDrawer())
       .catch(() => {})
   }
