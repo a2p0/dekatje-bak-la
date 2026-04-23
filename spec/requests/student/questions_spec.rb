@@ -37,4 +37,44 @@ RSpec.describe "Student::Questions", type: :request do
 
   # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).
   # See spec/requests/student/questions/corrections_spec.rb
+
+  describe "GET /subjects/:subject_id/questions/:id — tutor button (T200)" do
+    def get_show
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+    end
+
+    context "when student has no API key and classroom free mode is disabled" do
+      it "shows 'Activer le tuteur' link instead of Tutorat button" do
+        get_show
+        expect(response.body).to include("Activer le tuteur")
+        expect(response.body).not_to include("💬 Tutorat")
+      end
+
+      it "links to the settings page" do
+        get_show
+        expect(response.body).to include(student_settings_path(access_code: classroom.access_code))
+      end
+    end
+
+    context "when student has an API key" do
+      before { student.update!(api_key: "sk-test", use_personal_key: true) }
+
+      it "shows the Tutorat button" do
+        get_show
+        expect(response.body).to include("💬 Tutorat")
+        expect(response.body).not_to include("Activer le tuteur")
+      end
+    end
+
+    context "when classroom free mode is enabled (no student key)" do
+      let(:user) { create(:user, openrouter_api_key: "or-key") }
+      let(:classroom) { create(:classroom, owner: user, tutor_free_mode_enabled: true) }
+
+      it "shows the Tutorat button" do
+        get_show
+        expect(response.body).to include("💬 Tutorat")
+        expect(response.body).not_to include("Activer le tuteur")
+      end
+    end
+  end
 end

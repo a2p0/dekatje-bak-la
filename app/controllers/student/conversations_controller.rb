@@ -1,6 +1,6 @@
 class Student::ConversationsController < Student::BaseController
   before_action :require_api_key, only: [ :create, :messages ]
-  before_action :set_conversation, only: [ :messages, :confidence ]
+  before_action :set_conversation, only: [ :messages, :confidence, :mark_intro_seen ]
 
   def create
     @subject = Subject.kept.find(params[:subject_id])
@@ -14,13 +14,46 @@ class Student::ConversationsController < Student::BaseController
 
     @conversation.activate! unless @conversation.active?
 
+    unless @conversation.tutor_state.welcome_sent
+      api_key_data = resolve_api_key_data
+      Tutor::BuildWelcomeMessage.call(
+        subject:      @subject,
+        conversation: @conversation,
+        api_key_data: api_key_data
+      )
+      @conversation.reload
+    end
+
+    if params[:question_id].present?
+      @intro_question = Question.kept.find_by(id: params[:question_id].to_i)
+      Tutor::BuildIntroMessage.call(question: @intro_question, conversation: @conversation) if @intro_question
+      @conversation.reload
+    end
+
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "tutor-activation-banner",
-          partial: "student/tutor/tutor_activated",
-          locals:  { subject: @subject, access_code: params[:access_code] }
-        )
+        streams = []
+
+        if params[:question_id].present?
+          @question_for_drawer = Question.kept.find_by(id: params[:question_id].to_i)
+          streams << turbo_stream.replace(
+            "tutor-chat-drawer",
+            partial: "student/conversations/drawer",
+            locals:  {
+              conversation: @conversation,
+              question:     @question_for_drawer || @subject.questions.first,
+              access_code:  params[:access_code]
+            }
+          )
+        else
+          streams << turbo_stream.replace(
+            "tutor-activation-banner",
+            partial: "student/tutor/tutor_activated",
+            locals:  { subject: @subject, access_code: params[:access_code] }
+          )
+        end
+
+        render turbo_stream: streams
       end
       format.json { render json: { conversation_id: @conversation.id } }
     end
@@ -28,6 +61,21 @@ class Student::ConversationsController < Student::BaseController
     render json: { error: "Sujet introuvable." }, status: :not_found
   rescue AASM::InvalidTransition => e
     render json: { error: e.message }, status: :unprocessable_entity
+  end
+
+  def mark_intro_seen
+    question_id = params[:question_id].to_i
+    current_qs  = @conversation.tutor_state.question_states
+    existing_qs = current_qs[question_id.to_s] || QuestionState.new(
+      step: nil, hints_used: 0, last_confidence: nil,
+      error_types: [], completed_at: nil, intro_seen: false
+    )
+    updated_qs  = existing_qs.with(intro_seen: true)
+    new_ts      = @conversation.tutor_state.with(
+      question_states: current_qs.merge(question_id.to_s => updated_qs)
+    )
+    Tutor::UpdateTutorState.call(conversation: @conversation, tutor_state: new_ts)
+    head :ok
   end
 
   def messages
@@ -94,5 +142,14 @@ class Student::ConversationsController < Student::BaseController
       error: "Configurez votre clé IA dans les réglages, ou demandez à votre enseignant d'activer le mode gratuit.",
       settings_url: student_settings_path(access_code: params[:access_code])
     }, status: :unprocessable_entity
+  end
+
+  def resolve_api_key_data
+    ResolveTutorApiKey.new(
+      student:   current_student,
+      classroom: current_student.classroom
+    ).call
+  rescue Tutor::NoApiKeyError
+    { api_key: nil, provider: nil, model: nil }
   end
 end

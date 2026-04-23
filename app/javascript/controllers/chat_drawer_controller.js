@@ -3,6 +3,15 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["drawer", "backdrop"]
 
+  connect() {
+    this._drawerOpenHandler = () => this.open()
+    window.addEventListener("tutor:drawer-open", this._drawerOpenHandler)
+  }
+
+  disconnect() {
+    window.removeEventListener("tutor:drawer-open", this._drawerOpenHandler)
+  }
+
   open() {
     this.drawerTarget.classList.remove("translate-x-full")
     this.drawerTarget.classList.add("translate-x-0")

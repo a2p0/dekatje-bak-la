@@ -52,8 +52,7 @@ RSpec.describe TutorState do
         concepts_mastered:     [],
         concepts_to_revise:    [],
         discouragement_level:  0,
-        question_states:       {}
-      )
+        question_states:       {}, welcome_sent: false)
       prompt = state.to_prompt
       expect(prompt).to include("Phase courante : reading.")
       expect(prompt).to include("Niveau de découragement : 0/3.")
@@ -62,16 +61,14 @@ RSpec.describe TutorState do
     it "includes question context when current_question_id is set" do
       qs = QuestionState.new(
         step: "initial", hints_used: 2, last_confidence: 3,
-        error_types: [], completed_at: nil
-      )
+        error_types: [], completed_at: nil, intro_seen: false)
       state = TutorState.new(
         current_phase:         "guiding",
         current_question_id:   42,
         concepts_mastered:     [ "énergie primaire" ],
         concepts_to_revise:    [ "rendement" ],
         discouragement_level:  1,
-        question_states:       { "42" => qs }
-      )
+        question_states:       { "42" => qs }, welcome_sent: false)
       prompt = state.to_prompt
       expect(prompt).to include("L'élève travaille sur la question 42.")
       expect(prompt).to include("Concepts maîtrisés : énergie primaire.")
@@ -90,8 +87,7 @@ RSpec.describe QuestionState do
         hints_used: 2,
         last_confidence: 4,
         error_types: [ "calcul" ],
-        completed_at: nil
-      )
+        completed_at: nil, intro_seen: false)
     end
 
     it "stores step" do
@@ -108,6 +104,89 @@ RSpec.describe QuestionState do
 
     it "stores error_types" do
       expect(qs.error_types).to eq([ "calcul" ])
+    end
+  end
+
+  describe "intro_seen (044)" do
+    it "defaults to false" do
+      qs = QuestionState.new(step: nil, hints_used: 0, last_confidence: nil,
+                             error_types: [], completed_at: nil, intro_seen: false)
+      expect(qs.intro_seen).to eq(false)
+    end
+
+    it "can be set to true" do
+      qs = QuestionState.new(step: nil, hints_used: 0, last_confidence: nil,
+                             error_types: [], completed_at: nil, intro_seen: true)
+      expect(qs.intro_seen).to eq(true)
+    end
+  end
+end
+
+RSpec.describe TutorState, "(044 — welcome_sent)" do
+  describe "welcome_sent field" do
+    it "defaults to false on TutorState.default" do
+      expect(described_class.default.welcome_sent).to eq(false)
+    end
+
+    it "can be set to true via .with" do
+      state = described_class.default.with(welcome_sent: true)
+      expect(state.welcome_sent).to eq(true)
+    end
+  end
+
+  describe "TutorStateType retro-compatibility" do
+    let(:type) { TutorStateType.new }
+
+    it "reads welcome_sent as false when key absent from stored JSONB" do
+      old_hash = {
+        "current_phase" => "idle",
+        "current_question_id" => nil,
+        "concepts_mastered" => [],
+        "concepts_to_revise" => [],
+        "discouragement_level" => 0,
+        "question_states" => {}
+      }
+      state = type.cast(old_hash)
+      expect(state.welcome_sent).to eq(false)
+    end
+
+    it "reads intro_seen as false when key absent from stored question_state" do
+      old_hash = {
+        "current_phase" => "idle",
+        "current_question_id" => nil,
+        "concepts_mastered" => [],
+        "concepts_to_revise" => [],
+        "discouragement_level" => 0,
+        "question_states" => {
+          "42" => {
+            "step" => "initial",
+            "hints_used" => 0,
+            "last_confidence" => nil,
+            "error_types" => [],
+            "completed_at" => nil
+          }
+        }
+      }
+      state = type.cast(old_hash)
+      expect(state.question_states["42"].intro_seen).to eq(false)
+    end
+
+    it "round-trips welcome_sent through serialize/cast" do
+      original = described_class.default.with(welcome_sent: true)
+      serialized = type.serialize(original)
+      parsed = JSON.parse(serialized)
+      restored = type.cast(parsed)
+      expect(restored.welcome_sent).to eq(true)
+    end
+
+    it "round-trips intro_seen through serialize/cast" do
+      qs = QuestionState.new(step: nil, hints_used: 0, last_confidence: nil,
+                             error_types: [], completed_at: nil, intro_seen: true)
+      original = described_class.default.with(question_states: { "7" => qs })
+      serialized = type.serialize(original)
+      parsed = JSON.parse(serialized)
+      restored = type.cast(parsed)
+      expect(restored.question_states["7"].intro_seen).to eq(true)
     end
   end
 end

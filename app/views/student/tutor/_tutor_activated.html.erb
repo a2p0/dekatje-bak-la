@@ -8,13 +8,5 @@
         Le tuteur vous accompagnera dès la première question.
       </p>
     </div>
-    <%
-      first_question = subject.parts.order(:position).first&.questions&.kept&.order(:position)&.first
-    %>
-    <% if first_question %>
-      <%= link_to "Commencer",
-          student_question_path(access_code: access_code, subject_id: subject.id, id: first_question.id),
-          class: "ml-auto inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-colors" %>
-    <% end %>
   </div>
 </div>

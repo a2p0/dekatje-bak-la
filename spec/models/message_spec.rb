@@ -29,6 +29,24 @@ RSpec.describe Message, type: :model do
     it "defines role enum with user=0, assistant=1, system=2" do
       expect(Message.roles).to eq({ "user" => 0, "assistant" => 1, "system" => 2 })
     end
+
+    describe "kind (044)" do
+      it "defines kind with normal=0, welcome=1, intro=2" do
+        expect(Message.kinds).to eq({ "normal" => 0, "welcome" => 1, "intro" => 2 })
+      end
+
+      it "defaults to :normal kind" do
+        expect(build(:message).kind).to eq("normal")
+      end
+
+      it "accepts :welcome kind" do
+        expect(build(:message, kind: :welcome).kind).to eq("welcome")
+      end
+
+      it "accepts :intro kind" do
+        expect(build(:message, kind: :intro).kind).to eq("intro")
+      end
+    end
   end
 
   describe "factory" do

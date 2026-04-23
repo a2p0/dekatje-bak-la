@@ -50,7 +50,7 @@ RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
         student:         student,
         subject:         subject_record,
         lifecycle_state: "active",
-        tutor_state:     TutorState.default)
+        tutor_state:     TutorState.default.with(welcome_sent: true))
     end
 
     before do
@@ -91,6 +91,7 @@ RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
 
   context "when no conversation exists yet" do
     before do
+      FakeRubyLlm.setup_stub(content: "Bonne chance !", tool_calls: [])
       login_as_student(student, classroom)
       visit_question_page
     end

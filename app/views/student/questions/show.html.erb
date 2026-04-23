@@ -84,15 +84,25 @@
         <%= render(ProgressBarComponent.new(current: answered, total: total, color: :gradient)) %>
       </div>
       <%# Tutorat button — larger on desktop with gradient %>
-      <button type="button"
-              data-action="click->chat-drawer#open"
-              data-chat-drawer-toggle="true"
-              aria-label="Ouvrir le tutorat IA"
-              aria-expanded="false"
-              aria-controls="tutor-chat-drawer"
-              class="hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]">
-        💬 Tutorat
-      </button>
+      <% if @tutor_available %>
+        <button type="button"
+                data-controller="tutor-activator"
+                data-tutor-activator-subject-id-value="<%= @subject.id %>"
+                data-tutor-activator-question-id-value="<%= @question.id %>"
+                data-tutor-activator-conversations-url-value="<%= student_conversations_path(access_code: params[:access_code]) %>"
+                data-action="click->tutor-activator#activate"
+                data-chat-drawer-toggle="true"
+                aria-label="Ouvrir le tutorat IA"
+                aria-expanded="false"
+                aria-controls="tutor-chat-drawer"
+                class="hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]">
+          💬 Tutorat
+        </button>
+      <% else %>
+        <%= link_to "Activer le tuteur",
+            student_settings_path(access_code: params[:access_code]),
+            class: "hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors no-underline" %>
+      <% end %>
     </div>
 
     <%# Sticky part title %>
@@ -183,15 +193,25 @@
       <span class="flex-1"></span>
     <% end %>
 
-    <button type="button"
-            data-action="click->chat-drawer#open"
-            data-chat-drawer-toggle="true"
-            aria-label="Ouvrir le tutorat IA"
-            aria-expanded="false"
-            aria-controls="tutor-chat-drawer"
-            class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(99,102,241,0.3)]">
-      💬 Tutorat
-    </button>
+    <% if @tutor_available %>
+      <button type="button"
+              data-controller="tutor-activator"
+              data-tutor-activator-subject-id-value="<%= @subject.id %>"
+              data-tutor-activator-question-id-value="<%= @question.id %>"
+              data-tutor-activator-conversations-url-value="<%= student_conversations_path(access_code: params[:access_code]) %>"
+              data-action="click->tutor-activator#activate"
+              data-chat-drawer-toggle="true"
+              aria-label="Ouvrir le tutorat IA"
+              aria-expanded="false"
+              aria-controls="tutor-chat-drawer"
+              class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(99,102,241,0.3)]">
+        💬 Tutorat
+      </button>
+    <% else %>
+      <%= link_to "Activer le tuteur",
+          student_settings_path(access_code: params[:access_code]),
+          class: "flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors no-underline" %>
+    <% end %>
 
     <% if next_href %>
       <%= link_to next_href,

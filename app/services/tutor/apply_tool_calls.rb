@@ -103,7 +103,7 @@ module Tutor
 
       qs = @state.question_states[qid] || QuestionState.new(
         step: "initial", hints_used: 0, last_confidence: nil,
-        error_types: [], completed_at: nil
+        error_types: [], completed_at: nil, intro_seen: false
       )
 
       if level > MAX_HINTS

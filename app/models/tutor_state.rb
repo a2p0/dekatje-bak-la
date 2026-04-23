@@ -5,7 +5,8 @@ QuestionState = Data.define(
   :hints_used,       # Integer 0-5
   :last_confidence,  # Integer 1-5, or nil
   :error_types,      # Array<String>
-  :completed_at      # String ISO8601 or nil
+  :completed_at,     # String ISO8601 or nil
+  :intro_seen        # Boolean — true once drawer opened for this question (044)
 )
 
 TutorState = Data.define(
@@ -14,7 +15,8 @@ TutorState = Data.define(
   :concepts_mastered,    # Array<String>
   :concepts_to_revise,   # Array<String>
   :discouragement_level, # Integer 0-3
-  :question_states       # Hash<String, QuestionState>
+  :question_states,      # Hash<String, QuestionState>
+  :welcome_sent          # Boolean — true once welcome message sent for this subject (044)
 ) do
   def self.default
     new(
@@ -23,7 +25,8 @@ TutorState = Data.define(
       concepts_mastered:    [].freeze,
       concepts_to_revise:   [].freeze,
       discouragement_level: 0,
-      question_states:      {}.freeze
+      question_states:      {}.freeze,
+      welcome_sent:         false
     )
   end
 

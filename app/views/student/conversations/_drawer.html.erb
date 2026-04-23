@@ -44,7 +44,8 @@
     </div>
   </div>
 
-  <div data-tutor-chat-target="messages"
+  <div id="tutor-chat-messages"
+       data-tutor-chat-target="messages"
        class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
     <% if conversation&.messages&.any? %>
       <% conversation.messages.order(:created_at).each do |msg| %>

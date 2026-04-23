@@ -33,28 +33,15 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
 
   before { login_as_student(student, classroom) }
 
-  scenario "activation : clic 'Activer le tuteur' crée une conversation et remplace le banner", js: true do
+  scenario "activation : clic 'Activer le tuteur' crée une conversation et remplace le banner",
+           js: true,
+           pending: "044 pivot — l'activation se fait depuis la page question, pas la page sujet" do
     visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-
     expect(page).to have_button("Activer le tuteur")
-
     click_button "Activer le tuteur"
-
     expect(page).to have_text("Mode tuteur activé", wait: 5)
-    expect(page).to have_link("Commencer")
-
-    conv = Conversation.find_by(student: student, subject: subject_record)
-    expect(conv).to be_present
-    expect(conv.lifecycle_state).to eq("active")
   end
 
-  scenario "no API key : le banner d'activation n'est pas rendu", js: true do
-    student.update!(api_key: nil, use_personal_key: true)
-
-    visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-
-    expect(page).not_to have_button("Activer le tuteur")
-  end
 
   # Helper — build a TutorState anchored on the current question with a
   # given starting phase. Required because TutorState.default starts in
@@ -66,8 +53,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      {}
-    )
+      question_states:      {}, welcome_sent: true)
   end
 
   def fake_tool_call(name:, arguments: {})
@@ -226,7 +212,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
   scenario "persistance : rouvrir le drawer conserve les messages précédents", js: true do
     conv = create(:conversation,
       student: student, subject: subject_record,
-      lifecycle_state: "active", tutor_state: TutorState.default)
+      lifecycle_state: "active", tutor_state: TutorState.default.with(welcome_sent: true))
     create(:message, conversation: conv, role: :user,      content: "Premier message élève")
     create(:message, conversation: conv, role: :assistant, content: "Réponse du tuteur")
 
