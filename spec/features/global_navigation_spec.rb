@@ -104,11 +104,10 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     expect(page).to have_link(text: /Réglages/)
     expect(page).to have_link("Déconnexion")
 
-    # Navigate to a question page and check settings link is still present
+    # subjects#index → subjects#show (first Commencer)
     click_link "Commencer"
-
-    # "Commencer" leads to the mise en situation page — click through to questions
-    click_link "Commencer"
+    # subjects#show → questions#show (second Commencer — points to Q1)
+    find("a,button", text: "Commencer", match: :first).click
 
     # On desktop viewport (1400px), sidebar is always visible (lg:translate-x-0)
     within("aside") do

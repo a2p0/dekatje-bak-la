@@ -42,13 +42,6 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
     expect(page).to have_text("Mode tuteur activé", wait: 5)
   end
 
-  scenario "no API key : le banner d'activation n'est pas rendu",
-           js: true,
-           pending: "044 pivot — indicateur tri-état remplace le banner; couvert par subjects_spec T100" do
-    student.update!(api_key: nil, use_personal_key: true)
-    visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-    expect(page).not_to have_button("Activer le tuteur")
-  end
 
   # Helper — build a TutorState anchored on the current question with a
   # given starting phase. Required because TutorState.default starts in
