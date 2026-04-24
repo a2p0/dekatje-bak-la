@@ -22,6 +22,28 @@ RSpec.describe ResolveTutorApiKey do
         expect(result[:api_key]).to eq("student-sk-123")
         expect(result[:provider]).to eq("anthropic")
       end
+
+      it "returns student effective_model, not DEFAULT_MODEL" do
+        result = service.call
+        expect(result[:model]).to eq(student.effective_model)
+        expect(result[:model]).not_to eq("claude-3-5-haiku-20241022")
+      end
+    end
+
+    context "when student has a personal key with explicit api_model set" do
+      before do
+        student.update!(
+          api_key:          "student-sk-123",
+          api_provider:     :anthropic,
+          api_model:        "claude-sonnet-4-6",
+          use_personal_key: true
+        )
+      end
+
+      it "returns the explicit api_model" do
+        result = service.call
+        expect(result[:model]).to eq("claude-sonnet-4-6")
+      end
     end
 
     context "when student key absent but classroom free mode enabled and teacher has key" do
@@ -35,6 +57,11 @@ RSpec.describe ResolveTutorApiKey do
         result = service.call
         expect(result[:api_key]).to eq("or-teacher-key")
         expect(result[:provider]).to eq("openrouter")
+      end
+
+      it "returns student effective_model for free mode" do
+        result = service.call
+        expect(result[:model]).to eq(student.effective_model)
       end
     end
 
