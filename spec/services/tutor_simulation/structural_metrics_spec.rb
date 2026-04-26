@@ -17,9 +17,9 @@ RSpec.describe TutorSimulation::StructuralMetrics do
       discouragement_level: 0,
       question_states:      {
         question.id.to_s => QuestionState.new(
-          step: 1, hints_used: 2, last_confidence: nil,
+          phase: "enonce", step: 1, hints_used: 2, last_confidence: nil,
           error_types: [], completed_at: nil, intro_seen: false)
-      }, welcome_sent: false)
+      }, welcome_sent: false, last_activity_at: nil)
   end
 
   let(:conversation) do
@@ -111,7 +111,7 @@ RSpec.describe TutorSimulation::StructuralMetrics do
         current_phase:        "guiding",
         current_question_id:  nil,
         concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
-        question_states:      {}, welcome_sent: false)
+        question_states:      {}, welcome_sent: false, last_activity_at: nil)
     end
 
     let(:conversation_in_guiding) do
@@ -208,7 +208,7 @@ RSpec.describe TutorSimulation::StructuralMetrics do
         current_phase:        "guiding",
         current_question_id:  nil,
         concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
-        question_states:      {}, welcome_sent: false)
+        question_states:      {}, welcome_sent: false, last_activity_at: nil)
     end
     let(:leak_conversation) do
       create(:conversation, student: leak_student, subject: leak_subject,
@@ -253,7 +253,7 @@ RSpec.describe TutorSimulation::StructuralMetrics do
         current_phase:        "guiding",
         current_question_id:  nil,
         concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
-        question_states:      {}, welcome_sent: false)
+        question_states:      {}, welcome_sent: false, last_activity_at: nil)
     end
     let(:leak_conversation) do
       create(:conversation, student: leak_student, subject: leak_subject,
@@ -349,7 +349,7 @@ RSpec.describe TutorSimulation::StructuralMetrics do
         current_phase:        "guiding",
         current_question_id:  nil,
         concepts_mastered:    [], concepts_to_revise: [], discouragement_level: 0,
-        question_states:      {}, welcome_sent: false)
+        question_states:      {}, welcome_sent: false, last_activity_at: nil)
     end
     let(:short_conversation) do
       create(:conversation, student: short_student, subject: short_subject,

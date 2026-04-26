@@ -126,7 +126,7 @@ RSpec.describe BuildExtractionPrompt do
     it "system prompt mentions answer_type enum values" do
       system = result[:system]
 
-      %w[text calculation argumentation dr_reference completion choice].each do |type|
+      %w[identification calcul justification representation qcm verification conclusion].each do |type|
         expect(system).to include(type), "expected system prompt to include answer_type '#{type}'"
       end
     end

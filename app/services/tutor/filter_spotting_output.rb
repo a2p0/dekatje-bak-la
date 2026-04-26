@@ -31,7 +31,7 @@ module Tutor
     private
 
     def in_spotting_phase?
-      @message.conversation.tutor_state.current_phase == "spotting"
+      %w[spotting_type spotting_data].include?(@message.conversation.tutor_state.current_phase)
     end
 
     def forbidden?

@@ -44,7 +44,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      {}, welcome_sent: true)
+      question_states:      {}, welcome_sent: true, last_activity_at: nil)
   end
 
   def fake_tool_call(name:, arguments: {})

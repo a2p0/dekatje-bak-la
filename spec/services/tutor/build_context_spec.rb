@@ -72,19 +72,19 @@ RSpec.describe Tutor::BuildContext do
     expect(r.value[:messages].length).to be <= 40
   end
 
-  context "en phase spotting" do
+  context "en phase spotting_data (localisation données)" do
     let(:spotting_conversation) do
       spotting_state = TutorState.new(
-        current_phase:        "spotting",
+        current_phase:        "spotting_data",
         current_question_id:  question.id,
         concepts_mastered:    [],
         concepts_to_revise:   [],
         discouragement_level: 0,
         question_states:      {
           question.id.to_s => QuestionState.new(
-            step: "initial", hints_used: 0, last_confidence: nil,
+            phase: "spotting_data", step: "initial", hints_used: 0, last_confidence: nil,
             error_types: [], completed_at: nil, intro_seen: false)
-        }, welcome_sent: false)
+        }, welcome_sent: false, last_activity_at: nil)
       create(:conversation, student: student, subject: exam_subject,
              lifecycle_state: "active", tutor_state: spotting_state)
     end
@@ -97,8 +97,8 @@ RSpec.describe Tutor::BuildContext do
       )
     end
 
-    it "includes the spotting phase header" do
-      expect(result.value[:system_prompt]).to include("PHASE REPÉRAGE")
+    it "includes the spotting_data phase header" do
+      expect(result.value[:system_prompt]).to include("PHASE SPOTTING_DATA")
     end
 
     it "includes the 3-level relaunch instructions" do
@@ -116,22 +116,22 @@ RSpec.describe Tutor::BuildContext do
       expect(result.value[:system_prompt]).to include("forced_reveal")
     end
 
-    it "does NOT include the spotting section when phase is not spotting" do
-      reading_state = TutorState.new(
-        current_phase:        "reading",
+    it "does NOT include the spotting_data section when phase is not spotting_data" do
+      enonce_state = TutorState.new(
+        current_phase:        "enonce",
         current_question_id:  nil,
         concepts_mastered:    [],
         concepts_to_revise:   [],
         discouragement_level: 0,
-        question_states:      {}, welcome_sent: false)
-      reading_conv = create(:conversation, student: student, subject: exam_subject,
-                             lifecycle_state: "active", tutor_state: reading_state)
+        question_states:      {}, welcome_sent: false, last_activity_at: nil)
+      enonce_conv = create(:conversation, student: student, subject: exam_subject,
+                           lifecycle_state: "active", tutor_state: enonce_state)
       r = described_class.call(
-        conversation:  reading_conv,
+        conversation:  enonce_conv,
         question:      question,
         student_input: "test"
       )
-      expect(r.value[:system_prompt]).not_to include("PHASE REPÉRAGE")
+      expect(r.value[:system_prompt]).not_to include("PHASE SPOTTING_DATA")
     end
   end
 
@@ -254,6 +254,104 @@ RSpec.describe Tutor::BuildContext do
       expect(result.ok?).to be true
       expect(result.value[:system_prompt]).to include("Sujet CIME")
       expect(result.value[:system_prompt]).to include("SIN")
+    end
+  end
+
+  context "en phase spotting_type (049)" do
+    let(:spotting_type_conversation) do
+      state = TutorState.new(
+        current_phase:        "spotting_type",
+        current_question_id:  question.id,
+        concepts_mastered:    [],
+        concepts_to_revise:   [],
+        discouragement_level: 0,
+        question_states: {
+          question.id.to_s => QuestionState.new(
+            phase: "spotting_type", step: nil, hints_used: 0, last_confidence: nil,
+            error_types: [], completed_at: nil, intro_seen: false)
+        }, welcome_sent: false, last_activity_at: nil)
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: state)
+    end
+
+    subject(:result) do
+      described_class.call(
+        conversation:  spotting_type_conversation,
+        question:      question,
+        student_input: "Je cherche dans les DT."
+      )
+    end
+
+    it "includes PHASE SPOTTING_TYPE section" do
+      expect(result.value[:system_prompt]).to include("PHASE SPOTTING_TYPE")
+    end
+
+    it "does NOT include old PHASE REPÉRAGE (spotting) header" do
+      expect(result.value[:system_prompt]).not_to include("PHASE REPÉRAGE")
+    end
+  end
+
+  context "en phase spotting_data (049)" do
+    let(:spotting_data_conversation) do
+      state = TutorState.new(
+        current_phase:        "spotting_data",
+        current_question_id:  question.id,
+        concepts_mastered:    [],
+        concepts_to_revise:   [],
+        discouragement_level: 0,
+        question_states: {
+          question.id.to_s => QuestionState.new(
+            phase: "spotting_data", step: nil, hints_used: 0, last_confidence: nil,
+            error_types: [], completed_at: nil, intro_seen: false)
+        }, welcome_sent: false, last_activity_at: nil)
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: state)
+    end
+
+    subject(:result) do
+      described_class.call(
+        conversation:  spotting_data_conversation,
+        question:      question,
+        student_input: "Je pense que c'est dans DT1."
+      )
+    end
+
+    it "includes PHASE SPOTTING_DATA section" do
+      expect(result.value[:system_prompt]).to include("PHASE SPOTTING_DATA")
+    end
+
+    it "does NOT include PHASE SPOTTING_TYPE section" do
+      expect(result.value[:system_prompt]).not_to include("PHASE SPOTTING_TYPE")
+    end
+  end
+
+  context "style de guidage selon answer_type (049)" do
+    let(:calcul_question) { create(:question, part: part, label: "Calculer la puissance.", answer_type: :calcul) }
+    let!(:calcul_answer)  { create(:answer, question: calcul_question, correction_text: "P = 460 W") }
+
+    let(:qcm_question) { create(:question, part: part, label: "QCM test.", answer_type: :qcm) }
+    let!(:qcm_answer)  { create(:answer, question: qcm_question, correction_text: "Réponse C") }
+
+    it "includes style calcul when answer_type is calcul and phase is guiding" do
+      state = TutorState.default.with(current_phase: "guiding", current_question_id: calcul_question.id)
+      conv  = create(:conversation, student: student, subject: exam_subject,
+                     lifecycle_state: "active", tutor_state: state)
+      result = described_class.call(conversation: conv, question: calcul_question, student_input: "test")
+      expect(result.value[:system_prompt]).to include("STYLE DE GUIDAGE")
+    end
+
+    it "includes style qcm when answer_type is qcm and phase is guiding" do
+      state = TutorState.default.with(current_phase: "guiding", current_question_id: qcm_question.id)
+      conv  = create(:conversation, student: student, subject: exam_subject,
+                     lifecycle_state: "active", tutor_state: state)
+      result = described_class.call(conversation: conv, question: qcm_question, student_input: "test")
+      expect(result.value[:system_prompt]).to include("STYLE DE GUIDAGE")
+    end
+  end
+
+  context "règles de progression dans le prompt (049)" do
+    it "includes skip rules (RÈGLES DE PROGRESSION) in the prompt" do
+      expect(result.value[:system_prompt]).to include("RÈGLES DE PROGRESSION")
     end
   end
 end

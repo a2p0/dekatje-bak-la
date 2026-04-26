@@ -46,9 +46,9 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle",
       discouragement_level: 0,
       question_states:      {
         question.id.to_s => QuestionState.new(
-          step: 0, hints_used: 0, last_confidence: nil,
+          phase: "enonce", step: 0, hints_used: 0, last_confidence: nil,
           error_types: [], completed_at: nil, intro_seen: true)
-      }, welcome_sent: true)
+      }, welcome_sent: true, last_activity_at: nil)
     create(:conversation,
       student: student, subject: subject_record,
       lifecycle_state: "active", tutor_state: spotting_state)

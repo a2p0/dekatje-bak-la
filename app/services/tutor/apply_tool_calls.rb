@@ -1,18 +1,21 @@
 module Tutor
   class ApplyToolCalls
-    ALLOWED_PHASES = %w[greeting reading spotting guiding validating feedback ended].freeze
+    ALLOWED_PHASES = %w[
+      idle greeting enonce spotting_type spotting_data guiding validating feedback ended
+    ].freeze
 
     TRANSITION_MATRIX = {
-      "idle"       => %w[greeting],
-      "greeting"   => %w[reading],
-      "reading"    => %w[spotting],
-      "spotting"   => %w[guiding],
-      "guiding"    => %w[validating spotting],
-      "validating" => %w[feedback],
-      "feedback"   => %w[ended]
+      "idle"          => %w[greeting],
+      "greeting"      => %w[enonce],
+      "enonce"        => %w[spotting_type guiding],
+      "spotting_type" => %w[spotting_data guiding],
+      "spotting_data" => %w[guiding],
+      "guiding"       => %w[validating enonce],
+      "validating"    => %w[feedback ended],
+      "feedback"      => %w[ended]
     }.freeze
 
-    QUESTION_REQUIRED_PHASES = %w[guiding spotting].freeze
+    QUESTION_REQUIRED_PHASES = %w[enonce spotting_type spotting_data guiding validating feedback ended].freeze
     MAX_HINTS = 5
 
     def self.call(conversation:, tool_calls:)
@@ -73,6 +76,19 @@ module Tutor
         current_phase:       target_phase,
         current_question_id: question_id || @state.current_question_id
       )
+
+      if question_id.present?
+        qid_str = question_id.to_s
+        existing_qs = new_state.question_states[qid_str] || QuestionState.new(
+          phase: "enonce", step: nil, hints_used: 0, last_confidence: nil,
+          error_types: [], completed_at: nil, intro_seen: false
+        )
+        updated_qs  = existing_qs.with(phase: target_phase)
+        new_state   = new_state.with(
+          question_states: new_state.question_states.merge(qid_str => updated_qs)
+        )
+      end
+
       Result.ok(updated_tutor_state: new_state)
     end
 
@@ -102,7 +118,7 @@ module Tutor
       end
 
       qs = @state.question_states[qid] || QuestionState.new(
-        step: "initial", hints_used: 0, last_confidence: nil,
+        phase: "enonce", step: "initial", hints_used: 0, last_confidence: nil,
         error_types: [], completed_at: nil, intro_seen: false
       )
 
@@ -125,9 +141,9 @@ module Tutor
     end
 
     def apply_evaluate_spotting(args)
-      unless @state.current_phase == "spotting"
+      unless %w[spotting_type spotting_data].include?(@state.current_phase)
         return Result.err(
-          "evaluate_spotting: disponible uniquement en phase spotting (phase courante : #{@state.current_phase})"
+          "evaluate_spotting: disponible uniquement en phase spotting_type ou spotting_data (phase courante : #{@state.current_phase})"
         )
       end
 

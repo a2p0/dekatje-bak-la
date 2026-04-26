@@ -67,7 +67,7 @@ class Student::ConversationsController < Student::BaseController
     question_id = params[:question_id].to_i
     current_qs  = @conversation.tutor_state.question_states
     existing_qs = current_qs[question_id.to_s] || QuestionState.new(
-      step: nil, hints_used: 0, last_confidence: nil,
+      phase: "enonce", step: nil, hints_used: 0, last_confidence: nil,
       error_types: [], completed_at: nil, intro_seen: false
     )
     updated_qs  = existing_qs.with(intro_seen: true)

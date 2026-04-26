@@ -44,7 +44,7 @@ module Tutor
       )
       return llm_result if llm_result.err?
 
-      if @conversation.tutor_state.current_phase == "spotting"
+      if %w[spotting_type spotting_data].include?(@conversation.tutor_state.current_phase)
         filter_result = FilterSpottingOutput.call(
           message:    assistant_msg,
           llm_output: llm_result.value[:full_content]

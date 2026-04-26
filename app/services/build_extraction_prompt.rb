@@ -69,7 +69,7 @@ class BuildExtractionPrompt
               "label": "Énoncé VERBATIM de la question",
               "context": "Texte VERBATIM précédant la question (données, tableaux, intro locale)",
               "points": 2,
-              "answer_type": "calculation",
+              "answer_type": "calcul",
               "dt_references": ["DT1", "DT2"],
               "dr_references": ["DR1"],
               "correction": "Réponse VERBATIM extraite du corrigé",
@@ -94,7 +94,7 @@ class BuildExtractionPrompt
               "label": "Énoncé VERBATIM",
               "context": "Texte VERBATIM précédant la question",
               "points": 2,
-              "answer_type": "text",
+              "answer_type": "identification",
               "dt_references": ["DTS1"],
               "dr_references": ["DRS1"],
               "correction": "Réponse VERBATIM du corrigé",
@@ -148,7 +148,14 @@ class BuildExtractionPrompt
 
     ## Autres règles
 
-    - answer_type : "text", "calculation", "argumentation", "dr_reference", "completion", "choice"
+    - answer_type : "identification", "calcul", "justification", "representation", "qcm", "verification", "conclusion"
+      - identification : Relever, Lister, Citer, Nommer (ex: "Identifier les composants du système")
+      - calcul : Calculer, Dimensionner, Déterminer une valeur numérique (ex: "Calculer la consommation en litres")
+      - justification : Expliquer, Justifier, Argumenter (ex: "Justifier le choix de matériau")
+      - representation : Compléter un DR, Tracer, Schématiser, Dessiner (ex: "Compléter le diagramme")
+      - qcm : Choisir parmi des propositions, Sélectionner (ex: "Parmi les solutions suivantes, laquelle...")
+      - verification : Vérifier, Valider, Contrôler une valeur ou un résultat (ex: "Vérifier que la contrainte est respectée")
+      - conclusion : Conclure, Comparer, Synthétiser à partir des résultats précédents (ex: "Conclure sur le bilan énergétique")
     - Ne retourne AUCUN texte en dehors du JSON
     - Si une information est manquante, utilise une chaîne vide "" ou un tableau vide []
     - Les numéros des parties spécifiques sont des lettres (A, B, C...) et les numéros des questions
@@ -181,7 +188,7 @@ class BuildExtractionPrompt
               "label": "Un poteau a une longueur de 12 m. Justifier, à l'aide du document technique DT2, pourquoi le choix s'est porté sur une ossature en bois lamellé collé plutôt que sur du bois massif.",
               "context": "",
               "points": 1,
-              "answer_type": "text",
+              "answer_type": "justification",
               "dt_references": ["DT2"],
               "dr_references": [],
               "correction": "Le bois lamellé collé permet des portées allant jusqu'à 45 m alors que le bois massif est limité à 7 m. Un poteau de 12 m nécessite donc du bois lamellé collé.",
@@ -196,7 +203,7 @@ class BuildExtractionPrompt
               "label": "Sur le document réponses DR1, calculer le volume et la masse du poteau pour chaque matériau (bois, béton armé, acier).",
               "context": "Les sections des poteaux sont : Bois = 120 000 mm², Acier = 8 000 mm², Béton armé = 160 000 mm². La longueur du poteau est de 12 m.",
               "points": 2,
-              "answer_type": "calculation",
+              "answer_type": "calcul",
               "dt_references": [],
               "dr_references": ["DR1"],
               "correction": "Volume bois = 0,120 × 12 = 1,44 m³, masse = 1,44 × 430 = 619 kg. Volume acier = 0,008 × 12 = 0,096 m³, masse = 0,096 × 7 850 = 754 kg. Volume béton = 0,160 × 12 = 1,92 m³, masse = 1,92 × 2 500 = 4 800 kg.",
@@ -221,7 +228,7 @@ class BuildExtractionPrompt
               "label": "À l'aide du DTS1, calculer la valeur des résistances thermiques des composants de la paroi sur le DRS1.",
               "context": "La paroi extérieure du bâtiment CIME est composée de plusieurs couches de matériaux dont les caractéristiques thermiques sont données dans le DTS1.",
               "points": 2,
-              "answer_type": "calculation",
+              "answer_type": "calcul",
               "dt_references": ["DTS1"],
               "dr_references": ["DRS1"],
               "correction": "R = e / λ pour chaque couche. Béton : R = 0,20 / 1,75 = 0,114 m²·K/W. Laine de roche : R = 0,18 / 0,038 = 4,74 m²·K/W...",

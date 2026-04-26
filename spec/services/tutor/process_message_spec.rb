@@ -79,16 +79,16 @@ RSpec.describe Tutor::ProcessMessage do
 
     let(:spotting_conversation) do
       state = TutorState.new(
-        current_phase:        "spotting",
+        current_phase:        "spotting_data",
         current_question_id:  question.id,
         concepts_mastered:    [],
         concepts_to_revise:   [],
         discouragement_level: 0,
         question_states:      {
           question.id.to_s => QuestionState.new(
-            step: "initial", hints_used: 0, last_confidence: nil,
+            phase: "spotting_data", step: "initial", hints_used: 0, last_confidence: nil,
             error_types: [], completed_at: nil, intro_seen: false)
-        }, welcome_sent: false)
+        }, welcome_sent: false, last_activity_at: nil)
       create(:conversation, student: student, subject: exam_subject,
              lifecycle_state: "active", tutor_state: state)
     end

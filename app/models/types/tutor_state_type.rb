@@ -24,7 +24,8 @@ class TutorStateType < ActiveRecord::Type::Json
       "concepts_to_revise"   => tutor_state.concepts_to_revise,
       "discouragement_level" => tutor_state.discouragement_level,
       "question_states"      => serialize_question_states(tutor_state.question_states),
-      "welcome_sent"         => tutor_state.welcome_sent
+      "welcome_sent"         => tutor_state.welcome_sent,
+      "last_activity_at"     => tutor_state.last_activity_at
     )
   end
 
@@ -42,7 +43,11 @@ class TutorStateType < ActiveRecord::Type::Json
     question_states = raw_states.transform_values do |qs_hash|
       next qs_hash if qs_hash.is_a?(QuestionState)
 
+      raw_phase = qs_hash["phase"]
+      phase = VALID_QUESTION_PHASES.include?(raw_phase) ? raw_phase : "enonce"
+
       QuestionState.new(
+        phase:            phase,
         step:             qs_hash["step"],
         hints_used:       qs_hash["hints_used"] || 0,
         last_confidence:  qs_hash["last_confidence"],
@@ -59,13 +64,15 @@ class TutorStateType < ActiveRecord::Type::Json
       concepts_to_revise:   Array(hash["concepts_to_revise"]),
       discouragement_level: hash["discouragement_level"] || 0,
       question_states:      question_states,
-      welcome_sent:         hash["welcome_sent"] || false
+      welcome_sent:         hash["welcome_sent"] || false,
+      last_activity_at:     hash["last_activity_at"]
     )
   end
 
   def serialize_question_states(question_states)
     question_states.transform_values do |qs|
       {
+        "phase"           => qs.phase,
         "step"            => qs.step,
         "hints_used"      => qs.hints_used,
         "last_confidence" => qs.last_confidence,

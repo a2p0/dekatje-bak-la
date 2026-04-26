@@ -13,7 +13,7 @@ RSpec.describe Tutor::ApplyToolCalls do
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      extra_state, welcome_sent: false)
+      question_states:      extra_state, welcome_sent: false, last_activity_at: nil)
     create(:conversation, student: student, subject: exam_subject, tutor_state: state)
   end
 
@@ -39,13 +39,13 @@ RSpec.describe Tutor::ApplyToolCalls do
     end
 
     it "allows a valid phase transition" do
-      conv = make_conversation(phase: "reading")
+      conv = make_conversation(phase: "enonce", question_id: 1)
       result = described_class.call(
         conversation: conv,
-        tool_calls: [ { name: "transition", args: { "phase" => "spotting", "question_id" => 1 } } ]
+        tool_calls: [ { name: "transition", args: { "phase" => "spotting_type", "question_id" => 1 } } ]
       )
       expect(result.ok?).to be true
-      expect(result.value[:updated_tutor_state].current_phase).to eq("spotting")
+      expect(result.value[:updated_tutor_state].current_phase).to eq("spotting_type")
       expect(result.value[:updated_tutor_state].current_question_id).to eq(1)
     end
 
@@ -92,7 +92,7 @@ RSpec.describe Tutor::ApplyToolCalls do
       state3 = TutorState.new(
         current_phase: "reading", current_question_id: nil,
         concepts_mastered: [], concepts_to_revise: [],
-        discouragement_level: 3, question_states: {}, welcome_sent: false)
+        discouragement_level: 3, question_states: {}, welcome_sent: false, last_activity_at: nil)
       other_student = create(:student, classroom: classroom)
       conv3 = create(:conversation, student: other_student, subject: exam_subject, tutor_state: state3)
       result3 = described_class.call(
@@ -105,7 +105,7 @@ RSpec.describe Tutor::ApplyToolCalls do
 
   describe "tool: request_hint" do
     it "increments hints_used monotonically from 0 to 1" do
-      qs = QuestionState.new(step: "initial", hints_used: 0, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
+      qs = QuestionState.new(phase: "enonce", step: "initial", hints_used: 0, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
@@ -116,7 +116,7 @@ RSpec.describe Tutor::ApplyToolCalls do
     end
 
     it "silently ignores skipped hint levels (hints_used unchanged)" do
-      qs = QuestionState.new(step: "initial", hints_used: 1, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
+      qs = QuestionState.new(phase: "enonce", step: "initial", hints_used: 1, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
@@ -127,7 +127,7 @@ RSpec.describe Tutor::ApplyToolCalls do
     end
 
     it "silently ignores hint above max (5)" do
-      qs = QuestionState.new(step: "initial", hints_used: 5, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
+      qs = QuestionState.new(phase: "enonce", step: "initial", hints_used: 5, last_confidence: nil, error_types: [], completed_at: nil, intro_seen: false)
       conv = make_conversation(phase: "guiding", question_id: 7, extra_state: { "7" => qs })
       result = described_class.call(
         conversation: conv,
@@ -161,7 +161,7 @@ RSpec.describe Tutor::ApplyToolCalls do
     end
 
     it "auto-transitions to guiding on success outcome" do
-      conv = make_conversation(phase: "spotting", question_id: 3)
+      conv = make_conversation(phase: "spotting_type", question_id: 3)
       result = described_class.call(
         conversation: conv,
         tool_calls: [ {
@@ -190,6 +190,111 @@ RSpec.describe Tutor::ApplyToolCalls do
         tool_calls: [ { name: "do_something_weird", args: {} } ]
       )
       expect(result.ok?).to be true
+    end
+  end
+
+  describe "tool: transition — nouvelle TRANSITION_MATRIX (049)" do
+    # These tests will FAIL until apply_tool_calls.rb is updated (TDD)
+
+    it "allows greeting → enonce (nouveau flow sans reading)" do
+      conv = make_conversation(phase: "greeting", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "enonce", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("enonce")
+    end
+
+    it "allows enonce → guiding (skip spotting pour qcm)" do
+      conv = make_conversation(phase: "enonce", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "guiding", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("guiding")
+    end
+
+    it "allows enonce → spotting_type" do
+      conv = make_conversation(phase: "enonce", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "spotting_type", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("spotting_type")
+    end
+
+    it "allows spotting_type → guiding (skip spotting_data si pas de DT/DR)" do
+      conv = make_conversation(phase: "spotting_type", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "guiding", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("guiding")
+    end
+
+    it "allows spotting_type → spotting_data" do
+      conv = make_conversation(phase: "spotting_type", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "spotting_data", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("spotting_data")
+    end
+
+    it "allows spotting_data → guiding" do
+      conv = make_conversation(phase: "spotting_data", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "guiding", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("guiding")
+    end
+
+    it "allows guiding → enonce (passage question suivante)" do
+      conv = make_conversation(phase: "guiding", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "enonce", "question_id" => 6 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("enonce")
+    end
+
+    it "allows validating → ended (skip feedback)" do
+      conv = make_conversation(phase: "validating", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "ended", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("ended")
+    end
+
+    it "silently ignores forbidden transition enonce → reading (old phase not in matrix)" do
+      conv = make_conversation(phase: "enonce", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "reading", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      expect(result.value[:updated_tutor_state].current_phase).to eq("enonce")
+    end
+
+    it "persists QuestionState#phase when transitioning" do
+      conv = make_conversation(phase: "enonce", question_id: 5)
+      result = described_class.call(
+        conversation: conv,
+        tool_calls: [ { name: "transition", args: { "phase" => "spotting_type", "question_id" => 5 } } ]
+      )
+      expect(result.ok?).to be true
+      updated = result.value[:updated_tutor_state]
+      expect(updated.question_states["5"]&.phase).to eq("spotting_type")
     end
   end
 end
