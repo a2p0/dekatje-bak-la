@@ -14,7 +14,8 @@ class Student::ConversationsController < Student::BaseController
 
     @conversation.activate! unless @conversation.active?
 
-    unless @conversation.tutor_state.welcome_sent
+    last_at = @conversation.tutor_state.last_activity_at
+    if Tutor::BuildWelcomeMessage.should_greet?(conversation: @conversation, last_activity_at: last_at)
       api_key_data = resolve_api_key_data
       Tutor::BuildWelcomeMessage.call(
         subject:      @subject,
