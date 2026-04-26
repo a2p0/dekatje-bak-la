@@ -85,7 +85,7 @@
 
 - [x] T013 Mettre à jour `app/services/tutor/tools/evaluate_spotting_tool.rb` et `apply_tool_calls.rb#apply_evaluate_spotting` : adapter à `spotting_type` et `spotting_data` séparément via param `step: "type" | "data"` (un seul outil, deux étapes — évite la prolifération d'outils LLM)
 
-- [ ] T013b [US1] Couvrir FR-013 — réponse anticipée sans régression de phase :
+- [ ] T013b [US1] [DEFERRED → PR suivante] Couvrir FR-013 — réponse anticipée sans régression de phase :
   - Ajouter spec dans `spec/services/tutor/build_context_spec.rb` : quand `current_phase == "enonce"` et le message élève contient une réponse complète, le prompt contient une section `[RÉPONSE ANTICIPÉE]` indiquant au LLM de ne pas régresser vers `enonce`
   - Ajouter section `ANTICIPATED_ANSWER_SECTION` dans `app/services/tutor/build_context.rb` : détectée si `current_phase` est `enonce` ou `spotting_type`, injectée conditionnellement
   - Le LLM peut transitionner vers `guiding` directement depuis `enonce` si l'élève anticipe — déjà autorisé par la TRANSITION_MATRIX (`enonce → guiding`)
@@ -108,7 +108,7 @@
   - Mise à jour de `last_activity_at` à chaque message
   - Phase `ended` : pas de cycle repris (correction affichée)
 
-- [ ] T015 [P] Écrire specs feature `spec/features/student_tutor_full_flow_spec.rb` — mettre à jour les scénarios existants avec les nouvelles phases, ajouter scénario reprise (`guiding` → déconnexion → retour → `guiding`)
+- [ ] T015 [P] [DEFERRED → PR suivante] Écrire specs feature `spec/features/student_tutor_full_flow_spec.rb` — mettre à jour les scénarios existants avec les nouvelles phases, ajouter scénario reprise (`guiding` → déconnexion → retour → `guiding`)
 
 ### Implémentation
 
@@ -139,7 +139,7 @@
   - `welcome_sent == true` ET `last_activity_at` > 12h → re-greeting
   - Nouvelle `StudentSession` (reconnexion) → re-greeting
 
-- [ ] T019 [P] Compléter `spec/features/student_tutor_activation_spec.rb` : ajouter scénario navigation inter-questions (pas de double greeting) et scénario reconnexion (re-greeting)
+- [ ] T019 [P] [DEFERRED → PR suivante] Compléter `spec/features/student_tutor_activation_spec.rb` : ajouter scénario navigation inter-questions (pas de double greeting) et scénario reconnexion (re-greeting)
 
 ### Implémentation
 
@@ -160,13 +160,13 @@
 
 ### Specs (TDD)
 
-- [ ] T021 Écrire `spec/migrations/rename_answer_types_spec.rb` — tester : migration up (mapping correct pour chaque ancien type), migration down (rollback propre), 0 questions avec `answer_type: nil` après up
+- [ ] T021 [DEFERRED → PR suivante] Écrire `spec/migrations/rename_answer_types_spec.rb` — tester : migration up (mapping correct pour chaque ancien type), migration down (rollback propre), 0 questions avec `answer_type: nil` après up
 
-- [ ] T022 [P] Écrire `spec/services/build_extraction_prompt_spec.rb` — tester : le prompt contient les 7 nouveaux libellés, aucune mention des anciens (`text`, `calculation`, `dr_reference`, etc.)
+- [x] T022 [P] Écrire `spec/services/build_extraction_prompt_spec.rb` — tester : le prompt contient les 7 nouveaux libellés, aucune mention des anciens (`text`, `calculation`, `dr_reference`, etc.)
 
 ### Implémentation
 
-- [ ] T023 Appliquer la migration T001 et vérifier avec `bundle exec rails db:migrate` puis `bundle exec rails db:rollback`
+- [ ] T023 [DEFERRED → PR suivante] Appliquer la migration T001 et vérifier avec `bundle exec rails db:migrate` puis `bundle exec rails db:rollback`
 - [x] T024 [P] Mettre à jour les factories `spec/factories/questions.rb` : `answer_type` utilise les nouvelles valeurs
 
 **Checkpoint** : `bundle exec rails db:migrate && bundle exec rspec spec/migrations/` vert
