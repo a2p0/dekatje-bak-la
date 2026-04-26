@@ -59,9 +59,9 @@ RSpec.describe ResolveTutorApiKey do
         expect(result[:provider]).to eq("openrouter")
       end
 
-      it "returns student effective_model for free mode" do
+      it "returns the OpenRouter default model for free mode (not student's provider model)" do
         result = service.call
-        expect(result[:model]).to eq(student.effective_model)
+        expect(result[:model]).to eq(ResolveTutorApiKey::DEFAULT_MODEL["openrouter"])
       end
     end
 
