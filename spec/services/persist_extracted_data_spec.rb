@@ -105,7 +105,7 @@ RSpec.describe PersistExtractedData do
         expect(common_question.number).to eq("1.1")
         expect(common_question.label).to eq("Calculer...")
         expect(common_question.points).to eq(2.0)
-        expect(common_question.answer_type).to eq("calculation")
+        expect(common_question.answer_type).to eq("calcul")
         expect(common_question.dt_references).to eq([ "DT1" ])
         expect(common_question.dr_references).to eq([])
 
@@ -113,7 +113,7 @@ RSpec.describe PersistExtractedData do
         expect(specific_question.number).to eq("A.1")
         expect(specific_question.label).to eq("Relever...")
         expect(specific_question.points).to eq(3.0)
-        expect(specific_question.answer_type).to eq("text")
+        expect(specific_question.answer_type).to eq("identification")
         expect(specific_question.dt_references).to eq([ "DTS1" ])
         expect(specific_question.dr_references).to eq([ "DRS1" ])
       end
@@ -181,7 +181,7 @@ RSpec.describe PersistExtractedData do
         )
         question = common_part.questions.create!(
           number: "1.1", label: "Calculer...", context_text: "",
-          points: 2, answer_type: :calculation, position: 0, status: :draft,
+          points: 2, answer_type: :calcul, position: 0, status: :draft,
           dt_references: [ "DT1" ], dr_references: []
         )
         question.create_answer!(
