@@ -63,6 +63,17 @@ RSpec.describe ResolveTutorApiKey do
         result = service.call
         expect(result[:model]).to eq(ResolveTutorApiKey::DEFAULT_MODEL["openrouter"])
       end
+
+      context "when student has api_provider: anthropic (different from teacher openrouter)" do
+        before { student.update!(api_provider: :anthropic) }
+
+        it "still returns an openrouter-compatible model, not an anthropic model" do
+          result = service.call
+          expect(result[:provider]).to eq("openrouter")
+          expect(result[:model]).to eq(ResolveTutorApiKey::DEFAULT_MODEL["openrouter"])
+          expect(result[:model]).not_to include("claude-")
+        end
+      end
     end
 
     context "when no key is available" do

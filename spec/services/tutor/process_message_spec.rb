@@ -35,6 +35,13 @@ RSpec.describe Tutor::ProcessMessage do
     expect { result }.to change(Message.where(role: :user), :count).by(1)
   end
 
+  it "persists user message content without <student_input> tags" do
+    result
+    msg = Message.where(role: :user).last
+    expect(msg.content).to eq("Je ne sais pas.")
+    expect(msg.content).not_to include("<student_input>")
+  end
+
   it "persists an assistant message with content" do
     result
     assistant_msg = Message.where(role: :assistant).last
