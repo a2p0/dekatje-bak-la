@@ -43,6 +43,7 @@ TutorState = Data.define(
     lines << "Points à revoir : #{concepts_to_revise.join(', ')}." if concepts_to_revise.any?
     lines << "Niveau de découragement : #{discouragement_level}/3."
     if (qs = question_states[current_question_id.to_s])
+      lines << "Phase de la question #{current_question_id} : #{qs.phase}."
       lines << "Indices utilisés sur cette question : #{qs.hints_used}/5."
       lines << "Dernière confiance déclarée : #{qs.last_confidence}/5." if qs.last_confidence
     end

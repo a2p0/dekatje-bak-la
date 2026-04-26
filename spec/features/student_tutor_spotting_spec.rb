@@ -24,7 +24,7 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle",
   let!(:question) do
     create(:question, part: part, number: "1.1",
       label: "Calculer la consommation en litres pour 186 km.",
-      answer_type: :calculation, points: 2, position: 1)
+      answer_type: :calcul, points: 2, position: 1)
   end
   let!(:answer) do
     create(:answer, question: question,
@@ -39,14 +39,14 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle",
 
   let!(:spotting_conversation) do
     spotting_state = TutorState.new(
-      current_phase:        "spotting",
+      current_phase:        "spotting_data",
       current_question_id:  question.id,
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
       question_states:      {
         question.id.to_s => QuestionState.new(
-          phase: "enonce", step: 0, hints_used: 0, last_confidence: nil,
+          phase: "spotting_data", step: 0, hints_used: 0, last_confidence: nil,
           error_types: [], completed_at: nil, intro_seen: true)
       }, welcome_sent: true, last_activity_at: nil)
     create(:conversation,
@@ -70,7 +70,7 @@ RSpec.describe "Tuteur guidé : phase de repérage conversationnelle",
 
   before { login_as_student(student, classroom) }
 
-  scenario "le tuteur répond à une question en phase spotting", js: true do
+  scenario "le tuteur répond à une question en phase spotting_data", js: true do
     FakeRubyLlm.setup_stub(
       content: "Où penses-tu trouver les informations pour cette question ?",
       tool_calls: []
