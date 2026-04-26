@@ -355,6 +355,8 @@ SECRET_KEY_BASE            # rails secret
 - N/A — feature in-memory only (pas de migration, pas de nouvelle table). (039-structural-metrics)
 - Ruby 3.3+ / Rails 8.1 + AiClientFactory, ResolveApiKey, Sidekiq, rake tasks (046-extraction-structured-correction)
 - PostgreSQL via Neon (JSONB `structured_correction` sur `answers` — migration déjà présente depuis 043) (046-extraction-structured-correction)
+- Ruby 3.3+, Rails 8.1.3 + RubyLLM (outils LLM), ActiveRecord (JSONB TutorState), RSpec + FactoryBot + Capybara (049-tutor-phases-rework)
+- PostgreSQL via Neon — `conversations.tutor_state` (JSONB), `questions.answer_type` (integer enum) (049-tutor-phases-rework)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
