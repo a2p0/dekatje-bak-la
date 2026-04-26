@@ -102,7 +102,7 @@
 
 ### Specs (TDD)
 
-- [ ] T014 Écrire `spec/services/tutor/process_message_spec.rb` (ou compléter) — tester :
+- [x] T014 Écrire `spec/services/tutor/process_message_spec.rb` (ou compléter) — tester :
   - Reprise à `question_states[question_id].phase` si présent
   - Démarrage à `enonce` si `question_states[question_id]` absent
   - Mise à jour de `last_activity_at` à chaque message
@@ -112,12 +112,12 @@
 
 ### Implémentation
 
-- [ ] T016 Mettre à jour `app/services/tutor/process_message.rb` (ou équivalent d'entrée) :
+- [x] T016 Mettre à jour `app/services/tutor/process_message.rb` (ou équivalent d'entrée) :
   - Résoudre la phase courante depuis `question_states[current_question_id.to_s]&.phase` avant de construire le contexte
   - Si `question_states` absent pour cette question → initialiser à `phase: "enonce"`
   - Mettre à jour `last_activity_at` dans `TutorState` à chaque appel via `UpdateTutorState`
 
-- [ ] T017 Mettre à jour `app/services/tutor/apply_tool_calls.rb#apply_transition` :
+- [x] T017 Mettre à jour `app/services/tutor/apply_tool_calls.rb#apply_transition` :
   - Lors d'une transition, persister la nouvelle phase dans `question_states[question_id].phase` (en plus de `current_phase`)
   - Synchroniser `current_phase` (global) et `question_states[qid].phase` (par question)
 
@@ -133,7 +133,7 @@
 
 ### Specs (TDD)
 
-- [ ] T018 Écrire `spec/services/tutor/build_welcome_message_spec.rb` (ou compléter) — tester :
+- [x] T018 Écrire `spec/services/tutor/build_welcome_message_spec.rb` (ou compléter) — tester :
   - `welcome_sent == false` → greeting émis, `welcome_sent` devient `true`
   - `welcome_sent == true` ET `last_activity_at` < 12h → pas de greeting
   - `welcome_sent == true` ET `last_activity_at` > 12h → re-greeting
@@ -143,7 +143,7 @@
 
 ### Implémentation
 
-- [ ] T020 Mettre à jour `app/services/tutor/build_welcome_message.rb` :
+- [x] T020 Mettre à jour `app/services/tutor/build_welcome_message.rb` :
   - Condition re-greeting : `!welcome_sent` OU `last_activity_at.nil?` OU `Time.current - last_activity_at.to_datetime > 12.hours`
   - Détecter reconnexion : comparer `student_session.created_at` avec `last_activity_at` (nouvelle session = reconnexion)
   - Mettre à jour `welcome_sent: true` et `last_activity_at` après emission
@@ -177,11 +177,11 @@
 
 **Purpose**: Mise à jour des specs feature spotting et nettoyage global
 
-- [ ] T025 Mettre à jour `spec/features/student_tutor_spotting_spec.rb` : remplacer références à `spotting` par `spotting_type` et `spotting_data` selon le nouveau flow
-- [ ] T026 [P] Supprimer ou mettre à jour les `pending: "UI gap"` dans `spec/features/student_tutor_full_flow_spec.rb` qui ne sont plus valides avec les nouvelles phases
+- [x] T025 Mettre à jour `spec/features/student_tutor_spotting_spec.rb` : remplacer références à `spotting` par `spotting_type` et `spotting_data` selon le nouveau flow
+- [x] T026 [P] Supprimer ou mettre à jour les `pending: "UI gap"` dans `spec/features/student_tutor_full_flow_spec.rb` qui ne sont plus valides avec les nouvelles phases
 - [ ] T027 [P] Mettre à jour le prompt d'extraction (`build_extraction_prompt.rb`) pour documenter les 7 types dans les instructions au LLM avec des exemples concrets
-- [ ] T028 Vérifier que `TutorState#to_prompt` est mis à jour pour mentionner la phase par question dans le contexte LLM
-- [ ] T029 Run complet CI : `bundle exec rspec spec/` — zéro échec attendu
+- [x] T028 Vérifier que `TutorState#to_prompt` est mis à jour pour mentionner la phase par question dans le contexte LLM
+- [x] T029 Run complet CI : `bundle exec rspec spec/` — zéro échec attendu
 
 ---
 
