@@ -14,20 +14,21 @@ module Tutor
       validate_result = ValidateInput.call(raw_input: @student_input)
       return validate_result if validate_result.err?
 
-      sanitized = validate_result.value[:sanitized_input]
+      sanitized_for_llm = validate_result.value[:sanitized_input]
+      display_content   = @student_input.to_s.strip
 
       sync_question_state_and_activity
 
       context_result = BuildContext.call(
         conversation:  @conversation,
         question:      @question,
-        student_input: sanitized
+        student_input: sanitized_for_llm
       )
       return context_result if context_result.err?
 
       @conversation.messages.create!(
         role:     :user,
-        content:  sanitized,
+        content:  display_content,
         question: @question
       )
 
