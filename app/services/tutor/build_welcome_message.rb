@@ -17,7 +17,7 @@ module Tutor
     def self.should_greet?(conversation:, last_activity_at:)
       ts = conversation.tutor_state
       return true unless ts.welcome_sent
-      return true if last_activity_at.nil?
+      return false if last_activity_at.nil?
       Time.current - last_activity_at.to_time > INACTIVITY_THRESHOLD
     end
 

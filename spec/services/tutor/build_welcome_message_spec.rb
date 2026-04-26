@@ -42,9 +42,9 @@ RSpec.describe Tutor::BuildWelcomeMessage do
       expect(described_class.should_greet?(conversation: conv, last_activity_at: stale)).to be true
     end
 
-    it "returns true when welcome_sent but last_activity_at is nil" do
+    it "returns false when welcome_sent and last_activity_at is nil (welcome just sent, no messages yet)" do
       conv = conv_with_state(welcome_sent: true, last_activity_at: nil)
-      expect(described_class.should_greet?(conversation: conv, last_activity_at: nil)).to be true
+      expect(described_class.should_greet?(conversation: conv, last_activity_at: nil)).to be false
     end
   end
 
