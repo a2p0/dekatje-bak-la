@@ -17,21 +17,10 @@
         Mode tuteur
       </p>
 
-      <label class="flex items-start gap-3 cursor-pointer">
-        <%= f.check_box :tutor_free_mode_enabled,
-            class: "mt-1 accent-indigo-500 w-4 h-4 shrink-0" %>
-        <div>
-          <span class="text-sm font-medium text-slate-700 dark:text-slate-200">
-            Activer le tuteur en mode gratuit pour cette classe
-          </span>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Les élèves sans clé personnelle pourront utiliser le tuteur via
-            votre clé OpenRouter. Configurez votre clé OpenRouter dans
-            <%= link_to "votre profil", edit_user_registration_path,
-                class: "underline hover:text-indigo-600" %>.
-          </p>
-        </div>
-      </label>
+      <%= render "teacher/shared/field", f: f, field: :tutor_free_mode_enabled,
+            label_text: "Activer le tuteur en mode gratuit pour cette classe",
+            type: :checkbox,
+            hint: "Les élèves sans clé personnelle pourront utiliser le tuteur via votre clé OpenRouter." %>
 
       <% if @classroom.tutor_free_mode_enabled? && current_user.openrouter_api_key.blank? %>
         <div class="mt-3 flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2">

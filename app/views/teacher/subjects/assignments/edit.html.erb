@@ -1,4 +1,10 @@
 <%# Assigner un sujet aux classes — assign %>
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes sujets", href: teacher_subjects_path },
+  { label: @subject.title, href: teacher_subject_path(@subject) },
+  { label: "Assignation" }
+]) %>
+
 <div class="max-w-lg mx-auto">
   <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">Assigner aux classes</h1>
   <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
