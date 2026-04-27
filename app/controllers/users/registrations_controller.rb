@@ -1,4 +1,6 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  layout 'teacher', only: [:edit, :update]
+
   protected
 
   def account_update_params
