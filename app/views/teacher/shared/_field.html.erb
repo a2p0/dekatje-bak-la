@@ -34,7 +34,7 @@
     <% end %>
   <% end %>
 
-  <% if f.object&.errors&.[](field)&.any? %>
+  <% if f.object.respond_to?(:errors) && f.object.errors[field].any? %>
     <% f.object.errors[field].each do |msg| %>
       <p class="mt-1 text-sm text-rose-600 dark:text-rose-400"><%= msg %></p>
     <% end %>
