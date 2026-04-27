@@ -7,7 +7,7 @@ RSpec.describe "Teacher archives a subject from its detail page", type: :feature
     visit new_user_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
   end
 
   # Turbo.config.forms.confirm is overridden with a custom <dialog> in application.js.

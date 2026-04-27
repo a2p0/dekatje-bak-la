@@ -17,7 +17,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     visit new_user_session_path
     fill_in "Email", with: teacher.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
 
     expect(page).to have_content("Mes classes")
     expect(page).to have_content("Terminale SIN 2026")
@@ -32,7 +32,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     visit new_user_session_path
     fill_in "Email", with: teacher.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
     expect(page).to have_content("Mes classes")
 
     click_link "Mes sujets"
@@ -52,7 +52,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     visit new_user_session_path
     fill_in "Email", with: teacher.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
     expect(page).to have_content("Mes classes")
 
     visit teacher_subject_path(subject_record)
@@ -78,7 +78,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     visit new_user_session_path
     fill_in "Email", with: teacher.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
 
     within("nav") do
       expect(page).to have_link("Mes classes", href: teacher_root_path)

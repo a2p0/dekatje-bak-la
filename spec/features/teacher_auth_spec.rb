@@ -9,7 +9,7 @@ RSpec.describe "Story 1: Inscription et connexion enseignant", type: :feature do
     fill_in "Email", with: "jean@example.com"
     fill_in "Password", with: "password123"
     fill_in "Password confirmation", with: "password123"
-    click_button "Sign up"
+    click_button "S'inscrire"
 
     expect(page).to have_content("confirmation")
     expect(User.last.first_name).to eq("Jean")
@@ -32,7 +32,7 @@ RSpec.describe "Story 1: Inscription et connexion enseignant", type: :feature do
     visit new_user_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
 
     expect(page).to have_content("Mes classes")
   end
@@ -43,7 +43,7 @@ RSpec.describe "Story 1: Inscription et connexion enseignant", type: :feature do
     visit new_user_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
 
     expect(page).to have_content("Mes classes")
 

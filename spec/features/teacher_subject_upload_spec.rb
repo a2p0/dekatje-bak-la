@@ -7,7 +7,7 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     visit new_user_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
     expect(page).to have_content("Mes classes")
   end
 

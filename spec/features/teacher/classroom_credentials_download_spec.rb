@@ -7,7 +7,7 @@ RSpec.describe "Teacher downloads credentials PDF from generated banner", type: 
     visit new_user_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
   end
 
   scenario "le bandeau d'identifiants générés expose un bouton de téléchargement PDF" do
