@@ -66,7 +66,7 @@
     <% end %>
     <% if has_specific_presentation %>
       <%
-        first_specific = parts.order(:position).find { |p| p.section_type == "specific" }
+        first_specific = parts.sort_by(&:position).find { |p| p.section_type == "specific" }
         specific_q = first_specific&.questions&.kept&.order(:position)&.first
       %>
       <% if specific_q %>
@@ -82,7 +82,7 @@
 
   <%# All parts grouped by section_type (commune / specifique) %>
   <%
-    ordered_parts = parts.order(:position).to_a
+    ordered_parts = parts.sort_by(&:position)
     common_parts_list = common_parts(ordered_parts)
     specific_parts_list = specific_parts(ordered_parts)
     show_section_headers = common_parts_list.any? && specific_parts_list.any?

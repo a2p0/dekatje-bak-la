@@ -11,16 +11,14 @@ RSpec.describe "Filtrage des sujets par spécialité de classe", type: :feature 
   let(:student_ee) { create(:student, classroom: classroom_ee, password: "password123") }
 
   let(:subject_ac) do
-    create(:subject, :ac, :no_files, status: :published, owner: teacher, exam_session: exam_session).tap do |s|
+    create(:subject, :ac, :new_format, status: :published, owner: teacher, exam_session: exam_session).tap do |s|
       create(:part, :common_shared, exam_session: exam_session, title: "Partie commune AC")
       create(:part, section_type: :specific, specialty: :AC, subject: s, title: "Partie spécifique AC")
     end
   end
 
   let(:subject_tc) do
-    create(:subject, :tronc_commun, :no_files, status: :published, owner: teacher, exam_session: exam_session).tap do |s|
-      # tronc_commun: only common parts via exam_session
-    end
+    create(:subject, :tronc_commun, :new_format, status: :published, owner: teacher, exam_session: exam_session)
   end
 
   before do
@@ -39,14 +37,14 @@ RSpec.describe "Filtrage des sujets par spécialité de classe", type: :feature 
       before { login_as_student(student_ac, classroom_ac) }
 
       it "affiche le sujet AC sans mention 'partie commune uniquement'" do
-        visit student_subjects_path(access_code: classroom_ac.access_code)
+        visit student_root_path(access_code: classroom_ac.access_code)
         within("[data-subject-id='#{subject_ac.id}']") do
           expect(page).not_to have_text("partie commune uniquement")
         end
       end
 
       it "affiche le sujet tronc_commun avec mention 'partie commune uniquement'" do
-        visit student_subjects_path(access_code: classroom_ac.access_code)
+        visit student_root_path(access_code: classroom_ac.access_code)
         within("[data-subject-id='#{subject_tc.id}']") do
           expect(page).to have_text("partie commune uniquement")
         end
@@ -57,23 +55,23 @@ RSpec.describe "Filtrage des sujets par spécialité de classe", type: :feature 
       before { login_as_student(student_ee, classroom_ee) }
 
       it "affiche le sujet AC avec mention 'partie commune uniquement'" do
-        visit student_subjects_path(access_code: classroom_ee.access_code)
+        visit student_root_path(access_code: classroom_ee.access_code)
         within("[data-subject-id='#{subject_ac.id}']") do
           expect(page).to have_text("partie commune uniquement")
         end
       end
 
       it "affiche le sujet tronc_commun avec mention 'partie commune uniquement'" do
-        visit student_subjects_path(access_code: classroom_ee.access_code)
+        visit student_root_path(access_code: classroom_ee.access_code)
         within("[data-subject-id='#{subject_tc.id}']") do
           expect(page).to have_text("partie commune uniquement")
         end
       end
 
       it "n'affiche pas de mention pour un sujet EE (edge case: sujet de même spé)" do
-        subject_ee = create(:subject, :ee, :no_files, status: :published, owner: teacher, exam_session: exam_session)
+        subject_ee = create(:subject, :ee, :new_format, status: :published, owner: teacher, exam_session: exam_session)
         create(:classroom_subject, classroom: classroom_ee, subject: subject_ee)
-        visit student_subjects_path(access_code: classroom_ee.access_code)
+        visit student_root_path(access_code: classroom_ee.access_code)
         within("[data-subject-id='#{subject_ee.id}']") do
           expect(page).not_to have_text("partie commune uniquement")
         end
@@ -86,7 +84,7 @@ RSpec.describe "Filtrage des sujets par spécialité de classe", type: :feature 
   # ─────────────────────────────────────────────
 
   describe "US2: Blocage accès partie spécifique" do
-    let(:common_part)   { exam_session.parts.common.first }
+    let(:common_part)   { exam_session.common_parts.first }
     let(:specific_part) { subject_ac.parts.specific.first }
     let(:common_question) do
       create(:question, part: common_part, status: :validated)
