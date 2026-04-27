@@ -60,5 +60,11 @@ FactoryBot.define do
         end
       end
     end
+
+    trait :sin         do specialty { :SIN }; end
+    trait :itec        do specialty { :ITEC }; end
+    trait :ee          do specialty { :EE }; end
+    trait :ac          do specialty { :AC }; end
+    trait :tronc_commun do specialty { :tronc_commun }; end
   end
 end

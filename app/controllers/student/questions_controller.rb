@@ -51,10 +51,20 @@ class Student::QuestionsController < Student::BaseController
   end
 
   def filtered_parts
-    if @session_record.requires_scope_selection? && @session_record.scope_selected?
-      @session_record.filtered_parts
+    raw_parts = if @session_record.requires_scope_selection? && @session_record.scope_selected?
+      @session_record.filtered_parts.to_a
     else
-      @subject.parts.order(:position)
+      all_parts_for_subject_raw
+    end
+    SubjectAccessPolicy.accessible_parts(raw_parts, @subject, @classroom)
+  end
+
+  def all_parts_for_subject_raw
+    if @subject.exam_session.present?
+      @subject.exam_session.common_parts.includes(:questions).order(:position).to_a +
+        @subject.parts.includes(:questions).order(:position).to_a
+    else
+      @subject.parts.includes(:questions).order(:position).to_a
     end
   end
 
