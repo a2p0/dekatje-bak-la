@@ -1,15 +1,10 @@
 <!-- Sync Impact Report
-Version change: 1.0.0 → 2.0.0
+Version change: 2.0.0 → 2.1.0
 Modified principles:
-  - IV "Test-First" → IV "Testing" (reworded, added CI-temporary note)
-Added sections:
-  - VI "Development Workflow" (new principle)
-  - Definition of Done updated (plan, branch, PR requirements)
+  - VI "Development Workflow" — added rules 8-11 (superpowers skills integration)
+Added sections: none
 Removed sections: none
-Templates requiring updates:
-  ⚠ plan-template.md — verify workflow steps align with principle VI
-  ⚠ spec-template.md — verify Definition of Done section
-  ⚠ tasks-template.md — verify task types include workflow-driven categories
+Templates requiring updates: none
 Follow-up TODOs: none
 -->
 
@@ -102,6 +97,20 @@ memory feedbacks.
 7. **Push + CI green after each coherent batch.** Never accumulate
    unrelated changes without CI validation between them.
 
+8. **Debugging** : invoke `systematic-debugging` before any fix —
+   root cause first, never patch without investigation.
+
+9. **Verification** : invoke `verification-before-completion` before
+   any "done" claim — run tests, read output, THEN assert success.
+
+10. **Branch completion** : invoke `finishing-a-development-branch`
+    before opening a PR — tests green, then present merge/PR/keep/discard
+    options.
+
+11. **Parallel agents** : invoke `dispatching-parallel-agents` when
+    2+ independent tasks exist (e.g. specs on different files, bugs
+    with unrelated root causes).
+
 ## RGPD & Security Requirements
 
 Student data isolation: each student session MUST be scoped to their
@@ -135,4 +144,4 @@ migration plan if applicable.
 All PRs must verify compliance with these principles before merge.
 The constitution MUST be reviewed at each major milestone.
 
-**Version**: 2.0.0 | **Ratified**: 2026-03-26 | **Last Amended**: 2026-04-07
+**Version**: 2.1.0 | **Ratified**: 2026-03-26 | **Last Amended**: 2026-04-27
