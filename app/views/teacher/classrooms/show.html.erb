@@ -1,4 +1,8 @@
 <%# Détail classe — show %>
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes classes", href: teacher_root_path },
+  { label: @classroom.name }
+]) %>
 
 <%# Card : informations de la classe %>
 <div class="mb-6">

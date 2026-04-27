@@ -1,11 +1,14 @@
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes classes", href: teacher_root_path },
+  { label: @classroom.name, href: teacher_classroom_path(@classroom) },
+  { label: "Paramètres" }
+]) %>
+
 <div class="max-w-xl">
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">
       Paramètres — <%= @classroom.name %>
     </h1>
-    <%= link_to "← Retour à la classe",
-        teacher_classroom_path(@classroom),
-        class: "text-sm text-slate-500 dark:text-slate-400 hover:underline" %>
   </div>
 
   <%= form_with model: @classroom,
