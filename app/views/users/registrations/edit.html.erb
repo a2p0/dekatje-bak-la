@@ -1,60 +1,82 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Mon profil</h1>
+
+<% if resource.errors.any? %>
+  <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg p-4 mb-6">
+    <ul class="text-sm text-rose-700 dark:text-rose-300 list-disc list-inside space-y-1">
+      <% resource.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
 
 <%= form_with(model: resource, as: resource_name, url: registration_path(resource_name), method: :put, data: { turbo: false }) do |f| %>
-  <%= render "users/shared/error_messages", resource: resource %>
+  <%# Section 1 — Informations du compte %>
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-200 mb-4">Informations du compte</h2>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+    <div class="mb-4">
+      <%= f.label :email, "Adresse e-mail", class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.email_field :email,
+          autofocus: true,
+          autocomplete: "email",
+          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-slate-100" %>
+      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">En attente de confirmation pour : <%= resource.unconfirmed_email %></p>
+      <% end %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :password, "Nouveau mot de passe", class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Laissez vide pour conserver le mot de passe actuel<% if @minimum_password_length %> — <%= @minimum_password_length %> caractères minimum<% end %></p>
+      <%= f.password_field :password,
+          autocomplete: "new-password",
+          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-slate-100" %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :password_confirmation, "Confirmation du nouveau mot de passe", class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.password_field :password_confirmation,
+          autocomplete: "new-password",
+          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-slate-100" %>
+    </div>
+
+    <div class="mb-2">
+      <%= f.label :current_password, "Mot de passe actuel", class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Requis pour confirmer vos modifications</p>
+      <%= f.password_field :current_password,
+          autocomplete: "current-password",
+          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-slate-100" %>
+    </div>
   </div>
 
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
+  <%# Section 2 — Clé API %>
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-6">
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-200 mb-4">Clé API OpenRouter (mode tuteur gratuit)</h2>
 
-  <div class="field">
-    <p><%= f.label :password %> <i>(leave blank if you don't want to change it)</i></p>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-    <% if @minimum_password_length %>
-      <p><em><%= @minimum_password_length %> characters minimum</em></p>
-    <% end %>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :openrouter_api_key, "Clé OpenRouter (mode tuteur gratuit)" %></p>
-    <p>
+    <div class="mb-2">
+      <%= f.label :openrouter_api_key, "Clé OpenRouter", class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
       <%= f.password_field :openrouter_api_key,
           value: "",
           placeholder: resource.openrouter_api_key.present? ?
             "••••••••#{resource.openrouter_api_key.last(4)}" :
             "or-...",
-          autocomplete: "off" %>
-    </p>
-    <% if resource.openrouter_api_key.present? %>
-      <p><small>Clé configurée (se terminant par <code><%= resource.openrouter_api_key.last(4) %></code>).
-      Laissez vide pour conserver la clé actuelle, ou entrez une nouvelle clé pour la remplacer.</small></p>
-    <% else %>
-      <p><small>Optionnel. Nécessaire pour activer le mode tuteur gratuit pour vos classes.</small></p>
+          autocomplete: "off",
+          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-slate-100" %>
+      <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <% if resource.openrouter_api_key.present? %>
+          Clé configurée (se terminant par <code class="font-mono"><%= resource.openrouter_api_key.last(4) %></code>).
+          Laissez vide pour conserver la clé actuelle, ou entrez une nouvelle clé pour la remplacer.
+        <% else %>
+          Optionnel. Nécessaire pour activer le mode tuteur gratuit pour vos classes.
+        <% end %>
+      </p>
+    </div>
+  </div>
+
+  <div>
+    <%= render(ButtonComponent.new(variant: :primary, size: :md, type: "submit")) do %>
+      Enregistrer
     <% end %>
   </div>
-
-  <div class="field">
-    <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
-    <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
 <% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>

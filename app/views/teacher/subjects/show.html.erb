@@ -1,94 +1,113 @@
 <%# Sujet — show %>
 
-<%# Header %>
-<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-  <div class="flex-1 min-w-0">
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2 truncate">
-      <%= @subject.title %>
-    </h1>
-    <div class="flex flex-wrap gap-1.5">
-      <%
-        status_color = case @subject.status
-                       when "draft"               then :slate
-                       when "pending_validation"  then :amber
-                       when "published"           then :emerald
-                       else :slate
-                       end
-      %>
-      <%= render BadgeComponent.new(color: status_color, label: @subject.status) %>
-      <% if @subject.specialty.present? %>
-        <%= render BadgeComponent.new(color: :indigo, label: @subject.specialty) %>
-      <% end %>
-      <%= render BadgeComponent.new(color: :blue, label: @subject.exam) %>
-      <%= render BadgeComponent.new(color: :emerald, label: @subject.year.to_s) %>
-      <% if @subject.region.present? %>
-        <%= render BadgeComponent.new(color: :slate, label: @subject.region) %>
-      <% end %>
-    </div>
-    <% if @subject.exam_session.present? %>
-      <div class="mt-2 flex items-center gap-3">
-        <p class="text-sm text-slate-600 dark:text-slate-400">
-          Session :
-          <span class="font-medium text-indigo-600 dark:text-indigo-400">
-            <%= @subject.exam_session.title %>
-          </span>
-        </p>
-        <%= button_to "Supprimer la session",
-              teacher_exam_session_path(@subject.exam_session),
-              method: :delete,
-              form: { data: { turbo_confirm: "Supprimer la session « #{@subject.exam_session.title} » et toutes ses parties communes ? Cette action est irréversible." } },
-              class: "text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2" %>
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes sujets", href: teacher_subjects_path },
+  { label: @subject.title }
+]) %>
+
+<%# Card : métadonnées + documents PDF %>
+<div class="mb-6">
+  <%= render CardComponent.new(variant: :default) do |card| %>
+    <% card.with_header do %>
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2 truncate">
+            <%= @subject.title %>
+          </h1>
+          <div class="flex flex-wrap gap-1.5">
+            <%
+              status_color = case @subject.status
+                             when "draft"               then :slate
+                             when "pending_validation"  then :amber
+                             when "published"           then :emerald
+                             else :slate
+                             end
+            %>
+            <%= render BadgeComponent.new(color: status_color, label: @subject.status) %>
+            <% if @subject.specialty.present? %>
+              <%= render BadgeComponent.new(color: :indigo, label: @subject.specialty) %>
+            <% end %>
+            <%= render BadgeComponent.new(color: :blue, label: @subject.exam) %>
+            <%= render BadgeComponent.new(color: :emerald, label: @subject.year.to_s) %>
+            <% if @subject.region.present? %>
+              <%= render BadgeComponent.new(color: :slate, label: @subject.region) %>
+            <% end %>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 shrink-0">
+          <%= render ButtonComponent.new(href: edit_teacher_subject_assignment_path(@subject), variant: :ghost, size: :sm) do %>
+            Assigner aux classes
+          <% end %>
+        </div>
       </div>
     <% end %>
-  </div>
-  <div class="flex flex-wrap gap-2 shrink-0">
-    <%= render ButtonComponent.new(href: edit_teacher_subject_assignment_path(@subject), variant: :ghost, size: :sm) do %>
-      Assigner aux classes
-    <% end %>
-  </div>
-</div>
-
-<%= turbo_stream_from "subject_#{@subject.id}" %>
-
-<%# Documents PDF %>
-<div class="mb-6">
-  <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-3">Documents PDF</h2>
-  <% if @subject.new_format? %>
-    <%# New format: subject_pdf + correction_pdf %>
-    <ul class="space-y-1">
-      <% if @subject.subject_pdf.attached? %>
-        <li>
-          <%= link_to "Sujet complet",
-                rails_blob_path(@subject.subject_pdf, disposition: "attachment"),
-                class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
-        </li>
-      <% end %>
-      <% if @subject.correction_pdf.attached? %>
-        <li>
-          <%= link_to "Corrigé complet",
-                rails_blob_path(@subject.correction_pdf, disposition: "attachment"),
-                class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <%# Legacy format: 5 separate files %>
-    <% attached_files = @subject.legacy_attached_files %>
-    <% if attached_files.any? %>
-      <ul class="space-y-1">
-        <% attached_files.each do |file, label| %>
-          <li>
-            <%= link_to label,
-                  rails_blob_path(file, disposition: "attachment"),
-                  class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
-          </li>
+    <% card.with_body do %>
+      <div class="border-t border-slate-200 dark:border-slate-700 -mx-5 px-5 pt-4">
+        <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Documents PDF</h2>
+        <% if @subject.new_format? %>
+          <%# New format: subject_pdf + correction_pdf %>
+          <ul class="space-y-1">
+            <% if @subject.subject_pdf.attached? %>
+              <li>
+                <%= link_to "Sujet complet",
+                      rails_blob_path(@subject.subject_pdf, disposition: "attachment"),
+                      class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+              </li>
+            <% end %>
+            <% if @subject.correction_pdf.attached? %>
+              <li>
+                <%= link_to "Corrigé complet",
+                      rails_blob_path(@subject.correction_pdf, disposition: "attachment"),
+                      class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <%# Legacy format: 5 separate files %>
+          <% attached_files = @subject.legacy_attached_files %>
+          <% if attached_files.any? %>
+            <ul class="space-y-1">
+              <% attached_files.each do |file, label| %>
+                <li>
+                  <%= link_to label,
+                        rails_blob_path(file, disposition: "attachment"),
+                        class: "inline-flex items-center gap-1.5 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Aucun document attaché.</p>
+          <% end %>
         <% end %>
-      </ul>
-    <% else %>
-      <p class="text-sm text-slate-500 dark:text-slate-400">Aucun document attaché.</p>
+      </div>
     <% end %>
   <% end %>
 </div>
+
+<% if @subject.exam_session.present? %>
+  <%# Card : session d'examen %>
+  <div class="mb-6">
+    <%= render CardComponent.new(variant: :default) do |card| %>
+      <% card.with_body do %>
+        <div class="flex items-center gap-3">
+          <p class="text-sm text-slate-600 dark:text-slate-400">
+            Session :
+            <span class="font-medium text-indigo-600 dark:text-indigo-400">
+              <%= @subject.exam_session.title %>
+            </span>
+          </p>
+          <%= button_to "Supprimer la session",
+                teacher_exam_session_path(@subject.exam_session),
+                method: :delete,
+                form: { data: { turbo_confirm: "Supprimer la session « #{@subject.exam_session.title} » et toutes ses parties communes ? Cette action est irréversible." } },
+                class: "text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2" %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<%= turbo_stream_from "subject_#{@subject.id}" %>
 
 <%# Extraction %>
 <div class="mb-6">

@@ -1,0 +1,46 @@
+<%#
+  Partial centralisé pour les champs de formulaire enseignant.
+
+  Locals :
+    f          — form builder Rails (obligatoire)
+    field      — Symbol, nom du champ (obligatoire)
+    label_text — String, texte du label (obligatoire)
+    type       — Symbol : :text, :textarea, :file, :select, :checkbox (défaut :text)
+    options    — Hash, options supplémentaires passées au helper Rails (défaut {})
+    hint       — String, texte d'aide sous le champ (optionnel)
+    collection — Array de [label, value] pour :select (obligatoire si type == :select)
+%>
+<% type ||= :text; options ||= {}; hint ||= nil; collection ||= nil %>
+
+<div class="mb-4">
+  <% if type == :checkbox %>
+    <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+      <%= f.check_box field, options.merge(class: "accent-indigo-500 h-4 w-4 rounded #{options[:class]}") %>
+      <%= label_text %>
+    </label>
+  <% else %>
+    <%= f.label field, label_text, class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+
+    <% field_class = "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-slate-100" %>
+
+    <% if type == :textarea %>
+      <%= f.text_area field, options.merge(class: "#{field_class} #{options[:class]}", rows: options[:rows] || 4) %>
+    <% elsif type == :file %>
+      <%= f.file_field field, options.merge(class: "w-full text-sm text-slate-700 dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 #{options[:class]}") %>
+    <% elsif type == :select %>
+      <%= f.select field, collection, options.except(:class, :prompt).merge(prompt: options[:prompt]), options.slice(:class).merge(class: "#{field_class} #{options[:class]}") %>
+    <% else %>
+      <%= f.text_field field, options.merge(class: "#{field_class} #{options[:class]}") %>
+    <% end %>
+  <% end %>
+
+  <% if f.object.respond_to?(:errors) && f.object.errors[field].any? %>
+    <% f.object.errors[field].each do |msg| %>
+      <p class="mt-1 text-sm text-rose-600 dark:text-rose-400"><%= msg %></p>
+    <% end %>
+  <% end %>
+
+  <% if hint %>
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><%= hint %></p>
+  <% end %>
+</div>

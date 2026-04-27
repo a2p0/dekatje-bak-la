@@ -1,4 +1,9 @@
 <%# Nouveau sujet — new %>
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes sujets", href: teacher_subjects_path },
+  { label: "Nouveau sujet" }
+]) %>
+
 <div class="max-w-lg mx-auto">
   <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Nouveau sujet</h1>
 
@@ -38,57 +43,21 @@
       Informations
     </h2>
 
-    <div>
-      <%= f.label :title, "Titre",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.text_field :title,
-            required: true,
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :title, label_text: "Titre", type: :text, options: { required: true } %>
 
-    <div>
-      <%= f.label :year, "Année",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.text_field :year,
-            placeholder: "2026",
-            required: true,
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :year, label_text: "Année", type: :text, options: { placeholder: "2026", required: true } %>
 
-    <div>
-      <%= f.label :exam, "Type d'examen",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.select :exam,
-            ExamSession.exams.keys.map { |k| [k.humanize, k] },
-            {},
-            required: true,
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :exam, label_text: "Type d'examen", type: :select,
+          collection: ExamSession.exams.keys.map { |k| [k.humanize, k] },
+          options: { required: true } %>
 
-    <div>
-      <%= f.label :specialty, "Spécialité",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.select :specialty,
-            Subject.specialties.except("tronc_commun").keys.map { |k| [k, k] },
-            {},
-            required: true,
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :specialty, label_text: "Spécialité", type: :select,
+          collection: Subject.specialties.except("tronc_commun").keys.map { |k| [k, k] },
+          options: { required: true } %>
 
-    <div>
-      <%= f.label :region, "Région",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.select :region,
-            [
-              ["Métropole", "metropole"],
-              ["La Réunion", "reunion"],
-              ["Polynésie", "polynesie"],
-              ["Candidat libre", "candidat_libre"]
-            ],
-            {},
-            required: true,
-            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :region, label_text: "Région", type: :select,
+          collection: [["Métropole", "metropole"], ["La Réunion", "reunion"], ["Polynésie", "polynesie"], ["Candidat libre", "candidat_libre"]],
+          options: { required: true } %>
 
     <%# Files %>
     <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2 pt-2">
@@ -99,33 +68,9 @@
       Les DTs et DRs sont extraits automatiquement du PDF sujet.
     </p>
 
-    <div>
-      <%= f.label :subject_pdf, "Sujet complet (PDF)",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.file_field :subject_pdf,
-            accept: "application/pdf",
-            required: true,
-            class: "w-full text-sm text-slate-600 dark:text-slate-300
-                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
-                    file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
-                    dark:file:bg-indigo-900/30 dark:file:text-indigo-300
-                    hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
-                    focus:outline-none" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :subject_pdf, label_text: "Sujet complet (PDF)", type: :file, options: { accept: "application/pdf", required: true } %>
 
-    <div>
-      <%= f.label :correction_pdf, "Corrigé complet (PDF)",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.file_field :correction_pdf,
-            accept: "application/pdf",
-            required: true,
-            class: "w-full text-sm text-slate-600 dark:text-slate-300
-                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
-                    file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700
-                    dark:file:bg-indigo-900/30 dark:file:text-indigo-300
-                    hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
-                    focus:outline-none" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :correction_pdf, label_text: "Corrigé complet (PDF)", type: :file, options: { accept: "application/pdf", required: true } %>
 
     <div class="pt-2">
       <%= render ButtonComponent.new(variant: :primary, size: :md, type: :submit) do %>

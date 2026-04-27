@@ -3,34 +3,14 @@
               method: :patch,
               data: { turbo_frame: dom_id(question) } do |f| %>
   <div class="mt-4 space-y-3 border-t border-slate-100 dark:border-slate-700 pt-4">
-    <div>
-      <%= f.label :label, "Énoncé",
-          class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
-      <%= f.text_area :label, value: question.label, rows: 3,
-          class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :label, label_text: "Énoncé", type: :textarea, options: { value: question.label, rows: 3 } %>
 
-    <div>
-      <%= f.label :points, "Points",
-          class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
-      <%= f.number_field :points, value: question.points, step: 0.5,
-          class: "rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 w-24 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
-    </div>
+    <%= render "teacher/shared/field", f: f, field: :points, label_text: "Points", type: :text, options: { value: question.points, step: 0.5, type: "number" } %>
 
     <% if question.answer %>
       <%= fields_for :answer, question.answer do |af| %>
-        <div>
-          <%= af.label :correction_text, "Correction",
-              class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
-          <%= af.text_area :correction_text, rows: 3,
-              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
-        </div>
-        <div>
-          <%= af.label :explanation_text, "Explication",
-              class: "block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1" %>
-          <%= af.text_area :explanation_text, rows: 2,
-              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
-        </div>
+        <%= render "teacher/shared/field", f: af, field: :correction_text, label_text: "Correction", type: :textarea, options: { rows: 3 } %>
+        <%= render "teacher/shared/field", f: af, field: :explanation_text, label_text: "Explication", type: :textarea, options: { rows: 2 } %>
       <% end %>
     <% end %>
 

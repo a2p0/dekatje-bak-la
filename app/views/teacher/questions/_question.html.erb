@@ -1,6 +1,6 @@
 <%= turbo_frame_tag dom_id(question) do %>
   <% if question.validated? %>
-    <%# Validated: collapsed by default %>
+    <%# Validated: collapsed by default — <details>/<summary> préservé, incompatible avec les slots CardComponent %>
     <details class="mb-2.5 border-l-4 border-l-emerald-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
       <summary class="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-slate-800/50 list-none">
         <div class="flex items-center gap-2 flex-wrap">
@@ -39,41 +39,45 @@
       </div>
     </details>
   <% else %>
-    <%# Draft: expanded, full editing %>
-    <div class="mb-2.5 border-l-4 border-l-slate-300 dark:border-l-slate-600 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-      <div class="flex items-center justify-between gap-2 flex-wrap">
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-            Q<%= question.number %>
-          </span>
-          <%= render BadgeComponent.new(color: :slate, label: "brouillon") %>
-          <%= render BadgeComponent.new(color: :indigo, label: "#{question.points} pts") %>
-        </div>
-        <div class="flex items-center gap-2">
-          <%= button_to "Valider",
-              teacher_question_validation_path(question),
-              method: :post,
-              form: { data: { turbo_frame: dom_id(question) } },
-              class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
-          <%= button_to "Supprimer",
-              teacher_question_path(question),
-              method: :delete,
-              data: { turbo_confirm: "Supprimer cette question ?" },
-              form: { data: { turbo_frame: "_top" } },
-              class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors cursor-pointer" %>
-        </div>
-      </div>
+    <%# Draft: expanded, full editing — migré vers CardComponent %>
+    <div class="mb-2.5 border-l-4 border-l-slate-300 dark:border-l-slate-600">
+      <%= render CardComponent.new(variant: :default) do |card| %>
+        <% card.with_body do %>
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+                Q<%= question.number %>
+              </span>
+              <%= render BadgeComponent.new(color: :slate, label: "brouillon") %>
+              <%= render BadgeComponent.new(color: :indigo, label: "#{question.points} pts") %>
+            </div>
+            <div class="flex items-center gap-2">
+              <%= button_to "Valider",
+                  teacher_question_validation_path(question),
+                  method: :post,
+                  form: { data: { turbo_frame: dom_id(question) } },
+                  class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors cursor-pointer" %>
+              <%= button_to "Supprimer",
+                  teacher_question_path(question),
+                  method: :delete,
+                  data: { turbo_confirm: "Supprimer cette question ?" },
+                  form: { data: { turbo_frame: "_top" } },
+                  class: "inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors cursor-pointer" %>
+            </div>
+          </div>
 
-      <p class="mt-2 text-sm text-slate-700 dark:text-slate-300"><%= question.label %></p>
+          <p class="mt-2 text-sm text-slate-700 dark:text-slate-300"><%= question.label %></p>
 
-      <% if question.answer&.correction_text.present? %>
-        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 italic">
-          Correction : <%= question.answer.correction_text.truncate(120) %>
-        </p>
-      <% end %>
+          <% if question.answer&.correction_text.present? %>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 italic">
+              Correction : <%= question.answer.correction_text.truncate(120) %>
+            </p>
+          <% end %>
 
-      <%= turbo_frame_tag "#{dom_id(question)}_form" do %>
-        <%= render "teacher/questions/question_form", question: question, subject: subject, part: part %>
+          <%= turbo_frame_tag "#{dom_id(question)}_form" do %>
+            <%= render "teacher/questions/question_form", question: question, subject: subject, part: part %>
+          <% end %>
+        <% end %>
       <% end %>
     </div>
   <% end %>

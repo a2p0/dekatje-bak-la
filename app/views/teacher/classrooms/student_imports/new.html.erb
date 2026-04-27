@@ -13,14 +13,9 @@
 
     <%= form_with url: teacher_classroom_student_import_path(@classroom), method: :post do |f| %>
       <div class="space-y-4">
-        <div>
-          <%= f.label :students_list, "Liste des élèves",
-              class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-          <%= f.text_area :students_list,
-              rows: 15,
-              placeholder: "Jean Dupont\nMarie Martin\nPaul Bernard",
-              class: "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" %>
-        </div>
+        <%= render "teacher/shared/field", f: f, field: :students_list, label_text: "Liste des élèves",
+              type: :textarea,
+              options: { rows: 15, placeholder: "Jean Dupont\nMarie Martin\nPaul Bernard", class: "font-mono" } %>
 
         <div class="pt-2">
           <%= f.submit "Créer les comptes",

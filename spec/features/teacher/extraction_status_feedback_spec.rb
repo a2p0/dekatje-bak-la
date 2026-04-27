@@ -7,7 +7,7 @@ RSpec.describe "Teacher sees extraction feedback with elapsed time", type: :feat
     visit new_user_session_path
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
-    click_button "Log in"
+    click_button "Se connecter"
   end
 
   scenario "un job en cours affiche le temps écoulé et l'aria-live=polite" do

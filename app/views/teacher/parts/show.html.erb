@@ -1,3 +1,9 @@
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes sujets", href: teacher_subjects_path },
+  { label: @subject.title, href: teacher_subject_path(@subject) },
+  { label: "Partie #{@part.number}" }
+]) %>
+
 <div class="mb-4">
   <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
     <%= @subject.title %>
