@@ -67,3 +67,4 @@ spec/examples.txt
 sources/
 db/seeds/development/*.pdf
 wireframes/
+.worktrees/
