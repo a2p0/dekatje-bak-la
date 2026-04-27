@@ -20,7 +20,9 @@
           total = subject.total_questions_count
           answered = session_record ? session_record.answered_count : 0
           matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
+          tc_only = @tc_only_subject_ids.include?(subject.id)
         %>
+        <div data-subject-id="<%= subject.id %>">
         <%= render(CardComponent.new(variant: :glow)) do |card|
           card.with_body do %>
             <div class="flex flex-wrap gap-1.5 mb-3">
@@ -30,6 +32,9 @@
               )) %>
               <% if matches_specialty %>
                 <%= render(BadgeComponent.new(color: :emerald, label: "Ma spé")) %>
+              <% end %>
+              <% if tc_only %>
+                <%= render(BadgeComponent.new(color: :amber, label: "partie commune uniquement")) %>
               <% end %>
               <%= render(BadgeComponent.new(color: :slate, label: subject.year.to_s)) %>
               <% if subject.region.present? %>
@@ -53,6 +58,7 @@
             )) { session_record ? "Continuer →" : "Commencer →" } %>
           <% end %>
         <% end %>
+        </div>
       <% end %>
     </div>
   <% end %>

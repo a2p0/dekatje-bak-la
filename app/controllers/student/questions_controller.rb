@@ -51,11 +51,12 @@ class Student::QuestionsController < Student::BaseController
   end
 
   def filtered_parts
-    if @session_record.requires_scope_selection? && @session_record.scope_selected?
-      @session_record.filtered_parts
+    raw_parts = if @session_record.requires_scope_selection? && @session_record.scope_selected?
+      @session_record.filtered_parts.to_a
     else
-      @subject.parts.order(:position)
+      @subject.parts.order(:position).to_a
     end
+    SubjectAccessPolicy.accessible_parts(raw_parts, @subject, @classroom)
   end
 
   def filtered_question_ids

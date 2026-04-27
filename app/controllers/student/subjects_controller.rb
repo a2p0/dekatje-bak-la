@@ -1,6 +1,7 @@
 class Student::SubjectsController < Student::BaseController
   def index
     @subjects = @classroom.subjects.published.includes(:exam_session).order(:created_at)
+    @tc_only_subject_ids = @subjects.select { |s| SubjectAccessPolicy.tc_only?(s, @classroom) }.map(&:id).to_set
   end
 
   def show
@@ -9,6 +10,8 @@ class Student::SubjectsController < Student::BaseController
       return redirect_to student_root_path(access_code: params[:access_code]),
                          alert: "Sujet introuvable."
     end
+
+    @tc_only = SubjectAccessPolicy.tc_only?(@subject, @classroom)
 
     @session_record = current_student.student_sessions.find_or_create_by!(subject: @subject) do |ss|
       ss.mode = :autonomous
@@ -110,12 +113,13 @@ class Student::SubjectsController < Student::BaseController
   end
 
   def all_parts_for_subject
-    if @subject.exam_session.present?
+    all_parts = if @subject.exam_session.present?
       @subject.exam_session.common_parts.includes(:questions).order(:position).to_a +
         @subject.parts.specific.includes(:questions).order(:position).to_a
     else
       @subject.parts.includes(:questions).order(:position).to_a
     end
+    SubjectAccessPolicy.accessible_parts(all_parts, @subject, @classroom)
   end
 
   def should_show_specific_presentation?(all_parts)
