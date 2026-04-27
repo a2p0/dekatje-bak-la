@@ -30,6 +30,8 @@
       nav.with_link(href: teacher_subjects_path, label: "Mes sujets")
       nav.with_actions do
         render(ThemeToggleComponent.new) +
+        link_to("Mon profil", edit_user_registration_path,
+          class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200") +
         link_to("Déconnexion", destroy_user_session_path, data: { turbo_method: :delete },
           class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
       end
