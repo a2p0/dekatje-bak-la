@@ -1,4 +1,9 @@
 <%# Nouvelle classe — new %>
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes classes", href: teacher_root_path },
+  { label: "Nouvelle classe" }
+]) %>
+
 <div class="max-w-md mx-auto">
   <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Nouvelle classe</h1>
 
