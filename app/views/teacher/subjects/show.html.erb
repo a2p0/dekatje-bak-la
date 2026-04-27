@@ -1,9 +1,50 @@
 <%# Sujet — show %>
 
+<% subject_label = @subject.uploading? ? "Extraction en cours…" : (@subject.title.presence || "Sujet sans titre") %>
+
 <%= render BreadcrumbComponent.new(items: [
   { label: "Mes sujets", href: teacher_subjects_path },
-  { label: @subject.title }
+  { label: subject_label }
 ]) %>
+
+<% if @subject.uploading? && @extraction_job %>
+  <div class="mb-6">
+    <%= render CardComponent.new(variant: :default) do |card| %>
+      <% card.with_header do %>
+        <h1 class="text-xl font-bold text-slate-900 dark:text-white">En cours d'extraction…</h1>
+      <% end %>
+      <% card.with_body do %>
+        <% if @extraction_job.pending? || @extraction_job.processing? %>
+          <%= turbo_frame_tag "extraction-polling" do %>
+            <div class="flex items-center gap-3 py-2">
+              <svg class="w-5 h-5 animate-spin text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Extraction en cours…</p>
+            </div>
+          <% end %>
+          <meta http-equiv="refresh" content="3;url=<%= teacher_subject_path(@subject) %>">
+        <% elsif @extraction_job.done? %>
+          <div class="flex items-center justify-between gap-4">
+            <p class="text-sm text-emerald-700 dark:text-emerald-400 font-medium">Extraction terminée.</p>
+            <%= render ButtonComponent.new(href: teacher_subject_validation_path(@subject), variant: :primary, size: :sm) do %>
+              Valider le sujet
+            <% end %>
+          </div>
+        <% elsif @extraction_job.failed? %>
+          <div class="rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 px-4 py-3">
+            <p class="text-sm text-rose-700 dark:text-rose-300 font-semibold mb-2">L'extraction a échoué.</p>
+            <p class="text-xs text-rose-600 dark:text-rose-400 mb-3"><%= @extraction_job.error_message %></p>
+            <%= render ButtonComponent.new(href: teacher_subject_validation_path(@subject), variant: :ghost, size: :sm) do %>
+              Valider quand même
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
 
 <%# Card : métadonnées + documents PDF %>
 <div class="mb-6">
@@ -133,3 +174,5 @@
         form: { data: { turbo_confirm: "Archiver ce sujet ? Il disparaîtra de votre liste." } },
         class: "text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline underline-offset-2" %>
 </div>
+
+<% end # end: unless @subject.uploading? %>

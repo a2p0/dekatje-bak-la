@@ -274,13 +274,19 @@ class BuildExtractionPrompt
                                "Extrais toutes les parties communes et spécifiques avec leurs questions, corrections et références aux documents."
     end
 
+    specialty_line = if @specialty.blank?
+                       "Spécialité inconnue — extrait toutes les parties (communes et spécifiques) sans filtrage par spécialité."
+    else
+                       "Spécialité de l'élève : #{@specialty}"
+    end
+
     {
       system: system,
       messages: [
         {
           role: "user",
           content: <<~MSG
-            Spécialité de l'élève : #{@specialty}
+            #{specialty_line}
 
             === SUJET DE L'EXAMEN ===
             #{@subject_text}
@@ -288,7 +294,7 @@ class BuildExtractionPrompt
             === CORRIGÉ OFFICIEL ===
             #{@correction_text}
 
-            Analyse le sujet et le corrigé ci-dessus pour la spécialité #{@specialty}.
+            Analyse le sujet et le corrigé ci-dessus#{@specialty.present? ? " pour la spécialité #{@specialty}" : ""}.
             #{extraction_instruction}
           MSG
         }

@@ -17,10 +17,13 @@ class PersistExtractedData
 
   def call
     ActiveRecord::Base.transaction do
-      exam_session = @subject.exam_session
+      uploading = @subject.uploading?
+      exam_session = @subject.exam_session unless uploading
 
-      if exam_session.common_presentation.blank?
-        exam_session.update!(common_presentation: @data["common_presentation"])
+      unless uploading
+        if exam_session.common_presentation.blank?
+          exam_session.update!(common_presentation: @data["common_presentation"])
+        end
       end
 
       if @subject.specific_presentation.blank? && @data["specific_presentation"].present?
@@ -30,36 +33,38 @@ class PersistExtractedData
       metadata = @data["metadata"] || {}
       @subject.update_column(:code, metadata["code"]) if metadata["code"].present?
 
-      if metadata["variante"].present?
-        exam_session.update!(variante: metadata["variante"])
-      end
+      unless uploading
+        if metadata["variante"].present?
+          exam_session.update!(variante: metadata["variante"])
+        end
 
-      if metadata["region"].present?
-        exam_session.update!(region: metadata["region"])
-      end
+        if metadata["region"].present?
+          exam_session.update!(region: metadata["region"])
+        end
 
-      if metadata["exam"].present?
-        exam_session.update!(exam: metadata["exam"])
-      end
+        if metadata["exam"].present?
+          exam_session.update!(exam: metadata["exam"])
+        end
 
-      @subject.update_column(:status, Subject.statuses[:pending_validation])
+        @subject.update_column(:status, Subject.statuses[:pending_validation])
 
-      # Common parts: only create if exam_session has none yet
-      unless exam_session.common_parts.any?
-        common_doc_refs = Array(@data.dig("document_references", "common_dts")) +
-                          Array(@data.dig("document_references", "common_drs"))
+        # Common parts: only create if exam_session has none yet
+        unless exam_session.common_parts.any?
+          common_doc_refs = Array(@data.dig("document_references", "common_dts")) +
+                            Array(@data.dig("document_references", "common_drs"))
 
-        Array(@data["common_parts"]).each_with_index do |part_data, idx|
-          part = exam_session.common_parts.create!(
-            number:               part_data["number"].to_s,
-            title:                part_data["title"].to_s,
-            objective_text:       part_data["objective"].to_s,
-            section_type:         :common,
-            position:             idx,
-            document_references:  common_doc_refs
-          )
+          Array(@data["common_parts"]).each_with_index do |part_data, idx|
+            part = exam_session.common_parts.create!(
+              number:               part_data["number"].to_s,
+              title:                part_data["title"].to_s,
+              objective_text:       part_data["objective"].to_s,
+              section_type:         :common,
+              position:             idx,
+              document_references:  common_doc_refs
+            )
 
-          create_questions_and_answers(part, part_data["questions"])
+            create_questions_and_answers(part, part_data["questions"])
+          end
         end
       end
 

@@ -2,7 +2,7 @@ class Subject < ApplicationRecord
   class InvalidTransition < StandardError; end
 
   belongs_to :owner, class_name: "User"
-  belongs_to :exam_session
+  belongs_to :exam_session, optional: true
   has_one :extraction_job, dependent: :destroy
   has_many :parts, dependent: :destroy
   has_many :classroom_subjects, dependent: :destroy
@@ -21,15 +21,17 @@ class Subject < ApplicationRecord
   has_one_attached :questions_corrigees_file
 
   enum :specialty, { tronc_commun: 0, SIN: 1, ITEC: 2, EE: 3, AC: 4 }
-  enum :status,    { draft: 0, pending_validation: 1, published: 2, archived: 3 }
+  enum :status,    { uploading: -1, draft: 0, pending_validation: 1, published: 2, archived: 3 }
 
   delegate :title, :year, :exam, :region, :common_presentation, :variante, to: :exam_session, allow_nil: true
 
-  validates :specialty, presence: true
+  validates :specialty, presence: true, unless: :uploading?
 
-  validate :required_files_attached
+  validate :required_files_attached, unless: :uploading?
+  validate :uploading_files_attached,  if: :uploading?
 
-  scope :kept, -> { where(discarded_at: nil) }
+  scope :kept,    -> { where(discarded_at: nil) }
+  scope :visible, -> { kept.where.not(status: :uploading) }
 
   def new_format?
     subject_pdf.attached?
@@ -92,5 +94,10 @@ class Subject < ApplicationRecord
     else
       errors.add(:base, "Au moins un format de fichier est requis (subject_pdf ou enonce_file)")
     end
+  end
+
+  def uploading_files_attached
+    errors.add(:subject_pdf, :blank)    unless subject_pdf.attached?
+    errors.add(:correction_pdf, :blank) unless correction_pdf.attached?
   end
 end

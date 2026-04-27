@@ -65,9 +65,9 @@ RSpec.describe Subject, type: :model do
       expect(subject_obj.owner).to be_a(User)
     end
 
-    it "requires exam_session" do
-      subject_obj = build(:subject, exam_session: nil)
-      expect(subject_obj).not_to be_valid
+    it "allows nil exam_session (optional: true)" do
+      subject_obj = build(:subject, :uploading)
+      expect(subject_obj).to be_valid
     end
 
     it "can belong to an exam_session" do
@@ -83,6 +83,54 @@ RSpec.describe Subject, type: :model do
       deleted = create(:subject, discarded_at: Time.current)
       expect(Subject.kept).to include(kept)
       expect(Subject.kept).not_to include(deleted)
+    end
+
+    it "visible excludes :uploading subjects" do
+      regular  = create(:subject)
+      uploading = create(:subject, :uploading)
+      expect(Subject.visible).to include(regular)
+      expect(Subject.visible).not_to include(uploading)
+    end
+
+    it "visible excludes soft-deleted subjects" do
+      deleted = create(:subject, discarded_at: Time.current)
+      expect(Subject.visible).not_to include(deleted)
+    end
+  end
+
+  describe ":uploading status" do
+    it "exists as a valid status value" do
+      expect(Subject.statuses).to include("uploading")
+      expect(Subject.statuses["uploading"]).to eq(-1)
+    end
+
+    it "is valid without specialty (C1 guard)" do
+      subject_obj = build(:subject, :uploading)
+      expect(subject_obj).to be_valid
+    end
+
+    it "is valid without exam_session" do
+      subject_obj = build(:subject, :uploading, exam_session: nil)
+      expect(subject_obj).to be_valid
+    end
+
+    it "persists as -1 in the database" do
+      subject_obj = create(:subject, :uploading)
+      expect(subject_obj.reload.status).to eq("uploading")
+      expect(Subject.statuses["uploading"]).to eq(-1)
+    end
+  end
+
+  describe "specialty validation with status guard" do
+    it "requires specialty for non-uploading subjects" do
+      subject_obj = build(:subject, specialty: nil)
+      expect(subject_obj).not_to be_valid
+      expect(subject_obj.errors[:specialty]).to be_present
+    end
+
+    it "does not require specialty for :uploading subjects" do
+      subject_obj = build(:subject, :uploading)
+      expect(subject_obj).to be_valid
     end
   end
 

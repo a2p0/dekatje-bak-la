@@ -359,6 +359,8 @@ SECRET_KEY_BASE            # rails secret
 - PostgreSQL via Neon — `conversations.tutor_state` (JSONB), `questions.answer_type` (integer enum) (049-tutor-phases-rework)
 - Ruby 3.3+ / Rails 8.1.3 + Rails (ActiveRecord, controllers, views), RSpec + FactoryBot + Capybara (051-navigation-polish)
 - PostgreSQL — champs existants : `classrooms.specialty` (string), `subjects.specialty` (integer enum), `parts.section_type` (integer enum), `parts.specialty` (integer enum) (051-navigation-polish)
+- Ruby 3.3+ / Rails 8.1.3 + Hotwire (Turbo Streams), ActiveStorage, Sidekiq, Devise (teacher auth), RSpec + FactoryBot + Capybara (052-upload-first-subject)
+- PostgreSQL via Neon (subjects.exam_session_id already nullable in schema), ActiveStorage for PDFs (052-upload-first-subject)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
