@@ -68,3 +68,4 @@ sources/
 db/seeds/development/*.pdf
 wireframes/
 .worktrees/
+/coverage/
