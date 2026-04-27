@@ -1,5 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-  layout 'teacher', only: [:edit, :update]
+  layout "teacher", only: [ :edit, :update ]
 
   protected
 
