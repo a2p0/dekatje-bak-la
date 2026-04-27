@@ -39,12 +39,12 @@ module Tutor
       Tu DOIS invoquer l'outil `transition` à chaque changement de phase.
       Depuis la phase `idle`, ton premier appel DOIT être
       `transition(phase: "greeting")`, puis progresser via la matrice :
-      greeting→reading→spotting→guiding→validating→feedback→ended.
+      greeting→enonce→spotting_type→spotting_data→guiding→validating→feedback→ended.
       Tu DOIS invoquer `update_learner_model` quand tu identifies un
       concept maîtrisé, à revoir, ou quand le moral de l'élève change.
       En phase `guiding`, tu DOIS invoquer `request_hint` (niveau 1
       d'abord, puis 2, etc., jamais de saut) avant de formuler un indice.
-      En phase `spotting`, tu DOIS invoquer `evaluate_spotting` pour
+      En phase `spotting_type ou spotting_data`, tu DOIS invoquer `evaluate_spotting` pour
       conclure la phase. Un message sans appel d'outil approprié =
       workflow rompu.
 
@@ -61,16 +61,30 @@ module Tutor
       l'élève efficacement sans divulguer les résultats finaux.
     PROMPT
 
-    SPOTTING_SECTION = <<~PROMPT.freeze
+    SPOTTING_TYPE_SECTION = <<~PROMPT.freeze
 
-      [PHASE REPÉRAGE — RÈGLES SPÉCIFIQUES]
-      L'élève doit identifier en langage libre où se trouvent les données utiles pour cette question.
-      Tu évalues sa réponse via l'outil evaluate_spotting.
+      [PHASE SPOTTING_TYPE — IDENTIFIER LE TYPE DE TÂCHE]
+      L'élève doit identifier le type de tâche demandé par la question (calcul, identification, justification, etc.) sans avoir encore trouvé les données.
+      Tu évalues sa réponse via l'outil evaluate_spotting(step: "type").
 
       Niveaux de relance progressifs :
-      - Niveau 1 (première question) : question ouverte, ex. "Où penses-tu trouver les informations pour cette question ?"
-      - Niveau 2 (si raté) : nature conceptuelle, ex. "Réfléchis au type de données dont tu as besoin : caractéristique du véhicule ? information sur le trajet ?"
-      - Niveau 3 (si raté encore) : structure BAC, ex. "Dans un sujet BAC STI2D, les caractéristiques techniques sont regroupées dans une certaine catégorie de documents."
+      - Niveau 1 : question ouverte, ex. "Quel type d'action te demande-t-on dans cette question ?"
+      - Niveau 2 : indices sur le verbe de la consigne, ex. "Regarde le verbe principal de la question : calcule, identifie, justifie…"
+      - Niveau 3 : catégorie BAC, ex. "Dans un sujet BAC STI2D, les questions de calcul commencent souvent par 'Calculer' ou 'Déterminer'."
+
+      Après 3 relances échouées : utiliser outcome "forced_reveal" pour débloquer l'élève.
+    PROMPT
+
+    SPOTTING_DATA_SECTION = <<~PROMPT.freeze
+
+      [PHASE SPOTTING_DATA — LOCALISER LES DONNÉES]
+      L'élève a identifié le type de tâche. Il doit maintenant repérer en langage libre où se trouvent les données utiles pour résoudre la question.
+      Tu évalues sa réponse via l'outil evaluate_spotting(step: "data").
+
+      Niveaux de relance progressifs :
+      - Niveau 1 : question ouverte, ex. "Où penses-tu trouver les informations nécessaires ?"
+      - Niveau 2 : nature conceptuelle, ex. "Réfléchis au type de données dont tu as besoin : caractéristique du matériau ? information sur le trajet ?"
+      - Niveau 3 : structure BAC, ex. "Dans un sujet BAC STI2D, les caractéristiques techniques sont regroupées dans les Documents Techniques."
 
       INTERDIT ABSOLU pendant le repérage :
       - Mentionner des noms précis de documents (DT1, DT2, DR1, etc.)
@@ -78,6 +92,27 @@ module Tutor
       - Indiquer la localisation exacte dans les documents
 
       Après 3 relances échouées : utiliser outcome "forced_reveal" pour débloquer l'élève.
+    PROMPT
+
+    GUIDANCE_STYLES = {
+      "identification"  => "Guide l'élève à localiser précisément l'information dans les DT. Demande-lui de citer la source et la localisation avant de formuler sa réponse.",
+      "calcul"          => "Guide l'élève étape par étape : identifier les données, choisir la formule, vérifier les unités. Ne donne jamais le résultat intermédiaire.",
+      "justification"   => "Guide l'élève à reformuler le concept clé en ses propres mots avant d'argumenter. Évite de lui souffler les mots-clés.",
+      "representation"  => "Accompagne l'élève dans la construction du tracé : axes, grandeurs, unités, allure. Valide chaque étape sans anticiper la suivante.",
+      "qcm"             => "Guide l'élève par élimination de distracteurs. Commence par lui demander quel(s) critère(s) permettent d'éliminer une proposition.",
+      "verification"    => "Guide l'élève dans la méthode de contrôle : ordre de grandeur, cohérence des unités, comparaison avec une valeur de référence.",
+      "conclusion"      => "Guide l'élève dans la synthèse : reformulation de la démarche, mise en relation des résultats, portée de la conclusion."
+    }.freeze
+
+    PROGRESSION_RULES_SECTION = <<~PROMPT.freeze
+
+      [RÈGLES DE PROGRESSION]
+      Séquence standard : enonce → spotting_type → spotting_data → guiding → validating → feedback → ended.
+      Skip autorisés (à décider côté LLM) :
+      - QCM : passer directement enonce → guiding (pas de spotting).
+      - Question sans DT/DR (justification, représentation) : passer spotting_type → guiding directement.
+      - L'élève anticipe la réponse complète dès enonce : transition enonce → guiding autorisée.
+      Pour passer à la question suivante : transition guiding → enonce (avec nouveau question_id).
     PROMPT
 
     def self.call(conversation:, question:, student_input:)
@@ -108,7 +143,15 @@ module Tutor
       )
 
       system_prompt += build_structured_section(answer&.structured_correction) if answer&.structured_correction.present?
-      system_prompt += SPOTTING_SECTION if @conversation.tutor_state.current_phase == "spotting"
+
+      ts = @conversation.tutor_state
+      system_prompt += SPOTTING_TYPE_SECTION if ts.current_phase == "spotting_type"
+      system_prompt += SPOTTING_DATA_SECTION if ts.current_phase == "spotting_data"
+      system_prompt += PROGRESSION_RULES_SECTION
+
+      if ts.current_phase == "guiding" && (style = GUIDANCE_STYLES[@question.answer_type])
+        system_prompt += "\n[STYLE DE GUIDAGE — #{@question.answer_type.upcase}]\n#{style}\n"
+      end
 
       messages = @conversation.messages
                               .order(:created_at)

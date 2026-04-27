@@ -29,7 +29,7 @@ module Tutor
     def mark_intro_seen!
       current_qs = @conversation.tutor_state.question_states
       existing   = current_qs[@question.id.to_s] || QuestionState.new(
-        step: nil, hints_used: 0, last_confidence: nil,
+        phase: "enonce", step: nil, hints_used: 0, last_confidence: nil,
         error_types: [], completed_at: nil, intro_seen: false
       )
       updated_qs = existing.with(intro_seen: true)

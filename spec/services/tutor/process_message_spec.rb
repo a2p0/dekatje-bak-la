@@ -35,6 +35,13 @@ RSpec.describe Tutor::ProcessMessage do
     expect { result }.to change(Message.where(role: :user), :count).by(1)
   end
 
+  it "persists user message content without <student_input> tags" do
+    result
+    msg = Message.where(role: :user).last
+    expect(msg.content).to eq("Je ne sais pas.")
+    expect(msg.content).not_to include("<student_input>")
+  end
+
   it "persists an assistant message with content" do
     result
     assistant_msg = Message.where(role: :assistant).last
@@ -79,16 +86,16 @@ RSpec.describe Tutor::ProcessMessage do
 
     let(:spotting_conversation) do
       state = TutorState.new(
-        current_phase:        "spotting",
+        current_phase:        "spotting_data",
         current_question_id:  question.id,
         concepts_mastered:    [],
         concepts_to_revise:   [],
         discouragement_level: 0,
         question_states:      {
           question.id.to_s => QuestionState.new(
-            step: "initial", hints_used: 0, last_confidence: nil,
+            phase: "spotting_data", step: "initial", hints_used: 0, last_confidence: nil,
             error_types: [], completed_at: nil, intro_seen: false)
-        }, welcome_sent: false)
+        }, welcome_sent: false, last_activity_at: nil)
       create(:conversation, student: student, subject: exam_subject,
              lifecycle_state: "active", tutor_state: state)
     end
@@ -203,6 +210,98 @@ RSpec.describe Tutor::ProcessMessage do
         sys_msg = spotting_conversation.messages.reload.find { |m| m.role == "system" }
         expect(sys_msg).to be_present
         expect(sys_msg.content).to include("DT1")
+      end
+    end
+  end
+
+  describe "phase resumption from question_states (T014 — US2)" do
+    let(:guiding_state) do
+      TutorState.new(
+        current_phase:        "guiding",
+        current_question_id:  question.id,
+        concepts_mastered:    [],
+        concepts_to_revise:   [],
+        discouragement_level: 0,
+        question_states: {
+          question.id.to_s => QuestionState.new(
+            phase: "guiding", step: nil, hints_used: 0, last_confidence: nil,
+            error_types: [], completed_at: nil, intro_seen: false
+          )
+        },
+        welcome_sent: true,
+        last_activity_at: nil
+      )
+    end
+
+    let(:resumed_conversation) do
+      create(:conversation, student: student, subject: exam_subject,
+             lifecycle_state: "active", tutor_state: guiding_state)
+    end
+
+    it "resumes at the saved question phase, not idle" do
+      described_class.call(
+        conversation:  resumed_conversation,
+        student_input: "J'essaie.",
+        question:      question
+      )
+      expect(resumed_conversation.reload.tutor_state.current_phase).to eq("guiding")
+    end
+
+    it "does not regress to enonce when saved phase is guiding" do
+      tc = double("ToolCall", name: "transition", arguments: { "phase" => "validating", "question_id" => question.id })
+      FakeRubyLlm.setup_stub(content: "Bien.", tool_calls: [ tc ])
+
+      described_class.call(
+        conversation:  resumed_conversation,
+        student_input: "Ma réponse.",
+        question:      question
+      )
+      expect(resumed_conversation.reload.tutor_state.current_phase).to eq("validating")
+    end
+
+    it "updates last_activity_at on each message" do
+      before_call = Time.current
+      described_class.call(
+        conversation:  resumed_conversation,
+        student_input: "Je tente.",
+        question:      question
+      )
+      last_at = resumed_conversation.reload.tutor_state.last_activity_at
+      expect(last_at).not_to be_nil
+      expect(last_at).to be >= before_call
+    end
+
+    context "when question has no saved phase (new question)" do
+      let(:new_question) { create(:question, part: part) }
+      let!(:new_answer)  { create(:answer, question: new_question, correction_text: "X = 5") }
+
+      it "starts at enonce for a question not yet in question_states" do
+        state_with_other_q = TutorState.new(
+          current_phase:        "guiding",
+          current_question_id:  question.id,
+          concepts_mastered:    [],
+          concepts_to_revise:   [],
+          discouragement_level: 0,
+          question_states: {
+            question.id.to_s => QuestionState.new(
+              phase: "guiding", step: nil, hints_used: 0, last_confidence: nil,
+              error_types: [], completed_at: nil, intro_seen: false
+            )
+          },
+          welcome_sent: true,
+          last_activity_at: nil
+        )
+        conv = create(:conversation, student: student, subject: exam_subject,
+                      lifecycle_state: "active", tutor_state: state_with_other_q)
+
+        described_class.call(
+          conversation:  conv,
+          student_input: "Bonjour.",
+          question:      new_question
+        )
+        qs = conv.reload.tutor_state.question_states[new_question.id.to_s]
+        expect(qs).not_to be_nil
+        expect(qs.phase).to eq("enonce")
       end
     end
   end

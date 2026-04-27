@@ -9,12 +9,12 @@ RSpec.describe Tutor::FilterSpottingOutput do
   let(:question)     { create(:question, part: part) }
   let(:conversation) do
     state = TutorState.new(
-      current_phase:        "spotting",
+      current_phase:        "spotting_data",
       current_question_id:  question.id,
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      {}, welcome_sent: false)
+      question_states:      {}, welcome_sent: false, last_activity_at: nil)
     create(:conversation, student: student, subject: exam_subject,
            lifecycle_state: "active", tutor_state: state)
   end
@@ -96,7 +96,7 @@ RSpec.describe Tutor::FilterSpottingOutput do
           concepts_mastered:    [],
           concepts_to_revise:   [],
           discouragement_level: 0,
-          question_states:      {}, welcome_sent: false)
+          question_states:      {}, welcome_sent: false, last_activity_at: nil)
         guiding_conv = create(:conversation, student: student, subject: exam_subject,
                               lifecycle_state: "active", tutor_state: guiding_state)
         guiding_msg = create(:message, conversation: guiding_conv, role: :assistant,

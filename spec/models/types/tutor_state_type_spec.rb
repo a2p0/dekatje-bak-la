@@ -85,13 +85,13 @@ RSpec.describe TutorStateType do
 
     it "converts nested QuestionState to a hash inside the JSON payload" do
       qs = QuestionState.new(
-        step: 1, hints_used: 0, last_confidence: nil,
+        phase: "enonce", step: 1, hints_used: 0, last_confidence: nil,
         error_types: [], completed_at: nil, intro_seen: false)
       state = TutorState.new(
         current_phase: "chat", current_question_id: 5,
         concepts_mastered: [], concepts_to_revise: [],
         discouragement_level: 0,
-        question_states: { "5" => qs }, welcome_sent: false)
+        question_states: { "5" => qs }, welcome_sent: false, last_activity_at: nil)
       parsed = JSON.parse(type.serialize(state))
       expect(parsed["question_states"]["5"]).to be_a(Hash)
       expect(parsed["question_states"]["5"]["step"]).to eq(1)
@@ -118,7 +118,7 @@ RSpec.describe TutorStateType do
   describe "round-trip" do
     it "deserialize(serialize(state)) equals the original state for a populated state" do
       qs = QuestionState.new(
-        step: 3, hints_used: 2, last_confidence: 4,
+        phase: "enonce", step: 3, hints_used: 2, last_confidence: 4,
         error_types: [ "calcul", "unit" ], completed_at: "2026-04-13T10:00:00Z", intro_seen: false)
       original = TutorState.new(
         current_phase:        "chat",
@@ -126,7 +126,7 @@ RSpec.describe TutorStateType do
         concepts_mastered:    [ "énergie primaire" ],
         concepts_to_revise:   [ "rendement" ],
         discouragement_level: 2,
-        question_states:      { "7" => qs }, welcome_sent: false)
+        question_states:      { "7" => qs }, welcome_sent: false, last_activity_at: nil)
       round_tripped = type.deserialize(type.serialize(original))
       expect(round_tripped).to eq(original)
     end

@@ -1,6 +1,9 @@
 # app/models/tutor_state.rb
 
+VALID_QUESTION_PHASES = %w[enonce spotting_type spotting_data guiding validating feedback ended].freeze
+
 QuestionState = Data.define(
+  :phase,            # String — current phase for this question (049), default "enonce"
   :step,             # Integer — current tutoring step for this question
   :hints_used,       # Integer 0-5
   :last_confidence,  # Integer 1-5, or nil
@@ -10,13 +13,14 @@ QuestionState = Data.define(
 )
 
 TutorState = Data.define(
-  :current_phase,        # String — e.g. "idle", "spotting", "chat"
+  :current_phase,        # String — global subject phase (idle, greeting) or current question phase
   :current_question_id,  # Integer or nil
   :concepts_mastered,    # Array<String>
   :concepts_to_revise,   # Array<String>
   :discouragement_level, # Integer 0-3
   :question_states,      # Hash<String, QuestionState>
-  :welcome_sent          # Boolean — true once welcome message sent for this subject (044)
+  :welcome_sent,         # Boolean — true once welcome message sent for this subject (044)
+  :last_activity_at      # String ISO8601 or nil — for re-greeting after 12h inactivity (049)
 ) do
   def self.default
     new(
@@ -26,7 +30,8 @@ TutorState = Data.define(
       concepts_to_revise:   [].freeze,
       discouragement_level: 0,
       question_states:      {}.freeze,
-      welcome_sent:         false
+      welcome_sent:         false,
+      last_activity_at:     nil
     )
   end
 
@@ -38,6 +43,7 @@ TutorState = Data.define(
     lines << "Points à revoir : #{concepts_to_revise.join(', ')}." if concepts_to_revise.any?
     lines << "Niveau de découragement : #{discouragement_level}/3."
     if (qs = question_states[current_question_id.to_s])
+      lines << "Phase de la question #{current_question_id} : #{qs.phase}."
       lines << "Indices utilisés sur cette question : #{qs.hints_used}/5."
       lines << "Dernière confiance déclarée : #{qs.last_confidence}/5." if qs.last_confidence
     end

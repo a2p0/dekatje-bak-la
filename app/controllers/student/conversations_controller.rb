@@ -14,7 +14,8 @@ class Student::ConversationsController < Student::BaseController
 
     @conversation.activate! unless @conversation.active?
 
-    unless @conversation.tutor_state.welcome_sent
+    last_at = @conversation.tutor_state.last_activity_at
+    if Tutor::BuildWelcomeMessage.should_greet?(conversation: @conversation, last_activity_at: last_at)
       api_key_data = resolve_api_key_data
       Tutor::BuildWelcomeMessage.call(
         subject:      @subject,
@@ -67,7 +68,7 @@ class Student::ConversationsController < Student::BaseController
     question_id = params[:question_id].to_i
     current_qs  = @conversation.tutor_state.question_states
     existing_qs = current_qs[question_id.to_s] || QuestionState.new(
-      step: nil, hints_used: 0, last_confidence: nil,
+      phase: "enonce", step: nil, hints_used: 0, last_confidence: nil,
       error_types: [], completed_at: nil, intro_seen: false
     )
     updated_qs  = existing_qs.with(intro_seen: true)

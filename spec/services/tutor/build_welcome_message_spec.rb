@@ -13,6 +13,41 @@ RSpec.describe Tutor::BuildWelcomeMessage do
   let(:conversation) { create(:conversation, student: student, subject: subject, lifecycle_state: "active") }
   let(:api_key_data) { { api_key: "sk-test", provider: "anthropic", model: "claude-haiku-4-5" } }
 
+  describe ".should_greet? (T018 — US3)" do
+    def conv_with_state(welcome_sent:, last_activity_at:)
+      state = TutorState.new(
+        current_phase: "idle", current_question_id: nil,
+        concepts_mastered: [], concepts_to_revise: [],
+        discouragement_level: 0, question_states: {},
+        welcome_sent: welcome_sent, last_activity_at: last_activity_at
+      )
+      create(:conversation, student: student, subject: subject,
+             lifecycle_state: "active", tutor_state: state)
+    end
+
+    it "returns true when welcome_sent is false" do
+      conv = conv_with_state(welcome_sent: false, last_activity_at: nil)
+      expect(described_class.should_greet?(conversation: conv, last_activity_at: nil)).to be true
+    end
+
+    it "returns false when welcome_sent and last_activity_at is recent (< 12h)" do
+      recent = 1.hour.ago
+      conv = conv_with_state(welcome_sent: true, last_activity_at: recent)
+      expect(described_class.should_greet?(conversation: conv, last_activity_at: recent)).to be false
+    end
+
+    it "returns true when welcome_sent but last_activity_at is stale (> 12h)" do
+      stale = 13.hours.ago
+      conv = conv_with_state(welcome_sent: true, last_activity_at: stale)
+      expect(described_class.should_greet?(conversation: conv, last_activity_at: stale)).to be true
+    end
+
+    it "returns false when welcome_sent and last_activity_at is nil (welcome just sent, no messages yet)" do
+      conv = conv_with_state(welcome_sent: true, last_activity_at: nil)
+      expect(described_class.should_greet?(conversation: conv, last_activity_at: nil)).to be false
+    end
+  end
+
   describe ".call" do
     context "when LLM succeeds" do
       before do

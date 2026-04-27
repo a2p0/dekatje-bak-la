@@ -1,4 +1,13 @@
 class PersistExtractedData
+  ANSWER_TYPE_LEGACY_MAP = {
+    "text"          => "identification",
+    "calculation"   => "calcul",
+    "argumentation" => "justification",
+    "dr_reference"  => "representation",
+    "completion"    => "representation",
+    "choice"        => "qcm"
+  }.freeze
+
   def self.call(subject:, data:) = new(subject:, data:).call
 
   def initialize(subject:, data:)
@@ -89,7 +98,7 @@ class PersistExtractedData
         label:         q_data["label"].to_s,
         context_text:  q_data["context"].to_s,
         points:        q_data["points"].to_f,
-        answer_type:   q_data["answer_type"] || "text",
+        answer_type:   normalize_answer_type(q_data["answer_type"]),
         position:      q_index,
         status:        :draft,
         dt_references: Array(q_data["dt_references"]),
@@ -103,5 +112,9 @@ class PersistExtractedData
         data_hints:       Array(q_data["data_hints"])
       )
     end
+  end
+
+  def normalize_answer_type(raw)
+    ANSWER_TYPE_LEGACY_MAP.fetch(raw.to_s, raw.to_s).presence || "identification"
   end
 end

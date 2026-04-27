@@ -159,9 +159,9 @@ RSpec.describe "Student::Conversations", type: :request do
         discouragement_level: 0,
         question_states:      {
           question.id.to_s => QuestionState.new(
-            step: 0, hints_used: 0, last_confidence: nil,
+            phase: "enonce", step: 0, hints_used: 0, last_confidence: nil,
             error_types: [], completed_at: nil, intro_seen: false)
-        }, welcome_sent: false)
+        }, welcome_sent: false, last_activity_at: nil)
     end
 
     let!(:conversation) do
@@ -402,7 +402,7 @@ RSpec.describe "Student::Conversations", type: :request do
         existing_ts = TutorState.default.with(
           question_states: {
             question.id.to_s => QuestionState.new(
-              step: 0, hints_used: 0, last_confidence: nil,
+              phase: "enonce", step: 0, hints_used: 0, last_confidence: nil,
               error_types: [], completed_at: nil, intro_seen: true
             )
           }

@@ -19,11 +19,23 @@ RSpec.describe Question, type: :model do
   end
 
   describe "enums" do
-    it "defines answer_type enum" do
+    it "defines the 7 new answer_type values (049)" do
       expect(Question.answer_types).to eq(
-        "text" => 0, "calculation" => 1, "argumentation" => 2,
-        "dr_reference" => 3, "completion" => 4, "choice" => 5
+        "identification" => 0,
+        "calcul"         => 1,
+        "justification"  => 2,
+        "representation" => 3,
+        "qcm"            => 4,
+        "verification"   => 5,
+        "conclusion"     => 6
       )
+    end
+
+    it "does not include old answer_type values" do
+      old_types = %w[text calculation argumentation dr_reference completion choice]
+      old_types.each do |old|
+        expect(Question.answer_types).not_to have_key(old)
+      end
     end
 
     it "defines status enum with draft as default" do

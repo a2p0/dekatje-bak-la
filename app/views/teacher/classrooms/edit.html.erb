@@ -32,6 +32,18 @@
           </p>
         </div>
       </label>
+
+      <% if @classroom.tutor_free_mode_enabled? && current_user.openrouter_api_key.blank? %>
+        <div class="mt-3 flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2">
+          <span class="text-amber-500 shrink-0 mt-0.5">⚠</span>
+          <p class="text-xs text-amber-700 dark:text-amber-300">
+            Mode gratuit activé mais votre clé OpenRouter est manquante.
+            <%= link_to "Configurez-la dans votre profil", edit_user_registration_path,
+                class: "underline font-medium hover:text-amber-900 dark:hover:text-amber-100" %>
+            pour que les élèves puissent utiliser le tuteur.
+          </p>
+        </div>
+      <% end %>
     </div>
 
     <%= render(ButtonComponent.new(variant: :primary, size: :md, type: "submit")) { "Enregistrer" } %>

@@ -14,13 +14,12 @@ class ResolveTutorApiKey
   def call
     if @student.use_personal_key? && @student.api_key.present?
       provider = @student.api_provider.to_s
-      return { api_key: @student.api_key, provider: provider, model: DEFAULT_MODEL[provider] }
+      return { api_key: @student.api_key, provider: provider, model: @student.effective_model }
     end
 
     if @classroom.tutor_free_mode_enabled? && @classroom.owner.openrouter_api_key.present?
       key = @classroom.owner.openrouter_api_key
-      model = @student.api_model.presence || DEFAULT_MODEL["openrouter"]
-      return { api_key: key, provider: "openrouter", model: model }
+      return { api_key: key, provider: "openrouter", model: DEFAULT_MODEL["openrouter"] }
     end
 
     raise Tutor::NoApiKeyError

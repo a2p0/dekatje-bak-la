@@ -14,7 +14,7 @@ RSpec.describe Tutor::UpdateTutorState do
       concepts_mastered:    [ "énergie" ],
       concepts_to_revise:   [],
       discouragement_level: 1,
-      question_states:      {}, welcome_sent: false)
+      question_states:      {}, welcome_sent: false, last_activity_at: nil)
   end
 
   it "persists the updated TutorState and returns ok" do

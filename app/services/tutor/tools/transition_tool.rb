@@ -4,14 +4,15 @@ module Tutor
       description <<~DESC.strip
         Changer la phase pédagogique courante de la conversation.
         À appeler systématiquement lors d'un changement de phase.
-        Transitions autorisées : idle→greeting, greeting→reading,
-        reading→spotting, spotting→guiding, guiding→validating|spotting,
-        validating→feedback, feedback→ended.
+        Transitions autorisées : idle→greeting, greeting→enonce,
+        enonce→spotting_type|guiding, spotting_type→spotting_data|guiding,
+        spotting_data→guiding, guiding→validating|enonce,
+        validating→feedback|ended, feedback→ended.
       DESC
 
       param :phase,
             type: :string,
-            desc: "Phase cible (greeting, reading, spotting, guiding, validating, feedback, ended)",
+            desc: "Phase cible (greeting, enonce, spotting_type, spotting_data, guiding, validating, feedback, ended)",
             required: true
 
       param :question_id,

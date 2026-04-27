@@ -14,18 +14,21 @@ module Tutor
       validate_result = ValidateInput.call(raw_input: @student_input)
       return validate_result if validate_result.err?
 
-      sanitized = validate_result.value[:sanitized_input]
+      sanitized_for_llm = validate_result.value[:sanitized_input]
+      display_content   = @student_input.to_s.strip
+
+      sync_question_state_and_activity
 
       context_result = BuildContext.call(
         conversation:  @conversation,
         question:      @question,
-        student_input: sanitized
+        student_input: sanitized_for_llm
       )
       return context_result if context_result.err?
 
       @conversation.messages.create!(
         role:     :user,
-        content:  sanitized,
+        content:  display_content,
         question: @question
       )
 
@@ -44,7 +47,7 @@ module Tutor
       )
       return llm_result if llm_result.err?
 
-      if @conversation.tutor_state.current_phase == "spotting"
+      if %w[spotting_type spotting_data].include?(@conversation.tutor_state.current_phase)
         filter_result = FilterSpottingOutput.call(
           message:    assistant_msg,
           llm_output: llm_result.value[:full_content]
@@ -77,6 +80,37 @@ module Tutor
       return update_result if update_result.err?
 
       BroadcastMessage.call(conversation: @conversation, message: assistant_msg)
+    end
+
+    private
+
+    def sync_question_state_and_activity
+      ts  = @conversation.tutor_state
+      qid = @question.id.to_s
+      qs  = ts.question_states[qid]
+
+      new_qs = qs || QuestionState.new(
+        phase: "enonce", step: nil, hints_used: 0, last_confidence: nil,
+        error_types: [], completed_at: nil, intro_seen: false
+      )
+
+      # Only restore question-level phase if the global state is already in a question phase.
+      # Preserve global phases (idle, greeting) to keep TRANSITION_MATRIX valid.
+      resolved_phase =
+        if ApplyToolCalls::QUESTION_REQUIRED_PHASES.include?(ts.current_phase)
+          ApplyToolCalls::QUESTION_REQUIRED_PHASES.include?(new_qs.phase) ? new_qs.phase : ts.current_phase
+        else
+          ts.current_phase
+        end
+
+      updated_ts = ts.with(
+        current_phase:       resolved_phase,
+        current_question_id: @question.id,
+        last_activity_at:    Time.current,
+        question_states:     ts.question_states.merge(qid => new_qs)
+      )
+
+      UpdateTutorState.call(conversation: @conversation, tutor_state: updated_ts)
     end
   end
 end

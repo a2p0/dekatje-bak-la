@@ -8,8 +8,17 @@ module Tutor
       Exemples valides : 'Tu peux le faire !' / 'Bonne chance pour ce sujet !' / 'Prends ton temps, tu y arriveras.'
     PROMPT
 
+    INACTIVITY_THRESHOLD = 12.hours
+
     def self.call(subject:, conversation:, api_key_data:)
       new(subject: subject, conversation: conversation, api_key_data: api_key_data).call
+    end
+
+    def self.should_greet?(conversation:, last_activity_at:)
+      ts = conversation.tutor_state
+      return true unless ts.welcome_sent
+      return false if last_activity_at.nil?
+      Time.current - last_activity_at.to_time > INACTIVITY_THRESHOLD
     end
 
     def initialize(subject:, conversation:, api_key_data:)

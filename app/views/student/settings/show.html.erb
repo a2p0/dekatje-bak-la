@@ -100,7 +100,7 @@
         <p id="test_key_result" class="mt-3 text-sm"></p>
       <% end %>
 
-      <% if current_student.classroom.tutor_free_mode_enabled? %>
+      <% if current_student.classroom.tutor_free_mode_enabled? || current_student.api_key.present? %>
         <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
           <label class="flex items-start gap-3 cursor-pointer">
             <%= f.check_box :use_personal_key,
@@ -110,7 +110,11 @@
                 Utiliser ma clé personnelle (modèle premium)
               </span>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Si décoché, la clé de votre enseignant sera utilisée (modèle gratuit OpenRouter).
+                <% if current_student.classroom.tutor_free_mode_enabled? %>
+                  Si décoché, la clé de votre enseignant sera utilisée (modèle gratuit OpenRouter).
+                <% else %>
+                  Utilisez votre propre clé API pour accéder au tutorat IA.
+                <% end %>
               </p>
             </div>
           </label>

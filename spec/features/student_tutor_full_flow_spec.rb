@@ -21,7 +21,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
     create(:question, part: part,
       number: "1.1",
       label: "Calculer la consommation en litres pour 186 km.",
-      answer_type: :calculation, points: 2, position: 1)
+      answer_type: :calcul, points: 2, position: 1)
   end
   let!(:answer) { create(:answer, question: question) }
   let!(:classroom_subject) { create(:classroom_subject, classroom: classroom, subject: subject_record) }
@@ -44,7 +44,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
       concepts_mastered:    [],
       concepts_to_revise:   [],
       discouragement_level: 0,
-      question_states:      {}, welcome_sent: true)
+      question_states:      {}, welcome_sent: true, last_activity_at: nil)
   end
 
   def fake_tool_call(name:, arguments: {})
@@ -61,15 +61,18 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
     find("[data-tutor-chat-target='sendButton']", visible: :all).click
   end
 
-  scenario "transition greeting → reading : le tool 'transition' fait progresser current_phase", js: true do
+  scenario "transition greeting → enonce : le tool 'transition' fait progresser current_phase", js: true do
     conv = create(:conversation,
       student: student, subject: subject_record,
       lifecycle_state: "active",
       tutor_state: tutor_state_starting_at("greeting"))
 
     FakeRubyLlm.setup_stub(
-      content:    "D'accord, lisons l'énoncé ensemble.",
-      tool_calls: [ fake_tool_call(name: "transition", arguments: { "phase" => "reading" }) ]
+      content:    "Voici la question sur laquelle tu vas travailler.",
+      tool_calls: [ fake_tool_call(
+        name:      "transition",
+        arguments: { "phase" => "enonce", "question_id" => question.id }
+      ) ]
     )
 
     visit student_question_path(
@@ -81,21 +84,21 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
 
     open_drawer_and_send("Bonjour")
 
-    expect(page).to have_text("D'accord, lisons l'énoncé ensemble.", wait: 10)
-    expect(conv.reload.tutor_state.current_phase).to eq("reading")
+    expect(page).to have_text("Voici la question", wait: 10)
+    expect(conv.reload.tutor_state.current_phase).to eq("enonce")
   end
 
-  scenario "transition reading → spotting : tool 'transition' avec question_id avance la phase", js: true do
+  scenario "transition enonce → spotting_type : tool 'transition' avec question_id avance la phase", js: true do
     conv = create(:conversation,
       student: student, subject: subject_record,
       lifecycle_state: "active",
-      tutor_state: tutor_state_starting_at("reading"))
+      tutor_state: tutor_state_starting_at("enonce"))
 
     FakeRubyLlm.setup_stub(
-      content:    "Quelles sources vas-tu utiliser pour calculer ?",
+      content:    "Quel type de tâche te demande-t-on dans cette question ?",
       tool_calls: [ fake_tool_call(
         name:      "transition",
-        arguments: { "phase" => "spotting", "question_id" => question.id }
+        arguments: { "phase" => "spotting_type", "question_id" => question.id }
       ) ]
     )
 
@@ -108,8 +111,8 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
 
     open_drawer_and_send("J'ai lu l'énoncé.")
 
-    expect(page).to have_text("Quelles sources", wait: 10)
-    expect(conv.reload.tutor_state.current_phase).to eq("spotting")
+    expect(page).to have_text("Quel type de tâche", wait: 10)
+    expect(conv.reload.tutor_state.current_phase).to eq("spotting_type")
   end
 
   # ───── Pending scenarios — UI gaps to close in a future wave ─────

@@ -6,8 +6,13 @@ class Question < ApplicationRecord
   has_many :messages, dependent: :nullify
 
   enum :answer_type, {
-    text: 0, calculation: 1, argumentation: 2,
-    dr_reference: 3, completion: 4, choice: 5
+    identification: 0,
+    calcul:         1,
+    justification:  2,
+    representation: 3,
+    qcm:            4,
+    verification:   5,
+    conclusion:     6
   }
   enum :status, { draft: 0, validated: 1 }
 

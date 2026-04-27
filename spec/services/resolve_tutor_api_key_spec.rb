@@ -22,6 +22,28 @@ RSpec.describe ResolveTutorApiKey do
         expect(result[:api_key]).to eq("student-sk-123")
         expect(result[:provider]).to eq("anthropic")
       end
+
+      it "returns student effective_model, not DEFAULT_MODEL" do
+        result = service.call
+        expect(result[:model]).to eq(student.effective_model)
+        expect(result[:model]).not_to eq("claude-3-5-haiku-20241022")
+      end
+    end
+
+    context "when student has a personal key with explicit api_model set" do
+      before do
+        student.update!(
+          api_key:          "student-sk-123",
+          api_provider:     :anthropic,
+          api_model:        "claude-sonnet-4-6",
+          use_personal_key: true
+        )
+      end
+
+      it "returns the explicit api_model" do
+        result = service.call
+        expect(result[:model]).to eq("claude-sonnet-4-6")
+      end
     end
 
     context "when student key absent but classroom free mode enabled and teacher has key" do
@@ -35,6 +57,22 @@ RSpec.describe ResolveTutorApiKey do
         result = service.call
         expect(result[:api_key]).to eq("or-teacher-key")
         expect(result[:provider]).to eq("openrouter")
+      end
+
+      it "returns the OpenRouter default model for free mode (not student's provider model)" do
+        result = service.call
+        expect(result[:model]).to eq(ResolveTutorApiKey::DEFAULT_MODEL["openrouter"])
+      end
+
+      context "when student has api_provider: anthropic (different from teacher openrouter)" do
+        before { student.update!(api_provider: :anthropic) }
+
+        it "still returns an openrouter-compatible model, not an anthropic model" do
+          result = service.call
+          expect(result[:provider]).to eq("openrouter")
+          expect(result[:model]).to eq(ResolveTutorApiKey::DEFAULT_MODEL["openrouter"])
+          expect(result[:model]).not_to include("claude-")
+        end
       end
     end
 
