@@ -118,6 +118,9 @@ jobs:
       - name: Load schema
         run: bin/rails db:schema:load
 
+      - name: Run unit specs
+        run: bundle exec rspec spec/ --exclude-pattern "spec/features/**/*" --format progress --no-color
+
       - name: Run feature specs
         run: bundle exec rspec spec/features/ --format progress --no-color
         env:
