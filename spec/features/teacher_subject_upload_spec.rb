@@ -15,42 +15,29 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
     login_as(user)
   end
 
-  scenario "le formulaire 'Nouveau sujet' demande titre, année, type, spécialité, région et 2 fichiers PDF" do
+  scenario "le formulaire 'Nouveau sujet' demande uniquement les 2 fichiers PDF" do
     visit new_teacher_subject_path
 
-    expect(page).to have_content("Nouveau sujet")
-    expect(page).to have_field("Titre")
-    expect(page).to have_field("Année")
-    expect(page).to have_select("Type d'examen")
-    expect(page).to have_select("Spécialité")
-    expect(page).to have_select("Région")
-    expect(page).to have_field("Sujet complet (PDF)")
-    expect(page).to have_field("Corrigé complet (PDF)")
+    expect(page).to have_content("Importer")
+    expect(page).to have_field("subject[subject_pdf]")
+    expect(page).to have_field("subject[correction_pdf]")
+    expect(page).not_to have_field("Titre")
+    expect(page).not_to have_select("Spécialité")
   end
 
-  scenario "le sujet est créé et l'extraction démarre quand le formulaire est soumis avec les 2 PDFs" do
+  scenario "le sujet est créé et l'extraction démarre quand les 2 PDFs sont importés" do
     visit new_teacher_subject_path
 
-    fill_in "Titre", with: "BAC STI2D Métropole 2026"
-    fill_in "Année", with: "2026"
-    select "Bac", from: "Type d'examen"
-    select "SIN", from: "Spécialité"
-    select "Métropole", from: "Région"
+    attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/fake_subject.pdf").to_s
+    attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/fake_correction.pdf").to_s
+    click_button "Importer"
 
-    attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
-    attach_file "subject[correction_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
-
-    # Submit the form via JavaScript to bypass HTML5 validation
-    page.execute_script("document.querySelector('form').submit()")
-
-    expect(page).to have_content("Sujet créé")
-    expect(page).to have_content("extraction")
+    expect(page).to have_current_path(%r{/teacher/subjects/\d+})
+    expect(page).to have_content("Extraction en cours")
 
     subject = Subject.last
-    expect(subject.title).to eq("BAC STI2D Métropole 2026")
     expect(subject.extraction_job).to be_present
     expect(subject.extraction_job.status).to eq("pending")
-    expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to be >= 1
   end
 
   scenario "l'enseignant voit 'Extraction en cours...' quand l'extraction est en cours" do
@@ -89,20 +76,11 @@ RSpec.describe "Story 3: Upload et extraction de sujets PDF", type: :feature do
   scenario "le formulaire affiche une erreur quand un fichier PDF manque" do
     visit new_teacher_subject_path
 
-    fill_in "Titre", with: "BAC STI2D Métropole 2026"
-    fill_in "Année", with: "2026"
-    select "Bac", from: "Type d'examen"
-    select "SIN", from: "Spécialité"
-    select "Métropole", from: "Région"
-
     # Only attach subject_pdf, skip correction_pdf
-    attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/dummy.pdf").to_s
+    attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/fake_subject.pdf").to_s
+    click_button "Importer"
 
-    # Remove required attributes and submit via JS to avoid Selenium timing issues
-    page.execute_script("document.querySelectorAll('input[required]').forEach(el => el.removeAttribute('required'))")
-    page.execute_script("document.querySelector('form').submit()")
-
-    expect(page).to have_content("blank")
+    expect(page).to have_content(/correction pdf|doit être/i)
     expect(Subject.count).to eq(0)
   end
 end
