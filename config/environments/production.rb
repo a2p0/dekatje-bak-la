@@ -83,7 +83,7 @@ Rails.application.configure do
     address: "smtp.resend.com",
     port: 587,
     user_name: "resend",
-    password: Rails.application.credentials.resend_api_key
+    password: ENV.fetch("RESEND_API_KEY", Rails.application.credentials.resend_api_key)
   }
   config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "localhost") }
 
