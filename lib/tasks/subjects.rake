@@ -1,4 +1,13 @@
 namespace :subjects do
+  desc "Soft-delete subjects stuck in :uploading status older than 24 hours"
+  task cleanup_uploading: :environment do
+    cutoff  = 24.hours.ago
+    stale   = Subject.where(status: :uploading).where("created_at < ?", cutoff)
+    count   = stale.count
+    stale.update_all(discarded_at: Time.current)
+    puts "Archived #{count} stale uploading subject(s) (created before #{cutoff})."
+  end
+
   desc "Enrich structured_correction for all subjects (or a specific subject_id)"
   task :enrich_structured_correction, [ :subject_id ] => :environment do |_, args|
     subjects = if args[:subject_id].present?
