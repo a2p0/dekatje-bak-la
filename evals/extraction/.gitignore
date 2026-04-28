@@ -1,0 +1,3 @@
+# Anciens scripts (conservés pour référence, non maintenus)
+run_gemini_benchmark*.rb
+run_mistral.rb
