@@ -8,6 +8,7 @@ RSpec.describe "Teacher uploads PDFs and validates subject", type: :feature do
     fill_in "Email", with: user.email
     fill_in "Password", with: "password123"
     click_button "Se connecter"
+    expect(page).to have_current_path("/teacher", wait: 5)
   end
 
   context "US1 — nominal upload → extraction done → validation → draft" do
