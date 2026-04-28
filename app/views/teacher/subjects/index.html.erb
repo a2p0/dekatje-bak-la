@@ -6,9 +6,56 @@
   <% end %>
 </div>
 
-<% if @subjects.empty? %>
+<% if @pending_subjects.any? %>
+  <div class="mb-6">
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 mb-3">En cours d'extraction…</h2>
+    <div class="overflow-x-auto rounded-lg border border-amber-200 dark:border-amber-700">
+      <table class="w-full text-sm">
+        <thead class="bg-amber-50 dark:bg-amber-900/20">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Importé le</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">Statut extraction</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-amber-100 dark:divide-amber-800/30 bg-white dark:bg-slate-900">
+          <% @pending_subjects.each do |subject| %>
+            <tr class="hover:bg-amber-50/50 dark:hover:bg-amber-900/10 transition-colors">
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                <%= subject.created_at.strftime("%d/%m/%Y %H:%M") %>
+              </td>
+              <td class="px-4 py-3">
+                <% job = subject.extraction_job %>
+                <% if job %>
+                  <%
+                    job_color = case job.status
+                                when "pending"    then :slate
+                                when "processing" then :amber
+                                when "done"       then :emerald
+                                when "failed"     then :rose
+                                else :slate
+                                end
+                  %>
+                  <%= render BadgeComponent.new(color: job_color, label: job.status) %>
+                <% else %>
+                  <span class="text-slate-400 text-xs">—</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <%= link_to "Voir →", teacher_subject_path(subject),
+                      class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
+
+<% if @subjects.empty? && @pending_subjects.empty? %>
   <p class="text-slate-500 dark:text-slate-400">Aucun sujet pour l'instant.</p>
-<% else %>
+<% elsif @subjects.any? %>
   <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
     <table class="w-full text-sm">
       <thead class="bg-slate-50 dark:bg-slate-800">

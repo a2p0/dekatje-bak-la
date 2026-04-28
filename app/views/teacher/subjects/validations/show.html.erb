@@ -1,0 +1,140 @@
+<%= render BreadcrumbComponent.new(items: [
+  { label: "Mes sujets", href: teacher_subjects_path },
+  { label: "Validation du sujet" }
+]) %>
+
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Valider le sujet</h1>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+    Vérifiez les métadonnées extraites automatiquement et corrigez si nécessaire.
+  </p>
+
+  <% if @extraction_failed %>
+    <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-4 py-3 mb-6">
+      <p class="text-sm text-amber-700 dark:text-amber-300">
+        L'extraction a échoué. Renseignez les métadonnées manuellement.
+      </p>
+    </div>
+  <% end %>
+
+  <% if @existing_session %>
+    <div class="rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 px-4 py-3 mb-6">
+      <p class="text-sm text-indigo-700 dark:text-indigo-300 font-medium mb-1">
+        Session existante détectée
+      </p>
+      <p class="text-sm text-indigo-600 dark:text-indigo-400 mb-3">
+        Une session « <%= @existing_session.title %> (<%= @existing_session.year %>) » existe déjà.
+        Souhaitez-vous y rattacher ce sujet ou créer une nouvelle session ?
+      </p>
+      <div class="flex gap-3">
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+          <input type="radio" name="subject[exam_session_choice]" value="attach"
+                 form="validation_form" class="text-indigo-600" checked>
+          <span class="text-slate-700 dark:text-slate-300">Rattacher à la session existante</span>
+        </label>
+        <label class="flex items-center gap-2 text-sm cursor-pointer">
+          <input type="radio" name="subject[exam_session_choice]" value="create"
+                 form="validation_form" class="text-indigo-600">
+          <span class="text-slate-700 dark:text-slate-300">Créer une nouvelle session</span>
+        </label>
+      </div>
+      <input type="hidden" name="subject[exam_session_id]" value="<%= @existing_session.id %>" form="validation_form">
+    </div>
+  <% end %>
+
+  <%= form_with model: [:teacher, :subject, @subject], url: teacher_subject_validation_path(@subject), method: :patch, id: "validation_form",
+        class: "space-y-5" do |f| %>
+
+    <% unless @existing_session %>
+      <%= f.hidden_field :exam_session_choice, value: "create" %>
+    <% end %>
+
+    <% if @subject.errors.any? %>
+      <div class="rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 px-4 py-3">
+        <p class="text-sm font-semibold text-rose-700 dark:text-rose-400 mb-1">
+          <%= pluralize(@subject.errors.count, "erreur") %> :
+        </p>
+        <ul class="list-disc list-inside space-y-0.5">
+          <% @subject.errors.full_messages.each do |msg| %>
+            <li class="text-sm text-rose-600 dark:text-rose-300"><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2">
+      Session d'examen
+    </h2>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Titre</label>
+      <%= f.text_field :title, value: @metadata[:title],
+            placeholder: @metadata[:title].blank? ? "Non détecté" : nil,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent #{"border-amber-300" if @metadata[:title].blank?}" %>
+      <% if @metadata[:title].blank? %>
+        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Non détecté — à renseigner</p>
+      <% end %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Année</label>
+      <%= f.text_field :year, value: @metadata[:year],
+            placeholder: @metadata[:year].blank? ? "Non détecté" : nil,
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      <% if @metadata[:year].blank? %>
+        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Non détecté — à renseigner</p>
+      <% end %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Type d'examen</label>
+      <%= f.select :exam,
+            ExamSession.exams.keys.map { |k| [k.capitalize, k] },
+            { selected: @metadata[:exam], include_blank: @metadata[:exam].blank? ? "Non détecté" : false },
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      <% if @metadata[:exam].blank? %>
+        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Non détecté — à renseigner</p>
+      <% end %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Région</label>
+      <%= f.select :region,
+            [["Métropole", "metropole"], ["La Réunion", "reunion"], ["Polynésie", "polynesie"], ["Candidat libre", "candidat_libre"]],
+            { selected: @metadata[:region], include_blank: @metadata[:region].blank? ? "Non détecté" : false },
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      <% if @metadata[:region].blank? %>
+        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Non détecté — à renseigner</p>
+      <% end %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Variante</label>
+      <%= f.select :variante,
+            [["Normale", "normale"], ["Remplacement", "remplacement"]],
+            { selected: @metadata[:variante] || "normale" },
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+    </div>
+
+    <h2 class="text-base font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700 pb-2 pt-2">
+      Sujet
+    </h2>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Spécialité</label>
+      <%= f.select :specialty,
+            Subject.specialties.except("tronc_commun").keys.map { |k| [k, k] },
+            { selected: @metadata[:specialty]&.upcase, include_blank: @metadata[:specialty].blank? ? "Non détecté" : false },
+            class: "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      <% if @metadata[:specialty].blank? %>
+        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Non détecté — à renseigner</p>
+      <% end %>
+    </div>
+
+    <div class="pt-2">
+      <%= render ButtonComponent.new(variant: :primary, size: :md, type: :submit) do %>
+        Valider
+      <% end %>
+    </div>
+  <% end %>
+</div>
