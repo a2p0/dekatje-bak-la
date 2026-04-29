@@ -3,11 +3,13 @@
 # Required env vars:
 #   ANTHROPIC_API_KEY  — Claude Opus 4.7 (Anthropic direct)
 #   MISTRAL_API_KEY    — Mistral OCR + Mistral Large 2512 (Mistral direct)
+#   OPENROUTER_API_KEY — DeepSeek V4 Pro via OpenRouter
 #
 # Pipelines :
-#   opus             : pdf-reader -> texte brut -> Claude Opus 4.7
-#   mistral          : Mistral OCR -> Markdown  -> Mistral Large 2512
-#   mistral_ocr_opus : Mistral OCR -> Markdown  -> Claude Opus 4.7
+#   opus                  : pdf-reader -> texte brut -> Claude Opus 4.7
+#   mistral               : Mistral OCR -> Markdown  -> Mistral Large 2512
+#   mistral_ocr_opus      : Mistral OCR -> Markdown  -> Claude Opus 4.7
+#   mistral_ocr_deepseek  : Mistral OCR -> Markdown  -> DeepSeek V4 Pro (OpenRouter)
 #
 # Arreter Sidekiq avant : docker stop <sidekiq-container>
 # Output  : tmp/llm_comparison/extraction/results/<subject_id>/
@@ -33,6 +35,11 @@ MODELS = {
     label:    "Claude Opus 4.7 (Mistral OCR)",
     provider: :anthropic_ocr,
     model_id: "claude-opus-4-7"
+  },
+  mistral_ocr_deepseek: {
+    label:    "DeepSeek V4 Pro (Mistral OCR)",
+    provider: :openrouter_ocr,
+    model_id: "deepseek/deepseek-v4-pro"
   }
 }.freeze
 
@@ -176,6 +183,47 @@ def call_mistral_chat(system_prompt, user_content, api_key, model_id)
   }
 end
 
+# ---------- OpenRouter Chat (DeepSeek, etc.) ----------
+
+def call_openrouter_chat(system_prompt, user_content, api_key, model_id)
+  conn = Faraday.new(url: "https://openrouter.ai") do |f|
+    f.request :json
+    f.response :json
+    f.options.timeout = 600
+  end
+  body = {
+    model: model_id,
+    messages: [
+      { role: "system", content: system_prompt },
+      { role: "user",   content: user_content }
+    ],
+    max_tokens: 32_768,
+    temperature: 0.1
+  }
+  headers = {
+    "Authorization" => "Bearer #{api_key}",
+    "Content-Type"  => "application/json"
+  }
+  t0 = Time.now
+  response = conn.post("/api/v1/chat/completions", body, headers)
+  elapsed = (Time.now - t0).round(1)
+  raise "OpenRouter error #{response.status}: #{response.body}" unless response.success?
+
+  usage = response.body["usage"] || {}
+  tokens_in  = usage["prompt_tokens"].to_i
+  tokens_out = usage["completion_tokens"].to_i
+  # DeepSeek V4 Pro via OpenRouter : $0.435/M input, $0.87/M output
+  cost = (tokens_in * 0.435 + tokens_out * 0.87) / 1_000_000.0
+
+  {
+    text:       response.body.dig("choices", 0, "message", "content"),
+    tokens_in:  tokens_in,
+    tokens_out: tokens_out,
+    cost:       cost,
+    elapsed:    elapsed
+  }
+end
+
 # ---------- extraction texte pdf-reader (pour Opus) ----------
 
 def extract_text_from_blob(blob)
@@ -195,8 +243,9 @@ if subject_ids.empty?
   exit 1
 end
 
-anthropic_key = ENV["ANTHROPIC_API_KEY"].presence || abort("ANTHROPIC_API_KEY manquant")
-mistral_key   = ENV["MISTRAL_API_KEY"].presence   || abort("MISTRAL_API_KEY manquant")
+anthropic_key    = ENV["ANTHROPIC_API_KEY"].presence    || abort("ANTHROPIC_API_KEY manquant")
+mistral_key      = ENV["MISTRAL_API_KEY"].presence      || abort("MISTRAL_API_KEY manquant")
+openrouter_key   = ENV["OPENROUTER_API_KEY"].presence   || abort("OPENROUTER_API_KEY manquant")
 
 report_rows = []
 
@@ -325,6 +374,9 @@ subject_ids.each do |subject_id|
                when :anthropic_ocr
                  raise "OCR a echoue, impossible d'appeler Opus via OCR" unless mistral_user_content
                  call_anthropic(system_prompt, mistral_user_content, anthropic_key, config[:model_id])
+               when :openrouter_ocr
+                 raise "OCR a echoue, impossible d'appeler DeepSeek via OCR" unless mistral_user_content
+                 call_openrouter_chat(system_prompt, mistral_user_content, openrouter_key, config[:model_id])
                end
 
       File.write(output_file, result[:text])
