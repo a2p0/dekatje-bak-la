@@ -46,7 +46,7 @@ end
 def parse_json_response(text)
   clean = text.gsub(/\A```(?:json)?\n?/, "").gsub(/\n?```\z/, "").strip
   JSON.parse(clean)
-rescue JSON::ParseError
+rescue JSON::ParserError
   nil
 end
 
