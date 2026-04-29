@@ -35,11 +35,13 @@ PAIRWISE_SYSTEM = <<~PROMPT.freeze
   Aucun texte en dehors du JSON.
 PROMPT
 
-def run_pairwise(subject_id, subject_dir, openrouter_key)
-  data = load_extractions(subject_dir)
+def run_pairwise(subject_id, subject_dir, openrouter_key, model_a: "opus", model_b: "mistral")
+  data = load_extractions(subject_dir, model_a: model_a, model_b: model_b)
   common_numbers = data[:common_numbers]
   only_opus      = data[:only_opus]
   only_mistral   = data[:only_mistral]
+  model_a        = data[:model_a]
+  model_b        = data[:model_b]
 
   judge_results    = []
   total_cost       = 0.0
@@ -47,8 +49,8 @@ def run_pairwise(subject_id, subject_dir, openrouter_key)
   total_tokens_out = 0
 
   scores = {
-    "opus"    => CRITERIA.index_with(0),
-    "mistral" => CRITERIA.index_with(0),
+    model_a  => CRITERIA.index_with(0),
+    model_b  => CRITERIA.index_with(0),
     "egalite" => CRITERIA.index_with(0)
   }
 
@@ -116,52 +118,55 @@ def run_pairwise(subject_id, subject_dir, openrouter_key)
   end
 
   # --- Sauvegarde ---
+  slug = "#{model_a}_vs_#{model_b}"
   report = {
     subject_id:       subject_id,
     mode:             "pairwise",
+    model_a:          model_a,
+    model_b:          model_b,
     judge_model:      JUDGE_MODEL,
     generated_at:     Time.now.iso8601,
     questions_judged: common_numbers.size,
-    only_in_opus:     only_opus,
-    only_in_mistral:  only_mistral,
+    only_in_a:        only_opus,
+    only_in_b:        only_mistral,
     total_cost_usd:   format("%.4f", total_cost),
     total_tokens:     { in: total_tokens_in, out: total_tokens_out },
     scores:           scores,
     details:          judge_results
   }
-  report_path = subject_dir.join("pairwise_report.json")
+  report_path = subject_dir.join("pairwise_#{slug}_report.json")
   File.write(report_path, JSON.pretty_generate(report))
 
-  summary_path = subject_dir.join("pairwise_summary.md")
+  summary_path = subject_dir.join("pairwise_#{slug}_summary.md")
   File.open(summary_path, "w") do |f|
-    f.puts "# Jugement pairwise — Sujet ##{subject_id}"
+    f.puts "# Jugement pairwise — Sujet ##{subject_id} — #{model_a} vs #{model_b}"
     f.puts ""
     f.puts "Juge : `#{JUDGE_MODEL}` | #{common_numbers.size} questions | Cout : $#{format("%.4f", total_cost)}"
     f.puts ""
     f.puts "## Scores"
     f.puts ""
-    f.puts "| Critere | Opus | Mistral | Egalite |"
-    f.puts "|---------|------|---------|---------|"
+    f.puts "| Critere | #{model_a} | #{model_b} | Egalite |"
+    f.puts "|---------|#{"-" * (model_a.length + 2)}|#{"-" * (model_b.length + 2)}|---------|"
     CRITERIA.each do |c|
-      next if (scores["opus"][c] + scores["mistral"][c] + scores["egalite"][c]).zero?
-      f.puts "| #{c} | #{scores["opus"][c]} | #{scores["mistral"][c]} | #{scores["egalite"][c]} |"
+      next if (scores[model_a][c] + scores[model_b][c] + scores["egalite"][c]).zero?
+      f.puts "| #{c} | #{scores[model_a][c]} | #{scores[model_b][c]} | #{scores["egalite"][c]} |"
     end
     f.puts ""
     f.puts "## Vainqueur par critere"
     f.puts ""
     CRITERIA.each do |c|
-      o, m = scores["opus"][c], scores["mistral"][c]
-      winner = o > m ? "**Opus**" : m > o ? "**Mistral**" : "Egalite"
-      f.puts "- #{c} : #{winner} (#{o} vs #{m})"
+      a, b = scores[model_a][c], scores[model_b][c]
+      winner = a > b ? "**#{model_a}**" : b > a ? "**#{model_b}**" : "Egalite"
+      f.puts "- #{c} : #{winner} (#{a} vs #{b})"
     end
     f.puts ""
-    total_o = CRITERIA.sum { |c| scores["opus"][c] }
-    total_m = CRITERIA.sum { |c| scores["mistral"][c] }
+    total_a = CRITERIA.sum { |c| scores[model_a][c] }
+    total_b = CRITERIA.sum { |c| scores[model_b][c] }
     f.puts "## Vainqueur global"
     f.puts ""
-    f.puts total_o > total_m ? "**Opus** #{total_o} vs #{total_m}" :
-           total_m > total_o ? "**Mistral** #{total_m} vs #{total_o}" :
-           "Egalite #{total_o} vs #{total_m}"
+    f.puts total_a > total_b ? "**#{model_a}** #{total_a} vs #{total_b}" :
+           total_b > total_a ? "**#{model_b}** #{total_b} vs #{total_a}" :
+           "Egalite #{total_a} vs #{total_b}"
     f.puts ""
     f.puts "## Detail par question"
     f.puts ""
@@ -182,16 +187,16 @@ def run_pairwise(subject_id, subject_dir, openrouter_key)
 
   # Resume terminal
   puts "\n#{"=" * 60}"
-  puts "PAIRWISE — RESUME"
+  puts "PAIRWISE — RESUME (#{model_a} vs #{model_b})"
   puts "=" * 60
-  puts "| Critere      | Opus | Mistral | Egalite |"
-  puts "|--------------|------|---------|---------|"
+  puts "| Critere      | #{model_a.ljust(20)} | #{model_b.ljust(20)} | Egalite |"
+  puts "|--------------|#{"-" * 22}|#{"-" * 22}|---------|"
   CRITERIA.each do |c|
-    puts "| #{c.ljust(12)} | #{scores["opus"][c].to_s.center(4)} | #{scores["mistral"][c].to_s.center(7)} | #{scores["egalite"][c].to_s.center(7)} |"
+    puts "| #{c.ljust(12)} | #{scores[model_a][c].to_s.center(22)} | #{scores[model_b][c].to_s.center(22)} | #{scores["egalite"][c].to_s.center(7)} |"
   end
-  total_o = CRITERIA.sum { |c| scores["opus"][c] }
-  total_m = CRITERIA.sum { |c| scores["mistral"][c] }
-  puts "\nTOTAL : Opus #{total_o} | Mistral #{total_m}"
+  total_a = CRITERIA.sum { |c| scores[model_a][c] }
+  total_b = CRITERIA.sum { |c| scores[model_b][c] }
+  puts "\nTOTAL : #{model_a} #{total_a} | #{model_b} #{total_b}"
   puts "Cout  : $#{format("%.4f", total_cost)} (#{total_tokens_in} in / #{total_tokens_out} out)"
   puts "\nRapport JSON : #{report_path}"
   puts "Rapport MD   : #{summary_path}"

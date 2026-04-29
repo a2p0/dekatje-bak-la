@@ -69,38 +69,41 @@ def extract_all_questions(parsed_json)
   questions
 end
 
-def load_extractions(subject_dir)
-  opus_path    = subject_dir.join("opus.json")
-  mistral_path = subject_dir.join("mistral.json")
-  abort "opus.json introuvable dans #{subject_dir}"    unless opus_path.exist?
-  abort "mistral.json introuvable dans #{subject_dir}" unless mistral_path.exist?
+# model_a et model_b : noms de fichiers sans extension (ex: "opus", "mistral_ocr_opus")
+def load_extractions(subject_dir, model_a: "opus", model_b: "mistral")
+  path_a = subject_dir.join("#{model_a}.json")
+  path_b = subject_dir.join("#{model_b}.json")
+  abort "#{model_a}.json introuvable dans #{subject_dir}" unless path_a.exist?
+  abort "#{model_b}.json introuvable dans #{subject_dir}" unless path_b.exist?
 
-  opus_parsed    = JSON.parse(clean_json(File.read(opus_path)))    rescue abort("opus.json invalide : #{$!.message}")
-  mistral_parsed = JSON.parse(clean_json(File.read(mistral_path))) rescue abort("mistral.json invalide : #{$!.message}")
+  parsed_a = JSON.parse(clean_json(File.read(path_a))) rescue abort("#{model_a}.json invalide : #{$!.message}")
+  parsed_b = JSON.parse(clean_json(File.read(path_b))) rescue abort("#{model_b}.json invalide : #{$!.message}")
 
-  opus_questions    = extract_all_questions(opus_parsed)
-  mistral_questions = extract_all_questions(mistral_parsed)
+  questions_a = extract_all_questions(parsed_a)
+  questions_b = extract_all_questions(parsed_b)
 
-  puts "Opus    : #{opus_questions.size} questions"
-  puts "Mistral : #{mistral_questions.size} questions"
+  puts "#{model_a} : #{questions_a.size} questions"
+  puts "#{model_b} : #{questions_b.size} questions"
 
-  opus_by_number    = opus_questions.index_by    { |q| q["number"] }
-  mistral_by_number = mistral_questions.index_by { |q| q["number"] }
+  by_number_a = questions_a.index_by { |q| q["number"] }
+  by_number_b = questions_b.index_by { |q| q["number"] }
 
-  common_numbers = (opus_by_number.keys & mistral_by_number.keys).sort
-  only_opus      = opus_by_number.keys    - mistral_by_number.keys
-  only_mistral   = mistral_by_number.keys - opus_by_number.keys
+  common_numbers = (by_number_a.keys & by_number_b.keys).sort
+  only_a         = by_number_a.keys - by_number_b.keys
+  only_b         = by_number_b.keys - by_number_a.keys
 
   puts "\nQuestions communes : #{common_numbers.size}"
-  puts "Seulement dans Opus    : #{only_opus.join(", ")}"    if only_opus.any?
-  puts "Seulement dans Mistral : #{only_mistral.join(", ")}" if only_mistral.any?
+  puts "Seulement dans #{model_a} : #{only_a.join(", ")}" if only_a.any?
+  puts "Seulement dans #{model_b} : #{only_b.join(", ")}" if only_b.any?
 
   {
-    opus_by_number:    opus_by_number,
-    mistral_by_number: mistral_by_number,
+    opus_by_number:    by_number_a,
+    mistral_by_number: by_number_b,
     common_numbers:    common_numbers,
-    only_opus:         only_opus,
-    only_mistral:      only_mistral
+    only_opus:         only_a,
+    only_mistral:      only_b,
+    model_a:           model_a,
+    model_b:           model_b
   }
 end
 

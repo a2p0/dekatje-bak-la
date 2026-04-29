@@ -49,22 +49,24 @@ def build_single_prompt(question_number, extraction, model_label)
   MSG
 end
 
-def run_absolute(subject_id, subject_dir, openrouter_key)
-  data           = load_extractions(subject_dir)
+def run_absolute(subject_id, subject_dir, openrouter_key, model_a: "opus", model_b: "mistral")
+  data           = load_extractions(subject_dir, model_a: model_a, model_b: model_b)
   common_numbers = data[:common_numbers]
   only_opus      = data[:only_opus]
   only_mistral   = data[:only_mistral]
+  model_a        = data[:model_a]
+  model_b        = data[:model_b]
 
-  results_opus    = []
-  results_mistral = []
+  results_a        = []
+  results_b        = []
   total_cost       = 0.0
   total_tokens_in  = 0
   total_tokens_out = 0
 
   # Scores cumules : {modele => {critere => [scores]}}
   scores = {
-    "opus"    => CRITERIA.index_with { [] },
-    "mistral" => CRITERIA.index_with { [] }
+    model_a => CRITERIA.index_with { [] },
+    model_b => CRITERIA.index_with { [] }
   }
 
   total_questions = common_numbers.size * 2 + only_opus.size + only_mistral.size
@@ -72,8 +74,8 @@ def run_absolute(subject_id, subject_dir, openrouter_key)
 
   common_numbers.each do |qnum|
     [
-      ["opus",    data[:opus_by_number][qnum]],
-      ["mistral", data[:mistral_by_number][qnum]]
+      [model_a, data[:opus_by_number][qnum]],
+      [model_b, data[:mistral_by_number][qnum]]
     ].each do |model, extraction|
       counter += 1
       print "  [#{counter}/#{total_questions}] Q#{qnum} #{model}... "
@@ -89,7 +91,7 @@ def run_absolute(subject_id, subject_dir, openrouter_key)
         judgment = parse_json_response(result[:text])
         unless judgment
           puts "ERREUR JSON"
-          (model == "opus" ? results_opus : results_mistral) <<
+          (model == model_a ? results_a : results_b) <<
             { question_number: qnum, error: "JSON invalide : #{result[:text][0..120]}" }
           next
         end
@@ -104,11 +106,11 @@ def run_absolute(subject_id, subject_dir, openrouter_key)
           question_result["#{c}_reason"] = reason
         end
 
-        (model == "opus" ? results_opus : results_mistral) << question_result
+        (model == model_a ? results_a : results_b) << question_result
         print "OK (#{result[:elapsed]}s)\n"
       rescue => e
         puts "ERREUR : #{e.message}"
-        (model == "opus" ? results_opus : results_mistral) <<
+        (model == model_a ? results_a : results_b) <<
           { question_number: qnum, model: model, error: e.message }
       end
     end
@@ -116,7 +118,7 @@ def run_absolute(subject_id, subject_dir, openrouter_key)
 
   # Calcul des moyennes
   averages = {}
-  %w[opus mistral].each do |model|
+  [model_a, model_b].each do |model|
     averages[model] = CRITERIA.each_with_object({}) do |c, h|
       vals = scores[model][c].reject(&:zero?)
       h[c] = vals.empty? ? nil : (vals.sum.to_f / vals.size).round(2)
@@ -128,56 +130,59 @@ def run_absolute(subject_id, subject_dir, openrouter_key)
   end
 
   # --- Sauvegarde JSON ---
+  slug = "#{model_a}_vs_#{model_b}"
   report = {
-    subject_id:      subject_id,
-    mode:            "absolute",
-    judge_model:     JUDGE_MODEL,
-    generated_at:    Time.now.iso8601,
+    subject_id:       subject_id,
+    mode:             "absolute",
+    model_a:          model_a,
+    model_b:          model_b,
+    judge_model:      JUDGE_MODEL,
+    generated_at:     Time.now.iso8601,
     questions_judged: common_numbers.size,
-    only_in_opus:    only_opus,
-    only_in_mistral: only_mistral,
-    total_cost_usd:  format("%.4f", total_cost),
-    total_tokens:    { in: total_tokens_in, out: total_tokens_out },
-    averages:        averages,
-    details:         { opus: results_opus, mistral: results_mistral }
+    only_in_a:        only_opus,
+    only_in_b:        only_mistral,
+    total_cost_usd:   format("%.4f", total_cost),
+    total_tokens:     { in: total_tokens_in, out: total_tokens_out },
+    averages:         averages,
+    details:          { model_a => results_a, model_b => results_b }
   }
-  report_path = subject_dir.join("absolute_report.json")
+  report_path = subject_dir.join("absolute_#{slug}_report.json")
   File.write(report_path, JSON.pretty_generate(report))
 
   # --- Rapport Markdown ---
-  summary_path = subject_dir.join("absolute_summary.md")
+  summary_path = subject_dir.join("absolute_#{slug}_summary.md")
   File.open(summary_path, "w") do |f|
-    f.puts "# Jugement absolu — Sujet ##{subject_id}"
+    f.puts "# Jugement absolu — Sujet ##{subject_id} — #{model_a} vs #{model_b}"
     f.puts ""
     f.puts "Juge : `#{JUDGE_MODEL}` | #{common_numbers.size} questions | Cout : $#{format("%.4f", total_cost)}"
     f.puts ""
     f.puts "## Moyennes par critere (1-5)"
     f.puts ""
-    f.puts "| Critere | Opus | Mistral | Delta |"
-    f.puts "|---------|------|---------|-------|"
+    f.puts "| Critere | #{model_a} | #{model_b} | Delta (A-B) |"
+    f.puts "|---------|#{"-" * (model_a.length + 2)}|#{"-" * (model_b.length + 2)}|-------------|"
     CRITERIA.each do |c|
-      o = averages["opus"][c]
-      m = averages["mistral"][c]
-      delta = o && m ? format("%+.2f", o - m) : "n/a"
-      f.puts "| #{c} | #{o || "n/a"} | #{m || "n/a"} | #{delta} |"
+      a = averages[model_a][c]
+      b = averages[model_b][c]
+      delta = a && b ? format("%+.2f", a - b) : "n/a"
+      f.puts "| #{c} | #{a || "n/a"} | #{b || "n/a"} | #{delta} |"
     end
-    og = averages["opus"]["global"]
-    mg = averages["mistral"]["global"]
-    delta_g = og && mg ? format("%+.2f", og - mg) : "n/a"
-    f.puts "| **global** | **#{og || "n/a"}** | **#{mg || "n/a"}** | **#{delta_g}** |"
+    ag = averages[model_a]["global"]
+    bg = averages[model_b]["global"]
+    delta_g = ag && bg ? format("%+.2f", ag - bg) : "n/a"
+    f.puts "| **global** | **#{ag || "n/a"}** | **#{bg || "n/a"}** | **#{delta_g}** |"
     f.puts ""
     f.puts "## Detail par question"
     f.puts ""
     common_numbers.each do |qnum|
       f.puts "### Q#{qnum}"
-      %w[opus mistral].each do |model|
-        r = (model == "opus" ? results_opus : results_mistral).find { |x| x[:question_number] == qnum }
+      [[model_a, results_a], [model_b, results_b]].each do |model, results|
+        r = results.find { |x| x[:question_number] == qnum }
         next unless r
         if r[:error]
-          f.puts "- **#{model.capitalize}** : ERREUR #{r[:error]}"
+          f.puts "- **#{model}** : ERREUR #{r[:error]}"
         else
           scores_str = CRITERIA.map { |c| "#{c}=#{r["#{c}_score"]}" }.join(", ")
-          f.puts "- **#{model.capitalize}** : #{scores_str}"
+          f.puts "- **#{model}** : #{scores_str}"
         end
       end
       f.puts ""
@@ -188,18 +193,18 @@ def run_absolute(subject_id, subject_dir, openrouter_key)
   puts "\n#{"=" * 60}"
   puts "ABSOLU — RESUME (moyennes /5)"
   puts "=" * 60
-  puts "| Critere      | Opus | Mistral | Delta |"
-  puts "|--------------|------|---------|-------|"
+  puts "| Critere      | #{model_a.ljust(20)} | #{model_b.ljust(20)} | Delta |"
+  puts "|--------------|#{"-" * 22}|#{"-" * 22}|-------|"
   CRITERIA.each do |c|
-    o = averages["opus"][c] || "n/a"
-    m = averages["mistral"][c] || "n/a"
-    d = averages["opus"][c] && averages["mistral"][c] ? format("%+.2f", averages["opus"][c] - averages["mistral"][c]) : "n/a"
-    puts "| #{c.ljust(12)} | #{o.to_s.center(4)} | #{m.to_s.center(7)} | #{d.center(5)} |"
+    a = averages[model_a][c] || "n/a"
+    b = averages[model_b][c] || "n/a"
+    d = averages[model_a][c] && averages[model_b][c] ? format("%+.2f", averages[model_a][c] - averages[model_b][c]) : "n/a"
+    puts "| #{c.ljust(12)} | #{a.to_s.center(22)} | #{b.to_s.center(22)} | #{d.center(5)} |"
   end
-  og = averages["opus"]["global"] || "n/a"
-  mg = averages["mistral"]["global"] || "n/a"
-  dg = averages["opus"]["global"] && averages["mistral"]["global"] ? format("%+.2f", averages["opus"]["global"] - averages["mistral"]["global"]) : "n/a"
-  puts "| #{"global".ljust(12)} | #{og.to_s.center(4)} | #{mg.to_s.center(7)} | #{dg.center(5)} |"
+  ag = averages[model_a]["global"] || "n/a"
+  bg = averages[model_b]["global"] || "n/a"
+  dg = averages[model_a]["global"] && averages[model_b]["global"] ? format("%+.2f", averages[model_a]["global"] - averages[model_b]["global"]) : "n/a"
+  puts "| #{"global".ljust(12)} | #{ag.to_s.center(22)} | #{bg.to_s.center(22)} | #{dg.center(5)} |"
   puts "\nCout  : $#{format("%.4f", total_cost)} (#{total_tokens_in} in / #{total_tokens_out} out)"
   puts "\nRapport JSON : #{report_path}"
   puts "Rapport MD   : #{summary_path}"
