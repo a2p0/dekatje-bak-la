@@ -4,9 +4,10 @@
 #   ANTHROPIC_API_KEY  — Claude Opus 4.7 (Anthropic direct)
 #   MISTRAL_API_KEY    — Mistral OCR + Mistral Large 2512 (Mistral direct)
 #
-# Pipeline :
-#   Opus    : pdf-reader -> texte brut -> Claude Opus 4.7
-#   Mistral : mistral-ocr-latest -> Markdown -> Mistral Large 2512
+# Pipelines :
+#   opus             : pdf-reader -> texte brut -> Claude Opus 4.7
+#   mistral          : Mistral OCR -> Markdown  -> Mistral Large 2512
+#   mistral_ocr_opus : Mistral OCR -> Markdown  -> Claude Opus 4.7
 #
 # Arreter Sidekiq avant : docker stop <sidekiq-container>
 # Output  : tmp/llm_comparison/extraction/results/<subject_id>/
@@ -19,14 +20,19 @@ FileUtils.mkdir_p(OUTPUT_DIR)
 
 MODELS = {
   opus: {
-    label: "Claude Opus 4.7 (pdf-reader)",
-    provider: :anthropic,
+    label:    "Claude Opus 4.7 (pdf-reader)",
+    provider: :anthropic_pdftext,
     model_id: "claude-opus-4-7"
   },
   mistral: {
-    label: "Mistral Large 2512 (OCR natif)",
-    provider: :mistral,
+    label:    "Mistral Large 2512 (OCR natif)",
+    provider: :mistral_ocr,
     model_id: "mistral-large-2512"
+  },
+  mistral_ocr_opus: {
+    label:    "Claude Opus 4.7 (Mistral OCR)",
+    provider: :anthropic_ocr,
+    model_id: "claude-opus-4-7"
   }
 }.freeze
 
@@ -310,13 +316,15 @@ subject_ids.each do |subject_id|
 
     begin
       result = case config[:provider]
-               when :anthropic
+               when :anthropic_pdftext
                  call_anthropic(system_prompt, opus_user_content, anthropic_key, config[:model_id])
-               when :mistral
+               when :mistral_ocr
                  raise "OCR a echoue, impossible d'appeler Mistral chat" unless mistral_user_content
                  llm = call_mistral_chat(system_prompt, mistral_user_content, mistral_key, config[:model_id])
-                 # Ajoute le cout OCR au cout total Mistral
                  llm.merge(cost: llm[:cost] + ocr_cost, elapsed: llm[:elapsed] + ocr_elapsed)
+               when :anthropic_ocr
+                 raise "OCR a echoue, impossible d'appeler Opus via OCR" unless mistral_user_content
+                 call_anthropic(system_prompt, mistral_user_content, anthropic_key, config[:model_id])
                end
 
       File.write(output_file, result[:text])
@@ -366,7 +374,7 @@ end
 total_cost = report_rows.sum { |r| r[:cost_usd].to_f }
 puts "  TOTAL cout estime : $#{format("%.4f", total_cost)}"
 puts "\nRapport CSV : #{csv_path}"
-puts "JSONs       : #{OUTPUT_DIR}/<subject_id>/{opus,mistral}.json"
+puts "JSONs       : #{OUTPUT_DIR}/<subject_id>/{opus,mistral,mistral_ocr_opus}.json"
 puts "OCR MD      : #{OUTPUT_DIR}/<subject_id>/mistral_ocr_{subject,correction}.md"
 puts "\nPour lancer le juge :"
 puts "  bin/rails runner evals/extraction/judge.rb <subject_id> --mode pairwise"
