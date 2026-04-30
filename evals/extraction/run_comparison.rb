@@ -10,6 +10,7 @@
 #   mistral               : Mistral OCR -> Markdown  -> Mistral Large 2512
 #   mistral_ocr_opus      : Mistral OCR -> Markdown  -> Claude Opus 4.7
 #   mistral_ocr_deepseek  : Mistral OCR -> Markdown  -> DeepSeek V4 Pro (OpenRouter)
+#   mistral_ocr_kimi      : Mistral OCR -> Markdown  -> Kimi K2.6 (OpenRouter)
 #
 # Arreter Sidekiq avant : docker stop <sidekiq-container>
 # Output  : tmp/llm_comparison/extraction/results/<subject_id>/
@@ -40,6 +41,11 @@ MODELS = {
     label:    "DeepSeek V4 Pro (Mistral OCR)",
     provider: :openrouter_ocr,
     model_id: "deepseek/deepseek-v4-pro"
+  },
+  mistral_ocr_kimi: {
+    label:    "Kimi K2.6 (Mistral OCR)",
+    provider: :openrouter_ocr,
+    model_id: "moonshotai/kimi-k2.6"
   }
 }.freeze
 
@@ -212,8 +218,13 @@ def call_openrouter_chat(system_prompt, user_content, api_key, model_id)
   usage = response.body["usage"] || {}
   tokens_in  = usage["prompt_tokens"].to_i
   tokens_out = usage["completion_tokens"].to_i
-  # DeepSeek V4 Pro via OpenRouter : $0.435/M input, $0.87/M output
-  cost = (tokens_in * 0.435 + tokens_out * 0.87) / 1_000_000.0
+  # Pricing per model ($/M tokens)
+  price_in, price_out = case model_id
+                        when /kimi/    then [0.74, 3.49]
+                        when /deepseek/ then [0.435, 0.87]
+                        else [1.0, 3.0]
+                        end
+  cost = (tokens_in * price_in + tokens_out * price_out) / 1_000_000.0
 
   {
     text:       response.body.dig("choices", 0, "message", "content"),
