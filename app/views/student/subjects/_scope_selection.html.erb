@@ -1,63 +1,97 @@
-<%# Scope selection cards for new-format subjects %>
-<div class="mb-8">
-  <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">Choisissez votre perimetre de travail</h2>
-  <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
-    Selectionnez la partie du sujet sur laquelle vous souhaitez travailler.
-  </p>
+<div data-controller="scope-selector">
+  <%= render "student/subjects/stripes" %>
+  <%= render "student/subjects/subject_header",
+        back_path: student_root_path(access_code: access_code),
+        suptitle: "#{subject.exam_type&.upcase} · #{subject.specialty&.upcase}",
+        title: subject.title %>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <%# Partie commune %>
-    <%= button_to student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
-        method: :patch,
-        params: { part_filter: "common_only" },
-        class: "text-left bg-white dark:bg-slate-800 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-5 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all cursor-pointer group" do %>
-      <div class="text-blue-600 dark:text-blue-400 text-2xl mb-2">📘</div>
-      <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-        Partie commune
-      </h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
-        Questions communes a toutes les specialites.
-      </p>
-      <div class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
-        <span class="font-medium text-blue-600 dark:text-blue-400">12 points</span>
-        <span>2h30</span>
-      </div>
-    <% end %>
+  <div class="px-5 pb-5">
+    <p class="font-serif text-xl text-rad-text mb-1">
+      Quel périmètre veux-tu réviser<span class="text-rad-red">?</span>
+    </p>
+    <p class="text-sm text-rad-muted leading-relaxed">
+      Ce sujet comporte une partie commune (TC) et une partie spécifique <%= subject.specialty&.upcase %>.
+    </p>
+  </div>
 
-    <%# Partie specifique %>
-    <%= button_to student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
-        method: :patch,
-        params: { part_filter: "specific_only" },
-        class: "text-left bg-white dark:bg-slate-800 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-5 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-md transition-all cursor-pointer group" do %>
-      <div class="text-amber-600 dark:text-amber-400 text-2xl mb-2">📙</div>
-      <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400">
-        Partie specifique <%= subject.specialty&.upcase %>
-      </h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
-        Questions specifiques a votre specialite.
-      </p>
-      <div class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
-        <span class="font-medium text-amber-600 dark:text-amber-400">8 points</span>
-        <span>1h30</span>
+  <div class="px-4 flex flex-col gap-2.5">
+    <%# Option : TC + Spécifique (full) %>
+    <button type="button"
+            data-scope-selector-target="option"
+            data-value="full"
+            data-action="click->scope-selector#select"
+            data-selected="true"
+            class="group text-left w-full px-[18px] py-4 rounded-[18px] bg-rad-paper border-2 border-rad-red relative overflow-hidden transition-all
+                   data-[selected=false]:border data-[selected=false]:border-rad-rule">
+      <span class="absolute left-0 top-0 bottom-0 w-[5px] bg-rad-red group-data-[selected=false]:hidden"></span>
+      <div class="flex items-center justify-between gap-2.5">
+        <div>
+          <span class="font-serif text-base block mb-1">TC + Spécifique <%= subject.specialty&.upcase %></span>
+          <span class="text-xs text-rad-muted">Toutes les parties · 20 pts · 4h</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-serif text-2xl text-rad-red leading-none block">20</span>
+          <span class="text-[10px] text-rad-muted uppercase tracking-wider">pts</span>
+        </div>
       </div>
-    <% end %>
+    </button>
 
-    <%# Sujet complet %>
-    <%= button_to student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
-        method: :patch,
-        params: { part_filter: "full" },
-        class: "text-left bg-white dark:bg-slate-800 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-5 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-md transition-all cursor-pointer group" do %>
-      <div class="text-emerald-600 dark:text-emerald-400 text-2xl mb-2">📗</div>
-      <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
-        Sujet complet
-      </h3>
-      <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
-        Toutes les parties du sujet, commune et specifique.
-      </p>
-      <div class="flex items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
-        <span class="font-medium text-emerald-600 dark:text-emerald-400">20 points</span>
-        <span>4h</span>
+    <%# Option : Tronc commun seul %>
+    <button type="button"
+            data-scope-selector-target="option"
+            data-value="common_only"
+            data-action="click->scope-selector#select"
+            data-selected="false"
+            class="group text-left w-full px-[18px] py-4 rounded-[18px] bg-rad-paper border border-rad-rule relative overflow-hidden transition-all
+                   data-[selected=true]:border-2 data-[selected=true]:border-rad-teal">
+      <span class="absolute left-0 top-0 bottom-0 w-[5px] bg-rad-teal hidden group-data-[selected=true]:block"></span>
+      <div class="flex items-center justify-between gap-2.5">
+        <div>
+          <span class="font-serif text-base block mb-1">Tronc commun seul</span>
+          <span class="text-xs text-rad-muted">Parties communes · 12 pts · 2h30</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-serif text-2xl text-rad-teal leading-none block">12</span>
+          <span class="text-[10px] text-rad-muted uppercase tracking-wider">pts</span>
+        </div>
       </div>
-    <% end %>
+    </button>
+
+    <%# Option : Spécifique seul %>
+    <button type="button"
+            data-scope-selector-target="option"
+            data-value="specific_only"
+            data-action="click->scope-selector#select"
+            data-selected="false"
+            class="group text-left w-full px-[18px] py-4 rounded-[18px] bg-rad-paper border border-rad-rule relative overflow-hidden transition-all
+                   data-[selected=true]:border-2 data-[selected=true]:border-rad-yellow">
+      <span class="absolute left-0 top-0 bottom-0 w-[5px] bg-rad-yellow hidden group-data-[selected=true]:block"></span>
+      <div class="flex items-center justify-between gap-2.5">
+        <div>
+          <span class="font-serif text-base block mb-1">Spécifique <%= subject.specialty&.upcase %> seul</span>
+          <span class="text-xs text-rad-muted">Partie spécifique · 8 pts · 1h30</span>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <span class="font-serif text-2xl text-rad-yellow leading-none block">8</span>
+          <span class="text-[10px] text-rad-muted uppercase tracking-wider">pts</span>
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <%# Hidden form — submitted by the Commencer button %>
+  <%= form_with url: student_subject_scope_selection_path(access_code: access_code, subject_id: subject.id),
+                method: :patch,
+                data: { scope_selector_target: "form" } do |f| %>
+    <%= f.hidden_field :part_filter, value: "full", data: { scope_selector_target: "input" } %>
+  <% end %>
+
+  <%# Sticky CTA %>
+  <div class="sticky bottom-0 px-4 pb-8 pt-3 bg-rad-bg border-t border-rad-rule">
+    <button type="button"
+            data-action="click->scope-selector#submit"
+            class="w-full py-3.5 rounded-[14px] bg-rad-red text-rad-cream text-[13.5px] font-bold border-0 cursor-pointer">
+      Commencer →
+    </button>
   </div>
 </div>
