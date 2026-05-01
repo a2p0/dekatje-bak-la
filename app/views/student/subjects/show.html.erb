@@ -1,48 +1,20 @@
-<div class="max-w-3xl mx-auto px-4 py-8">
-  <%# Breadcrumb %>
-  <div class="mb-4">
-    <%= render(BreadcrumbComponent.new(items: [
-      { label: "Mes sujets", href: student_root_path(access_code: params[:access_code]) },
-      { label: @subject.title }
-    ])) %>
-  </div>
-
-  <%# Subject title %>
-  <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-3"><%= @subject.title %></h1>
-  <div class="flex flex-wrap gap-1.5 mb-6">
-    <%= render(BadgeComponent.new(color: :indigo, label: @subject.specialty&.upcase || "—")) %>
-    <%= render(BadgeComponent.new(color: :emerald, label: @subject.year.to_s)) %>
-    <% if @subject.region.present? %>
-      <%= render(BadgeComponent.new(color: :slate, label: @subject.region)) %>
-    <% end %>
-    <% if @tc_only %>
-      <%= render(BadgeComponent.new(color: :amber, label: "partie commune uniquement")) %>
-    <% end %>
-  </div>
-
-  <% if @tc_only %>
-    <div class="mb-6 flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-4 py-3">
-      <span class="text-amber-500 shrink-0 mt-0.5">ℹ</span>
-      <p class="text-sm text-amber-700 dark:text-amber-300">
-        Ce sujet ne propose pas de partie spécifique pour votre spécialité (<%= @classroom.specialty %>).
-        Seule la partie commune est accessible.
-      </p>
-    </div>
-  <% end %>
-
+<div class="bg-rad-bg min-h-screen text-rad-text">
   <% if @session_record.requires_scope_selection? && !@session_record.scope_selected? %>
-    <%# === SCOPE SELECTION SCREEN === %>
+    <%# === SCOPE SELECTION === %>
     <%= render "student/subjects/scope_selection",
         subject: @subject,
         session_record: @session_record,
         access_code: params[:access_code] %>
 
   <% elsif @show_completion %>
-    <%# === COMPLETION PAGE "BRAVO !!" === %>
-    <%= render "student/subjects/completion", access_code: params[:access_code] %>
+    <%# === COMPLETION === %>
+    <%= render "student/subjects/completion",
+        access_code: params[:access_code],
+        subject: @subject,
+        session_record: @session_record %>
 
   <% elsif @unanswered_questions %>
-    <%# === UNANSWERED QUESTIONS PAGE === %>
+    <%# === UNANSWERED QUESTIONS === %>
     <%= render "student/subjects/unanswered_questions",
         unanswered_questions: @unanswered_questions,
         subject: @subject,
@@ -58,112 +30,128 @@
         access_code: params[:access_code] %>
 
   <% else %>
-    <%# === MISE EN SITUATION + PARTS OVERVIEW (standard flow) === %>
+    <%# === PARTS LIST (standard flow + relecture) === %>
+    <%= render "student/subjects/stripes" %>
+    <%= render "student/subjects/subject_header",
+          back_path: student_root_path(access_code: params[:access_code]),
+          suptitle: [@subject.exam_type&.upcase, @subject.specialty&.upcase].compact.join(" · "),
+          title: @subject.title %>
 
-    <%# Tutor status indicator (always shown for autonomous students) %>
+    <%# Global progress bar %>
+    <%
+      all_questions = @parts.flat_map { |p| p.questions.kept.to_a }
+      total_q  = all_questions.size
+      answered_q = all_questions.count { |q| @session_record.answered?(q.id) }
+    %>
+    <div class="px-5 pb-4">
+      <div class="flex justify-between mb-1.5">
+        <span class="text-[11px] font-bold tracking-[0.1em] uppercase text-rad-muted">Progression</span>
+        <span class="text-[11px] font-semibold text-rad-muted"><%= answered_q %> / <%= total_q %></span>
+      </div>
+      <div class="h-[5px] rounded-full bg-rad-rule overflow-hidden">
+        <div class="h-full bg-rad-teal rounded-full transition-all"
+             style="width: <%= total_q > 0 ? (answered_q * 100 / total_q) : 0 %>%"></div>
+      </div>
+    </div>
+
+    <%# Tutor banner (autonomous students only) %>
     <% if @session_record.autonomous? %>
       <%= render "student/tutor/tutor_banner",
                  tutor_status: @tutor_status,
                  access_code: params[:access_code] %>
     <% end %>
 
-    <%# Scope change link (for new-format subjects with scope already selected) %>
-    <% if @session_record.requires_scope_selection? && @session_record.scope_selected? %>
-      <div class="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
-        <div class="text-sm text-indigo-700 dark:text-indigo-300">
-          <span class="font-medium">Perimetre :</span>
-          <%= scope_label(@session_record, @subject) %>
-        </div>
-        <button type="button"
-                class="text-xs text-indigo-600 dark:text-indigo-400 underline underline-offset-2 hover:text-indigo-800 dark:hover:text-indigo-200 cursor-pointer"
-                aria-expanded="false"
-                aria-controls="scope-selector"
-                onclick="var el = document.getElementById('scope-selector'); el.classList.toggle('hidden'); this.setAttribute('aria-expanded', !el.classList.contains('hidden'));">
-          Changer de perimetre
-        </button>
-      </div>
-      <div id="scope-selector" class="hidden mb-6">
-        <%= render "student/subjects/scope_selection",
-            subject: @subject,
-            session_record: @session_record,
-            access_code: params[:access_code] %>
-      </div>
-    <% end %>
-
-    <%# Relecture mode banner %>
+    <%# Relecture mode badge %>
     <% if @relecture_mode %>
-      <div class="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl px-4 py-3 mb-6">
-        <p class="text-sm text-emerald-700 dark:text-emerald-400 font-medium">Mode relecture — Naviguez librement dans les questions pour revoir les corrections.</p>
+      <div class="mx-5 mb-4 flex items-center gap-2">
+        <span class="text-[10.5px] font-bold tracking-[0.14em] uppercase px-2.5 py-1 rounded-full
+                     bg-rad-teal/10 text-rad-teal border border-rad-teal/30">
+          Mode relecture
+        </span>
+        <span class="text-xs text-rad-muted">Sujet complété</span>
+      </div>
+
+      <div class="mx-4 mb-4 px-[18px] py-3.5 rounded-[16px] bg-rad-paper border border-rad-rule flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-[12px] bg-rad-green flex items-center justify-center flex-shrink-0">
+          <span class="text-rad-cream text-xl">✓</span>
+        </div>
+        <div class="flex-1">
+          <div class="text-[13px] font-bold text-rad-text mb-0.5">
+            <%= @session_record.answered_count %> / <%= all_questions.size %> questions répondues
+          </div>
+          <div class="text-xs text-rad-muted">Toutes les parties terminées</div>
+        </div>
       </div>
     <% end %>
 
-    <%# Mise en situation — full text from PDF (only on first visit, not relecture) %>
-    <% unless @relecture_mode %>
-      <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-6 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
-        <h2 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">Mise en situation</h2>
-        <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line"><%= @subject.common_presentation %></div>
-      </div>
-    <% end %>
+    <%# Parts grouped by section_type %>
+    <%
+      common_parts_list   = common_parts(@parts)
+      specific_parts_list = specific_parts(@parts)
+      show_section_headers = common_parts_list.any? && specific_parts_list.any?
+    %>
+    <div class="px-4">
+      <% if show_section_headers && common_parts_list.any? %>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-[3px] h-3 bg-rad-teal rounded-sm"></span>
+          <span class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold">PARTIE COMMUNE · TC</span>
+        </div>
+      <% end %>
+      <% common_parts_list.each do |part| %>
+        <%= render "student/subjects/part_row", part: part, session_record: @session_record %>
+      <% end %>
 
-    <%# Parts overview with grouping %>
-    <div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
-      <h2 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">Parties du sujet</h2>
-
-      <% common_parts_list = common_parts(@parts) %>
-      <% specific_parts_list = specific_parts(@parts) %>
-      <% show_section_headers = common_parts_list.any? && specific_parts_list.any? %>
-
-      <div class="space-y-2">
-        <% if show_section_headers && common_parts_list.any? %>
-          <div class="pt-2 pb-1">
-            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Partie commune</span>
-          </div>
-        <% end %>
-
-        <% common_parts_list.each do |part| %>
-          <%= render "student/subjects/part_row", part: part, session_record: @session_record %>
-        <% end %>
-
-        <% if show_section_headers && specific_parts_list.any? %>
-          <div class="pt-4 pb-1">
-            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Partie specifique</span>
-          </div>
-        <% end %>
-
-        <% specific_parts_list.each do |part| %>
-          <%= render "student/subjects/part_row", part: part, session_record: @session_record %>
-        <% end %>
-      </div>
-    </div>
-
-    <%# Start / Continue button at the bottom %>
-    <div class="text-center">
-      <%
-        first_q = @first_question
-        incomplete_part = @parts&.find { |p| !@session_record.part_completed?(p.id) }
-        incomplete_part ||= @parts&.first
-        first_q ||= incomplete_part&.questions&.kept&.order(:position)&.first
-
-        # Route through subject#show if specific presentation needs to be shown
-        needs_specific_presentation = incomplete_part&.section_type == "specific" &&
-          @subject.specific_presentation.present? &&
-          !@session_record.specific_presentation_seen?
-      %>
-      <% if needs_specific_presentation %>
-        <%= render(ButtonComponent.new(
-          variant: :gradient,
-          size: :lg,
-          pill: true,
-          href: student_subject_path(access_code: params[:access_code], id: @subject.id, start: true)
-        )) { "Commencer" } %>
-      <% elsif first_q %>
-        <%= render(ButtonComponent.new(
-          variant: :gradient,
-          size: :lg,
-          pill: true,
-          href: student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: first_q.id)
-        )) { "Commencer" } %>
+      <% if show_section_headers && specific_parts_list.any? %>
+        <div class="flex items-center gap-2 mb-2 mt-4">
+          <span class="w-[3px] h-3 bg-rad-yellow rounded-sm"></span>
+          <span class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold">PARTIE SPÉCIFIQUE · <%= @subject.specialty&.upcase %></span>
+        </div>
+      <% end %>
+      <% specific_parts_list.each do |part| %>
+        <%= render "student/subjects/part_row", part: part, session_record: @session_record %>
       <% end %>
     </div>
+
+    <div class="h-20"></div>
+
+    <%# Sticky CTA %>
+    <% if @relecture_mode %>
+      <div class="sticky bottom-0 px-4 pb-8 pt-3 bg-rad-bg border-t border-rad-rule flex gap-2.5">
+        <%= link_to student_root_path(access_code: params[:access_code]),
+            class: "flex-1 py-3.5 rounded-[14px] border-[1.5px] border-rad-text bg-transparent text-rad-text text-[13px] font-bold text-center no-underline" do %>
+          Retour aux sujets
+        <% end %>
+        <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @first_question.id),
+            class: "flex-[1.5] py-3.5 rounded-[14px] bg-rad-raise text-rad-text text-[13px] font-bold text-center no-underline" do %>
+          Reprendre la lecture →
+        <% end %>
+      </div>
+    <% else %>
+      <%
+        active_part = @parts.find { |p| !@session_record.part_completed?(p.id) }
+      %>
+      <% if active_part %>
+        <div class="sticky bottom-0 px-4 pb-8 pt-3 bg-rad-bg border-t border-rad-rule flex gap-2.5">
+          <%
+            first_q = active_part.questions.kept.order(:position).first
+            needs_specific_presentation = active_part.section_type == "specific" &&
+              @subject.respond_to?(:specific_presentation) &&
+              @subject.specific_presentation.present? &&
+              !@session_record.specific_presentation_seen?
+            cta_path = if needs_specific_presentation
+              student_subject_path(access_code: params[:access_code], id: @subject.id, start: true)
+            elsif first_q
+              student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: first_q.id)
+            end
+          %>
+          <% if cta_path %>
+            <%= link_to cta_path,
+                class: "flex-[1.5] py-3.5 rounded-[14px] bg-rad-red text-rad-cream text-[13px] font-bold text-center no-underline" do %>
+              Continuer la partie <%= active_part.number %> →
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
   <% end %>
 </div>
