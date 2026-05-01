@@ -1,15 +1,72 @@
-<div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
-  <h2 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">Mise en situation — Partie specifique</h2>
-  <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line"><%= subject.specific_presentation %></div>
+<%= render "student/subjects/stripes" %>
+<%= render "student/subjects/subject_header",
+      back_path: student_subject_path(access_code: access_code, id: subject.id),
+      suptitle: "Partie spécifique · #{subject.specialty&.upcase}",
+      title: subject.title %>
+
+<%
+  specific_parts = subject.parts.where(section_type: :specific)
+  specific_pts   = specific_parts.joins(:questions).merge(Question.kept).sum("questions.points")
+  specific_q_cnt = specific_parts.joins(:questions).merge(Question.kept).count
+%>
+
+<%# Hero card teal with pattern madras %>
+<div class="mx-4 mt-3 rounded-[20px] overflow-hidden relative bg-rad-teal px-6 py-7">
+  <div class="pattern-madras absolute inset-0 opacity-15 pointer-events-none"></div>
+  <div class="relative">
+    <div class="text-[10.5px] font-bold tracking-[0.18em] uppercase text-white/70 mb-2.5">
+      Parties spécifiques · <%= subject.specialty&.upcase %>
+    </div>
+    <span class="font-serif text-2xl text-rad-cream leading-snug block">
+      <%= subject.specialty&.humanize %>
+    </span>
+    <div class="mt-4 flex gap-5">
+      <% [
+        [specific_pts.to_s,   "barème"],
+        [specific_q_cnt.to_s, "questions"],
+        ["1h30",              "estimé"]
+      ].each do |val, lbl| %>
+        <div class="text-center">
+          <div class="font-serif text-[22px] text-rad-cream leading-none"><%= val %></div>
+          <div class="text-[10px] text-white/65 uppercase tracking-[0.1em] mt-0.5"><%= lbl %></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>
 
-<div class="text-center">
+<%# Context block — yellow bar %>
+<% if subject.respond_to?(:specific_presentation) && subject.specific_presentation.present? %>
+  <div class="mx-4 mt-3.5 rounded-[16px] bg-rad-paper border border-rad-rule px-[18px] py-4 relative overflow-hidden">
+    <span class="absolute left-0 top-0 bottom-0 w-1 bg-rad-yellow"></span>
+    <div class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold mb-2">Contexte spécifique</div>
+    <p class="text-sm leading-relaxed text-rad-muted"><%= subject.specific_presentation %></p>
+  </div>
+<% end %>
+
+<%# DT tiles for the specific section %>
+<% specific_dts = subject.technical_documents.where(doc_type: "DT").order(:number) %>
+<% if specific_dts.any? %>
+  <div class="mx-4 mt-3 flex gap-2">
+    <% specific_dts.each do |dt| %>
+      <div class="flex-1 px-3 py-2.5 rounded-[12px] bg-rad-paper border border-dashed border-rad-rule text-center">
+        <span class="font-serif text-sm text-rad-yellow block">DT<%= dt.number %></span>
+        <span class="text-[10.5px] text-rad-muted">PDF</span>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Sticky bar %>
+<div class="sticky bottom-0 px-4 pb-8 pt-3 bg-rad-bg border-t border-rad-rule mt-6 flex gap-2.5">
+  <%= link_to student_subject_path(access_code: access_code, id: subject.id),
+      class: "flex-1 py-3.5 rounded-[14px] border-[1.5px] border-rad-text bg-transparent text-rad-text text-[13px] font-bold text-center no-underline" do %>
+    ← Parties
+  <% end %>
   <% if first_question %>
-    <%= render(ButtonComponent.new(
-      variant: :gradient,
-      size: :lg,
-      pill: true,
-      href: student_question_path(access_code: access_code, subject_id: subject.id, id: first_question.id, mark_specific_seen: true)
-    )) { "Commencer" } %>
+    <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: first_question.id, mark_specific_seen: true),
+        class: "flex-[1.5] py-3.5 rounded-[14px] bg-rad-red text-rad-cream text-[13px] font-bold text-center no-underline" do %>
+      Commencer →
+    <% end %>
   <% end %>
 </div>
