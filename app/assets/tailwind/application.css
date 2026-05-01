@@ -1,44 +1,84 @@
 @import "tailwindcss";
 
-/* Self-hosted Plus Jakarta Sans font */
+/* Self-hosted fonts */
 @import "../fonts/plus-jakarta-sans.css";
+@import "../fonts/fraunces.css";
+@import "../fonts/inter.css";
+@import "../fonts/jetbrains-mono.css";
 
 /* Dark mode via class strategy (toggle .dark on <html>) */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Design tokens */
 @theme {
-  /* Font */
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* Fonts */
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-serif:   'Fraunces', serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --font-teacher: 'Plus Jakarta Sans', system-ui, sans-serif;
 
-  /* Brand gradients */
-  --color-primary-gradient-from: #6366f1;
-  --color-primary-gradient-to: #8b5cf6;
-
-  /* Glow shadows */
-  --shadow-glow-indigo: 0 0 16px rgba(99, 102, 241, 0.3);
-  --shadow-glow-indigo-sm: 0 0 8px rgba(99, 102, 241, 0.1);
-  --shadow-glow-emerald: 0 0 12px rgba(16, 185, 129, 0.2);
+  /* Radical palette — light (default) */
+  --color-rad-bg:     #fbf7ee;
+  --color-rad-paper:  #ffffff;
+  --color-rad-raise:  #fdfaf3;
+  --color-rad-text:   #0e1b1f;
+  --color-rad-muted:  #6b665a;
+  --color-rad-rule:   #e6dcc1;
+  --color-rad-red:    #d4452e;
+  --color-rad-yellow: #e8b53f;
+  --color-rad-teal:   #127566;
+  --color-rad-green:  #2e8b3a;
+  --color-rad-ink:    #0e1b1f;
+  --color-rad-cream:  #fbf7ee;
 
   /* Border radius */
-  --radius-card: 1rem;
+  --radius-card:   1rem;
   --radius-button: 0.75rem;
-  --radius-input: 0.75rem;
-  --radius-pill: 9999px;
+  --radius-input:  0.75rem;
+  --radius-pill:   9999px;
 
-  /* Z-index scale — drawers/modals must be ABOVE their backdrops */
-  --z-bottom-bar: 30;
-  --z-backdrop: 40;
-  --z-sidebar: 50;
+  /* Z-index scale */
+  --z-bottom-bar:  30;
+  --z-backdrop:    40;
+  --z-sidebar:     50;
   --z-chat-drawer: 50;
-  --z-modal: 60;
+  --z-modal:       60;
 
   /* Transitions */
-  --transition-fast: 150ms ease;
+  --transition-fast:   150ms ease;
   --transition-normal: 300ms ease;
 }
 
-/* Reduced motion: disable transitions and glow for users who request it */
+/* Radical palette — dark overrides */
+.dark {
+  --color-rad-bg:     #0f2f33;
+  --color-rad-paper:  #143b40;
+  --color-rad-raise:  #1a4a50;
+  --color-rad-text:   #f5ecdc;
+  --color-rad-muted:  #a8c2c5;
+  --color-rad-rule:   #22585e;
+  --color-rad-red:    #e85a44;
+  --color-rad-yellow: #f0c25e;
+  --color-rad-teal:   #5fc5b8;
+  --color-rad-green:  #7bc77a;
+  --color-rad-ink:    #f5ecdc;
+  /* rad-cream reste #fbf7ee en dark */
+}
+
+/* Madras-inspired subtle grid pattern (used on hero cards) */
+.pattern-madras {
+  background-image:
+    repeating-linear-gradient(0deg,   rgba(0,0,0,0.05) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg,  rgba(0,0,0,0.05) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(0deg,   rgba(0,0,0,0.04) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(90deg,  rgba(0,0,0,0.04) 0 1px, transparent 1px 7px);
+}
+
+/* Hide scrollbars while keeping scroll functionality */
+.scroll-hide::-webkit-scrollbar { display: none; }
+.scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition-duration: 0.01ms !important;

@@ -22,9 +22,24 @@ class BuildExtractionPrompt
       Si aucune mise en situation spécifique n'est identifiable, utiliser une chaîne vide "".
     - label : l'énoncé complet de chaque question
     - context : tout texte introductif, tableau, données chiffrées ou informations qui précèdent la question
-      dans le sujet (entre la question précédente et la question courante). Si aucun texte ne précède
-      la question, utiliser une chaîne vide "".
+      dans le sujet (entre la question précédente et la question courante). Le context peut contenir
+      plusieurs paragraphes — recopie-les tous VERBATIM dans leur intégralité.
+      Si aucun texte ne précède la question, utiliser une chaîne vide "".
     - correction : la réponse officielle extraite du corrigé
+    - objective : l'objectif pédagogique de la partie, s'il est EXPLICITEMENT mentionné dans le sujet
+      (ex : "Objectif : ...", "But : ...", phrase introductive de la partie clairement identifiée comme objectif).
+      RÈGLE STRICTE : si aucun objectif n'est explicitement formulé dans le sujet, laisser une chaîne vide "".
+      Ne JAMAIS générer ou reformuler un objectif qui ne figure pas textuellement dans le sujet.
+
+    ## Formules mathématiques et grandeurs physiques
+
+    RÈGLE ABSOLUE : toutes les formules, équations, grandeurs physiques et symboles mathématiques
+    doivent être écrits en LaTeX.
+    - Formules inline : $F = m \cdot a$
+    - Formules en bloc : $$R = \frac{e}{\lambda}$$
+    - Symboles isolés : $\lambda$, $\eta$, $\Delta T$, $\Omega$
+    - Unités avec exposants : $\text{kg/m}^3$, $\text{m}^2\text{·K/W}$
+    Cette règle s'applique à TOUS les champs : label, context, correction, explanation, data_hints.
 
     ## Conventions de nommage des documents
 
@@ -206,8 +221,8 @@ class BuildExtractionPrompt
               "answer_type": "calcul",
               "dt_references": [],
               "dr_references": ["DR1"],
-              "correction": "Volume bois = 0,120 × 12 = 1,44 m³, masse = 1,44 × 430 = 619 kg. Volume acier = 0,008 × 12 = 0,096 m³, masse = 0,096 × 7 850 = 754 kg. Volume béton = 0,160 × 12 = 1,92 m³, masse = 1,92 × 2 500 = 4 800 kg.",
-              "explanation": "Il faut convertir les sections de mm² en m² (diviser par 1 000 000), puis multiplier par la longueur de 12 m pour obtenir le volume. La masse s'obtient en multipliant le volume par la masse volumique donnée dans le DR1. Les masses volumiques sont : bois = 430 kg/m³, acier = 7 850 kg/m³, béton = 2 500 kg/m³.",
+              "correction": "Volume bois $= 0{,}120 \\times 12 = 1{,}44 \\text{ m}^3$, masse $= 1{,}44 \\times 430 = 619 \\text{ kg}$. Volume acier $= 0{,}008 \\times 12 = 0{,}096 \\text{ m}^3$, masse $= 0{,}096 \\times 7850 = 754 \\text{ kg}$. Volume béton $= 0{,}160 \\times 12 = 1{,}92 \\text{ m}^3$, masse $= 1{,}92 \\times 2500 = 4800 \\text{ kg}$.",
+              "explanation": "Il faut convertir les sections de $\\text{mm}^2$ en $\\text{m}^2$ (diviser par $10^6$), puis multiplier par la longueur de $12 \\text{ m}$ pour obtenir le volume. La masse s'obtient en multipliant le volume par la masse volumique donnée dans le DR1. Les masses volumiques sont : bois $= 430 \\text{ kg/m}^3$, acier $= 7850 \\text{ kg/m}^3$, béton $= 2500 \\text{ kg/m}^3$.",
               "data_hints": [
                 {"source": "question_context", "location": "sections des poteaux et longueur de 12 m"},
                 {"source": "DR1", "location": "tableau des caractéristiques, colonne Masse volumique"}
@@ -231,8 +246,8 @@ class BuildExtractionPrompt
               "answer_type": "calcul",
               "dt_references": ["DTS1"],
               "dr_references": ["DRS1"],
-              "correction": "R = e / λ pour chaque couche. Béton : R = 0,20 / 1,75 = 0,114 m²·K/W. Laine de roche : R = 0,18 / 0,038 = 4,74 m²·K/W...",
-              "explanation": "La résistance thermique se calcule avec la formule R = e / λ (épaisseur divisée par conductivité thermique). Les valeurs d'épaisseur et de conductivité sont dans le DTS1, tableau de composition de la paroi. Les résultats sont à reporter dans le DRS1.",
+              "correction": "$R = \\frac{e}{\\lambda}$ pour chaque couche. Béton : $R = \\frac{0{,}20}{1{,}75} = 0{,}114 \\text{ m}^2\\text{·K/W}$. Laine de roche : $R = \\frac{0{,}18}{0{,}038} = 4{,}74 \\text{ m}^2\\text{·K/W}$...",
+              "explanation": "La résistance thermique se calcule avec la formule $R = \\frac{e}{\\lambda}$ (épaisseur divisée par conductivité thermique). Les valeurs d'épaisseur et de conductivité sont dans le DTS1, tableau de composition de la paroi. Les résultats sont à reporter dans le DRS1.",
               "data_hints": [
                 {"source": "DTS1", "location": "tableau de composition de la paroi, colonnes Épaisseur et Conductivité thermique"},
                 {"source": "DRS1", "location": "tableau de calcul à compléter"}
