@@ -72,6 +72,15 @@ RSpec.describe "Student::Questions", type: :request do
   # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).
   # See spec/requests/student/questions/corrections_spec.rb
 
+  describe "correction button styling" do
+    it "uses outlined rad-text style for correction button" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("border-rad-text")
+      expect(response.body).to include("Voir la correction")
+      expect(response.body).not_to include("from-indigo-500 to-violet-500 text-white border-0 rounded-xl")
+    end
+  end
+
   describe "GET /subjects/:subject_id/questions/:id — tutor button (T200)" do
     def get_show
       get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
