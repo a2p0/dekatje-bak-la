@@ -81,6 +81,29 @@ RSpec.describe "Student::Questions", type: :request do
     end
   end
 
+  describe "correction display (Radical)" do
+    before do
+      ss = student.student_sessions.find_or_create_by!(subject: subject_obj) do |s|
+        s.mode = :autonomous; s.started_at = Time.current; s.last_activity_at = Time.current
+      end
+      ss.mark_answered!(question.id)
+      ss.save!
+    end
+
+    it "renders correction with Radical green card" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-green")
+      expect(response.body).to include("pattern-madras")
+    end
+
+    it "renders data hints with yellow accent" do
+      answer.update!(data_hints: [{ "source" => "DT1", "location" => "tableau", "value" => "30,5 L" }])
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-yellow")
+      expect(response.body).to include("Où trouver les données")
+    end
+  end
+
   describe "GET /subjects/:subject_id/questions/:id — tutor button (T200)" do
     def get_show
       get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
