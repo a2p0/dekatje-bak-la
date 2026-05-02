@@ -173,11 +173,11 @@
     <% end %>
 
     <%# Desktop navigation (hidden on mobile — bottom bar handles it) %>
-    <div class="hidden lg:flex justify-between items-center pt-4 border-t border-slate-200 dark:border-indigo-500/10 mt-2">
+    <div class="hidden lg:flex justify-between items-center pt-4 border-t border-rad-rule mt-2">
       <% if prev_q %>
         <%= link_to "← Q#{prev_q.number}",
             prev_href,
-            class: "text-indigo-600 dark:text-indigo-400 text-sm no-underline hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors" %>
+            class: "text-rad-teal text-sm no-underline hover:opacity-75 transition-opacity" %>
       <% else %>
         <span></span>
       <% end %>
@@ -185,31 +185,29 @@
       <% if next_href && next_q %>
         <%= link_to "Question suivante →",
             next_href,
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold no-underline hover:opacity-90 transition-opacity" %>
       <% elsif params[:from] == "review" %>
         <%= link_to "Question suivante →",
             next_href,
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold no-underline hover:opacity-90 transition-opacity" %>
       <% elsif next_part_in_section && next_part_first_question %>
-        <%# Last question of an intermediate part → go to first question of next part in same section %>
         <%= link_to end_of_part_label,
             student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_part_first_question.id),
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold no-underline hover:opacity-90 transition-opacity" %>
       <% else %>
-        <%# Last question of the last part in its section → mark part done and route to other section %>
         <%= button_to end_of_part_label,
             student_subject_part_completion_path(access_code: params[:access_code], subject_id: @subject.id, part_id: @part.id),
             method: :post,
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold border-0 cursor-pointer hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold border-0 cursor-pointer hover:opacity-90 transition-opacity" %>
       <% end %>
     </div>
   </div>
 
   <%# Mobile bottom bar (hidden on lg+) %>
-  <div class="lg:hidden fixed bottom-0 left-0 right-0 z-[var(--z-bottom-bar)] bg-white/95 dark:bg-slate-900/95 border-t border-slate-200 dark:border-indigo-500/15 backdrop-blur-sm px-4 py-3 flex items-center gap-3">
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 z-[var(--z-bottom-bar)] bg-rad-bg border-t border-rad-rule px-4 py-3 flex items-center gap-3">
     <% if prev_q %>
       <%= link_to prev_href,
-          class: "flex-1 min-w-0 text-left text-sm text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 truncate no-underline" do %>
+          class: "flex-1 min-w-0 text-left text-sm text-rad-muted hover:text-rad-text truncate no-underline" do %>
         &larr; Q<%= prev_q.number %>
       <% end %>
     <% else %>
@@ -227,23 +225,24 @@
               aria-label="Ouvrir le tutorat IA"
               aria-expanded="false"
               aria-controls="tutor-chat-drawer"
-              class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(99,102,241,0.3)]">
-        💬 Tutorat
+              class="flex-shrink-0 inline-flex items-center gap-1.5 pl-2 pr-3 py-1.5 bg-rad-ink text-rad-cream border-0 rounded-full text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)]">
+        <span class="w-5 h-5 rounded-full bg-rad-red text-rad-cream flex items-center justify-center font-serif italic text-[11px] flex-shrink-0">T</span>
+        Tibo
       </button>
     <% else %>
       <%= link_to "Activer le tuteur",
           student_settings_path(access_code: params[:access_code]),
-          class: "flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors no-underline" %>
+          class: "flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-rad-paper text-rad-muted border border-rad-rule rounded-full text-xs font-medium whitespace-nowrap hover:bg-rad-raise transition-colors no-underline" %>
     <% end %>
 
     <% if next_href %>
       <%= link_to next_href,
-          class: "flex-1 min-w-0 text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate no-underline" do %>
+          class: "flex-1 min-w-0 text-right text-sm font-bold text-rad-red truncate no-underline" do %>
         <%= next_q ? "Q#{next_q.number}" : (params[:from] == 'review' ? "Retour" : "Suivante") %> &rarr;
       <% end %>
     <% elsif next_part_in_section && next_part_first_question %>
       <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_part_first_question.id),
-          class: "flex-1 min-w-0 text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate no-underline" do %>
+          class: "flex-1 min-w-0 text-right text-sm font-bold text-rad-red truncate no-underline" do %>
         <%= end_of_part_mobile_label %>
       <% end %>
     <% else %>
@@ -251,7 +250,7 @@
         <%= button_to end_of_part_mobile_label,
             student_subject_part_completion_path(access_code: params[:access_code], subject_id: @subject.id, part_id: @part.id),
             method: :post,
-            class: "text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate border-0 bg-transparent cursor-pointer p-0" %>
+            class: "text-sm font-bold text-rad-red truncate border-0 bg-transparent cursor-pointer p-0" %>
       </div>
     <% end %>
   </div>

@@ -57,6 +57,16 @@ RSpec.describe "Student::Questions", type: :request do
       expect(response.body).to include("bg-rad-red")
       expect(response.body).to include("bg-rad-paper")
     end
+
+    context "navigation styling" do
+      let!(:q2) { create(:question, part: part, position: 2) }
+
+      it "uses rad-red for next question button" do
+        get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+        expect(response.body).to include("bg-rad-red")
+        expect(response.body).to include("Question suivante")
+      end
+    end
   end
 
   # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).
@@ -71,7 +81,7 @@ RSpec.describe "Student::Questions", type: :request do
       it "shows 'Activer le tuteur' link instead of Tutorat button" do
         get_show
         expect(response.body).to include("Activer le tuteur")
-        expect(response.body).not_to include("💬 Tutorat")
+        expect(response.body).not_to include("Tibo")
       end
 
       it "links to the settings page" do
@@ -85,7 +95,7 @@ RSpec.describe "Student::Questions", type: :request do
 
       it "shows the Tutorat button" do
         get_show
-        expect(response.body).to include("💬 Tutorat")
+        expect(response.body).to include("Tibo")
         expect(response.body).not_to include("Activer le tuteur")
       end
     end
@@ -96,7 +106,7 @@ RSpec.describe "Student::Questions", type: :request do
 
       it "shows the Tutorat button" do
         get_show
-        expect(response.body).to include("💬 Tutorat")
+        expect(response.body).to include("Tibo")
         expect(response.body).not_to include("Activer le tuteur")
       end
     end
