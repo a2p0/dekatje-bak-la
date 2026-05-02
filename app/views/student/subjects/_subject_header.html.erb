@@ -1,0 +1,10 @@
+<div class="px-5 py-3.5 flex items-center justify-between">
+  <%= link_to back_path, class: "text-rad-text text-2xl leading-none no-underline" do %>‹<% end %>
+  <div class="text-center flex-1 px-2">
+    <% if suptitle.present? %>
+      <div class="text-[10.5px] tracking-[0.16em] uppercase text-rad-muted font-bold"><%= suptitle %></div>
+    <% end %>
+    <span class="font-serif text-sm italic text-rad-text leading-none"><%= title %></span>
+  </div>
+  <span class="text-rad-text text-lg leading-none">≡</span>
+</div>

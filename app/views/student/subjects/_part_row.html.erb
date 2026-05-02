@@ -1,17 +1,46 @@
-<div class="flex items-start justify-between py-3 border-b border-slate-100 dark:border-slate-700/50 last:border-0"
+<%
+  is_done   = session_record.part_completed?(part.id)
+  total_q   = part.questions.kept.size
+  answered  = part.questions.kept.count { |q| session_record.answered?(q.id) }
+  is_active = !is_done && answered > 0
+  pct       = total_q > 0 ? (answered * 100 / total_q) : 0
+  section_color = part.section_type == "specific" ? "bg-rad-yellow" : "bg-rad-teal"
+  accent_color  = is_done ? "bg-rad-green" : is_active ? "bg-rad-red" : section_color
+  border_class  = is_active ? "border-2 border-rad-red" : "border border-rad-rule"
+%>
+<div class="relative overflow-hidden rounded-[16px] bg-rad-paper <%= border_class %> px-4 py-3.5 mb-2"
      data-part-id="<%= part.id %>"
-     data-part-completed="<%= session_record.part_completed?(part.id) %>">
-  <div class="flex-1 min-w-0">
-    <div class="flex items-center gap-2 flex-wrap">
-      <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Partie <%= part.number %></span>
-      <span class="text-sm text-slate-600 dark:text-slate-400">— <%= part.title %></span>
-      <% if session_record.part_completed?(part.id) %>
-        <%= render(BadgeComponent.new(color: :emerald, label: "Terminé ✓")) %>
+     data-part-completed="<%= is_done %>">
+  <span class="absolute left-0 top-0 bottom-0 w-1 <%= accent_color %>"></span>
+  <div class="flex items-center gap-2.5">
+    <div class="w-[38px] h-[38px] rounded-[10px] flex-shrink-0 flex items-center justify-center
+                <%= is_done ? 'bg-rad-green' : is_active ? 'bg-rad-red' : 'bg-rad-raise' %>">
+      <% if is_done %>
+        <span class="text-rad-cream text-base">✓</span>
+      <% else %>
+        <span class="font-serif text-[15px] <%= is_active ? 'text-rad-cream' : 'text-rad-muted' %>">
+          <%= part.number %>
+        </span>
       <% end %>
     </div>
-    <% if part.objective_text.present? %>
-      <p class="text-xs text-slate-600 dark:text-slate-500 mt-1"><%= part.objective_text %></p>
+    <div class="flex-1 min-w-0">
+      <div class="text-[13.5px] font-semibold text-rad-text mb-0.5"><%= part.title %></div>
+      <% if part.objective_text.present? %>
+        <div class="text-[11.5px] text-rad-muted mb-0.5 truncate"><%= part.objective_text %></div>
+      <% end %>
+      <div class="text-[11.5px] text-rad-muted">
+        <%= answered %>/<%= total_q %> questions · <%= part.questions.kept.sum(:points) %> pts
+      </div>
+    </div>
+    <% if is_active %>
+      <span class="flex-shrink-0 text-[10.5px] font-bold px-2 py-1 rounded-full bg-rad-red text-rad-cream">
+        En cours
+      </span>
     <% end %>
   </div>
-  <span class="text-xs text-slate-600 dark:text-slate-500 whitespace-nowrap ml-3"><%= part.questions.kept.size %> questions</span>
+  <% if is_active && pct > 0 %>
+    <div class="mt-2.5 h-[3px] rounded-full bg-rad-rule overflow-hidden">
+      <div class="h-full bg-rad-red rounded-full" style="width: <%= pct %>%"></div>
+    </div>
+  <% end %>
 </div>

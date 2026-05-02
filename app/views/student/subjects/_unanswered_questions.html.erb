@@ -1,25 +1,58 @@
-<div class="bg-white/80 dark:bg-slate-900/60 border border-slate-200 dark:border-indigo-500/15 rounded-2xl p-6 mb-8 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
-  <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-1">Questions non repondues</h2>
-  <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Il vous reste <%= unanswered_questions.size %> question<%= unanswered_questions.size > 1 ? "s" : "" %> a revoir.</p>
+<%= render "student/subjects/stripes" %>
+<%= render "student/subjects/subject_header",
+      back_path: student_subject_path(access_code: access_code, id: subject.id),
+      suptitle: subject.exam&.upcase,
+      title: subject.title %>
 
-  <div class="space-y-2">
+<%# Yellow alert banner %>
+<div class="mx-4 mt-2 px-[18px] py-4 rounded-[16px] bg-rad-paper border-2 border-rad-yellow relative overflow-hidden">
+  <span class="absolute left-0 top-0 bottom-0 w-[5px] bg-rad-yellow"></span>
+  <div class="flex items-start gap-2.5">
+    <div class="w-[34px] h-[34px] rounded-full bg-rad-yellow flex items-center justify-center flex-shrink-0">
+      <span class="font-serif text-base text-rad-ink font-bold">!</span>
+    </div>
+    <div>
+      <div class="text-[14px] font-bold text-rad-text mb-1">Toutes les parties sont terminées</div>
+      <p class="text-[13px] text-rad-muted leading-relaxed m-0">
+        Il reste <strong class="text-rad-text"><%= unanswered_questions.size %> question<%= unanswered_questions.size > 1 ? "s" : "" %></strong>
+        (<%= unanswered_questions.sum(&:points) %> pts). Veux-tu les traiter avant de valider ?
+      </p>
+    </div>
+  </div>
+</div>
+
+<%# Skipped questions list %>
+<div class="px-4 mt-5">
+  <div class="text-[10.5px] tracking-[0.16em] uppercase text-rad-muted font-bold mb-2.5">Questions sautées</div>
+  <div class="flex flex-col gap-2">
     <% unanswered_questions.each do |question| %>
-      <div class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-700/50 last:border-0">
-        <div class="min-w-0">
-          <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Question <%= question.number %></span>
-          <span class="text-sm text-slate-600 dark:text-slate-400 ml-2">— <%= truncate(question.label, length: 80) %></span>
+      <div class="px-[18px] py-3.5 rounded-[16px] bg-rad-paper border border-rad-rule flex items-start gap-3">
+        <div class="w-11 h-11 rounded-[12px] bg-rad-yellow flex items-center justify-center flex-shrink-0">
+          <span class="font-serif text-sm text-rad-ink"><%= question.number %></span>
         </div>
-        <%= link_to "Revenir a cette question",
+        <div class="flex-1 min-w-0">
+          <div class="text-[11px] text-rad-muted mb-0.5">Partie <%= question.part.number %></div>
+          <p class="font-serif text-[14px] leading-snug text-rad-text m-0 mb-2"><%= truncate(question.label, length: 120) %></p>
+          <span class="text-[11px] font-bold px-2 py-1 rounded-[6px] bg-rad-raise border border-rad-rule text-rad-muted">
+            <%= question.points %> pts
+          </span>
+        </div>
+        <%= link_to "Répondre",
             student_question_path(access_code: access_code, subject_id: subject.id, id: question.id, from: "review"),
-            class: "text-xs text-indigo-600 dark:text-indigo-400 no-underline hover:text-indigo-700 dark:hover:text-indigo-300 whitespace-nowrap ml-3" %>
+            class: "flex-shrink-0 px-3 py-2 rounded-full border border-rad-text bg-transparent text-rad-text text-xs font-bold no-underline" %>
       </div>
     <% end %>
   </div>
 </div>
 
-<div class="text-center">
-  <%= button_to "Terminer le sujet",
+<%# Sticky bar %>
+<div class="sticky bottom-0 px-4 pb-8 pt-3 bg-rad-bg border-t border-rad-rule mt-4 flex gap-2.5">
+  <%= button_to "Ignorer et terminer",
       student_subject_completion_path(access_code: access_code, subject_id: subject.id),
       method: :post,
-      class: "inline-flex items-center px-8 py-3 bg-gradient-to-br from-indigo-500 to-violet-500 text-white rounded-full text-sm font-semibold border-0 cursor-pointer hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]" %>
+      class: "flex-1 py-3.5 rounded-[14px] border-[1.5px] border-rad-text bg-transparent text-rad-text text-[13px] font-bold cursor-pointer" %>
+  <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: unanswered_questions.first.id, from: "review"),
+      class: "flex-[1.5] py-3.5 rounded-[14px] bg-rad-red text-rad-cream text-[13px] font-bold text-center no-underline" do %>
+    Répondre aux <%= unanswered_questions.size %> questions →
+  <% end %>
 </div>

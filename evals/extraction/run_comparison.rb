@@ -203,7 +203,7 @@ def call_openrouter_chat(system_prompt, user_content, api_key, model_id)
       { role: "system", content: system_prompt },
       { role: "user",   content: user_content }
     ],
-    max_tokens: 32_768,
+    max_tokens: 65_536,
     temperature: 0.1
   }
   headers = {
