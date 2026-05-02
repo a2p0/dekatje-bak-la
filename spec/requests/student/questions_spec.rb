@@ -50,6 +50,13 @@ RSpec.describe "Student::Questions", type: :request do
       expect(response.body).to include(subject_obj.title)
       expect(response.body).to include("tracking-[0.16em]")
     end
+
+    it "renders question label in serif card" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("font-serif")
+      expect(response.body).to include("bg-rad-red")
+      expect(response.body).to include("bg-rad-paper")
+    end
   end
 
   # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).
