@@ -59,33 +59,38 @@
   <%# Main content %>
   <div class="flex-1 px-4 py-5 max-w-3xl mx-auto w-full">
 
-    <%# Breadcrumb %>
-    <div class="mb-3">
-      <%= render(BreadcrumbComponent.new(items: [
-        { label: "Mes sujets", href: student_root_path(access_code: params[:access_code]) },
-        { label: @subject.title, href: student_subject_path(access_code: params[:access_code], id: @subject.id) },
-        { label: "Partie #{@part.number}", href: student_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id) },
-        { label: "Q#{@question.number}" }
-      ])) %>
-    </div>
-
-    <%# Progress bar row %>
-    <div class="flex items-center gap-2.5 mb-4">
+    <%# Compact header: ← | exam label + subject title | ≡ %>
+    <div class="flex items-center justify-between mb-3">
+      <%= link_to student_subject_path(access_code: params[:access_code], id: @subject.id),
+          class: "text-rad-text text-xl leading-none no-underline flex-shrink-0 px-1" do %>
+        ‹
+      <% end %>
+      <div class="text-center flex-1 min-w-0 px-3">
+        <div class="text-[10.5px] tracking-[0.16em] uppercase text-rad-muted font-bold leading-none mb-1">
+          <%= [@subject.exam&.upcase, @subject.specialty&.upcase].compact.join(" · ") %>
+        </div>
+        <span class="font-serif italic text-[14px] text-rad-text leading-none block truncate"><%= @subject.title %></span>
+      </div>
       <button data-action="click->sidebar#open"
               data-sidebar-target="toggle"
               aria-label="Ouvrir le menu"
               aria-expanded="false"
               aria-controls="sidebar-drawer"
-              class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-800 border-0 rounded-lg text-slate-600 dark:text-slate-400 text-lg cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors lg:hidden">
-        ☰
+              class="lg:hidden flex-shrink-0 w-9 h-9 flex items-center justify-center bg-transparent border-0 text-rad-text text-xl cursor-pointer">
+        ≡
       </button>
-      <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">
-        Q<%= @question.number %> (<%= idx + 1 %>/<%= total %>)
-      </span>
-      <div class="flex-1">
-        <%= render(ProgressBarComponent.new(current: answered, total: total, color: :gradient)) %>
+      <div class="hidden lg:block w-9"></div><%# spacer for centering %>
+    </div>
+
+    <%# Segmented progress bar %>
+    <div class="flex items-center gap-2.5 mb-4">
+      <div class="flex flex-1 gap-[3px]">
+        <% total.times do |i| %>
+          <div class="flex-1 h-1 rounded-sm <%= i < answered ? 'bg-rad-teal' : i == answered ? 'bg-rad-red' : 'bg-rad-rule' %>"></div>
+        <% end %>
       </div>
-      <%# Tutorat button — larger on desktop with gradient %>
+      <span class="text-[11px] text-rad-muted font-semibold whitespace-nowrap"><%= idx + 1 %> / <%= total %></span>
+      <%# Tibo button — desktop %>
       <% if @tutor_available %>
         <button type="button"
                 data-controller="tutor-activator"
@@ -97,13 +102,14 @@
                 aria-label="Ouvrir le tutorat IA"
                 aria-expanded="false"
                 aria-controls="tutor-chat-drawer"
-                class="hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]">
-          💬 Tutorat
+                class="hidden lg:inline-flex items-center gap-2 pl-2 pr-4 py-1.5 bg-rad-ink text-rad-cream border-0 rounded-full text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_8px_20px_-8px_rgba(0,0,0,0.35)] transition-opacity hover:opacity-80">
+          <span class="w-6 h-6 rounded-full bg-rad-red text-rad-cream flex items-center justify-center font-serif italic text-[13px] flex-shrink-0">T</span>
+          Tibo
         </button>
       <% else %>
         <%= link_to "Activer le tuteur",
             student_settings_path(access_code: params[:access_code]),
-            class: "hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors no-underline" %>
+            class: "hidden lg:inline-flex items-center gap-2 px-3 py-1.5 bg-rad-paper text-rad-muted border border-rad-rule rounded-full text-xs font-medium whitespace-nowrap hover:bg-rad-raise transition-colors no-underline" %>
       <% end %>
     </div>
 
