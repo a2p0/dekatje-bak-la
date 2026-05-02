@@ -71,9 +71,9 @@ RSpec.describe "Student::Subjects", type: :request do
       get student_subject_path(access_code: classroom.access_code, id: subject_obj.id)
     end
 
-    it "affiche un seul bouton Commencer" do
+    it "affiche un seul bouton Continuer" do
       get_show
-      expect(response.body.scan("Commencer").size).to eq(1)
+      expect(response.body.scan("Continuer la partie").size).to eq(1)
     end
 
     it "pointe vers Q1 quand aucune question traitée" do
@@ -111,7 +111,7 @@ RSpec.describe "Student::Subjects", type: :request do
     context "when student has no API key and free mode is disabled" do
       it "shows unavailable indicator" do
         get_show
-        expect(response.body).to include("Tuteur indisponible")
+        expect(response.body).to include("Tibo indisponible")
       end
 
       it "shows a link to settings" do
@@ -125,7 +125,7 @@ RSpec.describe "Student::Subjects", type: :request do
 
       it "shows available indicator" do
         get_show
-        expect(response.body).to include("Tuteur disponible")
+        expect(response.body).to include("Tibo disponible")
       end
     end
 
@@ -137,7 +137,7 @@ RSpec.describe "Student::Subjects", type: :request do
 
       it "shows active indicator" do
         get_show
-        expect(response.body).to include("Tuteur actif")
+        expect(response.body).to include("Tibo actif")
       end
     end
 
@@ -146,7 +146,7 @@ RSpec.describe "Student::Subjects", type: :request do
 
       it "shows available indicator (not active without conversation)" do
         get_show
-        expect(response.body).to include("Tuteur disponible")
+        expect(response.body).to include("Tibo disponible")
       end
     end
 
