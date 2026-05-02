@@ -33,6 +33,17 @@ RSpec.describe "Student::Questions", type: :request do
       get student_question_path(access_code: classroom.access_code, subject_id: other_subject.id, id: other_q.id)
       expect(response).to redirect_to(student_root_path(access_code: classroom.access_code))
     end
+
+    it "uses Radical cream background" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-bg")
+    end
+
+    it "renders stripes" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-red")
+      expect(response.body).to include("bg-rad-yellow")
+    end
   end
 
   # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).

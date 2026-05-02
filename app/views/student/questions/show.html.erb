@@ -26,8 +26,10 @@
   end_of_part_mobile_label = next_part_in_section ? "Partie suivante →" : "Fin partie →"
 %>
 
+<%= render "student/subjects/stripes" %>
+
 <div data-controller="sidebar chat-drawer"
-     class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0">
+     class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0 bg-rad-bg">
 
   <%# Backdrop (mobile only) %>
   <div data-sidebar-target="backdrop"
@@ -35,13 +37,13 @@
        class="hidden fixed inset-0 bg-black/50 z-[var(--z-backdrop)] lg:hidden">
   </div>
 
-  <%# Sidebar / Drawer — stays dark in both modes %>
+  <%# Sidebar / Drawer — Radical light %>
   <aside id="sidebar-drawer"
          data-sidebar-target="drawer"
          data-controller="focus-trap"
          data-action="focus-trap:close->sidebar#close"
          aria-label="Navigation du sujet"
-         class="w-[260px] bg-slate-900 border-r border-indigo-500/10 flex-shrink-0 overflow-y-auto
+         class="w-[260px] bg-rad-paper border-r border-rad-rule flex-shrink-0 overflow-y-auto
                 fixed top-0 left-0 bottom-0 z-[var(--z-sidebar)] -translate-x-full transition-transform duration-200
                 lg:relative lg:translate-x-0 lg:z-auto">
     <%= render "student/questions/sidebar",
