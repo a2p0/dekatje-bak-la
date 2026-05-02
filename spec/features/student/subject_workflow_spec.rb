@@ -73,10 +73,11 @@ RSpec.describe "Student subject workflow", type: :feature do
     login_as_student(student, classroom)
   end
 
-  # Helper to select "Sujet complet" scope and land on subject page
+  # Helper to select "full" scope and land on subject page
   def select_full_scope
     visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-    click_button "Sujet complet"
+    # "full" is pre-selected by default — just submit
+    click_button "Commencer →"
   end
 
   # ---------- US1: Parts list with grouping + objectives ----------
@@ -86,7 +87,7 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
 
       expect(page).to have_content("PARTIE COMMUNE")
-      expect(page).to have_content("PARTIE SPECIFIQUE")
+      expect(page).to have_content("PARTIE SPÉCIFIQUE")
       expect(page).to have_content("Partie commune transport")
       expect(page).to have_content("Partie specifique SIN")
     end
@@ -102,12 +103,13 @@ RSpec.describe "Student subject workflow", type: :feature do
       select_full_scope
 
       # The button should exist and be after the parts
-      expect(page).to have_link("Commencer")
+      expect(page).to have_link("Continuer la partie 1 →")
     end
 
-    scenario "single scope (common_only) shows flat list without section headers" do
+    scenario "single scope (common_only) shows flat list without section headers", js: true do
       visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-      click_button "Partie commune"
+      find("[data-value='common_only']").click
+      click_button "Commencer →"
 
       expect(page).not_to have_content("PARTIE COMMUNE")
       expect(page).not_to have_content("PARTIE SPECIFIQUE")
@@ -120,7 +122,7 @@ RSpec.describe "Student subject workflow", type: :feature do
   describe "US2: Navigation with part transitions" do
     scenario "last question in the last common part shows 'Fin de la partie commune' button" do
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
 
       # Navigate to last common question
       click_link "Question suivante"
@@ -133,7 +135,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
     scenario "clicking 'Fin de la partie commune' marks part completed and routes to specific presentation" do
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
 
       # Go to last question
       click_link "Question suivante"
@@ -150,7 +152,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
     scenario "completed common part shows visual badge when returning to subject page" do
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
@@ -158,9 +160,9 @@ RSpec.describe "Student subject workflow", type: :feature do
       visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
 
       expect(page).to have_content("Partie commune transport")
-      expect(page).to have_content("Terminé")
+      expect(find("[data-part-id='#{common_part.id}']")["data-part-completed"]).to eq("true")
       specific_row = find("[data-part-id='#{specific_part.id}']")
-      expect(specific_row).not_to have_content("Terminé")
+      expect(specific_row["data-part-completed"]).to eq("false")
     end
   end
 
@@ -170,20 +172,20 @@ RSpec.describe "Student subject workflow", type: :feature do
     scenario "specific presentation shown when finishing common section" do
       # Complete common part first
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
       # Should see specific presentation directly after clicking Fin de la partie commune
       expect(page).to have_content("Presentation specifique SIN.")
-      expect(page).to have_link("Commencer")
+      expect(page).to have_link("Commencer →")
     end
 
     scenario "specific presentation skipped when empty" do
       subject_record.update!(specific_presentation: nil)
 
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
@@ -198,49 +200,49 @@ RSpec.describe "Student subject workflow", type: :feature do
     scenario "shows unanswered questions after all parts completed" do
       # Complete common part without answering
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
       # Goes directly to specific presentation
       expect(page).to have_content("Presentation specifique SIN.")
-      click_link "Commencer"
+      click_link "Commencer →"
       click_link "Question suivante"
       click_button "Fin de la partie spécifique"
 
       # Should see unanswered questions page
-      expect(page).to have_content("Questions non repondues")
+      expect(page).to have_content("Toutes les parties sont terminées")
       expect(page).to have_content("Question commune transport durable")
       expect(page).to have_content("Question specifique reseau")
-      expect(page).to have_link("Revenir a cette question", minimum: 1)
-      expect(page).to have_button("Terminer le sujet")
+      expect(page).to have_link("Répondre", minimum: 1)
+      expect(page).to have_button("Ignorer et terminer")
     end
 
-    scenario "'Revenir a cette question' opens question, 'Question suivante' returns to unanswered page" do
+    scenario "'Répondre' opens question, 'Question suivante' returns to unanswered page" do
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
       expect(page).to have_content("Presentation specifique SIN.")
-      click_link "Commencer"
+      click_link "Commencer →"
       click_link "Question suivante"
       click_button "Fin de la partie spécifique"
 
       # Click on first unanswered question
-      first(:link, "Revenir a cette question").click
+      first(:link, "Répondre").click
 
       # Should be on the question page
       expect(page).to have_content("Question commune transport durable").or have_content("Question specifique reseau")
 
       # "Question suivante" should redirect back to unanswered page
       click_link "Question suivante"
-      expect(page).to have_content("Questions non repondues")
+      expect(page).to have_content("Toutes les parties sont terminées")
     end
 
     scenario "all questions answered after all parts goes directly to completion" do
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
 
       # Answer q1
       click_button "Voir la correction"
@@ -252,7 +254,7 @@ RSpec.describe "Student subject workflow", type: :feature do
 
       # Specific presentation
       expect(page).to have_content("Presentation specifique SIN.")
-      click_link "Commencer"
+      click_link "Commencer →"
 
       # Answer specific q1
       click_button "Voir la correction"
@@ -263,55 +265,95 @@ RSpec.describe "Student subject workflow", type: :feature do
       click_button "Fin de la partie spécifique"
 
       # Should go directly to completion page
-      expect(page).to have_content("Bravo")
+      expect(page).to have_content("Sujet terminé")
     end
   end
 
   # ---------- US5: Completion page ----------
 
   describe "US5: Completion page" do
-    scenario "'Terminer le sujet' triggers completion page" do
+    scenario "'Ignorer et terminer' triggers completion page" do
       # Complete both parts without answering
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
       expect(page).to have_content("Presentation specifique SIN.")
-      click_link "Commencer"
+      click_link "Commencer →"
       click_link "Question suivante"
       click_button "Fin de la partie spécifique"
 
-      # On unanswered page, click Terminer
-      expect(page).to have_content("Questions non repondues")
-      click_button "Terminer le sujet"
+      # On unanswered page, click Ignorer et terminer
+      expect(page).to have_content("Toutes les parties sont terminées")
+      click_button "Ignorer et terminer"
 
-      expect(page).to have_content("Bravo")
-      expect(page).to have_link("Revenir aux sujets")
+      expect(page).to have_content("Sujet terminé")
+      expect(page).to have_link("Retour aux sujets")
     end
 
     scenario "re-entering completed subject shows relecture mode" do
       # Complete both parts without answering, then terminate
       select_full_scope
-      click_link "Commencer"
+      click_link "Continuer la partie 1 →"
       click_link "Question suivante"
       click_button "Fin de la partie commune"
 
       expect(page).to have_content("Presentation specifique SIN.")
-      click_link "Commencer"
+      click_link "Commencer →"
       click_link "Question suivante"
       click_button "Fin de la partie spécifique"
 
-      expect(page).to have_content("Questions non repondues")
-      click_button "Terminer le sujet"
+      expect(page).to have_content("Toutes les parties sont terminées")
+      click_button "Ignorer et terminer"
 
       # Re-enter the subject
       visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
 
-      # Should see parts list in relecture mode, not Bravo again
+      # Should see parts list in relecture mode, not completion again
       expect(page).to have_content("Partie commune transport")
       expect(page).to have_content("Partie specifique SIN")
-      expect(page).not_to have_content("Bravo")
+      expect(page).not_to have_content("Sujet terminé")
+    end
+  end
+
+  # ---------- Radical UI: visual elements ----------
+
+  describe "Radical UI elements" do
+    scenario "stripes bar is present on scope selection screen" do
+      visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
+      expect(page).to have_css("[aria-hidden='true'].flex.h-1\\.5")
+    end
+
+    scenario "scope selector has data-controller attribute" do
+      visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
+      expect(page).to have_css("[data-controller='scope-selector']")
+    end
+
+    scenario "scope selector radio cards have data-value attributes" do
+      visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
+      expect(page).to have_css("[data-value='full']")
+      expect(page).to have_css("[data-value='common_only']")
+      expect(page).to have_css("[data-value='specific_only']")
+    end
+
+    scenario "parts list shows global progress bar after scope selection" do
+      select_full_scope
+      expect(page).to have_css(".h-\\[5px\\].rounded-full")
+    end
+
+    scenario "completion screen shows Sujet terminé heading" do
+      select_full_scope
+      click_link "Continuer la partie 1 →"
+      click_link "Question suivante"
+      click_button "Fin de la partie commune"
+      click_link "Commencer →"
+      click_link "Question suivante"
+      click_button "Fin de la partie spécifique"
+      click_button "Ignorer et terminer"
+
+      expect(page).to have_content("Sujet terminé")
+      expect(page).to have_link("Retour aux sujets")
     end
   end
 end

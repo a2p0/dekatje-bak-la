@@ -45,7 +45,7 @@
 <% end %>
 
 <%# DT tiles for the specific section %>
-<% specific_dts = subject.technical_documents.where(doc_type: "DT").order(:number) %>
+<% specific_dts = subject.respond_to?(:technical_documents) ? subject.technical_documents.where(doc_type: "DT").order(:number) : [] %>
 <% if specific_dts.any? %>
   <div class="mx-4 mt-3 flex gap-2">
     <% specific_dts.each do |dt| %>

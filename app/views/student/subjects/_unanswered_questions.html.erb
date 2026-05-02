@@ -1,7 +1,7 @@
 <%= render "student/subjects/stripes" %>
 <%= render "student/subjects/subject_header",
       back_path: student_subject_path(access_code: access_code, id: subject.id),
-      suptitle: subject.exam_type&.upcase,
+      suptitle: subject.exam&.upcase,
       title: subject.title %>
 
 <%# Yellow alert banner %>
@@ -15,7 +15,7 @@
       <div class="text-[14px] font-bold text-rad-text mb-1">Toutes les parties sont terminées</div>
       <p class="text-[13px] text-rad-muted leading-relaxed m-0">
         Il reste <strong class="text-rad-text"><%= unanswered_questions.size %> question<%= unanswered_questions.size > 1 ? "s" : "" %></strong>
-        (<%= unanswered_questions.sum(:points) %> pts). Veux-tu les traiter avant de valider ?
+        (<%= unanswered_questions.sum(&:points) %> pts). Veux-tu les traiter avant de valider ?
       </p>
     </div>
   </div>

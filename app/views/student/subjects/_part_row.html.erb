@@ -25,6 +25,9 @@
     </div>
     <div class="flex-1 min-w-0">
       <div class="text-[13.5px] font-semibold text-rad-text mb-0.5"><%= part.title %></div>
+      <% if part.objective_text.present? %>
+        <div class="text-[11.5px] text-rad-muted mb-0.5 truncate"><%= part.objective_text %></div>
+      <% end %>
       <div class="text-[11.5px] text-rad-muted">
         <%= answered %>/<%= total_q %> questions · <%= part.questions.kept.sum(:points) %> pts
       </div>

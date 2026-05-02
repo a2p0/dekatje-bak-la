@@ -34,7 +34,7 @@
     <%= render "student/subjects/stripes" %>
     <%= render "student/subjects/subject_header",
           back_path: student_root_path(access_code: params[:access_code]),
-          suptitle: [@subject.exam_type&.upcase, @subject.specialty&.upcase].compact.join(" · "),
+          suptitle: [@subject.exam&.upcase, @subject.specialty&.upcase].compact.join(" · "),
           title: @subject.title %>
 
     <%# Global progress bar %>
@@ -121,9 +121,12 @@
             class: "flex-1 py-3.5 rounded-[14px] border-[1.5px] border-rad-text bg-transparent text-rad-text text-[13px] font-bold text-center no-underline" do %>
           Retour aux sujets
         <% end %>
-        <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: @first_question.id),
-            class: "flex-[1.5] py-3.5 rounded-[14px] bg-rad-raise text-rad-text text-[13px] font-bold text-center no-underline" do %>
-          Reprendre la lecture →
+        <% relecture_first_q = @parts.flat_map { |p| p.questions.kept.order(:position).to_a }.first %>
+        <% if relecture_first_q %>
+          <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: relecture_first_q.id),
+              class: "flex-[1.5] py-3.5 rounded-[14px] bg-rad-raise text-rad-text text-[13px] font-bold text-center no-underline" do %>
+            Reprendre la lecture →
+          <% end %>
         <% end %>
       </div>
     <% else %>

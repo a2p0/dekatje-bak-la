@@ -2,7 +2,7 @@
   <%= render "student/subjects/stripes" %>
   <%= render "student/subjects/subject_header",
         back_path: student_root_path(access_code: access_code),
-        suptitle: "#{subject.exam_type&.upcase} · #{subject.specialty&.upcase}",
+        suptitle: "#{subject.exam&.upcase} · #{subject.specialty&.upcase}",
         title: subject.title %>
 
   <div class="px-5 pb-5">
