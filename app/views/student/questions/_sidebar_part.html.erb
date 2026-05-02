@@ -5,31 +5,31 @@
 %>
 
 <% if is_active %>
-  <p class="text-indigo-400 text-[10px] uppercase tracking-wide mb-1 mt-2 font-semibold px-2">
+  <p class="text-rad-teal text-[10px] uppercase tracking-wide mb-1 mt-2 font-semibold px-2">
     Partie <%= part.number %>
-    <span class="text-slate-500 font-normal">(<%= part_answered %>/<%= part_questions.size %>)</span>
+    <span class="text-rad-muted font-normal">(<%= part_answered %>/<%= part_questions.size %>)</span>
   </p>
   <% part_questions.each do |q| %>
     <% answered = session_record.answered?(q.id) %>
     <% is_current = q == current_question %>
     <%= link_to student_question_path(access_code: access_code, subject_id: subject.id, id: q.id),
-        class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded-lg text-xs no-underline transition-colors #{is_current ? 'bg-indigo-500/20 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}",
+        class: "flex items-center gap-1.5 px-2 py-1.5 my-0.5 rounded-lg text-xs no-underline transition-colors #{is_current ? 'bg-rad-teal/10 text-rad-text' : 'text-rad-muted hover:bg-rad-raise hover:text-rad-text'}",
         data: { action: "click->sidebar#close" } do %>
       <% if answered %>
-        <span class="text-emerald-400 text-[10px]">✓</span>
+        <span class="text-rad-green text-[10px]">✓</span>
       <% elsif is_current %>
-        <span class="text-indigo-400 text-[10px]">◉</span>
+        <span class="text-rad-teal text-[10px]">◉</span>
       <% else %>
-        <span class="text-slate-600 text-[10px]">○</span>
+        <span class="text-rad-muted text-[10px]">○</span>
       <% end %>
       <span>Q<%= q.number %></span>
     <% end %>
   <% end %>
 <% else %>
   <%= link_to student_subject_path(access_code: access_code, id: subject.id, part_id: part.id),
-      class: "flex items-center justify-between px-2 py-1.5 mt-2 my-0.5 rounded-lg text-xs text-slate-400 no-underline hover:bg-slate-800 hover:text-slate-200 transition-colors",
+      class: "flex items-center justify-between px-2 py-1.5 mt-2 my-0.5 rounded-lg text-xs text-rad-muted no-underline hover:bg-rad-raise hover:text-rad-text transition-colors",
       data: { action: "click->sidebar#close" } do %>
     <span>Partie <%= part.number %></span>
-    <span class="text-slate-600 text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
+    <span class="text-rad-muted text-[10px]"><%= part_answered %>/<%= part_questions.size %></span>
   <% end %>
 <% end %>
