@@ -1,39 +1,78 @@
 <div class="mt-4">
 
-  <%# Data hints (at the top — "Où trouver les données ?") %>
+  <%# Big green answer card %>
+  <div class="relative rounded-[20px] overflow-hidden mb-3 bg-rad-green" style="padding: 22px 22px 26px">
+    <div class="pattern-madras absolute inset-0 opacity-[0.18]"></div>
+    <div class="relative">
+      <div class="flex items-center gap-2 text-[10.5px] tracking-[0.16em] uppercase font-bold text-rad-cream opacity-90 mb-2">
+        <span>✓</span>
+        <span>Réponse</span>
+      </div>
+      <% correction = question.answer&.correction_text.to_s %>
+      <% if correction.length <= 60 %>
+        <span class="font-serif text-[36px] text-rad-cream leading-none block"><%= correction %></span>
+      <% else %>
+        <p class="font-serif text-[20px] text-rad-cream leading-[1.4] m-0"><%= correction %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Explanation card %>
+  <% if question.answer&.explanation_text.present? %>
+    <div class="bg-rad-paper border border-rad-rule rounded-[18px] overflow-hidden mb-3">
+      <div class="px-[18px] py-[14px] border-b border-rad-rule flex items-center gap-2.5 relative">
+        <span class="absolute left-0 top-0 bottom-0 w-1 bg-rad-teal rounded-r-sm"></span>
+        <div class="w-[22px] h-[22px] rounded-full bg-rad-teal flex items-center justify-center font-serif italic text-[13px] text-rad-cream font-medium flex-shrink-0">=</div>
+        <span class="font-serif text-[15px] text-rad-text">
+          <% if question.answer_type == "calculation" %>
+            Détail du calcul
+          <% else %>
+            Pourquoi
+          <% end %>
+        </span>
+      </div>
+      <div class="px-[18px] py-[16px]">
+        <% if question.answer_type == "calculation" %>
+          <p class="font-mono text-[14px] leading-[1.7] text-rad-text m-0"><%= question.answer.explanation_text %></p>
+        <% else %>
+          <p class="font-serif text-[17px] leading-[1.5] text-rad-text m-0"><%= question.answer.explanation_text %></p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Data hints %>
   <% if question.answer&.data_hints.present? %>
-    <div class="bg-white/80 dark:bg-slate-900/60 rounded-2xl px-4 py-3.5 mb-3 border border-slate-200 dark:border-amber-500/20 shadow-sm">
-      <p class="text-amber-700 dark:text-amber-400 font-semibold text-sm mb-2">Où trouver les données ?</p>
-      <% question.answer.data_hints.each do |hint| %>
-        <div class="flex items-baseline gap-2 mb-1.5">
-          <%= render(BadgeComponent.new(color: hint_badge_color(hint["source"]), label: hint_source_label(hint["source"]))) %>
-          <span class="text-slate-700 dark:text-slate-300 text-sm"><%= hint["location"] %></span>
+    <div class="bg-rad-paper border border-rad-rule rounded-[18px] overflow-hidden mb-3">
+      <div class="px-[18px] py-[14px] border-b border-rad-rule flex items-center gap-2.5 relative">
+        <span class="absolute left-0 top-0 bottom-0 w-1 bg-rad-yellow rounded-r-sm"></span>
+        <div class="w-[22px] h-[22px] rounded-full bg-rad-yellow flex items-center justify-center font-serif italic text-[13px] text-rad-ink font-medium flex-shrink-0">i</div>
+        <span class="font-serif text-[15px] text-rad-text">Où trouver les données ?</span>
+      </div>
+      <% question.answer.data_hints.each_with_index do |hint, i| %>
+        <div class="px-[18px] py-[14px] flex gap-3 items-start <%= i > 0 ? 'border-t border-rad-rule' : '' %>">
+          <span class="flex-shrink-0 text-[11px] font-bold px-2 py-[3px] rounded-[6px] tracking-[0.04em] h-fit
+                        <%= i == 0 ? 'bg-rad-yellow text-rad-ink' : 'bg-rad-raise border border-rad-rule text-rad-text' %>">
+            <%= hint_source_label(hint["source"]) %>
+          </span>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13px] text-rad-muted mb-1"><%= hint["location"] %></div>
+            <% if hint["value"].present? %>
+              <div class="font-mono text-[13px] text-rad-text font-medium"><%= hint["value"] %></div>
+            <% end %>
+          </div>
         </div>
       <% end %>
     </div>
   <% end %>
 
-  <%# Correction %>
-  <div class="border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 rounded-r-2xl px-4 py-3.5 mb-3 dark:shadow-[0_0_15px_rgba(16,185,129,0.05)]">
-    <p class="text-emerald-700 dark:text-emerald-400 font-semibold text-sm mb-2 uppercase tracking-wide">✓ Correction</p>
-    <p class="text-slate-800 dark:text-slate-200 text-sm leading-relaxed"><%= question.answer&.correction_text %></p>
-  </div>
-
-  <%# Explication %>
-  <% if question.answer&.explanation_text.present? %>
-    <div class="bg-white/80 dark:bg-slate-900/60 rounded-2xl px-4 py-3.5 mb-3 border border-slate-200 dark:border-indigo-500/15 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.05)]">
-      <p class="text-blue-600 dark:text-blue-400 font-semibold text-sm mb-2">Explication</p>
-      <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed"><%= question.answer.explanation_text %></p>
-    </div>
-  <% end %>
-
   <%# Key concepts %>
   <% if question.answer&.key_concepts.present? %>
-    <div class="bg-white/80 dark:bg-slate-900/60 rounded-2xl px-4 py-3.5 mb-3 border border-slate-200 dark:border-indigo-500/15 shadow-sm">
-      <p class="text-indigo-600 dark:text-violet-400 font-semibold text-sm mb-2">Concepts clés</p>
+    <div class="bg-rad-paper border border-rad-rule rounded-[18px] px-[18px] py-[14px] mb-3">
+      <div class="text-[10.5px] tracking-[0.16em] uppercase text-rad-muted font-bold mb-2.5">Concepts à réviser</div>
       <div class="flex flex-wrap gap-1.5">
         <% question.answer.key_concepts.each do |concept| %>
-          <%= render(BadgeComponent.new(color: :indigo, label: concept)) %>
+          <span class="font-serif italic text-[14px] border border-rad-rule bg-rad-paper text-rad-text rounded-full px-3 py-1"><%= concept %></span>
         <% end %>
       </div>
     </div>
@@ -41,19 +80,19 @@
 
   <%# Documents correction %>
   <% if subject.dr_corrige_file.attached? || subject.questions_corrigees_file.attached? %>
-    <div class="border border-slate-200 dark:border-indigo-500/15 rounded-2xl px-4 py-3.5 mb-3 bg-white/80 dark:bg-slate-900/60">
-      <p class="text-slate-600 dark:text-slate-400 font-semibold text-sm mb-2">Documents correction</p>
+    <div class="bg-rad-paper border border-rad-rule rounded-[18px] px-[18px] py-[14px] mb-3">
+      <p class="text-rad-muted text-[10.5px] uppercase tracking-wide font-bold mb-2">Documents correction</p>
       <% if subject.dr_corrige_file.attached? %>
         <%= link_to "DR corrigé ↗",
             rails_blob_path(subject.dr_corrige_file, disposition: "inline"),
             target: "_blank",
-            class: "block text-blue-600 dark:text-blue-400 text-sm my-0.5 no-underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors" %>
+            class: "block text-rad-teal text-sm my-0.5 no-underline hover:opacity-75 transition-opacity" %>
       <% end %>
       <% if subject.questions_corrigees_file.attached? %>
         <%= link_to "Questions corrigées ↗",
             rails_blob_path(subject.questions_corrigees_file, disposition: "inline"),
             target: "_blank",
-            class: "block text-blue-600 dark:text-blue-400 text-sm my-0.5 no-underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors" %>
+            class: "block text-rad-teal text-sm my-0.5 no-underline hover:opacity-75 transition-opacity" %>
       <% end %>
     </div>
   <% end %>
@@ -62,7 +101,7 @@
   <% if defined?(session_record) && session_record&.tutored? %>
     <div class="text-center mt-3">
       <button type="button"
-              class="text-indigo-500 dark:text-indigo-400 text-sm underline underline-offset-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-300"
+              class="text-rad-teal text-sm underline underline-offset-2 cursor-pointer hover:opacity-75 transition-opacity border-0 bg-transparent"
               data-action="click->chat-drawer#open"
               data-chat-drawer-toggle="true"
               aria-controls="tutor-chat-drawer">

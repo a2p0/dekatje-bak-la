@@ -5,7 +5,7 @@
           student_subject_question_correction_path(access_code: access_code, subject_id: subject.id, question_id: question.id),
           method: :post,
           data: { turbo_frame: "question_#{question.id}_correction" },
-          class: "px-8 py-3 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm cursor-pointer hover:from-indigo-600 hover:to-violet-600 transition-all font-semibold shadow-[0_0_16px_rgba(99,102,241,0.3)]" %>
+          class: "px-8 py-3 border border-rad-text text-rad-text bg-transparent rounded-[14px] text-[13.5px] font-bold cursor-pointer hover:bg-rad-raise transition-colors" %>
     </div>
   <% end %>
 <% end %>

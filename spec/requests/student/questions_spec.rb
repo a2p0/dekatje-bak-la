@@ -33,10 +33,76 @@ RSpec.describe "Student::Questions", type: :request do
       get student_question_path(access_code: classroom.access_code, subject_id: other_subject.id, id: other_q.id)
       expect(response).to redirect_to(student_root_path(access_code: classroom.access_code))
     end
+
+    it "uses Radical cream background" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-bg")
+    end
+
+    it "renders stripes" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-red")
+      expect(response.body).to include("bg-rad-yellow")
+    end
+
+    it "shows compact header with subject title" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include(subject_obj.title)
+      expect(response.body).to include("tracking-[0.16em]")
+    end
+
+    it "renders question label in serif card" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("font-serif")
+      expect(response.body).to include("bg-rad-red")
+      expect(response.body).to include("bg-rad-paper")
+    end
+
+    context "navigation styling" do
+      let!(:q2) { create(:question, part: part, position: 2) }
+
+      it "uses rad-red for next question button" do
+        get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+        expect(response.body).to include("bg-rad-red")
+        expect(response.body).to include("Question suivante")
+      end
+    end
   end
 
   # Note: correction reveal is now handled by Student::Questions::CorrectionsController (POST).
   # See spec/requests/student/questions/corrections_spec.rb
+
+  describe "correction button styling" do
+    it "uses outlined rad-text style for correction button" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("border-rad-text")
+      expect(response.body).to include("Voir la correction")
+      expect(response.body).not_to include("from-indigo-500 to-violet-500 text-white border-0 rounded-xl")
+    end
+  end
+
+  describe "correction display (Radical)" do
+    before do
+      ss = student.student_sessions.find_or_create_by!(subject: subject_obj) do |s|
+        s.mode = :autonomous; s.started_at = Time.current; s.last_activity_at = Time.current
+      end
+      ss.mark_answered!(question.id)
+      ss.save!
+    end
+
+    it "renders correction with Radical green card" do
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-green")
+      expect(response.body).to include("pattern-madras")
+    end
+
+    it "renders data hints with yellow accent" do
+      answer.update!(data_hints: [{ "source" => "DT1", "location" => "tableau", "value" => "30,5 L" }])
+      get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
+      expect(response.body).to include("bg-rad-yellow")
+      expect(response.body).to include("Où trouver les données")
+    end
+  end
 
   describe "GET /subjects/:subject_id/questions/:id — tutor button (T200)" do
     def get_show
@@ -47,7 +113,7 @@ RSpec.describe "Student::Questions", type: :request do
       it "shows 'Activer le tuteur' link instead of Tutorat button" do
         get_show
         expect(response.body).to include("Activer le tuteur")
-        expect(response.body).not_to include("💬 Tutorat")
+        expect(response.body).not_to include("Tibo")
       end
 
       it "links to the settings page" do
@@ -61,7 +127,7 @@ RSpec.describe "Student::Questions", type: :request do
 
       it "shows the Tutorat button" do
         get_show
-        expect(response.body).to include("💬 Tutorat")
+        expect(response.body).to include("Tibo")
         expect(response.body).not_to include("Activer le tuteur")
       end
     end
@@ -72,7 +138,7 @@ RSpec.describe "Student::Questions", type: :request do
 
       it "shows the Tutorat button" do
         get_show
-        expect(response.body).to include("💬 Tutorat")
+        expect(response.body).to include("Tibo")
         expect(response.body).not_to include("Activer le tuteur")
       end
     end

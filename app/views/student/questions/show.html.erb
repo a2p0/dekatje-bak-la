@@ -26,8 +26,10 @@
   end_of_part_mobile_label = next_part_in_section ? "Partie suivante →" : "Fin partie →"
 %>
 
+<%= render "student/subjects/stripes" %>
+
 <div data-controller="sidebar chat-drawer"
-     class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0">
+     class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0 bg-rad-bg">
 
   <%# Backdrop (mobile only) %>
   <div data-sidebar-target="backdrop"
@@ -35,13 +37,13 @@
        class="hidden fixed inset-0 bg-black/50 z-[var(--z-backdrop)] lg:hidden">
   </div>
 
-  <%# Sidebar / Drawer — stays dark in both modes %>
+  <%# Sidebar / Drawer — Radical light %>
   <aside id="sidebar-drawer"
          data-sidebar-target="drawer"
          data-controller="focus-trap"
          data-action="focus-trap:close->sidebar#close"
          aria-label="Navigation du sujet"
-         class="w-[260px] bg-slate-900 border-r border-indigo-500/10 flex-shrink-0 overflow-y-auto
+         class="w-[260px] bg-rad-paper border-r border-rad-rule flex-shrink-0 overflow-y-auto
                 fixed top-0 left-0 bottom-0 z-[var(--z-sidebar)] -translate-x-full transition-transform duration-200
                 lg:relative lg:translate-x-0 lg:z-auto">
     <%= render "student/questions/sidebar",
@@ -57,33 +59,39 @@
   <%# Main content %>
   <div class="flex-1 px-4 py-5 max-w-3xl mx-auto w-full">
 
-    <%# Breadcrumb %>
-    <div class="mb-3">
-      <%= render(BreadcrumbComponent.new(items: [
-        { label: "Mes sujets", href: student_root_path(access_code: params[:access_code]) },
-        { label: @subject.title, href: student_subject_path(access_code: params[:access_code], id: @subject.id) },
-        { label: "Partie #{@part.number}", href: student_subject_path(access_code: params[:access_code], id: @subject.id, part_id: @part.id) },
-        { label: "Q#{@question.number}" }
-      ])) %>
-    </div>
-
-    <%# Progress bar row %>
-    <div class="flex items-center gap-2.5 mb-4">
+    <%# Compact header: ← | exam label + subject title | ≡ %>
+    <div class="flex items-center justify-between mb-3">
+      <%= link_to student_subject_path(access_code: params[:access_code], id: @subject.id),
+          class: "text-rad-text text-xl leading-none no-underline flex-shrink-0 px-1",
+          aria: { label: "Retour au sujet" } do %>
+        ‹
+      <% end %>
+      <div class="text-center flex-1 min-w-0 px-3">
+        <div class="text-[10.5px] tracking-[0.16em] uppercase text-rad-muted font-bold leading-none mb-1">
+          <%= [@subject.exam&.upcase, @subject.specialty&.upcase].compact.join(" · ") %>
+        </div>
+        <span class="font-serif italic text-[14px] text-rad-text leading-none block truncate"><%= @subject.title %></span>
+      </div>
       <button data-action="click->sidebar#open"
               data-sidebar-target="toggle"
               aria-label="Ouvrir le menu"
               aria-expanded="false"
               aria-controls="sidebar-drawer"
-              class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-800 border-0 rounded-lg text-slate-600 dark:text-slate-400 text-lg cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors lg:hidden">
-        ☰
+              class="lg:hidden flex-shrink-0 w-9 h-9 flex items-center justify-center bg-transparent border-0 text-rad-text text-xl cursor-pointer">
+        ≡
       </button>
-      <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">
-        Q<%= @question.number %> (<%= idx + 1 %>/<%= total %>)
-      </span>
-      <div class="flex-1">
-        <%= render(ProgressBarComponent.new(current: answered, total: total, color: :gradient)) %>
+      <div class="hidden lg:block w-9"></div><%# spacer for centering %>
+    </div>
+
+    <%# Segmented progress bar %>
+    <div class="flex items-center gap-2.5 mb-4">
+      <div class="flex flex-1 gap-[3px]">
+        <% total.times do |i| %>
+          <div class="flex-1 h-1 rounded-sm <%= i < answered ? 'bg-rad-teal' : i == answered ? 'bg-rad-red' : 'bg-rad-rule' %>"></div>
+        <% end %>
       </div>
-      <%# Tutorat button — larger on desktop with gradient %>
+      <span class="text-[11px] text-rad-muted font-semibold whitespace-nowrap"><%= idx + 1 %> / <%= total %></span>
+      <%# Tibo button — desktop %>
       <% if @tutor_available %>
         <button type="button"
                 data-controller="tutor-activator"
@@ -95,42 +103,57 @@
                 aria-label="Ouvrir le tutorat IA"
                 aria-expanded="false"
                 aria-controls="tutor-chat-drawer"
-                class="hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:from-indigo-600 hover:to-violet-600 transition-all shadow-[0_0_16px_rgba(99,102,241,0.3)]">
-          💬 Tutorat
+                class="hidden lg:inline-flex items-center gap-2 pl-2 pr-4 py-1.5 bg-rad-ink text-rad-cream border-0 rounded-full text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_8px_20px_-8px_rgba(0,0,0,0.35)] transition-opacity hover:opacity-80">
+          <span class="w-6 h-6 rounded-full bg-rad-red text-rad-cream flex items-center justify-center font-serif italic text-[13px] flex-shrink-0">T</span>
+          Tibo
         </button>
       <% else %>
         <%= link_to "Activer le tuteur",
             student_settings_path(access_code: params[:access_code]),
-            class: "hidden lg:inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors no-underline" %>
+            class: "hidden lg:inline-flex items-center gap-2 px-3 py-1.5 bg-rad-paper text-rad-muted border border-rad-rule rounded-full text-xs font-medium whitespace-nowrap hover:bg-rad-raise transition-colors no-underline" %>
       <% end %>
     </div>
 
-    <%# Sticky part title %>
-    <div class="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm -mx-4 px-4 py-2 mb-4 border-b border-slate-200 dark:border-indigo-500/10">
-      <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">
-        Partie <%= @part.number %> — <%= @part.title %>
-      </p>
+    <%# Sticky part header %>
+    <div class="sticky top-0 z-10 bg-rad-bg/95 backdrop-blur-sm -mx-4 px-4 py-2 mb-4 border-b border-rad-rule">
+      <div class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold leading-none mb-1">
+        Partie <%= @part.number %>
+        <% if @part.section_type.present? %>
+          · <%= @part.section_type == "specific" ? "Spécifique" : "Commune" %>
+        <% end %>
+      </div>
+      <p class="font-serif text-[18px] text-rad-text leading-[1.3] m-0"><%= @part.title %></p>
     </div>
 
-    <%# Context card (separate, above question) %>
+    <%# Context card (mise en situation locale) %>
     <% if @question.context_text.present? %>
-      <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-5 mb-3 border border-slate-200 dark:border-slate-700/50">
-        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed italic"><%= @question.context_text %></p>
+      <div class="bg-rad-paper border border-rad-rule rounded-2xl p-4 mb-3">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-1 h-[14px] bg-rad-yellow rounded-sm flex-shrink-0"></span>
+          <span class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold">Mise en situation</span>
+        </div>
+        <p class="text-rad-muted text-[13px] leading-[1.55] m-0"><%= @question.context_text %></p>
       </div>
     <% end %>
 
-    <%# Question card (glow) %>
-    <div class="bg-white/80 dark:bg-slate-900/60 rounded-2xl p-5 mb-4 border border-slate-200 dark:border-indigo-500/15 shadow-sm dark:shadow-[0_0_20px_rgba(99,102,241,0.05)]">
-      <div class="flex flex-wrap items-center gap-2 mb-3">
-        <span class="text-indigo-600 dark:text-indigo-400 font-semibold text-sm">Question <%= @question.number %></span>
-        <% Array(@question.dt_references).each do |dt_ref| %>
-          <%= render(BadgeComponent.new(color: :blue, label: dt_ref)) %>
-        <% end %>
-        <% Array(@question.dr_references).each do |dr_ref| %>
-          <%= render(BadgeComponent.new(color: :amber, label: dr_ref)) %>
-        <% end %>
+    <%# Question card %>
+    <div class="bg-rad-paper border border-rad-rule rounded-2xl p-4 mb-4 shadow-sm">
+      <div class="flex items-start gap-3 mb-3">
+        <%# Number box + DT/DR badges column %>
+        <div class="flex-shrink-0 flex flex-col items-center gap-2">
+          <div class="w-14 h-14 rounded-[14px] bg-rad-red flex items-center justify-center">
+            <span class="font-serif text-[22px] text-rad-cream leading-none"><%= @question.number %></span>
+          </div>
+          <% Array(@question.dt_references).each do |dt_ref| %>
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-[6px] bg-rad-yellow text-rad-ink tracking-[0.04em]"><%= dt_ref %></span>
+          <% end %>
+          <% Array(@question.dr_references).each do |dr_ref| %>
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-[6px] bg-rad-yellow text-rad-ink tracking-[0.04em]"><%= dr_ref %></span>
+          <% end %>
+        </div>
+        <%# Question label %>
+        <p class="flex-1 font-serif text-[19px] leading-[1.3] text-rad-text m-0 text-balance"><%= @question.label %></p>
       </div>
-      <p class="text-slate-800 dark:text-slate-100 text-sm leading-relaxed mb-2"><%= @question.label %></p>
     </div>
 
     <%# Correction + data hints area %>
@@ -144,17 +167,17 @@
               student_subject_question_correction_path(access_code: params[:access_code], subject_id: @subject.id, question_id: @question.id),
               method: :post,
               data: { turbo_frame: "question_#{@question.id}_correction" },
-              class: "px-8 py-3 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm cursor-pointer hover:from-indigo-600 hover:to-violet-600 transition-all font-semibold shadow-[0_0_16px_rgba(99,102,241,0.3)]" %>
+              class: "px-8 py-3 border border-rad-text text-rad-text bg-transparent rounded-[14px] text-[13.5px] font-bold cursor-pointer hover:bg-rad-raise transition-colors" %>
         </div>
       <% end %>
     <% end %>
 
     <%# Desktop navigation (hidden on mobile — bottom bar handles it) %>
-    <div class="hidden lg:flex justify-between items-center pt-4 border-t border-slate-200 dark:border-indigo-500/10 mt-2">
+    <div class="hidden lg:flex justify-between items-center pt-4 border-t border-rad-rule mt-2">
       <% if prev_q %>
         <%= link_to "← Q#{prev_q.number}",
             prev_href,
-            class: "text-indigo-600 dark:text-indigo-400 text-sm no-underline hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors" %>
+            class: "text-rad-teal text-sm no-underline hover:opacity-75 transition-opacity" %>
       <% else %>
         <span></span>
       <% end %>
@@ -162,31 +185,29 @@
       <% if next_href && next_q %>
         <%= link_to "Question suivante →",
             next_href,
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold no-underline hover:opacity-90 transition-opacity" %>
       <% elsif params[:from] == "review" %>
         <%= link_to "Question suivante →",
             next_href,
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold no-underline hover:opacity-90 transition-opacity" %>
       <% elsif next_part_in_section && next_part_first_question %>
-        <%# Last question of an intermediate part → go to first question of next part in same section %>
         <%= link_to end_of_part_label,
             student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_part_first_question.id),
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold no-underline hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold no-underline hover:opacity-90 transition-opacity" %>
       <% else %>
-        <%# Last question of the last part in its section → mark part done and route to other section %>
         <%= button_to end_of_part_label,
             student_subject_part_completion_path(access_code: params[:access_code], subject_id: @subject.id, part_id: @part.id),
             method: :post,
-            class: "inline-flex items-center px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl text-sm font-semibold border-0 cursor-pointer hover:from-emerald-600 hover:to-emerald-700 transition-all" %>
+            class: "inline-flex items-center px-6 py-2.5 bg-rad-red text-rad-cream rounded-[14px] text-sm font-bold border-0 cursor-pointer hover:opacity-90 transition-opacity" %>
       <% end %>
     </div>
   </div>
 
   <%# Mobile bottom bar (hidden on lg+) %>
-  <div class="lg:hidden fixed bottom-0 left-0 right-0 z-[var(--z-bottom-bar)] bg-white/95 dark:bg-slate-900/95 border-t border-slate-200 dark:border-indigo-500/15 backdrop-blur-sm px-4 py-3 flex items-center gap-3">
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 z-[var(--z-bottom-bar)] bg-rad-bg border-t border-rad-rule px-4 py-3 flex items-center gap-3">
     <% if prev_q %>
       <%= link_to prev_href,
-          class: "flex-1 min-w-0 text-left text-sm text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 truncate no-underline" do %>
+          class: "flex-1 min-w-0 text-left text-sm text-rad-muted hover:text-rad-text truncate no-underline" do %>
         &larr; Q<%= prev_q.number %>
       <% end %>
     <% else %>
@@ -204,23 +225,24 @@
               aria-label="Ouvrir le tutorat IA"
               aria-expanded="false"
               aria-controls="tutor-chat-drawer"
-              class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-0 rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_0_14px_rgba(99,102,241,0.3)]">
-        💬 Tutorat
+              class="flex-shrink-0 inline-flex items-center gap-1.5 pl-2 pr-3 py-1.5 bg-rad-ink text-rad-cream border-0 rounded-full text-sm font-semibold cursor-pointer whitespace-nowrap shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)]">
+        <span class="w-5 h-5 rounded-full bg-rad-red text-rad-cream flex items-center justify-center font-serif italic text-[11px] flex-shrink-0">T</span>
+        Tibo
       </button>
     <% else %>
       <%= link_to "Activer le tuteur",
           student_settings_path(access_code: params[:access_code]),
-          class: "flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors no-underline" %>
+          class: "flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-rad-paper text-rad-muted border border-rad-rule rounded-full text-xs font-medium whitespace-nowrap hover:bg-rad-raise transition-colors no-underline" %>
     <% end %>
 
     <% if next_href %>
       <%= link_to next_href,
-          class: "flex-1 min-w-0 text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate no-underline" do %>
+          class: "flex-1 min-w-0 text-right text-sm font-bold text-rad-red truncate no-underline" do %>
         <%= next_q ? "Q#{next_q.number}" : (params[:from] == 'review' ? "Retour" : "Suivante") %> &rarr;
       <% end %>
     <% elsif next_part_in_section && next_part_first_question %>
       <%= link_to student_question_path(access_code: params[:access_code], subject_id: @subject.id, id: next_part_first_question.id),
-          class: "flex-1 min-w-0 text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate no-underline" do %>
+          class: "flex-1 min-w-0 text-right text-sm font-bold text-rad-red truncate no-underline" do %>
         <%= end_of_part_mobile_label %>
       <% end %>
     <% else %>
@@ -228,7 +250,7 @@
         <%= button_to end_of_part_mobile_label,
             student_subject_part_completion_path(access_code: params[:access_code], subject_id: @subject.id, part_id: @part.id),
             method: :post,
-            class: "text-sm font-semibold text-emerald-600 dark:text-emerald-400 truncate border-0 bg-transparent cursor-pointer p-0" %>
+            class: "text-sm font-bold text-rad-red truncate border-0 bg-transparent cursor-pointer p-0" %>
       </div>
     <% end %>
   </div>
