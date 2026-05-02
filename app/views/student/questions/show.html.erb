@@ -62,7 +62,8 @@
     <%# Compact header: ← | exam label + subject title | ≡ %>
     <div class="flex items-center justify-between mb-3">
       <%= link_to student_subject_path(access_code: params[:access_code], id: @subject.id),
-          class: "text-rad-text text-xl leading-none no-underline flex-shrink-0 px-1" do %>
+          class: "text-rad-text text-xl leading-none no-underline flex-shrink-0 px-1",
+          aria: { label: "Retour au sujet" } do %>
         ‹
       <% end %>
       <div class="text-center flex-1 min-w-0 px-3">
