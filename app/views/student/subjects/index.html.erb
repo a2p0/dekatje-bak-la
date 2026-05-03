@@ -1,65 +1,83 @@
-<div class="max-w-5xl mx-auto px-4 py-8">
-  <div class="mb-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100">
-      Salut <span class="bg-gradient-to-br from-indigo-500 to-violet-500 bg-clip-text text-transparent"><%= current_student.first_name %></span> 👋
-    </h1>
-    <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">
-      <%= @classroom.name %> &middot; <%= pluralize(@subjects.size, "sujet") %>
-    </p>
+<div class="bg-rad-bg min-h-screen text-rad-text">
+  <%# Stripes %>
+  <div class="flex h-1.5" aria-hidden="true">
+    <div class="flex-1 bg-rad-red"></div>
+    <div class="flex-1 bg-rad-yellow"></div>
+    <div class="flex-1 bg-rad-teal"></div>
+    <div class="flex-1 bg-rad-ink"></div>
   </div>
 
-  <% if @subjects.empty? %>
-    <div class="bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-indigo-500/10 rounded-2xl p-8 text-center">
-      <p class="text-slate-600 dark:text-slate-400">Aucun sujet n'a encore été assigné à votre classe.</p>
+  <%# Header 3 zones %>
+  <div class="px-5 py-3.5 flex items-center justify-between">
+    <%= link_to root_path, class: "text-rad-text text-2xl leading-none no-underline" do %>‹<% end %>
+    <div class="text-center flex-1 px-2">
+      <span class="font-serif italic text-sm text-rad-text leading-none">Mes sujets</span>
     </div>
-  <% else %>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      <% @subjects.each do |subject| %>
-        <%
-          session_record = current_student.student_sessions.find_by(subject: subject)
-          total = subject.total_questions_count
-          answered = session_record ? session_record.answered_count : 0
-          matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
-          tc_only = @tc_only_subject_ids.include?(subject.id)
-        %>
-        <div data-subject-id="<%= subject.id %>">
-        <%= render(CardComponent.new(variant: :glow)) do |card|
-          card.with_body do %>
-            <div class="flex flex-wrap gap-1.5 mb-3">
-              <%= render(BadgeComponent.new(
-                color: matches_specialty ? :emerald : :indigo,
-                label: subject.specialty&.upcase || "—"
-              )) %>
-              <% if matches_specialty %>
-                <%= render(BadgeComponent.new(color: :emerald, label: "Ma spé")) %>
+    <%= link_to student_settings_path(access_code: params[:access_code]), class: "text-rad-text text-lg leading-none" do %>≡<% end %>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 py-6">
+    <div class="mb-6">
+      <h1 class="font-serif text-2xl sm:text-3xl text-rad-text">
+        Salut <span class="text-rad-red"><%= current_student.first_name %></span>
+      </h1>
+      <p class="text-sm text-rad-muted mt-1">
+        <%= @classroom.name %> &middot; <%= pluralize(@subjects.size, "sujet") %>
+      </p>
+    </div>
+
+    <% if @subjects.empty? %>
+      <div class="bg-rad-paper border border-rad-rule rounded-2xl p-8 text-center">
+        <p class="text-rad-muted">Aucun sujet n'a encore été assigné à votre classe.</p>
+      </div>
+    <% else %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <% @subjects.each do |subject| %>
+          <%
+            session_record = current_student.student_sessions.find_by(subject: subject)
+            total = subject.total_questions_count
+            answered = session_record ? session_record.answered_count : 0
+            matches_specialty = current_student.specialty.present? && subject.specialty == current_student.specialty
+            tc_only = @tc_only_subject_ids.include?(subject.id)
+          %>
+          <div data-subject-id="<%= subject.id %>">
+            <%= render(CardComponent.new(variant: :rad)) do |card|
+              card.with_body do %>
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                  <%= render(BadgeComponent.new(
+                    color: matches_specialty ? :rad_teal : :rad_red,
+                    label: subject.specialty&.upcase || "—"
+                  )) %>
+                  <% if matches_specialty %>
+                    <%= render(BadgeComponent.new(color: :rad_teal, label: "Ma spé")) %>
+                  <% end %>
+                  <% if tc_only %>
+                    <%= render(BadgeComponent.new(color: :rad_yellow, label: "partie commune uniquement")) %>
+                  <% end %>
+                  <%= render(BadgeComponent.new(color: :rad_muted, label: subject.year.to_s)) %>
+                  <% if subject.region.present? %>
+                    <%= render(BadgeComponent.new(color: :rad_muted, label: subject.region)) %>
+                  <% end %>
+                </div>
+                <h3 class="text-base font-semibold text-rad-text mb-1">
+                  <%= subject.title %>
+                </h3>
+                <p class="text-sm text-rad-muted mb-4">
+                  <%= subject.exam&.upcase %> <%= subject.year %>
+                </p>
+                <%= render(ProgressBarComponent.new(current: answered, total: total, color: :rad_teal, show_text: true)) %>
               <% end %>
-              <% if tc_only %>
-                <%= render(BadgeComponent.new(color: :amber, label: "partie commune uniquement")) %>
+              <% card.with_footer do %>
+                <%= link_to(
+                  session_record ? "Continuer →" : "Commencer →",
+                  student_subject_path(access_code: params[:access_code], id: subject.id),
+                  class: "inline-flex items-center px-4 py-1.5 bg-rad-red text-rad-cream text-sm font-bold rounded-full hover:opacity-90 transition-opacity"
+                ) %>
               <% end %>
-              <%= render(BadgeComponent.new(color: :slate, label: subject.year.to_s)) %>
-              <% if subject.region.present? %>
-                <%= render(BadgeComponent.new(color: :slate, label: subject.region)) %>
-              <% end %>
-            </div>
-            <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1">
-              <%= subject.title %>
-            </h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
-              <%= subject.exam&.upcase %> <%= subject.year %>
-            </p>
-            <%= render(ProgressBarComponent.new(current: answered, total: total, color: :gradient, show_text: true)) %>
-          <% end %>
-          <% card.with_footer do %>
-            <%= render(ButtonComponent.new(
-              variant: session_record ? :gradient : :gradient,
-              pill: true,
-              size: :sm,
-              href: student_subject_path(access_code: params[:access_code], id: subject.id)
-            )) { session_record ? "Continuer →" : "Commencer →" } %>
-          <% end %>
+            <% end %>
+          </div>
         <% end %>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
+      </div>
+    <% end %>
+  </div>
 </div>
