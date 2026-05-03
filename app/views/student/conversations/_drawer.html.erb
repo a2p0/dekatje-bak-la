@@ -22,66 +22,90 @@
      aria-modal="true"
      aria-label="Tutorat IA"
      aria-hidden="true"
-     class="fixed top-0 right-0 bottom-0 w-full lg:w-[420px] bg-white dark:bg-slate-900/95 border-l border-slate-200 dark:border-indigo-500/15 z-50 translate-x-full transition-transform duration-200 ease-in-out flex flex-col backdrop-blur-sm">
+     class="fixed top-0 right-0 bottom-0 w-full lg:w-[420px] bg-rad-bg border-l border-rad-rule z-50 translate-x-full transition-transform duration-200 ease-in-out flex flex-col">
 
-  <div class="px-4 py-3 border-b border-slate-200 dark:border-indigo-500/15 shrink-0 bg-slate-50 dark:bg-slate-900/80">
-    <div class="flex items-center justify-between mb-2">
-      <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Tutorat IA</span>
+  <%# Header — "espace Tibo" %>
+  <div class="bg-rad-warm shrink-0">
+    <%# Stripes martiniquaises 4px %>
+    <div class="flex h-1">
+      <div class="flex-1 bg-rad-red"></div>
+      <div class="flex-1 bg-rad-yellow"></div>
+      <div class="flex-1 bg-rad-teal"></div>
+      <div class="flex-1 bg-rad-ink"></div>
+    </div>
+
+    <div class="px-4 py-3 flex items-center gap-3">
+      <%# Bouton fermeture %>
       <button type="button"
               data-action="click->chat-drawer#close"
               aria-label="Fermer le tutorat"
-              class="p-1 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer bg-transparent border-none text-lg leading-none">
-        ✕
+              class="text-rad-text opacity-70 text-[22px] leading-none bg-transparent border-none cursor-pointer flex-shrink-0 p-0">
+        ‹
       </button>
-    </div>
-    <div class="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-lg px-3 py-2">
-      <div class="flex justify-between items-start gap-2">
-        <span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-          Q<%= question.number %> &middot; <%= question.points %> pts
-        </span>
+
+      <%# Avatar Tibo %>
+      <div class="relative flex-shrink-0">
+        <div class="w-10 h-10 rounded-full bg-rad-red flex items-center justify-center">
+          <span class="font-serif italic text-[19px] text-rad-cream leading-none">T</span>
+        </div>
+        <span class="absolute bottom-[1px] right-[1px] w-2.5 h-2.5 rounded-full bg-rad-teal border-2 border-rad-warm"></span>
       </div>
-      <p class="text-xs text-slate-700 dark:text-slate-300 mt-1 line-clamp-2"><%= question.label %></p>
+
+      <%# Titre + sous-titre %>
+      <div class="flex-1 min-w-0">
+        <div class="font-serif italic text-[17px] text-rad-text leading-none">Tibo, ton tuteur</div>
+        <div class="text-[11px] text-rad-muted mt-[3px]">Sur la Q<%= question.number %> · ne donne pas la réponse</div>
+      </div>
+
+      <%# Chip question %>
+      <span class="flex-shrink-0 text-[11px] font-bold px-2 py-1 rounded-lg bg-black/[.07] dark:bg-white/10 text-rad-muted">
+        Q<%= question.number %> ↗
+      </span>
     </div>
   </div>
 
+  <%# Zone messages %>
   <div id="tutor-chat-messages"
        data-tutor-chat-target="messages"
-       class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+       class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-rad-bg pattern-madras-diagonal">
     <% if conversation&.messages&.any? %>
       <% conversation.messages.order(:created_at).each do |msg| %>
         <%= render "student/conversations/message", message: msg %>
       <% end %>
     <% else %>
-      <div class="text-slate-600 dark:text-slate-500 text-sm text-center mt-10">
+      <div class="text-rad-muted text-sm text-center mt-10">
         Posez votre question pour commencer le tutorat.
       </div>
     <% end %>
   </div>
 
+  <%# Streaming placeholder — div unique car le controller fait textContent += token dessus directement. %>
+  <%# Pas d'avatar T : ajout d'un wrapper flex nécessiterait de refactorer le controller JS (hors scope). %>
   <div data-tutor-chat-target="streamingPlaceholder"
        aria-live="polite"
-       class="hidden self-start bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-3 py-2 rounded-2xl rounded-bl-sm max-w-[85%] text-sm leading-relaxed mx-4 mb-3 break-words">
+       class="hidden self-start bg-rad-paper border border-rad-rule text-rad-text px-3 py-2 rounded-2xl rounded-tl-sm max-w-[85%] text-sm leading-relaxed mx-4 mb-3 break-words">
   </div>
 
-  <div class="px-4 py-3 border-t border-slate-200 dark:border-indigo-500/15 shrink-0">
-    <div class="flex gap-2">
+  <%# Input bar %>
+  <div class="px-4 py-3 border-t border-rad-rule shrink-0 bg-rad-warm">
+    <div class="flex items-center gap-2 px-4 py-[6px] rounded-full bg-rad-paper border border-rad-rule">
       <label for="tutor-chat-input" class="sr-only">Écrivez votre question au tuteur</label>
       <input data-tutor-chat-target="input"
              data-action="keydown.enter->tutor-chat#send"
              type="text"
              id="tutor-chat-input"
              aria-label="Écrivez votre question au tuteur"
-             placeholder="Écrivez votre question..."
+             placeholder="Écris à Tibo…"
              <% unless conversation %>disabled<% end %>
-             class="flex-1 px-3 py-2 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-indigo-500/15 rounded-xl text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+             class="flex-1 border-none outline-none bg-transparent text-sm text-rad-text placeholder:text-rad-muted py-2 disabled:opacity-50"
              autocomplete="off">
       <button type="button"
               data-tutor-chat-target="sendButton"
               data-action="click->tutor-chat#send"
               aria-label="Envoyer"
               <% unless conversation %>disabled<% end %>
-              class="px-4 py-2 bg-gradient-to-br from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white rounded-xl text-sm font-medium transition-all cursor-pointer whitespace-nowrap border-none shadow-[0_0_14px_rgba(99,102,241,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
-        Envoyer
+              class="w-10 h-10 rounded-full bg-rad-red text-rad-cream border-0 flex items-center justify-center text-[16px] cursor-pointer flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
+        ↑
       </button>
     </div>
   </div>

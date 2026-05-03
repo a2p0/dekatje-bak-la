@@ -94,11 +94,11 @@ export default class extends Controller {
       const div = document.createElement("div")
       div.classList.add(
         "self-start",
-        "bg-slate-100", "dark:bg-slate-800",
-        "text-slate-800", "dark:text-slate-200",
+        "bg-rad-paper", "border", "border-rad-rule",
+        "text-rad-text",
         "px-3", "py-2",
-        "rounded-2xl", "rounded-bl-sm",
-        "max-w-[85%]", "text-sm", "leading-relaxed", "break-words"
+        "rounded-2xl", "rounded-tl-sm",
+        "max-w-[86%]", "text-sm", "leading-relaxed", "break-words"
       )
       div.dataset.messageId   = message.id
       div.dataset.messageRole = "assistant"
@@ -127,10 +127,10 @@ export default class extends Controller {
     const div = document.createElement("div")
     div.classList.add(
       "self-end",
-      "bg-gradient-to-br", "from-indigo-500", "to-violet-500",
-      "text-white", "px-3", "py-2",
-      "rounded-2xl", "rounded-br-sm",
-      "max-w-[85%]", "text-sm", "leading-relaxed", "break-words"
+      "bg-rad-red", "text-rad-cream",
+      "px-3", "py-2",
+      "rounded-2xl", "rounded-tr-sm",
+      "max-w-[82%]", "text-sm", "leading-relaxed", "break-words"
     )
     div.dataset.messageRole = "user"
     div.dataset.optimistic  = "true"
@@ -180,9 +180,9 @@ export default class extends Controller {
       errorEl.setAttribute("role", "alert")
       errorEl.classList.add(
         "mx-4", "mb-2", "px-3", "py-2",
-        "bg-red-50", "dark:bg-rose-950/50",
-        "border", "border-rose-200", "dark:border-rose-900",
-        "text-rose-700", "dark:text-rose-300",
+        "bg-rad-red/10",
+        "border", "border-rad-red/40",
+        "text-rad-red",
         "rounded-lg", "text-xs"
       )
       this.inputTarget.closest(".px-4")?.before(errorEl)
