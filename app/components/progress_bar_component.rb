@@ -1,8 +1,9 @@
 class ProgressBarComponent < ViewComponent::Base
   COLORS = {
-    indigo: "bg-indigo-500",
-    emerald: "bg-emerald-500",
-    gradient: "bg-gradient-to-r from-indigo-500 to-violet-500"
+    indigo:   "bg-indigo-500",
+    emerald:  "bg-emerald-500",
+    gradient: "bg-gradient-to-r from-indigo-500 to-violet-500",
+    rad_teal: "bg-rad-teal",
   }.freeze
 
   def initialize(current:, total:, color: :indigo, show_text: false)
@@ -25,14 +26,14 @@ class ProgressBarComponent < ViewComponent::Base
     content_tag(:div, class: "flex items-center gap-2") do
       bar = content_tag(:div, role: "progressbar",
                         aria: { valuenow: @current, valuemin: 0, valuemax: @total },
-                        class: "flex-1 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden") do
+                        class: "flex-1 h-1 bg-rad-rule rounded-full overflow-hidden") do
         content_tag(:div, "", class: "h-full #{bar_color} rounded-full transition-all",
                     style: "width: #{percentage}%")
       end
 
       if @show_text
-        text = content_tag(:span, "#{@current}/#{@total} — #{percentage}%",
-                           class: "text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap")
+        text = content_tag(:span, "#{@current}/#{@total}",
+                           class: "text-xs text-rad-muted whitespace-nowrap")
         bar + text
       else
         bar
