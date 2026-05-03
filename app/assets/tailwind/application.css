@@ -74,6 +74,23 @@
     repeating-linear-gradient(90deg,  rgba(0,0,0,0.04) 0 1px, transparent 1px 7px);
 }
 
+/* Diagonal madras pattern for tutor drawer — light and dark variants */
+.pattern-madras-diagonal {
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(212,69,46,0.06)  0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-45deg, rgba(212,69,46,0.06)  0 1px, transparent 1px 22px),
+    repeating-linear-gradient(45deg,  rgba(18,117,102,0.05) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(18,117,102,0.05) 0 1px, transparent 1px 7px);
+}
+
+.dark .pattern-madras-diagonal {
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(255,255,255,0.04)  0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.04)  0 1px, transparent 1px 22px),
+    repeating-linear-gradient(45deg,  rgba(255,255,255,0.025) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 7px);
+}
+
 /* Hide scrollbars while keeping scroll functionality */
 .scroll-hide::-webkit-scrollbar { display: none; }
 .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
