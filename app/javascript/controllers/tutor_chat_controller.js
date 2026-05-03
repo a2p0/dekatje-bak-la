@@ -94,11 +94,11 @@ export default class extends Controller {
       const div = document.createElement("div")
       div.classList.add(
         "self-start",
-        "bg-slate-100", "dark:bg-slate-800",
-        "text-slate-800", "dark:text-slate-200",
+        "bg-rad-paper", "border", "border-rad-rule",
+        "text-rad-text",
         "px-3", "py-2",
-        "rounded-2xl", "rounded-bl-sm",
-        "max-w-[85%]", "text-sm", "leading-relaxed", "break-words"
+        "rounded-2xl", "rounded-tl-sm",
+        "max-w-[86%]", "text-sm", "leading-relaxed", "break-words"
       )
       div.dataset.messageId   = message.id
       div.dataset.messageRole = "assistant"
@@ -127,10 +127,10 @@ export default class extends Controller {
     const div = document.createElement("div")
     div.classList.add(
       "self-end",
-      "bg-gradient-to-br", "from-indigo-500", "to-violet-500",
-      "text-white", "px-3", "py-2",
-      "rounded-2xl", "rounded-br-sm",
-      "max-w-[85%]", "text-sm", "leading-relaxed", "break-words"
+      "bg-rad-red", "text-rad-cream",
+      "px-3", "py-2",
+      "rounded-2xl", "rounded-tr-sm",
+      "max-w-[82%]", "text-sm", "leading-relaxed", "break-words"
     )
     div.dataset.messageRole = "user"
     div.dataset.optimistic  = "true"
