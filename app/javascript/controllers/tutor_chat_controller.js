@@ -180,9 +180,9 @@ export default class extends Controller {
       errorEl.setAttribute("role", "alert")
       errorEl.classList.add(
         "mx-4", "mb-2", "px-3", "py-2",
-        "bg-red-50", "dark:bg-rose-950/50",
-        "border", "border-rose-200", "dark:border-rose-900",
-        "text-rose-700", "dark:text-rose-300",
+        "bg-rad-red/10",
+        "border", "border-rad-red/40",
+        "text-rad-red",
         "rounded-lg", "text-xs"
       )
       this.inputTarget.closest(".px-4")?.before(errorEl)

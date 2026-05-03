@@ -25,7 +25,7 @@
      class="fixed top-0 right-0 bottom-0 w-full lg:w-[420px] bg-rad-bg border-l border-rad-rule z-50 translate-x-full transition-transform duration-200 ease-in-out flex flex-col">
 
   <%# Header — "espace Tibo" %>
-  <div class="bg-[#e8e0cc] dark:bg-rad-raise shrink-0">
+  <div class="bg-rad-warm shrink-0">
     <%# Stripes martiniquaises 4px %>
     <div class="flex h-1">
       <div class="flex-1 bg-rad-red"></div>
@@ -48,7 +48,7 @@
         <div class="w-10 h-10 rounded-full bg-rad-red flex items-center justify-center">
           <span class="font-serif italic text-[19px] text-rad-cream leading-none">T</span>
         </div>
-        <span class="absolute bottom-[1px] right-[1px] w-2.5 h-2.5 rounded-full bg-rad-teal border-2 border-[#e8e0cc] dark:border-rad-raise"></span>
+        <span class="absolute bottom-[1px] right-[1px] w-2.5 h-2.5 rounded-full bg-rad-teal border-2 border-rad-warm"></span>
       </div>
 
       <%# Titre + sous-titre %>
@@ -79,15 +79,15 @@
     <% end %>
   </div>
 
-  <%# Streaming placeholder — target unique (le controller écrit textContent dessus directement) %>
-  <%# Pas d'avatar T ici : le controller JS fait classList.remove("hidden") sur ce div %>
+  <%# Streaming placeholder — div unique car le controller fait textContent += token dessus directement. %>
+  <%# Pas d'avatar T : ajout d'un wrapper flex nécessiterait de refactorer le controller JS (hors scope). %>
   <div data-tutor-chat-target="streamingPlaceholder"
        aria-live="polite"
        class="hidden self-start bg-rad-paper border border-rad-rule text-rad-text px-3 py-2 rounded-2xl rounded-tl-sm max-w-[85%] text-sm leading-relaxed mx-4 mb-3 break-words">
   </div>
 
   <%# Input bar %>
-  <div class="px-4 py-3 border-t border-rad-rule shrink-0 bg-[#e8e0cc] dark:bg-rad-raise">
+  <div class="px-4 py-3 border-t border-rad-rule shrink-0 bg-rad-warm">
     <div class="flex items-center gap-2 px-4 py-[6px] rounded-full bg-rad-paper border border-rad-rule">
       <label for="tutor-chat-input" class="sr-only">Écrivez votre question au tuteur</label>
       <input data-tutor-chat-target="input"

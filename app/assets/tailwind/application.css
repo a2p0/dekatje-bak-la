@@ -30,6 +30,7 @@
   --color-rad-green:  #2e8b3a;
   --color-rad-ink:    #0e1b1f;
   --color-rad-cream:  #fbf7ee;
+  --color-rad-warm:   #e8e0cc; /* tutor drawer header/footer — beige chaud */
 
   /* Border radius */
   --radius-card:   1rem;
@@ -63,6 +64,7 @@
   --color-rad-green:  #7bc77a;
   --color-rad-ink:    #f5ecdc;
   /* rad-cream reste #fbf7ee en dark */
+  --color-rad-warm:   #1a4a50; /* = rad-raise en dark */
 }
 
 /* Madras-inspired subtle grid pattern (used on hero cards) */
