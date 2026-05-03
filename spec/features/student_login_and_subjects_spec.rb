@@ -110,10 +110,6 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
   end
 
   scenario "un élève connecté se déconnecte" do
-    # pending: Radical reskin (057) déplace le lien Déconnexion vers settings/show.
-    # Le lien n'est plus sur subjects/index — le scénario nécessite de naviguer vers les réglages d'abord.
-    pending "Déconnexion déplacée vers settings/show (reskin 057)"
-
     student = create(:student, classroom: classroom)
 
     visit student_login_path(access_code: classroom.access_code)
@@ -122,6 +118,8 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
     click_button "Se connecter"
 
     expect(page).to have_content("Salut #{student.first_name}")
+
+    visit student_settings_path(access_code: classroom.access_code)
 
     # The logout link uses data-turbo-method="delete".
     # Turbo JS may not intercept in headless Chrome; submit a DELETE form via JS.
