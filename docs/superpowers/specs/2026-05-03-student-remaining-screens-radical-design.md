@@ -74,7 +74,7 @@ Configuration API et mode par défaut. Design iOS-settings style du handoff.
 
 ### Suppressions
 - **Champ spécialité** (section "Profil" entière retirée) — la spécialité est gérée par l'enseignant
-- **Toggle "Utiliser ma clé personnelle"** — remplacé par une note texte info
+- ~~Toggle "Utiliser ma clé personnelle"~~ — **conservé**
 
 ### Ajouts
 - **Card profil** en haut de page : avatar rond `bg-rad-red text-rad-cream font-serif italic` (initiale prénom), nom complet + username + nom classe en `text-rad-muted`
@@ -100,7 +100,8 @@ Configuration API et mode par défaut. Design iOS-settings style du handoff.
 - Input clé : `bg-rad-raise border-rad-rule rounded-xl font-mono focus:border-rad-teal`
 - Bouton "Tester la clé" : `bg-rad-teal text-rad-cream rounded-full`
 - Feedback : `text-rad-green` (✓) / `text-rad-red` (✗)
-- Note mode gratuit : texte `text-rad-muted text-xs` (remplace le toggle)
+- Toggle "Utiliser ma clé personnelle" : conservé — `label` avec `accent-rad-teal`, texte `text-rad-text/text-rad-muted`
+- Note mode gratuit : texte `text-rad-muted text-xs`
 
 ### Bouton save
 - `bg-rad-red text-rad-cream w-full rounded-[14px] font-bold py-[14px]`
