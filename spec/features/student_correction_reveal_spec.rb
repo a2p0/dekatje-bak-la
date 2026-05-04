@@ -73,8 +73,8 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     visit_question(q1)
     click_button "Voir la correction"
 
-    # Correction text (green card with "Réponse" label)
-    expect(page).to have_content("Réponse")
+    # Correction text (green card with "RÉPONSE" label — uppercase in HTML)
+    expect(page).to have_content("RÉPONSE")
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
 
     # Explication pédagogique (label depends on answer_type; q1 has default type)

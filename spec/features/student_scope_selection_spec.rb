@@ -123,6 +123,9 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     find("button[data-value='common_only']").click
     click_button "Commencer →"
 
+    # Scope selection redirects to parts list — navigate to first question
+    click_link "Continuer la partie 1 →"
+
     # Should see common question
     expect(page).to have_content("Question commune sur le transport durable")
 
@@ -141,6 +144,9 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     visit student_subject_path(access_code: classroom.access_code, id: new_format_subject.id)
     find("button[data-value='full']").click
     click_button "Commencer →"
+
+    # Scope selection redirects to parts list — navigate to first question
+    click_link "Continuer la partie 1 →"
 
     # Should see first common question
     expect(page).to have_content("Question commune sur le transport durable")
