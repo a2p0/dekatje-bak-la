@@ -69,6 +69,14 @@ RSpec.describe Tutor::ChipsPresenter do
         expect(hint_chip[:disabled]).to be_truthy
       end
     end
+
+    context "hints_used > 5 (above MAX_HINTS)" do
+      subject { chips(phase: "guiding", hints_used: 7) }
+      it "Un indice is disabled" do
+        hint_chip = subject.find { _1[:label] == "Un indice" }
+        expect(hint_chip[:disabled]).to be_truthy
+      end
+    end
   end
 
   describe "validating" do

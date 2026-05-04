@@ -1,5 +1,7 @@
 module Tutor
   class ChipsPresenter
+    MAX_HINTS = 5
+
     CONFIDENCE_LABELS = {
       1 => "😰 Pas du tout sûr",
       2 => "😅 Peu sûr",
@@ -47,7 +49,7 @@ module Tutor
     end
 
     def guiding_chips
-      hint_disabled = @hints_used >= Tutor::ApplyToolCalls::MAX_HINTS
+      hint_disabled = @hints_used >= MAX_HINTS
       hint      = send_chip("Un indice", "Donne-moi un indice.", :yellow, disabled: hint_disabled)
       reformule = send_chip("Reformule", "Peux-tu reformuler la question ?", :teal)
       definis   = send_chip("Définis",   "Peux-tu définir un terme clé ?",   :red)
