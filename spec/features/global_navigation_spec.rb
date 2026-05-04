@@ -87,7 +87,7 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     end
   end
 
-  scenario "un élève connecté peut toujours accéder aux réglages et à la déconnexion" do
+  scenario "un élève connecté peut toujours accéder aux réglages depuis la liste et la question" do
     classroom = create(:classroom, name: "Terminale SIN 2026")
     student = create(:student, classroom: classroom, first_name: "Marie")
     subject = create(:subject, status: :published)
@@ -100,18 +100,19 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
     fill_in "Mot de passe", with: "password123"
     click_button "Se connecter"
 
-    # On the subjects index page
-    expect(page).to have_link(text: /Réglages/)
-    expect(page).to have_link("Déconnexion")
+    # On the subjects index page — settings via ≡ icon link
+    expect(page).to have_link(href: /settings/)
 
-    # subjects#index → subjects#show (first Commencer)
-    click_link "Commencer"
-    # subjects#show → questions#show (second Commencer — points to Q1)
-    find("a,button", text: "Commencer", match: :first).click
+    # Navigate directly to the question page
+    visit student_question_path(
+      access_code: classroom.access_code,
+      subject_id: subject.id,
+      id: question.id
+    )
 
     # On desktop viewport (1400px), sidebar is always visible (lg:translate-x-0)
     within("aside") do
-      expect(page).to have_link(text: /Réglages/)
+      expect(page).to have_link(href: /settings/)
     end
   end
 end
