@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { createConsumer } from "@rails/actioncable"
 
 export default class extends Controller {
-  static targets = ["messages", "input", "sendButton", "streamingPlaceholder"]
+  static targets = ["messages", "input", "sendButton", "streamingPlaceholder", "chips"]
   static values  = {
     conversationId: String,
     messagesUrl:    String,
@@ -20,6 +20,7 @@ export default class extends Controller {
     }
 
     this.#scrollToBottom()
+    this.#syncValidatingState()
   }
 
   disconnect() {
@@ -38,6 +39,7 @@ export default class extends Controller {
     this.#appendOptimisticMessage(content)
     this.inputTarget.value = ""
     this.#setStreaming(true)
+    if (this.hasChipsTarget) this.chipsTarget.innerHTML = ""
 
     try {
       const body = { content }
@@ -64,13 +66,68 @@ export default class extends Controller {
     }
   }
 
+  handleChipClick(event) {
+    const button = event.target.closest("[data-chip-action]")
+    if (!button) return
+
+    const action = button.dataset.chipAction
+
+    if (action === "send") {
+      const text = button.dataset.chipText
+      if (!text || this.isStreaming) return
+      this.inputTarget.value = text
+      this.send()
+    } else if (action === "confidence") {
+      const level = parseInt(button.dataset.chipLevel, 10)
+      const url   = button.dataset.confidenceUrl
+      if (!level || !url || this.isStreaming) return
+      const container = button.closest("turbo-frame") || button.parentElement
+      this.#submitConfidence(level, url, container)
+    }
+    // navigate: handled natively by <a href>
+  }
+
+  async #submitConfidence(level, url, chipsContainer) {
+    const buttons = chipsContainer.querySelectorAll("[data-chip-action='confidence']")
+    buttons.forEach(b => { b.disabled = true; b.classList.add("opacity-50", "cursor-not-allowed") })
+
+    try {
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": this.#csrfToken(),
+          "Accept": "text/vnd.turbo-stream.html"
+        },
+        body: JSON.stringify({ level })
+      })
+
+      if (response.ok) {
+        const html = await response.text()
+        Turbo.renderStreamMessage(html)
+      } else {
+        buttons.forEach(b => { b.disabled = false; b.classList.remove("opacity-50", "cursor-not-allowed") })
+      }
+    } catch {
+      buttons.forEach(b => { b.disabled = false; b.classList.remove("opacity-50", "cursor-not-allowed") })
+    }
+  }
+
+  #syncValidatingState() {
+    if (!this.hasChipsTarget) return
+    const isValidating = !!this.chipsTarget.querySelector("[data-tutor-chat-validating]")
+    this.inputTarget.disabled      = isValidating
+    this.sendButtonTarget.disabled = isValidating
+    this.inputTarget.placeholder   = isValidating ? "Réponds via les chips ci-dessus…" : "Écris à Tibo…"
+  }
+
   #handleReceived(data) {
     switch (data.type) {
       case "token":
         this.#onToken(data.token)
         break
       case "done":
-        this.#onDone(data.message)
+        this.#onDone(data)
         break
       case "data_hints":
         this.#onDataHints(data.html)
@@ -87,7 +144,8 @@ export default class extends Controller {
     this.#scrollToBottom()
   }
 
-  #onDone(message) {
+  #onDone(data) {
+    const message = data.message
     this.streamingPlaceholderTarget.textContent = ""
     this.streamingPlaceholderTarget.classList.add("hidden")
     if (message && message.content) {
@@ -104,6 +162,10 @@ export default class extends Controller {
       div.dataset.messageRole = "assistant"
       div.textContent = message.content
       this.messagesTarget.appendChild(div)
+    }
+    if (data.chips_html !== undefined && this.hasChipsTarget) {
+      this.chipsTarget.innerHTML = data.chips_html
+      this.#syncValidatingState()
     }
     this.#setStreaming(false)
     this.#scrollToBottom()

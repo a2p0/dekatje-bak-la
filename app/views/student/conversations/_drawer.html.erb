@@ -13,6 +13,7 @@
 <div id="tutor-chat-drawer"
      data-chat-drawer-target="drawer"
      data-controller="<%= conversation ? 'tutor-chat' : '' %>"
+     data-action="click->tutor-chat#handleChipClick"
      <% if conversation %>
        data-tutor-chat-conversation-id-value="<%= conversation.id %>"
        data-tutor-chat-messages-url-value="<%= messages_student_conversation_path(access_code: access_code, id: conversation.id) %>"
