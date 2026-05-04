@@ -87,7 +87,7 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     expect(page).to have_content("distance 186 km")
 
     # Key concepts
-    expect(page).to have_content("Concepts à réviser")
+    expect(page).to have_content("CONCEPTS À RÉVISER")
     expect(page).to have_content("énergie primaire")
     expect(page).to have_content("rendement")
   end
