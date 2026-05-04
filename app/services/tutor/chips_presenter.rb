@@ -72,7 +72,7 @@ module Tutor
     def feedback_chips
       [
         send_chip("Explique la correction", "Explique-moi la correction.", :teal),
-        { label: "Question suivante →", action: :navigate, color: :red }
+        { label: "Question suivante →", action: :navigate, color: :red, disabled: false }
       ]
     end
 
