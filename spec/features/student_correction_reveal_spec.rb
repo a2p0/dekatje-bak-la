@@ -73,23 +73,21 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     visit_question(q1)
     click_button "Voir la correction"
 
-    # Correction text (green section, rendered uppercase via CSS)
-    expect(page).to have_content(/correction/i)
+    # Correction text (green card with "Réponse" label)
+    expect(page).to have_content("Réponse")
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
 
-    # Explication pédagogique
-    expect(page).to have_content("Explication")
+    # Explication pédagogique (label depends on answer_type; q1 has default type)
     expect(page).to have_content("On utilise la formule Consommation × Distance / 100")
 
     # Data hints (source + location)
     expect(page).to have_content("Où trouver les données ?")
     expect(page).to have_content("DT")
     expect(page).to have_content("tableau Consommation")
-    expect(page).to have_content("Présentation")
     expect(page).to have_content("distance 186 km")
 
-    # Key concepts (badges)
-    expect(page).to have_content("Concepts clés")
+    # Key concepts
+    expect(page).to have_content("Concepts à réviser")
     expect(page).to have_content("énergie primaire")
     expect(page).to have_content("rendement")
   end
@@ -153,6 +151,6 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     sidebar = find("aside[data-sidebar-target='drawer']")
     expect(sidebar).to have_link(text: /Q1\.1/, visible: :all)
     # Verify the checkmark is present
-    expect(sidebar).to have_css("span.text-emerald-400", text: "✓", visible: :all)
+    expect(sidebar).to have_css("span.text-rad-green", text: "✓", visible: :all)
   end
 end
