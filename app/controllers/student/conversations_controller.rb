@@ -124,6 +124,8 @@ class Student::ConversationsController < Student::BaseController
     @conversation.give_feedback! if @conversation.may_give_feedback?
 
     @question_id = q_id
+    @question    = Question.find_by(id: q_id)
+    @access_code = params[:access_code]
     render "student/conversations/confidence", formats: [ :turbo_stream ]
   end
 
