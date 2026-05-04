@@ -119,6 +119,8 @@ RSpec.describe "Story 5: Connexion élève et navigation des sujets", type: :fea
 
     expect(page).to have_content("Salut #{student.first_name}")
 
+    visit student_settings_path(access_code: classroom.access_code)
+
     # The logout link uses data-turbo-method="delete".
     # Turbo JS may not intercept in headless Chrome; submit a DELETE form via JS.
     logout_url = find_link("Déconnexion")[:href]

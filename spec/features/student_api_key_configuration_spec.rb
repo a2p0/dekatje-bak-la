@@ -40,13 +40,13 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
     expect(page).to have_css("[data-settings-connected='true']", wait: 10)
   end
 
-  scenario "l'élève accède aux réglages via le lien dans la liste des sujets" do
+  scenario "l'élève accède aux réglages via le lien ≡ dans la liste des sujets" do
     login_as_student(student, classroom)
 
-    click_link "Réglages", match: :first
+    find("a[href*='settings']").click
 
     expect(page).to have_content("Réglages")
-    expect(page).to have_field("Provider")
+    expect(page).to have_css("select[name='student[api_provider]']")
   end
 
   scenario "l'élève accède aux réglages depuis la sidebar de la page question" do
