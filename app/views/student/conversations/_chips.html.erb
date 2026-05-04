@@ -28,7 +28,7 @@
                 data-chip-action="send"
                 data-chip-text="<%= chip[:text] %>"
                 class="<%= base_classes %> <%= shape_classes %> <%= disabled_classes %>"
-                <%= chip[:disabled] ? "disabled aria-disabled='true'" : "" %>>
+                <%= "disabled aria-disabled='true'" if chip[:disabled] %>>
           <%= chip[:label] %>
         </button>
 
