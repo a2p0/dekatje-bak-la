@@ -15,7 +15,7 @@ RSpec.describe "Teacher downloads credentials PDF from generated banner", type: 
 
     sign_in_teacher(user)
     visit teacher_classroom_path(classroom)
-    click_link "Ajouter un élève"
+    find("a", text: "Ajouter un élève", wait: 5).click
 
     fill_in "Prénom", with: "Jean"
     fill_in "Nom", with: "Dupont"
