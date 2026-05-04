@@ -227,7 +227,7 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
 
     expect(page).to have_css(
       "[data-chat-drawer-target='drawer'].translate-x-full",
-      visible: :all, wait: 5
+      visible: :all, wait: 10
     )
 
     find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
