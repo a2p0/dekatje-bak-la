@@ -41,9 +41,10 @@ class Student::ConversationsController < Student::BaseController
             "tutor-chat-drawer",
             partial: "student/conversations/drawer",
             locals:  {
-              conversation: @conversation,
-              question:     @question_for_drawer || @subject.questions.first,
-              access_code:  params[:access_code]
+              conversation:      @conversation,
+              question:          @question_for_drawer || @subject.questions.first,
+              access_code:       params[:access_code],
+              next_question_url: nil
             }
           )
         else
