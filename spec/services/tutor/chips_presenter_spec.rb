@@ -16,7 +16,7 @@ RSpec.describe Tutor::ChipsPresenter do
       context "phase=#{phase}" do
         subject { chips(phase: phase) }
         it "has 2 chips: Reformule + Définis" do
-          expect(subject.map { _1[:label] }).to eq(["Reformule la question", "Définis un terme"])
+          expect(subject.map { _1[:label] }).to eq([ "Reformule la question", "Définis un terme" ])
         end
         it "all chips are :send action" do
           expect(subject.map { _1[:action] }).to all(eq(:send))
@@ -36,7 +36,7 @@ RSpec.describe Tutor::ChipsPresenter do
       context "phase=#{phase}" do
         subject { chips(phase: phase) }
         it "has 2 chips: Donne un exemple + Reformule" do
-          expect(subject.map { _1[:label] }).to eq(["Donne un exemple", "Reformule la question"])
+          expect(subject.map { _1[:label] }).to eq([ "Donne un exemple", "Reformule la question" ])
         end
         it "Donne un exemple uses yellow color" do
           expect(subject[0][:color]).to eq(:yellow)
@@ -49,7 +49,7 @@ RSpec.describe Tutor::ChipsPresenter do
     context "hints_used < 5" do
       subject { chips(phase: "guiding", hints_used: 2) }
       it "has 3 chips: Un indice + Reformule + Définis" do
-        expect(subject.map { _1[:label] }).to eq(["Un indice", "Reformule", "Définis"])
+        expect(subject.map { _1[:label] }).to eq([ "Un indice", "Reformule", "Définis" ])
       end
       it "Un indice is not disabled" do
         expect(subject[0][:disabled]).to be_falsey
@@ -62,7 +62,7 @@ RSpec.describe Tutor::ChipsPresenter do
     context "hints_used = 5 (MAX_HINTS)" do
       subject { chips(phase: "guiding", hints_used: 5) }
       it "has 3 chips including disabled Un indice last" do
-        expect(subject.map { _1[:label] }).to eq(["Reformule", "Définis", "Un indice"])
+        expect(subject.map { _1[:label] }).to eq([ "Reformule", "Définis", "Un indice" ])
       end
       it "Un indice is disabled" do
         hint_chip = subject.find { _1[:label] == "Un indice" }
@@ -88,7 +88,7 @@ RSpec.describe Tutor::ChipsPresenter do
       expect(subject.map { _1[:action] }).to all(eq(:confidence))
     end
     it "levels are 1..5" do
-      expect(subject.map { _1[:level] }).to eq([1, 2, 3, 4, 5])
+      expect(subject.map { _1[:level] }).to eq([ 1, 2, 3, 4, 5 ])
     end
     it "labels include emojis" do
       expect(subject[0][:label]).to include("😰")

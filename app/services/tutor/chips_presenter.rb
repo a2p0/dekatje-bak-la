@@ -54,7 +54,7 @@ module Tutor
       reformule = send_chip("Reformule", "Peux-tu reformuler la question ?", :teal)
       definis   = send_chip("Définis",   "Peux-tu définir un terme clé ?",   :red)
 
-      hint_disabled ? [reformule, definis, hint] : [hint, reformule, definis]
+      hint_disabled ? [ reformule, definis, hint ] : [ hint, reformule, definis ]
     end
 
     def validating_chips

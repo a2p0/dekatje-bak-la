@@ -22,7 +22,8 @@ RSpec.describe ProcessTutorMessageJob, type: :job do
     expect(Tutor::ProcessMessage).to have_received(:call).with(
       conversation:  conversation,
       student_input: "Bonjour.",
-      question:      question
+      question:      question,
+      access_code:   nil
     )
   end
 
