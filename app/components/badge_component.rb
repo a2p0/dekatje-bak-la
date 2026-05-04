@@ -8,8 +8,8 @@ class BadgeComponent < ViewComponent::Base
     rose:      "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400",
     rad_teal:  "bg-rad-teal/10 text-rad-teal border border-rad-teal/20",
     rad_red:   "bg-rad-red/10 text-rad-red border border-rad-red/20",
-    rad_yellow:"bg-rad-yellow/15 text-rad-ink border border-rad-yellow/30",
-    rad_muted: "bg-rad-rule/40 text-rad-muted border border-rad-rule",
+    rad_yellow: "bg-rad-yellow/15 text-rad-ink border border-rad-yellow/30",
+    rad_muted: "bg-rad-rule/40 text-rad-muted border border-rad-rule"
   }.freeze
 
   def initialize(color:, label:)

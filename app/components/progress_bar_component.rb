@@ -3,7 +3,7 @@ class ProgressBarComponent < ViewComponent::Base
     indigo:   "bg-indigo-500",
     emerald:  "bg-emerald-500",
     gradient: "bg-gradient-to-r from-indigo-500 to-violet-500",
-    rad_teal: "bg-rad-teal",
+    rad_teal: "bg-rad-teal"
   }.freeze
 
   def initialize(current:, total:, color: :indigo, show_text: false)

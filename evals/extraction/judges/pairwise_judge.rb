@@ -89,11 +89,11 @@ def run_pairwise(subject_id, subject_dir, openrouter_key, model_a: "opus", model
         raw    = judgment.dig(c, "winner").to_s.downcase
         reason = judgment.dig(c, "reason").to_s
         winner = case raw
-                 when "a"       then a_is
-                 when "b"       then b_is
-                 when "egalite" then "egalite"
-                 else "inconnu"
-                 end
+        when "a"       then a_is
+        when "b"       then b_is
+        when "egalite" then "egalite"
+        else "inconnu"
+        end
         scores[winner][c] += 1 if scores.key?(winner)
         question_result["#{c}_winner"] = winner
         question_result["#{c}_reason"] = reason

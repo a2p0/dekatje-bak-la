@@ -60,7 +60,7 @@ def call_anthropic(system_prompt, user_content, api_key, model_id)
   body = {
     model: model_id,
     system: system_prompt,
-    messages: [{ role: "user", content: user_content }],
+    messages: [ { role: "user", content: user_content } ],
     max_tokens: 32_768
     # temperature omis : deprecated sur Opus 4.7+
   }
@@ -220,10 +220,10 @@ def call_openrouter_chat(system_prompt, user_content, api_key, model_id)
   tokens_out = usage["completion_tokens"].to_i
   # Pricing per model ($/M tokens)
   price_in, price_out = case model_id
-                        when /kimi/    then [0.74, 3.49]
-                        when /deepseek/ then [0.435, 0.87]
-                        else [1.0, 3.0]
-                        end
+  when /kimi/    then [ 0.74, 3.49 ]
+  when /deepseek/ then [ 0.435, 0.87 ]
+  else [ 1.0, 3.0 ]
+  end
   cost = (tokens_in * price_in + tokens_out * price_out) / 1_000_000.0
 
   {
@@ -376,19 +376,19 @@ subject_ids.each do |subject_id|
 
     begin
       result = case config[:provider]
-               when :anthropic_pdftext
+      when :anthropic_pdftext
                  call_anthropic(system_prompt, opus_user_content, anthropic_key, config[:model_id])
-               when :mistral_ocr
+      when :mistral_ocr
                  raise "OCR a echoue, impossible d'appeler Mistral chat" unless mistral_user_content
                  llm = call_mistral_chat(system_prompt, mistral_user_content, mistral_key, config[:model_id])
                  llm.merge(cost: llm[:cost] + ocr_cost, elapsed: llm[:elapsed] + ocr_elapsed)
-               when :anthropic_ocr
+      when :anthropic_ocr
                  raise "OCR a echoue, impossible d'appeler Opus via OCR" unless mistral_user_content
                  call_anthropic(system_prompt, mistral_user_content, anthropic_key, config[:model_id])
-               when :openrouter_ocr
+      when :openrouter_ocr
                  raise "OCR a echoue, impossible d'appeler DeepSeek via OCR" unless mistral_user_content
                  call_openrouter_chat(system_prompt, mistral_user_content, openrouter_key, config[:model_id])
-               end
+      end
 
       File.write(output_file, result[:text])
 

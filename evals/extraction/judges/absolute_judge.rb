@@ -74,8 +74,8 @@ def run_absolute(subject_id, subject_dir, openrouter_key, model_a: "opus", model
 
   common_numbers.each do |qnum|
     [
-      [model_a, data[:opus_by_number][qnum]],
-      [model_b, data[:mistral_by_number][qnum]]
+      [ model_a, data[:opus_by_number][qnum] ],
+      [ model_b, data[:mistral_by_number][qnum] ]
     ].each do |model, extraction|
       counter += 1
       print "  [#{counter}/#{total_questions}] Q#{qnum} #{model}... "
@@ -118,7 +118,7 @@ def run_absolute(subject_id, subject_dir, openrouter_key, model_a: "opus", model
 
   # Calcul des moyennes
   averages = {}
-  [model_a, model_b].each do |model|
+  [ model_a, model_b ].each do |model|
     averages[model] = CRITERIA.each_with_object({}) do |c, h|
       vals = scores[model][c].reject(&:zero?)
       h[c] = vals.empty? ? nil : (vals.sum.to_f / vals.size).round(2)
@@ -175,7 +175,7 @@ def run_absolute(subject_id, subject_dir, openrouter_key, model_a: "opus", model
     f.puts ""
     common_numbers.each do |qnum|
       f.puts "### Q#{qnum}"
-      [[model_a, results_a], [model_b, results_b]].each do |model, results|
+      [ [ model_a, results_a ], [ model_b, results_b ] ].each do |model, results|
         r = results.find { |x| x[:question_number] == qnum }
         next unless r
         if r[:error]
