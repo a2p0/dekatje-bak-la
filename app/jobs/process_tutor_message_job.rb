@@ -1,14 +1,15 @@
 class ProcessTutorMessageJob < ApplicationJob
   queue_as :default
 
-  def perform(conversation_id, student_input, question_id)
+  def perform(conversation_id, student_input, question_id, access_code = nil)
     conversation = Conversation.find(conversation_id)
     question     = Question.find(question_id)
 
     result = Tutor::ProcessMessage.call(
       conversation:  conversation,
       student_input: student_input,
-      question:      question
+      question:      question,
+      access_code:   access_code
     )
 
     unless result.ok?

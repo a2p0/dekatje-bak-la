@@ -1,13 +1,14 @@
 module Tutor
   class ProcessMessage
-    def self.call(conversation:, student_input:, question:)
-      new(conversation: conversation, student_input: student_input, question: question).call
+    def self.call(conversation:, student_input:, question:, access_code:)
+      new(conversation: conversation, student_input: student_input, question: question, access_code: access_code).call
     end
 
-    def initialize(conversation:, student_input:, question:)
+    def initialize(conversation:, student_input:, question:, access_code:)
       @conversation  = conversation
       @student_input = student_input
       @question      = question
+      @access_code   = access_code
     end
 
     def call
@@ -79,7 +80,12 @@ module Tutor
       )
       return update_result if update_result.err?
 
-      BroadcastMessage.call(conversation: @conversation, message: assistant_msg)
+      BroadcastMessage.call(
+        conversation: @conversation,
+        message:      assistant_msg,
+        question:     @question,
+        access_code:  @access_code
+      )
     end
 
     private

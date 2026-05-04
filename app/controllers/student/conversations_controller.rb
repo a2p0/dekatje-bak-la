@@ -92,7 +92,8 @@ class Student::ConversationsController < Student::BaseController
     ProcessTutorMessageJob.perform_later(
       @conversation.id,
       content,
-      question.id
+      question.id,
+      params[:access_code]
     )
 
     render json: { status: "ok" }

@@ -111,7 +111,8 @@ module TutorSimulation
         result = Tutor::ProcessMessage.call(
           conversation:  conversation,
           student_input: student_message,
-          question:      question
+          question:      question,
+          access_code:   nil
         )
 
         if result.err?

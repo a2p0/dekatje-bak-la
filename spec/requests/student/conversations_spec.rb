@@ -118,7 +118,8 @@ RSpec.describe "Student::Conversations", type: :request do
       expect(ProcessTutorMessageJob).to have_received(:perform_later).with(
         conversation.id,
         "Je ne comprends pas.",
-        question.id
+        question.id,
+        classroom.access_code
       )
     end
 
