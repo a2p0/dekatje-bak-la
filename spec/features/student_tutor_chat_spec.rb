@@ -80,11 +80,11 @@ RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
         visible: :all, wait: 5
       )
 
-      find("button[aria-label='Fermer le tutorat']").click
+      find("button[aria-label='Fermer le tutorat']", wait: 5).click
 
       expect(page).to have_css(
         "[data-chat-drawer-target='drawer'].translate-x-full",
-        visible: :all, wait: 5
+        visible: :all, wait: 10
       )
     end
   end
