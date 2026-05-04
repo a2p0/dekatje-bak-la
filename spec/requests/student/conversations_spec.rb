@@ -298,7 +298,7 @@ RSpec.describe "Student::Conversations", type: :request do
       html = render_message(msg)
 
       expect(html).to include("Ma réponse")
-      expect(html).to include("self-start")
+      expect(html).to include("items-start")
       expect(html).to include(%(data-message-role="assistant"))
     end
 

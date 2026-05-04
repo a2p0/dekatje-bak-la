@@ -113,7 +113,7 @@ RSpec.describe "Student::Questions", type: :request do
       it "shows 'Activer le tuteur' link instead of Tutorat button" do
         get_show
         expect(response.body).to include("Activer le tuteur")
-        expect(response.body).not_to include("Tibo")
+        expect(response.body).not_to include('data-controller="tutor-activator"')
       end
 
       it "links to the settings page" do
