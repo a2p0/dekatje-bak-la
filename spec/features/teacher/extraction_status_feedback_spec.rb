@@ -34,5 +34,7 @@ RSpec.describe "Teacher sees extraction feedback with elapsed time", type: :feat
 
     expect(page).to have_content(/Extraction en cours/i)
     expect(page).not_to have_content(/démarrée il y a/i)
+  ensure
+    RSpec::Mocks.space.reset_all
   end
 end
