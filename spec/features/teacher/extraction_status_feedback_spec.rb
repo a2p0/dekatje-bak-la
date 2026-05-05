@@ -22,5 +22,4 @@ RSpec.describe "Teacher sees extraction feedback with elapsed time", type: :feat
     expect(page).to have_css('#extraction-status[aria-atomic="true"]')
     expect(page).to have_content(/démarrée il y a/i)
   end
-
 end
