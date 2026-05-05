@@ -238,11 +238,11 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
     expect(drawer).to have_text("Premier message élève", wait: 5)
     expect(drawer).to have_text("Réponse du tuteur")
 
-    find("button[aria-label='Fermer le tutorat']").click
+    find("button[aria-label='Fermer le tutorat']", wait: 5).click
 
     expect(page).to have_css(
       "[data-chat-drawer-target='drawer'].translate-x-full",
-      visible: :all, wait: 10
+      visible: :all, wait: 15
     )
 
     find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click

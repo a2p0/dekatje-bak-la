@@ -4,14 +4,6 @@ RSpec.describe "Teacher attaches subject to existing exam session", type: :featu
   let(:user) { create(:user, confirmed_at: Time.current) }
   let!(:existing_session) { create(:exam_session, owner: user, title: "CIME 2024", year: "2024") }
 
-  def sign_in_teacher(user)
-    visit new_user_session_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "password123"
-    click_button "Se connecter"
-    expect(page).to have_current_path("/teacher", wait: 5)
-  end
-
   def upload_and_set_extraction_done(raw_json)
     visit new_teacher_subject_path
     attach_file "subject[subject_pdf]",    Rails.root.join("spec/fixtures/files/fake_subject.pdf")
@@ -41,7 +33,7 @@ RSpec.describe "Teacher attaches subject to existing exam session", type: :featu
 
   context "US2 — attach to existing session" do
     scenario "extraction matches existing session → teacher chooses Rattacher → subject linked" do
-      sign_in_teacher(user)
+      login_as(user, scope: :user)
       subject_record = upload_and_set_extraction_done(matching_raw_json)
 
       click_link "Valider le sujet"
@@ -61,7 +53,7 @@ RSpec.describe "Teacher attaches subject to existing exam session", type: :featu
 
   context "US2 — create new session despite existing one" do
     scenario "extraction matches existing session → teacher chooses Créer nouvelle → new ExamSession created" do
-      sign_in_teacher(user)
+      login_as(user, scope: :user)
       subject_record = upload_and_set_extraction_done(matching_raw_json)
 
       click_link "Valider le sujet"

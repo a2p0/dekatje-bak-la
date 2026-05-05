@@ -3,13 +3,6 @@ require "rails_helper"
 RSpec.describe "Teacher archives a subject from its detail page", type: :feature do
   let(:user) { create(:user, confirmed_at: Time.current) }
 
-  def sign_in_teacher(user)
-    visit new_user_session_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "password123"
-    click_button "Se connecter"
-  end
-
   # Turbo.config.forms.confirm is overridden with a custom <dialog> in application.js.
   # Wait for the dialog to appear, then click "Confirmer" inside it.
   def click_with_turbo_confirm(button_text)
@@ -22,7 +15,7 @@ RSpec.describe "Teacher archives a subject from its detail page", type: :feature
     es = create(:exam_session, owner: user, title: "Sujet à archiver")
     subject_record = create(:subject, owner: user, exam_session: es)
 
-    sign_in_teacher(user)
+    login_as(user, scope: :user)
     visit teacher_subject_path(subject_record)
 
     click_with_turbo_confirm "Archiver le sujet"
