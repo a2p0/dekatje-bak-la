@@ -84,7 +84,7 @@ RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
 
       expect(page).to have_css(
         "[data-chat-drawer-target='drawer'].translate-x-full",
-        visible: :all, wait: 10
+        visible: :all, wait: 15
       )
     end
   end

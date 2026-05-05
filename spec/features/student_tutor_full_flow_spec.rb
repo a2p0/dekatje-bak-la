@@ -76,10 +76,16 @@ RSpec.describe "Parcours tuteur complet (E2E)", type: :feature, tutor_streaming:
       "[data-chat-drawer-target='drawer'].translate-x-0",
       visible: :all, wait: 5
     )
-    # Wait for ActionCable subscription to be established before sending,
-    # otherwise the broadcast from the inline job may arrive before the
-    # subscription is ready (or the drawer replacement by conversations#create
-    # may overwrite the chips rendered by the broadcast).
+    # Wait for conversations#create turbo stream to replace the drawer before
+    # typing — BuildIntroMessage always inserts an assistant message for new
+    # conversations, so the first [data-message-role] appearing signals that
+    # the drawer DOM is stable and the input belongs to the new controller.
+    # Without this, set(message) fires on the OLD input element, then the
+    # turbo stream replacement clears it, and send() gets an empty string.
+    expect(page).to have_css(
+      "[data-tutor-chat-target='messages'] [data-message-role]",
+      wait: 10
+    )
     expect(page).to have_css("[data-chat-connected='true']", wait: 10)
     find("[data-tutor-chat-target='input']", visible: :all).set(message)
     find("[data-tutor-chat-target='sendButton']", visible: :all).click
