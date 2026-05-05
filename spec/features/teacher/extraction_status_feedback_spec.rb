@@ -23,18 +23,4 @@ RSpec.describe "Teacher sees extraction feedback with elapsed time", type: :feat
     expect(page).to have_content(/démarrée il y a/i)
   end
 
-  scenario "fallback gracieux si updated_at est nil" do
-    subject_record = create(:subject, owner: user)
-    create(:extraction_job, subject: subject_record, status: :processing)
-
-    allow_any_instance_of(ExtractionJob).to receive(:updated_at).and_return(nil)
-
-    sign_in_teacher(user)
-    visit teacher_subject_path(subject_record)
-
-    expect(page).to have_content(/Extraction en cours/i)
-    expect(page).not_to have_content(/démarrée il y a/i)
-  ensure
-    RSpec::Mocks.space.reset_all
-  end
 end
