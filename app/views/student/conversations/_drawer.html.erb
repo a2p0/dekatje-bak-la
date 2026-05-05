@@ -13,6 +13,7 @@
 <div id="tutor-chat-drawer"
      data-chat-drawer-target="drawer"
      data-controller="<%= conversation ? 'tutor-chat' : '' %>"
+     data-action="click->tutor-chat#handleChipClick"
      <% if conversation %>
        data-tutor-chat-conversation-id-value="<%= conversation.id %>"
        data-tutor-chat-messages-url-value="<%= messages_student_conversation_path(access_code: access_code, id: conversation.id) %>"
@@ -78,6 +79,15 @@
       </div>
     <% end %>
   </div>
+
+  <%# Chips contextuelles — mises à jour par ActionCable en fin de tour %>
+  <turbo-frame id="tutor-chips" data-tutor-chat-target="chips" class="shrink-0">
+    <%= render "student/conversations/chips",
+          conversation:      conversation,
+          question:          question,
+          access_code:       access_code,
+          next_question_url: local_assigns[:next_question_url] %>
+  </turbo-frame>
 
   <%# Streaming placeholder — div unique car le controller fait textContent += token dessus directement. %>
   <%# Pas d'avatar T : ajout d'un wrapper flex nécessiterait de refactorer le controller JS (hors scope). %>

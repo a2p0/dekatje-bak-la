@@ -8,6 +8,10 @@ export default class extends Controller {
   }
 
   activate() {
+    let closedByUser = false
+    const onClose = () => { closedByUser = true }
+    document.addEventListener("chat-drawer:closed", onClose, { once: true })
+
     this.#openDrawer()
 
     fetch(this.conversationsUrlValue, {
@@ -25,7 +29,10 @@ export default class extends Controller {
       .then(r => r.text())
       .then(html => window.Turbo?.renderStreamMessage(html))
       .then(() => new Promise(resolve => setTimeout(resolve, 50)))
-      .then(() => this.#openDrawer())
+      .then(() => {
+        document.removeEventListener("chat-drawer:closed", onClose)
+        if (!closedByUser) this.#openDrawer()
+      })
       .catch(() => {})
   }
 

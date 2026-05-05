@@ -106,25 +106,25 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     login_as_student(student, classroom)
 
     visit student_subject_path(access_code: classroom.access_code, id: new_format_subject.id)
-    # Should see the scope selection instead of mise en situation
-    expect(page).to have_content("Choisissez votre perimetre de travail")
-    expect(page).to have_button("Partie commune")
-    expect(page).to have_content("Partie specifique SIN")
-    expect(page).to have_button("Sujet complet")
-    expect(page).to have_content("12 points")
-    expect(page).to have_content("8 points")
-    expect(page).to have_content("20 points")
+    # Should see the scope selection instead of parts list
+    expect(page).to have_content("Quel périmètre veux-tu réviser")
+    expect(page).to have_content("Tronc commun seul")
+    expect(page).to have_content("Spécifique SIN seul")
+    expect(page).to have_content("TC + Spécifique SIN")
+    expect(page).to have_content("12 pts")
+    expect(page).to have_content("8 pts")
+    expect(page).to have_content("20 pts")
   end
 
-  scenario "student chooses 'Partie commune' and sees only common questions" do
+  scenario "student chooses 'Tronc commun seul' and sees only common questions" do
     login_as_student(student, classroom)
 
     visit student_subject_path(access_code: classroom.access_code, id: new_format_subject.id)
-    click_button "Partie commune"
+    find("button[data-value='common_only']").click
+    click_button "Commencer →"
 
-    # Should redirect to mise en situation, then start questions
-    expect(page).to have_content("MISE EN SITUATION")
-    click_link "Commencer"
+    # Scope selection redirects to parts list — navigate to first question
+    click_link "Continuer la partie 1 →"
 
     # Should see common question
     expect(page).to have_content("Question commune sur le transport durable")
@@ -138,17 +138,15 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
     expect(page).to have_button("Fin de la partie commune")
   end
 
-  scenario "student chooses 'Sujet complet' and sees all questions" do
+  scenario "student chooses 'TC + Specifique' and sees all questions" do
     login_as_student(student, classroom)
 
     visit student_subject_path(access_code: classroom.access_code, id: new_format_subject.id)
-    click_button "Sujet complet"
+    find("button[data-value='full']").click
+    click_button "Commencer →"
 
-    # Should see mise en situation with all parts listed
-    expect(page).to have_content("Partie commune transport")
-    expect(page).to have_content("Partie specifique SIN")
-
-    click_link "Commencer"
+    # Scope selection redirects to parts list — navigate to first question
+    click_link "Continuer la partie 1 →"
 
     # Should see first common question
     expect(page).to have_content("Question commune sur le transport durable")
@@ -159,18 +157,15 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
     visit student_subject_path(access_code: classroom.access_code, id: legacy_subject.id)
 
-    # Should go directly to mise en situation, no scope selection
-    expect(page).not_to have_content("Choisissez votre perimetre de travail")
-    expect(page).to have_content("MISE EN SITUATION")
-    expect(page).to have_link("Commencer")
-
-    click_link "Commencer"
-    expect(page).to have_content("Question du sujet legacy")
+    # Should go directly to parts list, no scope selection
+    expect(page).not_to have_content("Quel périmètre veux-tu réviser")
+    expect(page).to have_content("Partie unique")
+    expect(page).to have_content("Continuer la partie")
   end
 
-  scenario "student with scope selected sees 'Changer de perimetre' option" do
+  scenario "student with scope selected sees scope summary on parts list" do
     # Pre-select scope
-    session_record = create(:student_session,
+    create(:student_session,
       student: student,
       subject: new_format_subject,
       part_filter: :common_only,
@@ -180,8 +175,8 @@ RSpec.describe "US4: Student scope selection (perimetre de travail)", type: :fea
 
     visit student_subject_path(access_code: classroom.access_code, id: new_format_subject.id)
 
-    # Should see scope indicator and change link
-    expect(page).to have_content("Partie commune (12 pts, 2h30)")
-    expect(page).to have_button("Changer de perimetre")
+    # Should see scope-filtered parts list (common parts only, no scope selection screen)
+    expect(page).not_to have_content("Quel périmètre veux-tu réviser")
+    expect(page).to have_content("Partie commune transport")
   end
 end

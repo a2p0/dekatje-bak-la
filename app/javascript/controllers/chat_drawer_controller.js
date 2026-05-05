@@ -32,5 +32,6 @@ export default class extends Controller {
     this.element.querySelectorAll("[data-chat-drawer-toggle]").forEach(btn => {
       btn.setAttribute("aria-expanded", "false")
     })
+    document.dispatchEvent(new CustomEvent("chat-drawer:closed"))
   }
 }

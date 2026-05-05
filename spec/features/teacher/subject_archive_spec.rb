@@ -13,7 +13,7 @@ RSpec.describe "Teacher archives a subject from its detail page", type: :feature
   # Turbo.config.forms.confirm is overridden with a custom <dialog> in application.js.
   # Wait for the dialog to appear, then click "Confirmer" inside it.
   def click_with_turbo_confirm(button_text)
-    click_button button_text
+    find("button, input[type=submit]", text: button_text, wait: 5).click
     dialog = find("dialog", wait: 10)
     within(dialog) { click_button "Confirmer" }
   end

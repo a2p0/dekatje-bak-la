@@ -24,7 +24,25 @@ RSpec.describe Tutor::BroadcastMessage do
         message: hash_including(content: message.content)
       )
     )
-    result = described_class.call(conversation: conversation, message: message)
+    result = described_class.call(
+      conversation: conversation,
+      message:      message,
+      question:     question,
+      access_code:  classroom.access_code
+    )
     expect(result.ok?).to be true
+  end
+
+  it "returns ok and broadcasts empty chips_html when question is nil" do
+    expect(ActionCable.server).to receive(:broadcast).with(
+      "conversation_#{conversation.id}",
+      hash_including(chips_html: "")
+    )
+    described_class.call(
+      conversation: conversation,
+      message:      message,
+      question:     nil,
+      access_code:  nil
+    )
   end
 end

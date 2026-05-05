@@ -97,7 +97,7 @@ RSpec.describe "Student::Questions", type: :request do
     end
 
     it "renders data hints with yellow accent" do
-      answer.update!(data_hints: [{ "source" => "DT1", "location" => "tableau", "value" => "30,5 L" }])
+      answer.update!(data_hints: [ { "source" => "DT1", "location" => "tableau", "value" => "30,5 L" } ])
       get student_question_path(access_code: classroom.access_code, subject_id: subject_obj.id, id: question.id)
       expect(response.body).to include("bg-rad-yellow")
       expect(response.body).to include("Où trouver les données")

@@ -23,7 +23,8 @@ RSpec.describe Tutor::ProcessMessage do
     described_class.call(
       conversation:  conversation,
       student_input: "Je ne sais pas.",
-      question:      question
+      question:      question,
+      access_code:   nil
     )
   end
 
@@ -69,7 +70,8 @@ RSpec.describe Tutor::ProcessMessage do
     r = described_class.call(
       conversation:  conversation,
       student_input: "   ",
-      question:      question
+      question:      question,
+      access_code:   nil
     )
     expect(r.err?).to be true
   end
@@ -112,7 +114,8 @@ RSpec.describe Tutor::ProcessMessage do
         result = described_class.call(
           conversation:  spotting_conversation,
           question:      question,
-          student_input: "Je ne sais pas."
+          student_input: "Je ne sais pas.",
+          access_code:   nil
         )
         expect(result.ok?).to be true
         assistant_msg = spotting_conversation.messages.reload.find { |m| m.role == "assistant" }
@@ -153,7 +156,8 @@ RSpec.describe Tutor::ProcessMessage do
         described_class.call(
           conversation:  spotting_conversation,
           question:      question,
-          student_input: "Les données sont dans un document technique."
+          student_input: "Les données sont dans un document technique.",
+          access_code:   nil
         )
       end
 
@@ -161,7 +165,8 @@ RSpec.describe Tutor::ProcessMessage do
         described_class.call(
           conversation:  spotting_conversation,
           question:      question,
-          student_input: "Les données sont dans un document technique."
+          student_input: "Les données sont dans un document technique.",
+          access_code:   nil
         )
         expect(spotting_conversation.reload.tutor_state.current_phase).to eq("guiding")
       end
@@ -170,7 +175,8 @@ RSpec.describe Tutor::ProcessMessage do
         described_class.call(
           conversation:  spotting_conversation,
           question:      question,
-          student_input: "Les données sont dans un document technique."
+          student_input: "Les données sont dans un document technique.",
+          access_code:   nil
         )
         sys_msg = spotting_conversation.messages.reload.find { |m| m.role == "system" }
         expect(sys_msg).to be_present
@@ -205,7 +211,8 @@ RSpec.describe Tutor::ProcessMessage do
         described_class.call(
           conversation:  spotting_conversation,
           question:      question,
-          student_input: "Je ne sais vraiment pas."
+          student_input: "Je ne sais vraiment pas.",
+          access_code:   nil
         )
         sys_msg = spotting_conversation.messages.reload.find { |m| m.role == "system" }
         expect(sys_msg).to be_present
@@ -242,7 +249,8 @@ RSpec.describe Tutor::ProcessMessage do
       described_class.call(
         conversation:  resumed_conversation,
         student_input: "J'essaie.",
-        question:      question
+        question:      question,
+        access_code:   nil
       )
       expect(resumed_conversation.reload.tutor_state.current_phase).to eq("guiding")
     end
@@ -254,7 +262,8 @@ RSpec.describe Tutor::ProcessMessage do
       described_class.call(
         conversation:  resumed_conversation,
         student_input: "Ma réponse.",
-        question:      question
+        question:      question,
+        access_code:   nil
       )
       expect(resumed_conversation.reload.tutor_state.current_phase).to eq("validating")
     end
@@ -264,7 +273,8 @@ RSpec.describe Tutor::ProcessMessage do
       described_class.call(
         conversation:  resumed_conversation,
         student_input: "Je tente.",
-        question:      question
+        question:      question,
+        access_code:   nil
       )
       last_at = resumed_conversation.reload.tutor_state.last_activity_at
       expect(last_at).not_to be_nil
@@ -297,7 +307,8 @@ RSpec.describe Tutor::ProcessMessage do
         described_class.call(
           conversation:  conv,
           student_input: "Bonjour.",
-          question:      new_question
+          question:      new_question,
+          access_code:   nil
         )
         qs = conv.reload.tutor_state.question_states[new_question.id.to_s]
         expect(qs).not_to be_nil

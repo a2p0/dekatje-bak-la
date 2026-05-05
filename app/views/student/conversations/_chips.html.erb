@@ -1,0 +1,55 @@
+<%#
+  Locals:
+    conversation      (Conversation | nil)
+    question          (Question)
+    access_code       (String)
+    next_question_url (String | nil) — URL de la question suivante, nil si dernière
+%>
+<% return unless conversation %>
+
+<%
+  ts         = conversation.tutor_state
+  qid        = ts.current_question_id.to_s
+  hints_used = ts.question_states[qid]&.hints_used.to_i
+  chips      = Tutor::ChipsPresenter.call(phase: ts.current_phase, hints_used: hints_used)
+%>
+
+<% if chips.any? %>
+  <div id="tutor-chips-inner"
+       class="px-3 pb-2 flex <%= chips.first[:stacked] ? 'flex-col' : 'flex-row flex-wrap' %> gap-1.5">
+    <% chips.each do |chip| %>
+      <% color_class = { teal: "border-rad-teal", red: "border-rad-red", yellow: "border-rad-yellow" }[chip[:color]] || "border-rad-rule" %>
+      <% base_classes = "text-[11.5px] font-semibold bg-rad-paper border border-rad-rule #{color_class} text-rad-text leading-none cursor-pointer transition-opacity" %>
+      <% shape_classes = chip[:stacked] ? "rounded-lg px-3 py-[7px] border-l-[3px]" : "rounded-full px-3 py-[7px] border-l-[3px]" %>
+      <% disabled_classes = chip[:disabled] ? "opacity-40 cursor-not-allowed pointer-events-none line-through" : "hover:opacity-80" %>
+
+      <% if chip[:action] == :send %>
+        <button type="button"
+                data-chip-action="send"
+                data-chip-text="<%= chip[:text] %>"
+                class="<%= base_classes %> <%= shape_classes %> <%= disabled_classes %>"
+                <%= "disabled aria-disabled='true'" if chip[:disabled] %>>
+          <%= chip[:label] %>
+        </button>
+
+      <% elsif chip[:action] == :confidence %>
+        <button type="button"
+                data-chip-action="confidence"
+                data-chip-level="<%= chip[:level] %>"
+                data-confidence-url="<%= confidence_student_conversation_path(access_code: access_code, id: conversation.id) %>"
+                class="<%= base_classes %> <%= shape_classes %> <%= disabled_classes %>">
+          <%= chip[:label] %>
+        </button>
+
+      <% elsif chip[:action] == :navigate && next_question_url.present? %>
+        <%= link_to chip[:label],
+              next_question_url,
+              class: "#{base_classes} #{shape_classes} #{disabled_classes} no-underline" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if ts.current_phase == "validating" %>
+    <div data-tutor-chat-validating="true" class="hidden"></div>
+  <% end %>
+<% end %>

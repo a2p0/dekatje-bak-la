@@ -41,9 +41,10 @@ class Student::ConversationsController < Student::BaseController
             "tutor-chat-drawer",
             partial: "student/conversations/drawer",
             locals:  {
-              conversation: @conversation,
-              question:     @question_for_drawer || @subject.questions.first,
-              access_code:  params[:access_code]
+              conversation:      @conversation,
+              question:          @question_for_drawer || @subject.questions.first,
+              access_code:       params[:access_code],
+              next_question_url: nil
             }
           )
         else
@@ -91,7 +92,8 @@ class Student::ConversationsController < Student::BaseController
     ProcessTutorMessageJob.perform_later(
       @conversation.id,
       content,
-      question.id
+      question.id,
+      params[:access_code]
     )
 
     render json: { status: "ok" }
@@ -122,6 +124,8 @@ class Student::ConversationsController < Student::BaseController
     @conversation.give_feedback! if @conversation.may_give_feedback?
 
     @question_id = q_id
+    @question    = Question.find_by(id: q_id)
+    @access_code = params[:access_code]
     render "student/conversations/confidence", formats: [ :turbo_stream ]
   end
 

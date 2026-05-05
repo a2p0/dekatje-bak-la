@@ -56,8 +56,8 @@ RSpec.describe "Tuteur — activation depuis la page question (044)", type: :fea
         visit_question
       end
 
-      scenario "affiche le bouton '💬 Tutorat'", js: false do
-        expect(page).to have_button("Tutorat")
+      scenario "affiche le bouton 'Tibo'", js: false do
+        expect(page).to have_button("Tibo")
         expect(page).not_to have_link("Activer le tuteur")
       end
     end
@@ -72,8 +72,8 @@ RSpec.describe "Tuteur — activation depuis la page question (044)", type: :fea
         visit_question
       end
 
-      scenario "affiche le bouton '💬 Tutorat'", js: false do
-        expect(page).to have_button("Tutorat")
+      scenario "affiche le bouton 'Tibo'", js: false do
+        expect(page).to have_button("Tibo")
         expect(page).not_to have_link("Activer le tuteur")
       end
     end
@@ -185,17 +185,17 @@ RSpec.describe "Tuteur — activation depuis la page question (044)", type: :fea
 
     before { login_as_student(student, classroom) }
 
-    scenario "sans conversation active : affiche 'Tuteur disponible'", js: false do
+    scenario "sans conversation active : affiche 'Tibo disponible'", js: false do
       visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-      expect(page).to have_text("Tuteur disponible")
+      expect(page).to have_text("Tibo disponible")
     end
 
-    scenario "avec conversation active : affiche 'Tuteur actif'", js: false do
+    scenario "avec conversation active : affiche 'Tibo actif'", js: false do
       create(:conversation, student: student, subject: subject_record,
              lifecycle_state: "active", tutor_state: TutorState.default)
 
       visit student_subject_path(access_code: classroom.access_code, id: subject_record.id)
-      expect(page).to have_text("Tuteur actif")
+      expect(page).to have_text("Tibo actif")
     end
   end
 end
