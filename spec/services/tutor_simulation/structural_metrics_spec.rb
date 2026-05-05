@@ -41,6 +41,24 @@ RSpec.describe TutorSimulation::StructuralMetrics do
     expect(metrics[:phase_rank]).to eq(4)
   end
 
+  it "ranks post-049 phases correctly (enonce, spotting_type, spotting_data)" do
+    [
+      %w[enonce 1], %w[spotting_type 2], %w[spotting_data 3]
+    ].each do |phase, expected_rank|
+      ts = TutorState.new(
+        current_phase: phase, current_question_id: nil,
+        concepts_mastered: [], concepts_to_revise: [],
+        discouragement_level: 0, question_states: {},
+        welcome_sent: false, last_activity_at: nil
+      )
+      conv = create(:conversation, student: create(:student, classroom: classroom),
+                    subject: create(:subject, owner: user, status: :published),
+                    lifecycle_state: "active", tutor_state: ts)
+      m = described_class.compute(conversation: conv)
+      expect(m[:phase_rank]).to eq(expected_rank.to_i), "expected rank #{expected_rank} for phase #{phase}, got #{m[:phase_rank]}"
+    end
+  end
+
   it "computes the average tutor message length in words" do
     expect(metrics[:avg_message_length_words]).to be > 0
   end
@@ -284,10 +302,10 @@ RSpec.describe TutorSimulation::StructuralMetrics do
       end
     end
 
-    context "with 'passons au reading'" do
+    context "with 'passons au spotting_data'" do
       before do
         create(:message, conversation: leak_conversation, role: :assistant,
-               content: "Passons au reading maintenant.")
+               content: "Passons au spotting_data maintenant.")
       end
 
       it "returns 1" do

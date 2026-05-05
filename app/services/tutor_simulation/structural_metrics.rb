@@ -3,14 +3,15 @@ module TutorSimulation
   # Cheap, no LLM call, complementary to Judge's qualitative scoring.
   class StructuralMetrics
     PHASE_RANK = {
-      "idle"       => 0,
-      "greeting"   => 1,
-      "reading"    => 2,
-      "spotting"   => 3,
-      "guiding"    => 4,
-      "validating" => 5,
-      "feedback"   => 6,
-      "ended"      => 7
+      "idle"          => 0,
+      "greeting"      => 0,
+      "enonce"        => 1,
+      "spotting_type" => 2,
+      "spotting_data" => 3,
+      "guiding"       => 4,
+      "validating"    => 5,
+      "feedback"      => 6,
+      "ended"         => 7
     }.freeze
 
     ACTION_VERBS = %w[identifie repère cite relève compare calcule].freeze
@@ -21,7 +22,7 @@ module TutorSimulation
     # messages. Only explicit meta-commentary about the tutor's own state is
     # caught; the underlying words remain usable in ordinary discourse.
     STATE_TARGETS = %w[
-      greeting reading spotting guiding validating feedback transition repérage
+      greeting enonce spotting_type spotting_data guiding validating feedback transition repérage
     ].freeze
     STATE_NARRATION_PATTERNS = [
       /je\s+suis\s+(?:en|dans)\s+(?:la\s+)?(?:phase|état|étape|niveau)\b/i,
@@ -108,7 +109,7 @@ module TutorSimulation
 
       @assistant_messages.to_a.each_with_index.count do |msg, idx|
         phase = @phase_per_turn[idx + 1]
-        phase && phase != "spotting" && msg.content.to_s.match?(DT_DR_REGEX)
+        phase && !%w[spotting spotting_type spotting_data].include?(phase) && msg.content.to_s.match?(DT_DR_REGEX)
       end
     end
 

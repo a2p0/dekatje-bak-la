@@ -53,7 +53,7 @@ module TutorSimulation
       lines << ""
       lines << "| Métrique | Valeur |"
       lines << "|---|---|"
-      lines << "| Phase finale | `#{metrics[:final_phase]}` (rang #{metrics[:phase_rank]}/7) |"
+      lines << "| Phase finale | `#{metrics[:final_phase]}` (rang #{metrics[:phase_rank]}/7, idle/greeting=0) |"
       lines << "| Mots / message tuteur (cible ≤60) | #{metrics[:avg_message_length_words]} |"
       lines << "| Ratio messages se terminant par `?` (cible ≥0.7) | #{metrics[:open_question_ratio]} |"
       lines << "| Interceptions filtre regex (low = bon) | #{metrics[:regex_intercepts]} |"
