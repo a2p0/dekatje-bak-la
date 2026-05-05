@@ -30,13 +30,6 @@ module FakeRubyLlm
                 .any_instance_recorder_for(RubyLLM::Chat)
                 .stub(:with_params) { |**_kwargs| nil }
 
-    # Stub on_tool_call to capture the block (but don't invoke it).
-    # The real RubyLLM handles tool callbacks internally and returns
-    # tool_calls via the chunk, so we just capture the block and ignore it.
-    RSpec::Mocks.space
-                .any_instance_recorder_for(RubyLLM::Chat)
-                .stub(:on_tool_call) { |&_block| nil }
-
     if raise_error
       RSpec::Mocks.space
                   .any_instance_recorder_for(RubyLLM::Chat)
