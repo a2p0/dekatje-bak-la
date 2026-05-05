@@ -3,14 +3,6 @@ require "rails_helper"
 RSpec.describe "Teacher handles partial or failed extraction", type: :feature do
   let(:user) { create(:user, confirmed_at: Time.current) }
 
-  def sign_in_teacher(user)
-    visit new_user_session_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "password123"
-    click_button "Se connecter"
-    expect(page).to have_current_path("/teacher", wait: 5)
-  end
-
   def upload_subject
     visit new_teacher_subject_path
     attach_file "subject[subject_pdf]",    Rails.root.join("spec/fixtures/files/fake_subject.pdf")
@@ -23,7 +15,7 @@ RSpec.describe "Teacher handles partial or failed extraction", type: :feature do
 
   context "US3 — partial metadata (region nil)" do
     scenario "form shows available fields pre-filled and 'non détecté' for missing region" do
-      sign_in_teacher(user)
+      login_as(user, scope: :user)
       subject_record = upload_subject
 
       raw_json = JSON.generate({

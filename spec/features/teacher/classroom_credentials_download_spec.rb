@@ -3,17 +3,10 @@ require "rails_helper"
 RSpec.describe "Teacher downloads credentials PDF from generated banner", type: :feature do
   let(:user) { create(:user, confirmed_at: Time.current) }
 
-  def sign_in_teacher(user)
-    visit new_user_session_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "password123"
-    click_button "Se connecter"
-  end
-
   scenario "le bandeau d'identifiants générés expose un bouton de téléchargement PDF" do
     classroom = create(:classroom, owner: user)
 
-    sign_in_teacher(user)
+    login_as(user, scope: :user)
     visit teacher_classroom_path(classroom)
     find("a", text: "Ajouter un élève", wait: 5).click
 

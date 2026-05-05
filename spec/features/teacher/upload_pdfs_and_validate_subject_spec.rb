@@ -3,17 +3,9 @@ require "rails_helper"
 RSpec.describe "Teacher uploads PDFs and validates subject", type: :feature do
   let(:user) { create(:user, confirmed_at: Time.current) }
 
-  def sign_in_teacher(user)
-    visit new_user_session_path
-    fill_in "Email", with: user.email
-    fill_in "Password", with: "password123"
-    click_button "Se connecter"
-    expect(page).to have_current_path("/teacher", wait: 5)
-  end
-
   context "US1 — nominal upload → extraction done → validation → draft" do
     scenario "teacher uploads 2 PDFs, sees extraction status, validates, subject becomes draft" do
-      sign_in_teacher(user)
+      login_as(user, scope: :user)
       visit new_teacher_subject_path
 
       attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/fake_subject.pdf")
@@ -59,7 +51,7 @@ RSpec.describe "Teacher uploads PDFs and validates subject", type: :feature do
 
   context "US1 edge case — single PDF upload rejected" do
     scenario "shows error when correction_pdf is missing" do
-      sign_in_teacher(user)
+      login_as(user, scope: :user)
       visit new_teacher_subject_path
 
       attach_file "subject[subject_pdf]", Rails.root.join("spec/fixtures/files/fake_subject.pdf")
