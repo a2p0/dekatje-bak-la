@@ -332,15 +332,27 @@ inchangés :
 
 ### 6.2 Mapping chips par answer_type
 
-Structure validée :
+Structure :
 
 ```ruby
 { action: "send" | "navigate" | "confidence", label:, payload: }
 ```
 
-**Calibrage du contenu différé à une session sujet-en-main**. Voir mémoire
-`project_062_chips_calibration.md`. Sets minimaux de démarrage documentés dans le
-brainstorm (mémoire `project_062_tutor_redesign_brainstorm.md`, section 5.2).
+**Mapping calibré livré** dans `2026-05-06-tutor-redesign-chips-mapping.md`
+(même dossier `docs/superpowers/specs/`). Calibrage effectué sur corpus BAC
+STI2D 2025 — ~90 questions, 4 spécialités, 2 sujets (Ferme éolienne + STEU).
+
+Le mapping couvre les 7 `answer_types` × 5 phases dérivées (`fresh`, `armed`,
+`debug`, `close`, `done`), avec des chips `send | navigate | confidence`,
+exemples de phrases tuteur par type et phase, et 10 cas particuliers
+documentés (representation avec calculs internes, code Python, identification
+avec décodage, conclusion DD, calculs chaînés longs, navigation dynamique
+selon `question_documents`, etc.).
+
+À l'implémentation : mapping importé tel quel dans
+`Tutor::ChipsPresenter::CHIPS_MAPPING` (constante figée). Une couche runtime
+peut enrichir avec des chips `navigate` dynamiques dérivés des
+`question.question_documents` (ex. `[Ouvrir DT1]` si DT1 référencé).
 
 ### 6.3 Conversation créée silencieusement
 
@@ -603,7 +615,7 @@ Avant de merger 062 :
 - [ ] CI verte (specs unitaires + request + feature)
 - [ ] Sim sur branche : `resolution_rate ≥ 70%` (collaboratif, 15 questions)
 - [ ] Sim sur branche : `cap_violations = 0`
-- [ ] Calibrage chips terminé (mémoire `project_062_chips_calibration.md` livrée)
+- [x] Calibrage chips terminé (livré dans `2026-05-06-tutor-redesign-chips-mapping.md`)
 - [ ] Spec self-review effectuée
 - [ ] PR review humaine (au moins 1 cycle)
 - [ ] Aucune spec en `pending` ou `xscenario` créée par 062
@@ -612,9 +624,6 @@ Avant de merger 062 :
 
 Reportés à des features de suivi :
 
-- **Calibrage des chips par answer_type** (mémoire
-  `project_062_chips_calibration.md`) — session sujet-en-main dédiée, peut être
-  conduite en parallèle ou avant `superpowers:writing-plans`.
 - **Profils élèves complets et juge LLM réécrit** — PR 063 (suivi de 062).
 - **`Tutor::SubjectDebrief`** — feature future qui consommera `concepts_seen`
   pour un retour fin-de-sujet à l'élève.
