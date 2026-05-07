@@ -64,6 +64,14 @@ RSpec.describe "Student::Questions::Corrections", type: :request do
         types = conv.tutor_state.trace_for(question.id).events.map { |e| e["type"] }
         expect(types).to include("viewed_data_hints")
       end
+
+      it "does not record viewed_data_hints when the answer has no data_hints" do
+        answer.update!(data_hints: [])
+        post_correction
+        conv = Conversation.find_by(student: student, subject: subject_obj)
+        types = conv.tutor_state.trace_for(question.id).events.map { |e| e["type"] }
+        expect(types).not_to include("viewed_data_hints")
+      end
     end
 
     context "when the question does not belong to the subject" do

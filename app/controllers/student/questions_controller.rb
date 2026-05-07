@@ -56,7 +56,7 @@ class Student::QuestionsController < Student::BaseController
       source:       "page_click"
     )
   rescue => e
-    Rails.logger.warn("[QuestionsController] navigated_here event failed: #{e.message}")
+    Rails.logger.warn("[QuestionsController] navigated_here event failed for question=#{@question&.id}: #{e.message}")
   end
 
   def tutor_available?

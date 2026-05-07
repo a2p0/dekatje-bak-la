@@ -35,7 +35,7 @@ class Student::Questions::CorrectionsController < Student::BaseController
       )
     end
   rescue => e
-    Rails.logger.warn("[CorrectionsController] correction events failed: #{e.message}")
+    Rails.logger.warn("[CorrectionsController] correction events failed for question=#{@question&.id}: #{e.message}")
   end
 
   def set_subject
