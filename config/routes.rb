@@ -57,6 +57,7 @@ Rails.application.routes.draw do
         patch :mark_intro_seen
       end
     end
+    resources :events, only: [ :create ], controller: "student/events"
   end
 
   root to: "pages#home"
