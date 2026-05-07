@@ -6,5 +6,10 @@ FactoryBot.define do
     password   { "password123" }
     api_provider { 0 }
     association :classroom
+
+    trait :with_api_key do
+      api_key { "sk-test-key" }
+      api_provider { :anthropic }
+    end
   end
 end
