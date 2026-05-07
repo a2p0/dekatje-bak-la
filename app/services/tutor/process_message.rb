@@ -45,6 +45,11 @@ module Tutor
         role: :assistant, content: "", question: @question, chunk_index: 0
       )
 
+      # Note: user/assistant messages are persisted before BuildContext can fail.
+      # If BuildContext returns Result.err the empty assistant message stays in
+      # the DB. Acceptable for the MVP (BuildContext only fails if the question
+      # has no part, which we treat as a developer error). Future cleanup: T18
+      # legacy-cleanup pass.
       context_result = BuildContext.call(
         conversation:  @conversation.reload,
         question:      @question,
@@ -83,7 +88,7 @@ module Tutor
       return :fresh_open if @conversation.tutor_state.greeted == false
 
       return :chip_formule  if content.include?("Quelle formule")
-      return :chip_valeur   if content.include?("Donne-moi les valeurs") || content.include?("Où je trouve les données")
+      return :chip_valeur   if content.include?("Où je trouve les données")
       return :chip_calcul   if content.match?(/refaire le calcul ensemble/)
       return :chip_resultat if content.match?(/résultat final/i)
 
@@ -145,7 +150,7 @@ module Tutor
       # @conversation.tutor_state.with(greeted: true) would overwrite those events.
       Conversation.transaction do
         conv = Conversation.lock.find(@conversation.id)
-        return if conv.tutor_state.greeted
+        next if conv.tutor_state.greeted
 
         conv.update!(tutor_state: conv.tutor_state.with(greeted: true))
       end
