@@ -1,114 +1,58 @@
 require "rails_helper"
 
 RSpec.describe Tutor::ChipsPresenter do
-  def chips(phase:, hints_used: 0)
-    described_class.call(phase: phase, hints_used: hints_used)
-  end
+  # Force TutorState to load, which defines QuestionTrace at the top level
+  before(:all) { _ = TutorState }
 
-  describe "idle / no conversation" do
-    it "returns empty array" do
-      expect(chips(phase: "idle")).to eq([])
-    end
-  end
+  describe ".call" do
+    let(:trace) { QuestionTrace.empty(question_id: 1) }
 
-  describe "greeting / enonce" do
-    %w[greeting enonce].each do |phase|
-      context "phase=#{phase}" do
-        subject { chips(phase: phase) }
-        it "has 2 chips: Reformule + Définis" do
-          expect(subject.map { _1[:label] }).to eq([ "Reformule la question", "Définis un terme" ])
-        end
-        it "all chips are :send action" do
-          expect(subject.map { _1[:action] }).to all(eq(:send))
-        end
-        it "Reformule uses teal color" do
-          expect(subject[0][:color]).to eq(:teal)
-        end
-        it "Définis uses red color" do
-          expect(subject[1][:color]).to eq(:red)
-        end
-      end
-    end
-  end
-
-  describe "spotting_type / spotting_data" do
-    %w[spotting_type spotting_data].each do |phase|
-      context "phase=#{phase}" do
-        subject { chips(phase: phase) }
-        it "has 2 chips: Donne un exemple + Reformule" do
-          expect(subject.map { _1[:label] }).to eq([ "Donne un exemple", "Reformule la question" ])
-        end
-        it "Donne un exemple uses yellow color" do
-          expect(subject[0][:color]).to eq(:yellow)
-        end
-      end
-    end
-  end
-
-  describe "guiding" do
-    context "hints_used < 5" do
-      subject { chips(phase: "guiding", hints_used: 2) }
-      it "has 3 chips: Un indice + Reformule + Définis" do
-        expect(subject.map { _1[:label] }).to eq([ "Un indice", "Reformule", "Définis" ])
-      end
-      it "Un indice is not disabled" do
-        expect(subject[0][:disabled]).to be_falsey
-      end
-      it "Un indice uses yellow color" do
-        expect(subject[0][:color]).to eq(:yellow)
-      end
+    it "returns the calcul/fresh chips for a fresh trace on a calcul question" do
+      chips = described_class.call(trace: trace, answer_type: "calcul")
+      expect(chips).to be_an(Array)
+      expect(chips.length).to be_between(3, 4).inclusive
+      labels = chips.map { |c| c[:label] }
+      expect(labels).to include("C'est quoi la formule ?")
     end
 
-    context "hints_used = 5 (MAX_HINTS)" do
-      subject { chips(phase: "guiding", hints_used: 5) }
-      it "has 3 chips including disabled Un indice last" do
-        expect(subject.map { _1[:label] }).to eq([ "Reformule", "Définis", "Un indice" ])
-      end
-      it "Un indice is disabled" do
-        hint_chip = subject.find { _1[:label] == "Un indice" }
-        expect(hint_chip[:disabled]).to be_truthy
-      end
+    it "returns the qcm/fresh chips for qcm" do
+      chips = described_class.call(trace: trace, answer_type: "qcm")
+      expect(chips.map { |c| c[:label] }).to include("Explique les options")
     end
 
-    context "hints_used > 5 (above MAX_HINTS)" do
-      subject { chips(phase: "guiding", hints_used: 7) }
-      it "Un indice is disabled" do
-        hint_chip = subject.find { _1[:label] == "Un indice" }
-        expect(hint_chip[:disabled]).to be_truthy
+    it "marks 'Donne le résultat' as disabled when cap is active" do
+      events = [ { "type" => "student_attempt", "verdict" => "incorrect", "source" => "llm_message",
+                   "at" => "2026-05-06T10:00:00Z", "content" => "5673" } ]
+      trace_one_attempt = QuestionTrace.new(question_id: 1, events: events.freeze)
+
+      chips = described_class.call(trace: trace_one_attempt, answer_type: "calcul")
+      result_chip = chips.find { |c| c[:label] == "Donne le résultat" }
+      expect(result_chip).not_to be_nil
+      expect(result_chip[:disabled]).to be(true)
+      expect(result_chip[:tooltip]).to include("Essaie")
+    end
+
+    it "marks 'Donne le résultat' as enabled when cap is lifted (2 attempts)" do
+      events = 2.times.map do
+        { "type" => "student_attempt", "verdict" => "incorrect", "source" => "llm_message",
+          "at" => "2026-05-06T10:00:00Z", "content" => "5673" }
       end
-    end
-  end
+      trace_two_attempts = QuestionTrace.new(question_id: 1, events: events.freeze)
 
-  describe "validating" do
-    subject { chips(phase: "validating") }
-    it "has 5 confidence chips" do
-      expect(subject.size).to eq(5)
+      chips = described_class.call(trace: trace_two_attempts, answer_type: "calcul")
+      result_chip = chips.find { |c| c[:label] == "Donne le résultat" }
+      expect(result_chip[:disabled]).to be(false)
     end
-    it "all chips are :confidence action" do
-      expect(subject.map { _1[:action] }).to all(eq(:confidence))
-    end
-    it "levels are 1..5" do
-      expect(subject.map { _1[:level] }).to eq([ 1, 2, 3, 4, 5 ])
-    end
-    it "labels include emojis" do
-      expect(subject[0][:label]).to include("😰")
-      expect(subject[4][:label]).to include("💪")
-    end
-  end
 
-  describe "feedback / ended" do
-    %w[feedback ended].each do |phase|
-      context "phase=#{phase}" do
-        subject { chips(phase: phase) }
-        it "has Explique la correction chip (send)" do
-          chip = subject.find { _1[:label] == "Explique la correction" }
-          expect(chip).to be_present
-          expect(chip[:action]).to eq(:send)
-        end
-        it "has Question suivante chip (navigate)" do
-          chip = subject.find { _1[:action] == :navigate }
-          expect(chip).to be_present
-          expect(chip[:label]).to include("suivante")
+    it "covers all 7 answer_types × 5 phases without raising" do
+      answer_types = %w[calcul identification justification representation qcm verification conclusion]
+      phases       = %i[fresh armed debug close done]
+
+      answer_types.each do |at|
+        phases.each do |ph|
+          # Build a trace that yields the desired phase via DerivePhase semantics.
+          chips = described_class.for_phase(answer_type: at, phase: ph, cap_active: false)
+          expect(chips).to be_an(Array), "missing chips for #{at}/#{ph}"
         end
       end
     end

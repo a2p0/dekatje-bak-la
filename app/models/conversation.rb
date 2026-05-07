@@ -12,8 +12,6 @@ class Conversation < ApplicationRecord
   aasm column: :lifecycle_state do
     state :disabled, initial: true
     state :active
-    state :validating
-    state :feedback
     state :done
 
     event :activate do
@@ -21,20 +19,8 @@ class Conversation < ApplicationRecord
                   guard: :student_has_api_key_or_free_mode?
     end
 
-    event :request_validation do
-      transitions from: :active, to: :validating
-    end
-
-    event :give_feedback do
-      transitions from: :validating, to: :feedback
-    end
-
-    event :resume do
-      transitions from: :feedback, to: :active
-    end
-
     event :finish do
-      transitions from: [ :active, :feedback ], to: :done
+      transitions from: :active, to: :done
     end
   end
 

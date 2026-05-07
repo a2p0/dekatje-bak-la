@@ -18,7 +18,7 @@ RSpec.describe TutorSimulation::StudentSimulator do
 
   describe "#respond" do
     it "calls the AI client and returns a response" do
-      simulator = described_class.new(profile: :eleve_moyen, client: client)
+      simulator = described_class.new(profile: :collaboratif, client: client)
 
       response = simulator.respond(
         question_label: "Calculer la consommation en litres",
@@ -31,7 +31,7 @@ RSpec.describe TutorSimulation::StudentSimulator do
     end
 
     it "swaps roles in conversation history for the student LLM perspective" do
-      simulator = described_class.new(profile: :bon_eleve, client: client)
+      simulator = described_class.new(profile: :collaboratif, client: client)
 
       history = [
         { "role" => "user", "content" => "Je pense que c'est 56 litres" },

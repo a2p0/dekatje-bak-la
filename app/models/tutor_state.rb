@@ -1,52 +1,70 @@
-# app/models/tutor_state.rb
+# 062: TutorState root and QuestionTrace per-question.
+# - Pas de champ phase persisté (la phase est dérivée par Tutor::DerivePhase).
+# - QuestionTrace.events est append-only; budget est calculé à la volée.
 
-VALID_QUESTION_PHASES = %w[enonce spotting_type spotting_data guiding validating feedback ended].freeze
+QuestionTrace = Data.define(:question_id, :events) do
+  def self.empty(question_id:)
+    new(question_id: question_id, events: [].freeze)
+  end
 
-QuestionState = Data.define(
-  :phase,            # String — current phase for this question (049), default "enonce"
-  :step,             # Integer — current tutoring step for this question
-  :hints_used,       # Integer 0-5
-  :last_confidence,  # Integer 1-5, or nil
-  :error_types,      # Array<String>
-  :completed_at,     # String ISO8601 or nil
-  :intro_seen        # Boolean — true once drawer opened for this question (044)
-)
+  def append(event)
+    with(events: events + [ event ].freeze)
+  end
+
+  def budget
+    {
+      formule_given:     event_present?("tutor_gave", "what" => "formule"),
+      value_given:       event_present?("tutor_gave", "what" => "valeur"),
+      calc_given:        event_present?("tutor_gave", "what" => "calcul"),
+      result_given:      event_present?("tutor_gave", "what" => "résultat"),
+      attempts_count:    events.count { |e| e["type"] == "student_attempt" },
+      viewed_correction: event_present?("viewed_correction")
+    }
+  end
+
+  def cap_active?
+    !budget[:viewed_correction] && budget[:attempts_count] < 2
+  end
+
+  def last_signal
+    events.last
+  end
+
+  private
+
+  def event_present?(type, match = {})
+    events.any? do |e|
+      e["type"] == type && match.all? { |k, v| e[k.to_s] == v }
+    end
+  end
+end
 
 TutorState = Data.define(
-  :current_phase,        # String — global subject phase (idle, greeting) or current question phase
-  :current_question_id,  # Integer or nil
-  :concepts_mastered,    # Array<String>
-  :concepts_to_revise,   # Array<String>
-  :discouragement_level, # Integer 0-3
-  :question_states,      # Hash<String, QuestionState>
-  :welcome_sent,         # Boolean — true once welcome message sent for this subject (044)
-  :last_activity_at      # String ISO8601 or nil — for re-greeting after 12h inactivity (049)
+  :current_question_id,
+  :greeted,
+  :question_traces,
+  :concepts_seen
 ) do
   def self.default
     new(
-      current_phase:        "idle",
-      current_question_id:  nil,
-      concepts_mastered:    [].freeze,
-      concepts_to_revise:   [].freeze,
-      discouragement_level: 0,
-      question_states:      {}.freeze,
-      welcome_sent:         false,
-      last_activity_at:     nil
+      current_question_id: nil,
+      greeted:             false,
+      question_traces:     {}.freeze,
+      concepts_seen:       [].freeze
     )
   end
 
-  def to_prompt
-    lines = []
-    lines << "L'élève travaille sur la question #{current_question_id}." if current_question_id
-    lines << "Phase courante : #{current_phase}."
-    lines << "Concepts maîtrisés : #{concepts_mastered.join(', ')}." if concepts_mastered.any?
-    lines << "Points à revoir : #{concepts_to_revise.join(', ')}." if concepts_to_revise.any?
-    lines << "Niveau de découragement : #{discouragement_level}/3."
-    if (qs = question_states[current_question_id.to_s])
-      lines << "Phase de la question #{current_question_id} : #{qs.phase}."
-      lines << "Indices utilisés sur cette question : #{qs.hints_used}/5."
-      lines << "Dernière confiance déclarée : #{qs.last_confidence}/5." if qs.last_confidence
-    end
-    lines.join("\n")
+  def trace_for(question_id)
+    question_traces[question_id.to_s] || QuestionTrace.empty(question_id: question_id)
+  end
+
+  def with_trace(trace)
+    new_traces = question_traces.merge(trace.question_id.to_s => trace).freeze
+    with(question_traces: new_traces)
+  end
+
+  def with_concept(concept)
+    return self if concept.blank? || concepts_seen.include?(concept)
+    with(concepts_seen: (concepts_seen + [ concept ]).freeze)
   end
 end

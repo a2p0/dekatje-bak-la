@@ -1,85 +1,47 @@
-# app/models/types/tutor_state_type.rb
 class TutorStateType < ActiveRecord::Type::Json
-  def cast(value)
-    case value
-    when TutorState
-      value
-    when Hash
-      cast_from_hash(value)
-    when NilClass
-      TutorState.default
-    else
-      raise ArgumentError, "Cannot cast #{value.class} to TutorState"
-    end
+  def deserialize(value)
+    raw = value.is_a?(String) ? super(value) : value
+    raw = {} if raw.blank?
+    raw = {} unless raw.is_a?(Hash)
+
+    TutorState.new(
+      current_question_id: raw["current_question_id"],
+      greeted:             raw["greeted"] == true,
+      question_traces:     deserialize_traces(raw["question_traces"]),
+      concepts_seen:       Array(raw["concepts_seen"]).map(&:to_s).freeze
+    )
   end
 
   def serialize(value)
     return super({}) if value.nil?
+    raise ArgumentError, "expected TutorState, got #{value.class}" unless value.is_a?(TutorState)
 
-    tutor_state = cast(value)
     super(
-      "current_phase"        => tutor_state.current_phase,
-      "current_question_id"  => tutor_state.current_question_id,
-      "concepts_mastered"    => tutor_state.concepts_mastered,
-      "concepts_to_revise"   => tutor_state.concepts_to_revise,
-      "discouragement_level" => tutor_state.discouragement_level,
-      "question_states"      => serialize_question_states(tutor_state.question_states),
-      "welcome_sent"         => tutor_state.welcome_sent,
-      "last_activity_at"     => tutor_state.last_activity_at
+      "current_question_id" => value.current_question_id,
+      "greeted"             => value.greeted,
+      "question_traces"     => value.question_traces.transform_values { |t| serialize_trace(t) },
+      "concepts_seen"       => value.concepts_seen
     )
-  end
-
-  def deserialize(value)
-    return TutorState.default if value.nil?
-
-    parsed = value.is_a?(String) ? JSON.parse(value) : value
-    cast(parsed)
   end
 
   private
 
-  def cast_from_hash(hash)
-    raw_states = hash["question_states"] || {}
-    question_states = raw_states.transform_values do |qs_hash|
-      next qs_hash if qs_hash.is_a?(QuestionState)
+  def deserialize_traces(raw)
+    return {}.freeze unless raw.is_a?(Hash)
 
-      raw_phase = qs_hash["phase"]
-      phase = VALID_QUESTION_PHASES.include?(raw_phase) ? raw_phase : "enonce"
-
-      QuestionState.new(
-        phase:            phase,
-        step:             qs_hash["step"],
-        hints_used:       qs_hash["hints_used"] || 0,
-        last_confidence:  qs_hash["last_confidence"],
-        error_types:      Array(qs_hash["error_types"]),
-        completed_at:     qs_hash["completed_at"],
-        intro_seen:       qs_hash["intro_seen"] || false
+    raw.each_with_object({}) do |(qid, payload), acc|
+      events = Array(payload["events"]).map(&:dup)
+      acc[qid.to_s] = QuestionTrace.new(
+        question_id: payload["question_id"]&.to_i || qid.to_i,
+        events:      events.freeze
       )
-    end
-
-    TutorState.new(
-      current_phase:        hash["current_phase"] || "idle",
-      current_question_id:  hash["current_question_id"],
-      concepts_mastered:    Array(hash["concepts_mastered"]),
-      concepts_to_revise:   Array(hash["concepts_to_revise"]),
-      discouragement_level: hash["discouragement_level"] || 0,
-      question_states:      question_states,
-      welcome_sent:         hash["welcome_sent"] || false,
-      last_activity_at:     hash["last_activity_at"]
-    )
+    end.freeze
   end
 
-  def serialize_question_states(question_states)
-    question_states.transform_values do |qs|
-      {
-        "phase"           => qs.phase,
-        "step"            => qs.step,
-        "hints_used"      => qs.hints_used,
-        "last_confidence" => qs.last_confidence,
-        "error_types"     => qs.error_types,
-        "completed_at"    => qs.completed_at,
-        "intro_seen"      => qs.intro_seen
-      }
-    end
+  def serialize_trace(trace)
+    {
+      "question_id" => trace.question_id,
+      "events"      => trace.events
+    }
   end
 end

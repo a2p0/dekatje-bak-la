@@ -93,6 +93,28 @@ jobs:
           SKIP_JUDGE: ${{ inputs.skip_judge && '1' || '' }}
         run: bundle exec rake "tutor:simulate[${{ inputs.subject_id }}]"
 
+      - name: Assert SC-A (resolution_rate >= 0.70) and SC-B (cap_violations == 0)
+        run: |
+          RAW_JSON=$(ls -1dt tmp/tutor_simulations/*/raw.json 2>/dev/null | head -n1)
+          if [ -z "$RAW_JSON" ]; then
+            echo "::error::No raw.json found in tmp/tutor_simulations/"
+            exit 1
+          fi
+          echo "Reading: $RAW_JSON"
+
+          # Aggregate metrics across .results[].profiles[].structural_metrics
+          RR=$(jq '[.results[].profiles[].structural_metrics.resolution_rate] | add / length' "$RAW_JSON")
+          CV=$(jq '[.results[].profiles[].structural_metrics.cap_violations] | add' "$RAW_JSON")
+          echo "resolution_rate (mean) = $RR"
+          echo "cap_violations (sum)   = $CV"
+
+          python3 -c "import sys; sys.exit(0 if float('$RR') >= 0.70 else 1)" \
+            || { echo "::error::SC-A failed: resolution_rate $RR < 0.70"; exit 1; }
+          [ "$CV" = "0" ] \
+            || { echo "::error::SC-B failed: $CV cap_violations (target 0)"; exit 1; }
+
+          echo "✓ SC-A and SC-B passed"
+
       - name: Upload simulation reports
         if: always()
         uses: actions/upload-artifact@v7

@@ -11,9 +11,9 @@ namespace :tutor do
 
     Optional env:
       TURNS               Max conversation turns per question (default: 5)
-      PROFILES            Comma-separated profiles (default: all)
-                          Available: bon_eleve, eleve_moyen, eleve_en_difficulte,
-                                     eleve_paresseux, eleve_hors_sujet
+      PROFILES            Comma-separated profiles (default: collaboratif)
+                          Available: collaboratif
+                          (autonome and passif deferred to PR 063)
       QUESTIONS           Comma-separated question numbers to limit the run
                           (e.g. "1.1,1.2"). Default: all questions of the subject.
       TUTOR_MODEL         OpenRouter model id for the tutor
@@ -25,7 +25,7 @@ namespace :tutor do
 
     Examples:
       rake tutor:simulate[42]
-      rake tutor:simulate[1] TURNS=2 PROFILES=bon_eleve QUESTIONS=1.1
+      rake tutor:simulate[1] TURNS=2 PROFILES=collaboratif QUESTIONS=1.1
       rake tutor:simulate[42] TUTOR_MODEL=mistralai/mistral-large-2512
   DESC
   task :simulate, [ :subject_id ] => :environment do |_t, args|
@@ -68,6 +68,24 @@ namespace :tutor do
       question_numbers: question_numbers
     )
 
-    runner.run
+    data = runner.run
+
+    puts "\n=== Métriques structurelles par conversation ==="
+    data[:results].each do |result|
+      result[:profiles].each do |pr|
+        metrics = pr[:structural_metrics]
+        next unless metrics
+
+        puts "\nQ#{result[:question_number]} — profil #{pr[:profile]}:"
+        puts "  resolution_rate:                   #{metrics[:resolution_rate]}"
+        puts "  cap_violations:                    #{metrics[:cap_violations]}"
+        puts "  mean_help_steps_before_resolution: #{metrics[:mean_help_steps_before_resolution]}"
+        puts "  proactive_help_rate:               #{metrics[:proactive_help_rate]}"
+        puts "  correct_attempts_after_help_rate:  #{metrics[:correct_attempts_after_help_rate]}"
+        puts "  attempts_per_question:             #{metrics[:attempts_per_question]}"
+        puts "  correction_view_rate:              #{metrics[:correction_view_rate]}"
+        puts "  mean_turns_to_resolution:          #{metrics[:mean_turns_to_resolution]}"
+      end
+    end
   end
 end

@@ -50,7 +50,7 @@ RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
         student:         student,
         subject:         subject_record,
         lifecycle_state: "active",
-        tutor_state:     TutorState.default.with(welcome_sent: true))
+        tutor_state:     TutorState.default)
     end
 
     before do

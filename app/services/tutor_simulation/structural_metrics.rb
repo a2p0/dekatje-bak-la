@@ -1,161 +1,113 @@
 module TutorSimulation
-  # Deterministic metrics computed from a Conversation after a sim run.
-  # Cheap, no LLM call, complementary to Judge's qualitative scoring.
+  # 062: structural metrics computed from QuestionTrace events.
+  # No phase-rank, no spotting concepts. Aligned with redesign goals:
+  # - resolution_rate (main metric)
+  # - cap_violations (target = 0)
+  # - mean_help_steps_before_resolution
+  # - proactive_help_rate
+  # - correct_attempts_after_help_rate
+  # - attempts_per_question
+  # - correction_view_rate
+  # - mean_turns_to_resolution
   class StructuralMetrics
-    PHASE_RANK = {
-      "idle"       => 0,
-      "greeting"   => 1,
-      "reading"    => 2,
-      "spotting"   => 3,
-      "guiding"    => 4,
-      "validating" => 5,
-      "feedback"   => 6,
-      "ended"      => 7
-    }.freeze
-
-    ACTION_VERBS = %w[identifie repère cite relève compare calcule].freeze
-    DT_DR_REGEX  = /\b(?:DT|DR)\d+\b/i.freeze
-    SHORT_MESSAGE_WORD_THRESHOLD = 60
-
-    # H3a soft — patterns of explicit state-machine narration in assistant
-    # messages. Only explicit meta-commentary about the tutor's own state is
-    # caught; the underlying words remain usable in ordinary discourse.
-    STATE_TARGETS = %w[
-      greeting reading spotting guiding validating feedback transition repérage
-    ].freeze
-    STATE_NARRATION_PATTERNS = [
-      /je\s+suis\s+(?:en|dans)\s+(?:la\s+)?(?:phase|état|étape|niveau)\b/i,
-      /je\s+passe\s+(?:en|au|à)\s+(?:la\s+phase\s+)?(?:#{STATE_TARGETS.join('|')})\b/i,
-      /passons?\s+(?:en|au|à)\s+(?:la\s+phase\s+)?(?:#{STATE_TARGETS.join('|')})\b/i,
-      /la\s+phase\s+(?:est|devient|passe)\b/i,
-      /je\s+vois\s+que\s+la\s+phase\b/i,
-      /on\s+(?:est|passe)\s+(?:en|au|à)\s+(?:la\s+phase\s+)?(?:#{STATE_TARGETS.join('|')})\b/i,
-      /tu\s+es\s+(?:en|dans)\s+(?:la\s+)?phase\b/i
-    ].freeze
-
-    def self.compute(conversation:, phase_per_turn: nil)
-      new(conversation: conversation, phase_per_turn: phase_per_turn).compute
+    def self.compute(conversation:, question_ids:)
+      new(conversation: conversation, question_ids: question_ids).compute
     end
 
-    def initialize(conversation:, phase_per_turn: nil)
+    def initialize(conversation:, question_ids:)
       @conversation = conversation
-      @phase_per_turn = phase_per_turn
-      @assistant_messages = conversation.messages.where(role: :assistant).order(:created_at)
+      @question_ids = Array(question_ids).map(&:to_i)
     end
 
     def compute
+      traces = @question_ids.map { |qid| @conversation.tutor_state.trace_for(qid) }
+
       {
-        final_phase:               @conversation.tutor_state.current_phase,
-        phase_rank:                PHASE_RANK.fetch(@conversation.tutor_state.current_phase, 0),
-        avg_message_length_words:  avg_message_length_words,
-        open_question_ratio:       open_question_ratio,
-        regex_intercepts:          regex_intercept_count,
-        hints_used:                @conversation.tutor_state.question_states.values.sum { |qs| qs.hints_used.to_i },
-        message_count_assistant:   @assistant_messages.count,
-        message_count_user:        @conversation.messages.where(role: :user).count,
-        first_turn_with_transition:    first_turn_with_transition,
-        action_verb_ratio_guiding:     action_verb_ratio_guiding,
-        dt_dr_leak_count_non_spotting: dt_dr_leak_count_non_spotting,
-        short_message_ratio:           short_message_ratio,
-        state_narration_count:         state_narration_count
+        resolution_rate:                   resolution_rate(traces),
+        cap_violations:                    cap_violations(traces),
+        mean_help_steps_before_resolution: mean_help_steps_before_resolution(traces),
+        proactive_help_rate:               proactive_help_rate(traces),
+        correct_attempts_after_help_rate:  correct_attempts_after_help_rate(traces),
+        attempts_per_question:             attempts_per_question(traces),
+        correction_view_rate:              correction_view_rate(traces),
+        mean_turns_to_resolution:          mean_turns_to_resolution(traces)
       }
     end
 
     private
 
-    def first_turn_with_transition
-      return nil if @phase_per_turn.nil?
+    def resolution_rate(traces)
+      return 0.0 if traces.empty?
+      resolved = traces.count { |t| resolved_without_correction?(t) }
+      (resolved.to_f / traces.size).round(3)
+    end
 
-      @phase_per_turn.each_with_index do |phase, i|
-        next if i.zero?
-        return i if phase != @phase_per_turn[i - 1] && phase != "idle"
+    def resolved_without_correction?(trace)
+      first_correct = trace.events.index { |e| e["type"] == "student_attempt" && e["verdict"] == "correct" }
+      first_view    = trace.events.index { |e| e["type"] == "viewed_correction" }
+      return false unless first_correct
+      first_view.nil? || first_correct < first_view
+    end
+
+    def cap_violations(traces)
+      traces.sum { |t| t.events.count { |e| e["type"] == "cap_violation" } }
+    end
+
+    def mean_help_steps_before_resolution(traces)
+      counts = traces.filter_map do |t|
+        idx = t.events.index { |e| e["type"] == "student_attempt" && e["verdict"] == "correct" }
+        next nil if idx.nil?
+        t.events[0...idx].count { |e| e["type"] == "tutor_gave" }
       end
-      nil
+      return 0.0 if counts.empty?
+      (counts.sum.to_f / counts.size).round(3)
     end
 
-    # Ratio of assistant messages emitted during guiding phase that start
-    # with an action verb (from ACTION_VERBS) — measures H2.
-    # Returns nil when phase_per_turn is missing OR when guiding phase
-    # was never reached (no division by zero, distinguishable from "0 verbs").
-    def action_verb_ratio_guiding
-      return nil if @phase_per_turn.nil?
+    def proactive_help_rate(traces)
+      total_gives = traces.sum { |t| t.events.count { |e| e["type"] == "tutor_gave" } }
+      return 0.0 if total_gives.zero?
 
-      guiding_messages = @assistant_messages.to_a.each_with_index.select do |_msg, idx|
-        @phase_per_turn[idx + 1] == "guiding"
+      proactive_count = traces.sum do |t|
+        t.events.each_with_index.count do |e, i|
+          e["type"] == "tutor_gave" && t.events[0...i].none? { |prev| prev["type"] == "student_attempt" }
+        end
       end
-      return nil if guiding_messages.empty?
-
-      matching = guiding_messages.count { |msg, _idx| has_sentence_starting_with_action_verb?(msg.content) }
-      (matching.to_f / guiding_messages.size).round(2)
+      (proactive_count.to_f / total_gives).round(3)
     end
 
-    def has_sentence_starting_with_action_verb?(content)
-      content.to_s.split(/(?<=[.!?])\s+/).any? do |sentence|
-        first_word = sentence.strip.downcase.split(/\s+/).first.to_s
-        first_word = first_word.gsub(/[[:punct:]]+$/, "")
-        ACTION_VERBS.include?(first_word)
+    def correct_attempts_after_help_rate(traces)
+      correct_attempts = traces.sum { |t| t.events.count { |e| e["type"] == "student_attempt" && e["verdict"] == "correct" } }
+      return 0.0 if correct_attempts.zero?
+
+      after_help = traces.sum do |t|
+        t.events.each_with_index.count do |e, i|
+          e["type"] == "student_attempt" && e["verdict"] == "correct" &&
+            t.events[0...i].any? { |prev| prev["type"] == "tutor_gave" }
+        end
       end
+      (after_help.to_f / correct_attempts).round(3)
     end
 
-    # Counts assistant messages mentioning DT<n> or DR<n> outside the
-    # spotting phase (which is the only phase where citing doc names is
-    # legitimate). When phase_per_turn is missing, counts ALL matches as
-    # a diagnostic fallback.
-    def dt_dr_leak_count_non_spotting
-      if @phase_per_turn.nil?
-        return @assistant_messages.to_a.count { |m| m.content.to_s.match?(DT_DR_REGEX) }
+    def attempts_per_question(traces)
+      return 0.0 if traces.empty?
+      total = traces.sum { |t| t.events.count { |e| e["type"] == "student_attempt" } }
+      (total.to_f / traces.size).round(3)
+    end
+
+    def correction_view_rate(traces)
+      return 0.0 if traces.empty?
+      viewed = traces.count { |t| t.events.any? { |e| e["type"] == "viewed_correction" } }
+      (viewed.to_f / traces.size).round(3)
+    end
+
+    def mean_turns_to_resolution(traces)
+      turns = traces.filter_map do |t|
+        idx = t.events.index { |e| e["type"] == "student_attempt" && e["verdict"] == "correct" }
+        next nil if idx.nil?
+        t.events[0..idx].count { |e| e["type"] == "student_attempt" }
       end
-
-      @assistant_messages.to_a.each_with_index.count do |msg, idx|
-        phase = @phase_per_turn[idx + 1]
-        phase && phase != "spotting" && msg.content.to_s.match?(DT_DR_REGEX)
-      end
-    end
-
-    # Ratio of assistant messages whose word count is <= 60
-    # (matches the prompt rule "Maximum 60 mots par message").
-    # Returns 0.0 when there are no assistant messages (sentinel — avoids
-    # bruiting global_summary averages).
-    def short_message_ratio
-      return 0.0 if @assistant_messages.empty?
-
-      short = @assistant_messages.count { |m| m.content.to_s.split(/\s+/).size <= SHORT_MESSAGE_WORD_THRESHOLD }
-      (short.to_f / @assistant_messages.count).round(2)
-    end
-
-
-    # H3a soft — counts explicit state-machine narration patterns in
-    # assistant messages. Only "Je suis en phase X", "Passons au Y", etc.
-    # trigger; the underlying words in other contexts are ignored.
-    # User messages are ignored.
-    def state_narration_count
-      @assistant_messages.to_a.sum do |m|
-        content = m.content.to_s
-        STATE_NARRATION_PATTERNS.sum { |pat| content.scan(pat).size }
-      end
-    end
-
-    def avg_message_length_words
-      return 0 if @assistant_messages.empty?
-
-      total = @assistant_messages.sum { |m| m.content.to_s.split.size }
-      (total.to_f / @assistant_messages.count).round(1)
-    end
-
-    def open_question_ratio
-      return 0.0 if @assistant_messages.empty?
-
-      ending_with_question = @assistant_messages.count { |m| m.content.to_s.strip.end_with?("?") }
-      (ending_with_question.to_f / @assistant_messages.count).round(2)
-    end
-
-    # FilterSpottingOutput::NEUTRAL_RELAUNCH replaces the LLM output when a
-    # forbidden pattern (DT/DR mentions, numerical values) is detected.
-    # Counting how many assistant messages got replaced reveals leaks the
-    # tutor tried to make.
-    def regex_intercept_count
-      neutral = Tutor::FilterSpottingOutput::NEUTRAL_RELAUNCH
-      @assistant_messages.where(content: neutral).count
+      return 0.0 if turns.empty?
+      (turns.sum.to_f / turns.size).round(3)
     end
   end
 end

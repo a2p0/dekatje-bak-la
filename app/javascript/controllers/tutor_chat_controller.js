@@ -20,7 +20,6 @@ export default class extends Controller {
     }
 
     this.#scrollToBottom()
-    this.#syncValidatingState()
   }
 
   disconnect() {
@@ -73,52 +72,18 @@ export default class extends Controller {
     const action = button.dataset.chipAction
 
     if (action === "send") {
-      const text = button.dataset.chipText
-      if (!text || this.isStreaming) return
-      this.inputTarget.value = text
+      const payload = button.dataset.chipPayload
+      if (!payload || this.isStreaming) return
+      this.inputTarget.value = payload
       this.send()
+    } else if (action === "navigate") {
+      const payload = button.dataset.chipPayload
+      if (!payload) return
+      window.location.href = payload
     } else if (action === "confidence") {
-      const level = parseInt(button.dataset.chipLevel, 10)
-      const url   = button.dataset.confidenceUrl
-      if (!level || !url || this.isStreaming) return
-      const container = button.closest("turbo-frame") || button.parentElement
-      this.#submitConfidence(level, url, container)
+      // 062: confidence chip retained as low-confidence signal but no longer routed.
+      // The pedagogical effect (calmer/more guided tutor) is achieved via the LLM prompt.
     }
-    // navigate: handled natively by <a href>
-  }
-
-  async #submitConfidence(level, url, chipsContainer) {
-    const buttons = chipsContainer.querySelectorAll("[data-chip-action='confidence']")
-    buttons.forEach(b => { b.disabled = true; b.classList.add("opacity-50", "cursor-not-allowed") })
-
-    try {
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": this.#csrfToken(),
-          "Accept": "text/vnd.turbo-stream.html"
-        },
-        body: JSON.stringify({ level })
-      })
-
-      if (response.ok) {
-        const html = await response.text()
-        Turbo.renderStreamMessage(html)
-      } else {
-        buttons.forEach(b => { b.disabled = false; b.classList.remove("opacity-50", "cursor-not-allowed") })
-      }
-    } catch {
-      buttons.forEach(b => { b.disabled = false; b.classList.remove("opacity-50", "cursor-not-allowed") })
-    }
-  }
-
-  #syncValidatingState() {
-    if (!this.hasChipsTarget) return
-    const isValidating = !!this.chipsTarget.querySelector("[data-tutor-chat-validating]")
-    this.inputTarget.disabled      = isValidating
-    this.sendButtonTarget.disabled = isValidating
-    this.inputTarget.placeholder   = isValidating ? "Réponds via les chips ci-dessus…" : "Écris à Tibo…"
   }
 
   #handleReceived(data) {
@@ -165,7 +130,6 @@ export default class extends Controller {
     }
     if (data.chips_html !== undefined && this.hasChipsTarget) {
       this.chipsTarget.innerHTML = data.chips_html
-      this.#syncValidatingState()
     }
     this.#setStreaming(false)
     this.#scrollToBottom()

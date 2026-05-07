@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_224900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,8 +20,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.string "name", null: false
     t.bigint "record_id", null: false
     t.string "record_type", null: false
-    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+    t.index [ "blob_id" ], name: "index_active_storage_attachments_on_blob_id"
+    t.index [ "record_type", "record_id", "name", "blob_id" ], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
@@ -33,13 +33,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.string "key", null: false
     t.text "metadata"
     t.string "service_name", null: false
-    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+    t.index [ "key" ], name: "index_active_storage_blobs_on_key", unique: true
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
-    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+    t.index [ "blob_id", "variation_digest" ], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "answers", force: :cascade do |t|
@@ -51,7 +51,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.bigint "question_id", null: false
     t.jsonb "structured_correction"
     t.datetime "updated_at", null: false
-    t.index ["question_id"], name: "index_answers_on_question_id"
+    t.index [ "question_id" ], name: "index_answers_on_question_id"
   end
 
   create_table "classroom_subjects", force: :cascade do |t|
@@ -59,9 +59,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.datetime "created_at", null: false
     t.bigint "subject_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["classroom_id", "subject_id"], name: "index_classroom_subjects_on_classroom_id_and_subject_id", unique: true
-    t.index ["classroom_id"], name: "index_classroom_subjects_on_classroom_id"
-    t.index ["subject_id"], name: "index_classroom_subjects_on_subject_id"
+    t.index [ "classroom_id", "subject_id" ], name: "index_classroom_subjects_on_classroom_id_and_subject_id", unique: true
+    t.index [ "classroom_id" ], name: "index_classroom_subjects_on_classroom_id"
+    t.index [ "subject_id" ], name: "index_classroom_subjects_on_subject_id"
   end
 
   create_table "classrooms", force: :cascade do |t|
@@ -73,8 +73,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.string "specialty"
     t.boolean "tutor_free_mode_enabled", default: false, null: false
     t.datetime "updated_at", null: false
-    t.index ["access_code"], name: "index_classrooms_on_access_code", unique: true
-    t.index ["owner_id"], name: "index_classrooms_on_owner_id"
+    t.index [ "access_code" ], name: "index_classrooms_on_access_code", unique: true
+    t.index [ "owner_id" ], name: "index_classrooms_on_owner_id"
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -86,9 +86,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.integer "tokens_used", default: 0, null: false
     t.jsonb "tutor_state", default: {}, null: false
     t.datetime "updated_at", null: false
-    t.index ["student_id", "subject_id"], name: "index_conversations_on_student_id_and_subject_id", unique: true
-    t.index ["student_id"], name: "index_conversations_on_student_id"
-    t.index ["subject_id"], name: "index_conversations_on_subject_id"
+    t.index [ "student_id", "subject_id" ], name: "index_conversations_on_student_id_and_subject_id", unique: true
+    t.index [ "student_id" ], name: "index_conversations_on_student_id"
+    t.index [ "subject_id" ], name: "index_conversations_on_subject_id"
   end
 
   create_table "exam_sessions", force: :cascade do |t|
@@ -101,8 +101,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.datetime "updated_at", null: false
     t.integer "variante", default: 0, null: false
     t.string "year", null: false
-    t.index ["owner_id", "year", "region"], name: "idx_exam_sessions_lookup"
-    t.index ["owner_id"], name: "index_exam_sessions_on_owner_id"
+    t.index [ "owner_id", "year", "region" ], name: "idx_exam_sessions_lookup"
+    t.index [ "owner_id" ], name: "index_exam_sessions_on_owner_id"
   end
 
   create_table "extraction_jobs", force: :cascade do |t|
@@ -114,9 +114,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.integer "status", default: 0, null: false
     t.bigint "subject_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["exam_session_id"], name: "index_extraction_jobs_on_exam_session_id"
-    t.index ["status"], name: "index_extraction_jobs_on_status"
-    t.index ["subject_id"], name: "index_extraction_jobs_on_subject_id"
+    t.index [ "exam_session_id" ], name: "index_extraction_jobs_on_exam_session_id"
+    t.index [ "status" ], name: "index_extraction_jobs_on_status"
+    t.index [ "subject_id" ], name: "index_extraction_jobs_on_subject_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -131,8 +131,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.integer "tokens_in", default: 0, null: false
     t.integer "tokens_out", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
-    t.index ["question_id"], name: "index_messages_on_question_id"
+    t.index [ "conversation_id", "created_at" ], name: "index_messages_on_conversation_id_and_created_at"
+    t.index [ "question_id" ], name: "index_messages_on_question_id"
   end
 
   create_table "parts", force: :cascade do |t|
@@ -147,9 +147,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.bigint "subject_id"
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["exam_session_id"], name: "index_parts_on_exam_session_id"
-    t.index ["subject_id", "position"], name: "index_parts_on_subject_id_and_position"
-    t.index ["subject_id"], name: "index_parts_on_subject_id"
+    t.index [ "exam_session_id" ], name: "index_parts_on_exam_session_id"
+    t.index [ "subject_id", "position" ], name: "index_parts_on_subject_id_and_position"
+    t.index [ "subject_id" ], name: "index_parts_on_subject_id"
   end
 
   add_check_constraint "parts", "exam_session_id IS NOT NULL AND subject_id IS NULL OR exam_session_id IS NULL AND subject_id IS NOT NULL", name: "parts_owner_check", validate: false
@@ -168,9 +168,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.integer "position", default: 0, null: false
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["discarded_at"], name: "index_questions_on_discarded_at"
-    t.index ["part_id", "position"], name: "index_questions_on_part_id_and_position"
-    t.index ["part_id"], name: "index_questions_on_part_id"
+    t.index [ "discarded_at" ], name: "index_questions_on_discarded_at"
+    t.index [ "part_id", "position" ], name: "index_questions_on_part_id_and_position"
+    t.index [ "part_id" ], name: "index_questions_on_part_id"
   end
 
   create_table "student_insights", force: :cascade do |t|
@@ -182,10 +182,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.bigint "subject_id", null: false
     t.text "text"
     t.datetime "updated_at", null: false
-    t.index ["question_id"], name: "index_student_insights_on_question_id"
-    t.index ["student_id", "subject_id"], name: "index_student_insights_on_student_id_and_subject_id"
-    t.index ["student_id"], name: "index_student_insights_on_student_id"
-    t.index ["subject_id"], name: "index_student_insights_on_subject_id"
+    t.index [ "question_id" ], name: "index_student_insights_on_question_id"
+    t.index [ "student_id", "subject_id" ], name: "index_student_insights_on_student_id_and_subject_id"
+    t.index [ "student_id" ], name: "index_student_insights_on_student_id"
+    t.index [ "subject_id" ], name: "index_student_insights_on_subject_id"
   end
 
   create_table "student_sessions", force: :cascade do |t|
@@ -199,9 +199,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.bigint "student_id", null: false
     t.bigint "subject_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["student_id", "subject_id"], name: "index_student_sessions_on_student_id_and_subject_id", unique: true
-    t.index ["student_id"], name: "index_student_sessions_on_student_id"
-    t.index ["subject_id"], name: "index_student_sessions_on_subject_id"
+    t.index [ "student_id", "subject_id" ], name: "index_student_sessions_on_student_id_and_subject_id", unique: true
+    t.index [ "student_id" ], name: "index_student_sessions_on_student_id"
+    t.index [ "subject_id" ], name: "index_student_sessions_on_subject_id"
   end
 
   create_table "students", force: :cascade do |t|
@@ -218,8 +218,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.datetime "updated_at", null: false
     t.boolean "use_personal_key", default: true, null: false
     t.string "username", null: false
-    t.index ["classroom_id"], name: "index_students_on_classroom_id"
-    t.index ["username", "classroom_id"], name: "index_students_on_username_and_classroom_id", unique: true
+    t.index [ "classroom_id" ], name: "index_students_on_classroom_id"
+    t.index [ "username", "classroom_id" ], name: "index_students_on_username_and_classroom_id", unique: true
   end
 
   create_table "subjects", force: :cascade do |t|
@@ -232,10 +232,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.text "specific_presentation"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["discarded_at"], name: "index_subjects_on_discarded_at"
-    t.index ["exam_session_id"], name: "index_subjects_on_exam_session_id"
-    t.index ["owner_id"], name: "index_subjects_on_owner_id"
-    t.index ["status"], name: "index_subjects_on_status"
+    t.index [ "discarded_at" ], name: "index_subjects_on_discarded_at"
+    t.index [ "exam_session_id" ], name: "index_subjects_on_exam_session_id"
+    t.index [ "owner_id" ], name: "index_subjects_on_owner_id"
+    t.index [ "status" ], name: "index_subjects_on_status"
   end
 
   create_table "users", force: :cascade do |t|
@@ -256,9 +256,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_211523) do
     t.text "tutor_prompt_template"
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
-    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index [ "confirmation_token" ], name: "index_users_on_confirmation_token", unique: true
+    t.index [ "email" ], name: "index_users_on_email", unique: true
+    t.index [ "reset_password_token" ], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
