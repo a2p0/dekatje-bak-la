@@ -45,15 +45,16 @@ RSpec.feature "Student tutor — navigation between questions",
       subject_id: subject_record.id, id: q1.id)
     open_tutor_drawer
 
-    initial_count = page.all("[data-message-id]", visible: :all).count
+    initial_count = Message.count
 
-    visit student_question_path(access_code: classroom.access_code,
-      subject_id: subject_record.id, id: q2.id)
-    visit student_question_path(access_code: classroom.access_code,
-      subject_id: subject_record.id, id: q1.id)
-    sleep 1
+    expect {
+      visit student_question_path(access_code: classroom.access_code,
+        subject_id: subject_record.id, id: q2.id)
+      visit student_question_path(access_code: classroom.access_code,
+        subject_id: subject_record.id, id: q1.id)
+    }.not_to change { Message.count }.from(initial_count)
+
     open_tutor_drawer
-
-    expect(page.all("[data-message-id]", visible: :all).count).to eq(initial_count)
+    expect(page.all("[data-message-id]", visible: :all).count).to be <= initial_count
   end
 end

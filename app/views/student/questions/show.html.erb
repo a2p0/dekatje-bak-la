@@ -256,8 +256,7 @@
   </div>
 
   <%= render "student/conversations/drawer",
-             conversation:      @conversation,
-             question:          @question,
-             access_code:       params[:access_code],
-             next_question_url: next_href %>
+             conversation: @conversation,
+             question:     @question,
+             access_code:  params[:access_code] %>
 </div>
