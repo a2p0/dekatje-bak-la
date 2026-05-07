@@ -28,8 +28,6 @@ class Student::EventsController < Student::BaseController
   private
 
   def ensure_conversation(subject)
-    current_student.conversations.find_or_create_by!(subject: subject) do |c|
-      c.tutor_state = TutorState.default
-    end
+    Student::EnsureConversation.call(student: current_student, subject: subject)
   end
 end

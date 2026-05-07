@@ -12,6 +12,8 @@ class Student::QuestionsController < Student::BaseController
     @tutor_available = tutor_available?
     @session_record.mark_seen!(@question.id)
 
+    record_navigation_event
+
     # Mark specific presentation as seen (from specific presentation page link)
     if params[:mark_specific_seen]
       @session_record.mark_specific_presentation_seen!
@@ -43,6 +45,18 @@ class Student::QuestionsController < Student::BaseController
       redirect_to student_root_path(access_code: params[:access_code]),
                   alert: "Question introuvable."
     end
+  end
+
+  def record_navigation_event
+    conv = Student::EnsureConversation.call(student: current_student, subject: @subject)
+    Tutor::RecordEvent.call(
+      conversation: conv,
+      question_id:  @question.id,
+      type:         "navigated_here",
+      source:       "page_click"
+    )
+  rescue => e
+    Rails.logger.warn("[QuestionsController] navigated_here event failed: #{e.message}")
   end
 
   def tutor_available?

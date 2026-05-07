@@ -6,6 +6,9 @@ class Student::Questions::CorrectionsController < Student::BaseController
 
   def create
     @session_record.mark_answered!(@question.id)
+
+    record_correction_events
+
     render turbo_stream: turbo_stream.replace(
       "question_#{@question.id}_correction",
       partial: "student/questions/correction",
@@ -14,6 +17,26 @@ class Student::Questions::CorrectionsController < Student::BaseController
   end
 
   private
+
+  def record_correction_events
+    conv = Student::EnsureConversation.call(student: current_student, subject: @subject)
+    Tutor::RecordEvent.call(
+      conversation: conv,
+      question_id:  @question.id,
+      type:         "viewed_correction",
+      source:       "page_click"
+    )
+    if @question.answer&.data_hints.present?
+      Tutor::RecordEvent.call(
+        conversation: conv,
+        question_id:  @question.id,
+        type:         "viewed_data_hints",
+        source:       "page_click"
+      )
+    end
+  rescue => e
+    Rails.logger.warn("[CorrectionsController] correction events failed: #{e.message}")
+  end
 
   def set_subject
     @subject = @classroom.subjects.published.find_by(id: params[:subject_id])

@@ -49,6 +49,21 @@ RSpec.describe "Student::Questions::Corrections", type: :request do
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
         expect(response.body).to include("question_#{question.id}_correction")
       end
+
+      it "records a viewed_correction event in the conversation's QuestionTrace" do
+        post_correction
+        conv = Conversation.find_by(student: student, subject: subject_obj)
+        expect(conv).not_to be_nil
+        types = conv.tutor_state.trace_for(question.id).events.map { |e| e["type"] }
+        expect(types).to include("viewed_correction")
+      end
+
+      it "also records viewed_data_hints when the answer has data_hints" do
+        post_correction
+        conv = Conversation.find_by(student: student, subject: subject_obj)
+        types = conv.tutor_state.trace_for(question.id).events.map { |e| e["type"] }
+        expect(types).to include("viewed_data_hints")
+      end
     end
 
     context "when the question does not belong to the subject" do
