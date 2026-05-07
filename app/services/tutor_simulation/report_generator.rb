@@ -53,16 +53,14 @@ module TutorSimulation
       lines << ""
       lines << "| Métrique | Valeur |"
       lines << "|---|---|"
-      lines << "| Phase finale | `#{metrics[:final_phase]}` (rang #{metrics[:phase_rank]}/7) |"
-      lines << "| Mots / message tuteur (cible ≤60) | #{metrics[:avg_message_length_words]} |"
-      lines << "| Ratio messages se terminant par `?` (cible ≥0.7) | #{metrics[:open_question_ratio]} |"
-      lines << "| Interceptions filtre regex (low = bon) | #{metrics[:regex_intercepts]} |"
-      lines << "| Indices distribués | #{metrics[:hints_used]} |"
-      lines << "| Messages assistant / élève | #{metrics[:message_count_assistant]} / #{metrics[:message_count_user]} |"
-      lines << "| 1er tour avec transition (H1) | #{format_value(metrics[:first_turn_with_transition])} |"
-      lines << "| % verbes d'action en guiding (H2) | #{format_value(metrics[:action_verb_ratio_guiding])} |"
-      lines << "| Leaks DT/DR hors spotting | #{metrics[:dt_dr_leak_count_non_spotting]} |"
-      lines << "| % messages ≤ 60 mots (cible ≥0.7) | #{metrics[:short_message_ratio]} |"
+      lines << "| Taux de résolution (cible ≥0.7) | #{format_value(metrics[:resolution_rate])} |"
+      lines << "| Violations CAP (cible = 0) | #{format_value(metrics[:cap_violations])} |"
+      lines << "| Étapes d'aide avant résolution | #{format_value(metrics[:mean_help_steps_before_resolution])} |"
+      lines << "| Taux aide proactive | #{format_value(metrics[:proactive_help_rate])} |"
+      lines << "| Taux tentatives correctes après aide | #{format_value(metrics[:correct_attempts_after_help_rate])} |"
+      lines << "| Tentatives par question | #{format_value(metrics[:attempts_per_question])} |"
+      lines << "| Taux consultation correction | #{format_value(metrics[:correction_view_rate])} |"
+      lines << "| Tours moyens avant résolution | #{format_value(metrics[:mean_turns_to_resolution])} |"
       lines << ""
     end
 
@@ -123,14 +121,15 @@ module TutorSimulation
     end
 
     def global_summary
-      qualitative_scores   = []
-      phase_ranks          = []
-      open_q_ratios        = []
-      regex_intercepts     = []
-      first_turns          = []
-      action_verb_ratios   = []
-      dt_dr_leaks          = []
-      short_msg_ratios     = []
+      qualitative_scores         = []
+      resolution_rates           = []
+      cap_violations_total       = []
+      mean_help_steps            = []
+      proactive_help_rates       = []
+      correct_after_help_rates   = []
+      attempts_per_q             = []
+      correction_view_rates      = []
+      mean_turns                 = []
 
       @data[:results].each do |result|
         result[:profiles].each do |pr|
@@ -142,13 +141,14 @@ module TutorSimulation
           metrics = pr[:structural_metrics]
           next unless metrics
 
-          phase_ranks      << metrics[:phase_rank]
-          open_q_ratios    << metrics[:open_question_ratio]
-          regex_intercepts << metrics[:regex_intercepts]
-          first_turns          << metrics[:first_turn_with_transition] unless metrics[:first_turn_with_transition].nil?
-          action_verb_ratios   << metrics[:action_verb_ratio_guiding]  unless metrics[:action_verb_ratio_guiding].nil?
-          dt_dr_leaks          << metrics[:dt_dr_leak_count_non_spotting] if metrics.key?(:dt_dr_leak_count_non_spotting)
-          short_msg_ratios     << metrics[:short_message_ratio]        if metrics.key?(:short_message_ratio)
+          resolution_rates         << metrics[:resolution_rate]         unless metrics[:resolution_rate].nil?
+          cap_violations_total     << metrics[:cap_violations]          unless metrics[:cap_violations].nil?
+          mean_help_steps          << metrics[:mean_help_steps_before_resolution] unless metrics[:mean_help_steps_before_resolution].nil?
+          proactive_help_rates     << metrics[:proactive_help_rate]     unless metrics[:proactive_help_rate].nil?
+          correct_after_help_rates << metrics[:correct_attempts_after_help_rate] unless metrics[:correct_attempts_after_help_rate].nil?
+          attempts_per_q           << metrics[:attempts_per_question]   unless metrics[:attempts_per_question].nil?
+          correction_view_rates    << metrics[:correction_view_rate]    unless metrics[:correction_view_rate].nil?
+          mean_turns               << metrics[:mean_turns_to_resolution] unless metrics[:mean_turns_to_resolution].nil?
         end
       end
 
@@ -171,18 +171,20 @@ module TutorSimulation
         lines << ""
       end
 
-      if phase_ranks.any?
+      if resolution_rates.any?
+        avg_resolution = (resolution_rates.sum.to_f / resolution_rates.size).round(2)
         lines << "**Structurel (calculé sur les conversations)**"
         lines << ""
         lines << "| Métrique | Moyenne |"
         lines << "|---|---|"
-        lines << "| Phase finale moyenne (rang/7) | #{(phase_ranks.sum.to_f / phase_ranks.size).round(1)} |"
-        lines << "| Ratio questions ouvertes | #{(open_q_ratios.sum.to_f / open_q_ratios.size).round(2)} |"
-        lines << "| Interceptions regex (somme) | #{regex_intercepts.sum} |"
-        lines << "| 1er tour transition moyen (H1, non-nil) | #{first_turns.any? ? (first_turns.sum.to_f / first_turns.size).round(1) : "—"} |"
-        lines << "| % verbes d'action moyen (H2, non-nil) | #{action_verb_ratios.any? ? (action_verb_ratios.sum.to_f / action_verb_ratios.size).round(2) : "—"} |"
-        lines << "| Leaks DT/DR totaux | #{dt_dr_leaks.sum} |"
-        lines << "| % messages ≤ 60 mots moyen | #{short_msg_ratios.any? ? (short_msg_ratios.sum.to_f / short_msg_ratios.size).round(2) : "—"} |"
+        lines << "| Taux de résolution (cible ≥0.7) | #{avg_resolution} |"
+        lines << "| Violations CAP (somme) | #{cap_violations_total.sum} |"
+        lines << "| Étapes d'aide avant résolution | #{mean_help_steps.any? ? (mean_help_steps.sum.to_f / mean_help_steps.size).round(1) : "—"} |"
+        lines << "| Taux aide proactive | #{proactive_help_rates.any? ? (proactive_help_rates.sum.to_f / proactive_help_rates.size).round(2) : "—"} |"
+        lines << "| Taux tentatives correctes après aide | #{correct_after_help_rates.any? ? (correct_after_help_rates.sum.to_f / correct_after_help_rates.size).round(2) : "—"} |"
+        lines << "| Tentatives par question | #{attempts_per_q.any? ? (attempts_per_q.sum.to_f / attempts_per_q.size).round(1) : "—"} |"
+        lines << "| Taux consultation correction | #{correction_view_rates.any? ? (correction_view_rates.sum.to_f / correction_view_rates.size).round(2) : "—"} |"
+        lines << "| Tours moyens avant résolution | #{mean_turns.any? ? (mean_turns.sum.to_f / mean_turns.size).round(1) : "—"} |"
         lines << ""
       end
 

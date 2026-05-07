@@ -36,7 +36,7 @@ RSpec.describe TutorSimulation::Runner do
   it "creates the sim classroom on first run" do
     runner = described_class.new(
       subject:        exam_subject,
-      profiles:       [ "bon_eleve" ],
+      profiles:       [ "collaboratif" ],
       max_turns:      1,
       api_key:        "or-test",
       tutor_model:    "openai/gpt-4o-mini",
@@ -52,7 +52,7 @@ RSpec.describe TutorSimulation::Runner do
   it "drives the real Tutor::ProcessMessage pipeline and persists messages" do
     runner = described_class.new(
       subject:        exam_subject,
-      profiles:       [ "bon_eleve" ],
+      profiles:       [ "collaboratif" ],
       max_turns:      1,
       api_key:        "or-test",
       tutor_model:    "openai/gpt-4o-mini",
@@ -73,7 +73,7 @@ RSpec.describe TutorSimulation::Runner do
     output_dir = Dir.mktmpdir
     runner = described_class.new(
       subject:        exam_subject,
-      profiles:       [ "bon_eleve" ],
+      profiles:       [ "collaboratif" ],
       max_turns:      1,
       api_key:        "or-test",
       tutor_model:    "openai/gpt-4o-mini",
@@ -86,7 +86,7 @@ RSpec.describe TutorSimulation::Runner do
     profile_result = data[:results].first[:profiles].first
 
     expect(profile_result[:structural_metrics]).to be_a(Hash)
-    expect(profile_result[:structural_metrics]).to include(:final_phase, :phase_rank, :open_question_ratio)
+    expect(profile_result[:structural_metrics]).to include(:resolution_rate, :cap_violations, :mean_turns_to_resolution)
     expect(profile_result[:evaluation]["non_divulgation"]["score"]).to eq(5)
   end
 
@@ -94,7 +94,7 @@ RSpec.describe TutorSimulation::Runner do
     let(:runner) do
       described_class.new(
         subject:        exam_subject,
-        profiles:       [ "bon_eleve" ],
+        profiles:       [ "collaboratif" ],
         max_turns:      1,
         api_key:        "or-test",
         tutor_model:    "openai/gpt-4o-mini",

@@ -97,7 +97,6 @@ module TutorSimulation
       configure_ruby_llm
 
       transcript = []
-      phase_per_turn = [ conversation.tutor_state.current_phase ]
 
       @max_turns.times do |turn|
         student_message = simulator.respond(
@@ -118,20 +117,18 @@ module TutorSimulation
         if result.err?
           puts "tuteur ✗ (#{result.error})"
           transcript << { "role" => "assistant", "content" => "[ERREUR : #{result.error}]" }
-          phase_per_turn << conversation.reload.tutor_state.current_phase
           break
         end
 
         conversation.reload
         last_assistant = conversation.messages.where(role: :assistant).order(:created_at).last
         transcript << { "role" => "assistant", "content" => last_assistant&.content.to_s }
-        phase_per_turn << conversation.tutor_state.current_phase
         puts "tuteur ✓"
       end
 
       conversation.reload
 
-      structural = StructuralMetrics.compute(conversation: conversation, phase_per_turn: phase_per_turn)
+      structural = StructuralMetrics.compute(conversation: conversation, question_ids: [ question.id ])
 
       evaluation = if ENV["SKIP_JUDGE"] == "1"
         puts "    Juge désactivé (SKIP_JUDGE=1)"
@@ -149,7 +146,6 @@ module TutorSimulation
         transcript:            transcript,
         structural_metrics:    structural,
         evaluation:            evaluation,
-        final_phase:           conversation.tutor_state.current_phase,
         final_lifecycle_state: conversation.lifecycle_state
       }
     end
