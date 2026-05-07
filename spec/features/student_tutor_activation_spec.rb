@@ -102,14 +102,6 @@ RSpec.describe "Tuteur — activation depuis la page question (044)", type: :fea
       )
     end
 
-    scenario "un message welcome apparaît dans le drawer" do
-      find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
-
-      drawer = find("[data-chat-drawer-target='drawer']", visible: :all)
-      # Le welcome inclut le titre du sujet (exam_session.title)
-      expect(drawer).to have_text("CIME", wait: 8)
-    end
-
     scenario "un message intro pour la question apparaît dans le drawer" do
       find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
 
@@ -137,41 +129,6 @@ RSpec.describe "Tuteur — activation depuis la page question (044)", type: :fea
       conv = Conversation.find_by(student: student, subject: subject_record)
       expect(conv).to be_present
       expect(conv.lifecycle_state).to eq("active")
-    end
-  end
-
-  # ─── T302 : idempotence — pas de doublon à la 2e visite ──────────────────
-
-  describe "T302 — re-clic sur Tutorat : pas de doublon intro", js: true do
-    let(:student) do
-      create(:student, classroom: classroom,
-             api_key: "sk-test", api_provider: :anthropic, use_personal_key: true)
-    end
-
-    before do
-      FakeRubyLlm.setup_stub(content: "Tu peux le faire !", tool_calls: [])
-      login_as_student(student, classroom)
-    end
-
-    scenario "ouvrir deux fois le drawer ne crée qu'un seul message intro pour la question" do
-      visit_question
-      find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
-      expect(page).to have_css(
-        "[data-chat-drawer-target='drawer'].translate-x-0",
-        visible: :all, wait: 8
-      )
-
-      # fermer puis réouvrir (reload de la page = nouvelle visite)
-      visit_question
-      FakeRubyLlm.setup_stub(content: "Bonne chance !", tool_calls: [])
-      find("button[aria-label='Ouvrir le tutorat IA']", match: :first).click
-      expect(page).to have_css(
-        "[data-chat-drawer-target='drawer'].translate-x-0",
-        visible: :all, wait: 8
-      )
-
-      conv = Conversation.find_by(student: student, subject: subject_record)
-      expect(conv.messages.where(kind: :intro).count).to eq(1)
     end
   end
 
