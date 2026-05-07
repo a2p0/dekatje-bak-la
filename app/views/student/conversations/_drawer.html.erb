@@ -12,9 +12,9 @@
 
 <div id="tutor-chat-drawer"
      data-chat-drawer-target="drawer"
-     data-controller="<%= conversation ? 'tutor-chat' : '' %>"
+     data-controller="<%= conversation&.active? ? 'tutor-chat' : '' %>"
      data-action="click->tutor-chat#handleChipClick"
-     <% if conversation %>
+     <% if conversation&.active? %>
        data-tutor-chat-conversation-id-value="<%= conversation.id %>"
        data-tutor-chat-messages-url-value="<%= messages_student_conversation_path(access_code: access_code, id: conversation.id) %>"
        data-tutor-chat-question-id-value="<%= question.id %>"
@@ -111,14 +111,14 @@
              id="tutor-chat-input"
              aria-label="Écrivez votre question au tuteur"
              placeholder="Écris à Tibo…"
-             <% unless conversation %>disabled<% end %>
+             <% unless conversation&.active? %>disabled<% end %>
              class="flex-1 border-none outline-none bg-transparent text-sm text-rad-text placeholder:text-rad-muted py-2 disabled:opacity-50"
              autocomplete="off">
       <button type="button"
               data-tutor-chat-target="sendButton"
               data-action="click->tutor-chat#send"
               aria-label="Envoyer"
-              <% unless conversation %>disabled<% end %>
+              <% unless conversation&.active? %>disabled<% end %>
               class="w-10 h-10 rounded-full bg-rad-red text-rad-cream border-0 flex items-center justify-center text-[16px] cursor-pointer flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
         ↑
       </button>
