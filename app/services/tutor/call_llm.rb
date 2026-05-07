@@ -29,28 +29,18 @@ module Tutor
       configure_ruby_llm(credentials)
 
       full_content  = +""
-      tool_calls    = []
+      # 062: prose pure — pas de tool-use forcé.
+      # Le classifier post-réponse (Tutor::Classify) annote la trace.
       buffer_tokens = 0
       last_persist  = Time.current
 
       chat = RubyLLM::Chat.new(model: credentials[:model])
       chat.with_instructions(@system_prompt)
       chat.with_params(max_tokens: MAX_TOKENS)
-      chat.with_tools(
-        Tutor::Tools::TransitionTool,
-        Tutor::Tools::UpdateLearnerModelTool,
-        Tutor::Tools::RequestHintTool,
-        Tutor::Tools::EvaluateSpottingTool
-      )
-      chat.on_tool_call { |tc| tool_calls << tc }
 
       response = chat.ask(@messages) do |chunk|
         delta = chunk.content.to_s
         full_content << delta
-        if chunk.tool_calls.present?
-          chunk_tcs = chunk.tool_calls.respond_to?(:values) ? chunk.tool_calls.values : chunk.tool_calls
-          Array(chunk_tcs).each { |tc| tool_calls << tc unless tool_calls.include?(tc) }
-        end
 
         if delta.present?
           ActionCable.server.broadcast(
@@ -78,7 +68,7 @@ module Tutor
         streaming_finished_at: Time.current
       )
 
-      Result.ok(full_content: full_content, tool_calls: Array(tool_calls))
+      Result.ok(full_content: full_content)
     rescue Tutor::NoApiKeyError => e
       broadcast_error(e.message)
       Result.err(e.message)
