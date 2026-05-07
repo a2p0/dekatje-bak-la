@@ -65,12 +65,12 @@
     </div>
   </div>
 
-  <%# Zone messages %>
+  <%# Zone messages — filtered by current question %>
   <div id="tutor-chat-messages"
        data-tutor-chat-target="messages"
        class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-rad-bg pattern-madras-diagonal">
-    <% if conversation&.messages&.any? %>
-      <% conversation.messages.order(:created_at).each do |msg| %>
+    <% if conversation&.messages&.where(question_id: question.id)&.any? %>
+      <% conversation.messages.where(question_id: question.id).order(:created_at).each do |msg| %>
         <%= render "student/conversations/message", message: msg %>
       <% end %>
     <% else %>
@@ -83,10 +83,14 @@
   <%# Chips contextuelles — mises à jour par ActionCable en fin de tour %>
   <turbo-frame id="tutor-chips" data-tutor-chat-target="chips" class="shrink-0">
     <%= render "student/conversations/chips",
-          conversation:      conversation,
-          question:          question,
-          access_code:       access_code,
-          next_question_url: local_assigns[:next_question_url] %>
+          conversation: conversation,
+          question:     question,
+          access_code:  access_code,
+          chips:        conversation ? Tutor::ChipsPresenter.call(
+                          trace:          conversation.tutor_state.trace_for(question.id),
+                          answer_type:    question.answer_type.to_s,
+                          expected_value: nil
+                        ) : [] %>
   </turbo-frame>
 
   <%# Streaming placeholder — div unique car le controller fait textContent += token dessus directement. %>

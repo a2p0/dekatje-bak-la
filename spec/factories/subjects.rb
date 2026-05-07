@@ -89,4 +89,15 @@ FactoryBot.define do
     trait :ac          do specialty { :AC }; end
     trait :tronc_commun do specialty { :tronc_commun }; end
   end
+
+  factory :subject_with_two_questions, parent: :subject do
+    status  { :published }
+    specialty { :SIN }
+
+    after(:create) do |s|
+      p = create(:part, subject: s, position: 1, section_type: :specific)
+      create(:question, part: p, position: 1, number: "1.1", answer_type: :calcul)
+      create(:question, part: p, position: 2, number: "1.2", answer_type: :calcul)
+    end
+  end
 end
