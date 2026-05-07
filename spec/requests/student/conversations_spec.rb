@@ -16,10 +16,6 @@ RSpec.describe "Student::Conversations", type: :request do
   end
 
   describe "POST /:access_code/conversations" do
-    before do
-      allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
-    end
-
     it "creates a conversation for the subject and returns conversation_id" do
       post student_conversations_path(access_code: classroom.access_code),
            params: { subject_id: exam_subject.id },
@@ -31,6 +27,14 @@ RSpec.describe "Student::Conversations", type: :request do
       expect(Conversation.count).to eq(1)
       expect(Conversation.last.student).to eq(student)
       expect(Conversation.last.subject).to eq(exam_subject)
+    end
+
+    it "creates a conversation with TutorState.default for new conversations" do
+      post student_conversations_path(access_code: classroom.access_code),
+           params: { subject_id: exam_subject.id },
+           as: :json
+
+      expect(Conversation.last.tutor_state).to eq(TutorState.default)
     end
 
     it "returns existing active conversation if one already exists" do
@@ -96,6 +100,21 @@ RSpec.describe "Student::Conversations", type: :request do
     end
   end
 
+  describe "POST /:access_code/conversations with question_id" do
+    # NOTE: the tutor-chat-drawer test requires T15 (drawer partial wiring chips local)
+    # and is deferred to that task. Only the banner branch is tested here.
+
+    it "returns a turbo stream replacing tutor-activation-banner when no question_id" do
+      post student_conversations_path(access_code: classroom.access_code),
+           params: { subject_id: exam_subject.id },
+           headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("turbo-stream")
+      expect(response.body).to include("tutor-activation-banner")
+    end
+  end
+
   describe "POST /:access_code/conversations/:id/messages" do
     let!(:conversation) do
       create(:conversation, student: student, subject: exam_subject,
@@ -150,127 +169,6 @@ RSpec.describe "Student::Conversations", type: :request do
     end
   end
 
-  describe "PATCH /:access_code/conversations/:id/confidence" do
-    let(:tutor_state_with_question) do
-      TutorState.new(
-        current_phase:        "validating",
-        current_question_id:  question.id,
-        concepts_mastered:    [],
-        concepts_to_revise:   [],
-        discouragement_level: 0,
-        question_states:      {
-          question.id.to_s => QuestionState.new(
-            phase: "enonce", step: 0, hints_used: 0, last_confidence: nil,
-            error_types: [], completed_at: nil, intro_seen: false)
-        }, welcome_sent: false, last_activity_at: nil)
-    end
-
-    let!(:conversation) do
-      create(:conversation,
-             student:          student,
-             subject:          exam_subject,
-             lifecycle_state:  "validating",
-             tutor_state:      tutor_state_with_question)
-    end
-
-    it "saves the confidence level and returns a Turbo Stream" do
-      patch confidence_student_conversation_path(
-              access_code: classroom.access_code,
-              id:          conversation.id
-            ),
-            params: { level: 3 },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
-
-      expect(response).to have_http_status(:ok)
-      expect(response.content_type).to include("turbo-stream")
-
-      conversation.reload
-      q_state = conversation.tutor_state.question_states[question.id.to_s]
-      expect(q_state.last_confidence).to eq(3)
-    end
-
-    it "transitions lifecycle from validating to feedback" do
-      patch confidence_student_conversation_path(
-              access_code: classroom.access_code,
-              id:          conversation.id
-            ),
-            params: { level: 4 },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
-
-      expect(conversation.reload.lifecycle_state).to eq("feedback")
-    end
-
-    it "rejects invalid confidence levels" do
-      patch confidence_student_conversation_path(
-              access_code: classroom.access_code,
-              id:          conversation.id
-            ),
-            params: { level: 9 },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
-
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
-
-    it "returns 422 when no current_question_id is set" do
-      conversation.update!(tutor_state: TutorState.default, lifecycle_state: "validating")
-
-      patch confidence_student_conversation_path(
-              access_code: classroom.access_code,
-              id:          conversation.id
-            ),
-            params: { level: 3 },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
-
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
-
-    it "returns 404 when conversation belongs to another student" do
-      other_student = create(:student, classroom: classroom)
-      other_conv    = create(:conversation,
-                             student:         other_student,
-                             subject:         exam_subject,
-                             lifecycle_state: "validating",
-                             tutor_state:     tutor_state_with_question)
-
-      patch confidence_student_conversation_path(
-              access_code: classroom.access_code,
-              id:          other_conv.id
-            ),
-            params: { level: 3 },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
-
-      expect(response).to have_http_status(:not_found)
-    end
-  end
-
-  describe "confidence form partial rendering" do
-    let(:conversation) do
-      create(:conversation, student: student, subject: exam_subject,
-             lifecycle_state: "validating", tutor_state: TutorState.default)
-    end
-
-    it "renders 5 confidence buttons with labels and data-controller" do
-      html = ApplicationController.render(
-        partial: "student/conversations/confidence_form",
-        locals:  {
-          conversation: conversation,
-          question_id:  question.id,
-          access_code:  classroom.access_code
-        }
-      )
-
-      expect(html).to include("Très peu sûr")
-      expect(html).to include("Très sûr")
-      expect(html).to include(%(data-controller="confidence-form"))
-      (1..5).each { |n| expect(html).to include(%(value="#{n}")) }
-    end
-  end
-
   describe "message partial rendering" do
     let(:conversation) do
       create(:conversation, student: student, subject: exam_subject,
@@ -310,128 +208,6 @@ RSpec.describe "Student::Conversations", type: :request do
       expect(html).to include("Info système")
       expect(html).to include("self-center")
       expect(html).to include(%(data-message-role="system"))
-    end
-  end
-
-  describe "POST #create — welcome message (044)" do
-    before do
-      allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
-    end
-
-    context "when welcome has not been sent yet (welcome_sent: false)" do
-      it "calls BuildWelcomeMessage" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(Tutor::BuildWelcomeMessage).to have_received(:call).once
-      end
-
-      it "includes a turbo-stream replace for the activation banner" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(response.body).to include("turbo-stream")
-        expect(response.body).to include("tutor-activation-banner")
-      end
-    end
-
-    context "when welcome has already been sent (welcome_sent: true)" do
-      before do
-        create(:conversation, student: student, subject: exam_subject,
-               lifecycle_state: "active",
-               tutor_state: TutorState.default.with(welcome_sent: true))
-      end
-
-      it "does not call BuildWelcomeMessage again" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(Tutor::BuildWelcomeMessage).not_to have_received(:call)
-      end
-    end
-  end
-
-  describe "PATCH #mark_intro_seen (044)" do
-    let!(:conversation) do
-      create(:conversation, student: student, subject: exam_subject,
-             lifecycle_state: "active", tutor_state: TutorState.default)
-    end
-
-    it "sets intro_seen to true for the given question and returns 200" do
-      patch mark_intro_seen_student_conversation_path(
-              access_code: classroom.access_code,
-              id: conversation.id
-            ),
-            params: { question_id: question.id }
-
-      expect(response).to have_http_status(:ok)
-      qs = conversation.reload.tutor_state.question_states[question.id.to_s]
-      expect(qs&.intro_seen).to eq(true)
-    end
-  end
-
-  describe "POST #create — intro message on question page (T201)" do
-    before do
-      allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
-      allow(Tutor::BuildIntroMessage).to receive(:call).and_return(Tutor::Result.ok)
-    end
-
-    context "when question_id is provided and intro not yet seen" do
-      it "calls BuildIntroMessage" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id, question_id: question.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(Tutor::BuildIntroMessage).to have_received(:call).once
-      end
-
-      it "returns a turbo-stream response" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id, question_id: question.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to include("turbo-stream")
-      end
-    end
-
-    context "when question_id is provided and intro already seen" do
-      before do
-        existing_ts = TutorState.default.with(
-          question_states: {
-            question.id.to_s => QuestionState.new(
-              phase: "enonce", step: 0, hints_used: 0, last_confidence: nil,
-              error_types: [], completed_at: nil, intro_seen: true
-            )
-          }
-        )
-        create(:conversation, student: student, subject: exam_subject,
-               lifecycle_state: "active", tutor_state: existing_ts)
-      end
-
-      it "does not create a duplicate intro message (idempotent)" do
-        allow(Tutor::BuildWelcomeMessage).to receive(:call).and_return(Tutor::Result.ok)
-
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id, question_id: question.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        conv = Conversation.find_by(student: student, subject: exam_subject)
-        expect(conv.messages.where(kind: :intro).count).to eq(0)
-      end
-    end
-
-    context "when no question_id is provided" do
-      it "does not call BuildIntroMessage" do
-        post student_conversations_path(access_code: classroom.access_code),
-             params: { subject_id: exam_subject.id },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        expect(Tutor::BuildIntroMessage).not_to have_received(:call)
-      end
     end
   end
 end

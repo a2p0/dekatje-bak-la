@@ -52,9 +52,7 @@ Rails.application.routes.draw do
       controller: "student/settings/api_key_tests"
     resources :conversations, only: [ :create ], controller: "student/conversations" do
       member do
-        post  :messages
-        patch :confidence
-        patch :mark_intro_seen
+        post :messages
       end
     end
     resources :events, only: [ :create ], controller: "student/events"
