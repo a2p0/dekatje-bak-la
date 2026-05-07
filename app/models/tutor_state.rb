@@ -8,7 +8,7 @@ QuestionTrace = Data.define(:question_id, :events) do
   end
 
   def append(event)
-    new(question_id: question_id, events: events + [ event ].freeze)
+    with(events: events + [ event ].freeze)
   end
 
   def budget
