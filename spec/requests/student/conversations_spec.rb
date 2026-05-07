@@ -100,9 +100,9 @@ RSpec.describe "Student::Conversations", type: :request do
     end
   end
 
-  describe "POST /:access_code/conversations with question_id" do
-    # NOTE: the tutor-chat-drawer test requires T15 (drawer partial wiring chips local)
-    # and is deferred to that task. Only the banner branch is tested here.
+  describe "POST /:access_code/conversations turbo_stream branches" do
+    # NOTE: the tutor-chat-drawer (question_id present) test requires T15 (drawer partial
+    # wiring chips local) and is deferred to that task. Only the banner branch is tested here.
 
     it "returns a turbo stream replacing tutor-activation-banner when no question_id" do
       post student_conversations_path(access_code: classroom.access_code),
