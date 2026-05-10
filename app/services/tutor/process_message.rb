@@ -31,13 +31,20 @@ module Tutor
       # Option C: always record student_attempt — the message is an attempt even
       # on the very first turn. :fresh_open still flows to BuildContext to shape
       # the greeting behavior but must not block trace recording.
+      #
+      # Verdict is computed deterministically by ClassifyAttempt against the
+      # question's structured_correction.final_answers. Returns "correct" if a
+      # final answer value is found in the student content (after normalization),
+      # else "unknown". MVP: no LLM call, no numeric tolerance.
+      verdict = ClassifyAttempt.call(student_content: display_content, question: @question)
+
       RecordEvent.call(
         conversation: @conversation,
         question_id:  @question.id,
         type:         "student_attempt",
         source:       "llm_message",
         content:      display_content,
-        verdict:      "unknown"
+        verdict:      verdict
       )
 
       @conversation.messages.create!(role: :user, content: display_content, question: @question)

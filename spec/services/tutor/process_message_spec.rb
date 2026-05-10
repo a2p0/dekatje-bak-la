@@ -58,4 +58,48 @@ RSpec.describe Tutor::ProcessMessage do
     types = conversation.reload.tutor_state.trace_for(question.id).events.map { |e| e["type"] }
     expect(types).to include("cap_violation")
   end
+
+  describe "verdict on student_attempt" do
+    context "when student content matches a final_answer" do
+      let!(:answer) do
+        create(:answer, question: question, structured_correction: {
+          "final_answers" => [ { "name" => "Consommation", "value" => "56,73 l" } ]
+        })
+      end
+
+      it "records student_attempt with verdict=correct" do
+        described_class.call(
+          conversation:  conversation,
+          student_input: "Je trouve 56,73 litres au final",
+          question:      question,
+          access_code:   "tutor-sim"
+        )
+
+        attempt = conversation.reload.tutor_state.trace_for(question.id).events
+                              .find { |e| e["type"] == "student_attempt" }
+        expect(attempt["verdict"]).to eq("correct")
+      end
+    end
+
+    context "when student content does not match any final_answer" do
+      let!(:answer) do
+        create(:answer, question: question, structured_correction: {
+          "final_answers" => [ { "name" => "Consommation", "value" => "56,73 l" } ]
+        })
+      end
+
+      it "records student_attempt with verdict=unknown" do
+        described_class.call(
+          conversation:  conversation,
+          student_input: "Je sais pas trop",
+          question:      question,
+          access_code:   "tutor-sim"
+        )
+
+        attempt = conversation.reload.tutor_state.trace_for(question.id).events
+                              .find { |e| e["type"] == "student_attempt" }
+        expect(attempt["verdict"]).to eq("unknown")
+      end
+    end
+  end
 end
