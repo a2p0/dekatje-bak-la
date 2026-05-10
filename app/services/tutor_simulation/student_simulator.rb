@@ -11,7 +11,7 @@ module TutorSimulation
           Tu ne demandes JAMAIS à voir la correction.
           Tu n'écris jamais [VOIR_CORRECTION].
           Si vraiment tu n'y arrives pas après 6+ tentatives, tu admets ne pas savoir
-          mais tu ne capitules pas, tu retentes encore.
+          mais tu n'abandonnes pas — tu continues à chercher jusqu'au bout.
           Réponds en français, niveau lycéen, 1-3 phrases maximum.
         PROMPT
       },
