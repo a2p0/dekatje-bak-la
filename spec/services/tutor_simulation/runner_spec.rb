@@ -170,6 +170,33 @@ RSpec.describe TutorSimulation::Runner do
       ENV.delete("SKIP_JUDGE")
     end
 
+    it "skip un turn quand l'élève simulé retourne une réponse vide" do
+      empty_then_speak_client = instance_double(AiClientFactory)
+      allow(empty_then_speak_client).to receive(:call).and_return("", "  ", "Je tente la formule R = e/λ")
+      allow(empty_then_speak_client).to receive(:instance_variable_get).with(:@provider).and_return(:openrouter)
+      allow(empty_then_speak_client).to receive(:instance_variable_get).with(:@model).and_return("openai/gpt-5-mini")
+
+      runner = described_class.new(
+        subject:        exam_subject,
+        profiles:       [ "collaboratif" ],
+        max_turns:      3,
+        api_key:        "or-test",
+        tutor_model:    "openai/gpt-4o-mini",
+        student_client: empty_then_speak_client,
+        judge_client:   judge_client,
+        output_dir:     Dir.mktmpdir
+      )
+      ENV["SKIP_JUDGE"] = "1"
+
+      expect { runner.run }.not_to raise_error
+
+      conv = Conversation.last
+      user_msgs = conv.messages.where(role: :user).pluck(:content)
+      expect(user_msgs).to eq([ "Je tente la formule R = e/λ" ])
+    ensure
+      ENV.delete("SKIP_JUDGE")
+    end
+
     it "n'appelle jamais viewed_correction sur le profil autonome" do
       runner = described_class.new(
         subject:        exam_subject,

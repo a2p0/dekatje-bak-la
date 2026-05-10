@@ -128,7 +128,13 @@ class AiClientFactory
     when :anthropic
       body.dig("content", 0, "text")
     when :openrouter, :openai
-      body.dig("choices", 0, "message", "content")
+      msg = body.dig("choices", 0, "message")
+      return "" unless msg
+
+      text = msg["content"]
+      text = msg["reasoning_content"] if text.nil? || text.to_s.strip.empty?
+      text = msg["reasoning"]         if text.nil? || text.to_s.strip.empty?
+      text.to_s
     when :google
       body.dig("candidates", 0, "content", "parts", 0, "text")
     end

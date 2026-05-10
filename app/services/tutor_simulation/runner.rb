@@ -106,6 +106,17 @@ module TutorSimulation
           conversation_history: transcript,
           turn:                 turn + 1
         )
+
+        # Guard: some LLMs (esp. reasoning models like gpt-5-mini) occasionally
+        # return empty content. Skip the turn rather than crash the conversation
+        # in ValidateInput. The turn counter still advances — we treat it as a
+        # wasted turn.
+        if raw_student.to_s.strip.empty?
+          puts "    [#{turn + 1}/#{@max_turns}] élève → réponse vide, skip turn"
+          turns_without_correct += 1
+          next
+        end
+
         cleaned = behavior.strip_view_tag(raw_student)
         print "    [#{turn + 1}/#{@max_turns}] élève ✓ "
 

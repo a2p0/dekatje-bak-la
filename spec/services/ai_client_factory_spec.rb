@@ -99,6 +99,35 @@ RSpec.describe AiClientFactory do
     end
   end
 
+  describe "#extract_text fallback for reasoning models" do
+    let(:factory) { described_class.build(provider: :openrouter, api_key: "test", model: "openai/gpt-5-mini") }
+
+    it "returns content when present" do
+      body = { "choices" => [ { "message" => { "content" => "hello" } } ] }
+      expect(factory.send(:extract_text, body)).to eq("hello")
+    end
+
+    it "falls back to reasoning_content when content is nil" do
+      body = { "choices" => [ { "message" => { "content" => nil, "reasoning_content" => "thinking..." } } ] }
+      expect(factory.send(:extract_text, body)).to eq("thinking...")
+    end
+
+    it "falls back to reasoning when content is empty string" do
+      body = { "choices" => [ { "message" => { "content" => "", "reasoning" => "alt" } } ] }
+      expect(factory.send(:extract_text, body)).to eq("alt")
+    end
+
+    it "returns empty string when all candidates are absent" do
+      body = { "choices" => [ { "message" => {} } ] }
+      expect(factory.send(:extract_text, body)).to eq("")
+    end
+
+    it "returns empty string when message is missing" do
+      body = { "choices" => [ {} ] }
+      expect(factory.send(:extract_text, body)).to eq("")
+    end
+  end
+
   describe "#stream" do
     it "raises ArgumentError without a block" do
       client = described_class.build(provider: :anthropic, api_key: "sk-test")
