@@ -127,6 +127,9 @@ module TutorSimulation
           break
         end
 
+        # Snapshot trace length BEFORE ProcessMessage to identify events emitted this turn.
+        events_before = conversation.tutor_state.trace_for(question.id).events.length
+
         transcript << { "role" => "user", "content" => cleaned }
 
         result = Tutor::ProcessMessage.call(
@@ -147,9 +150,11 @@ module TutorSimulation
         transcript << { "role" => "assistant", "content" => last_assistant&.content.to_s }
         puts "tuteur ✓"
 
-        trace      = conversation.tutor_state.trace_for(question.id)
-        last_event = trace.events.last
-        if last_event&.dig("type") == "student_attempt" && last_event["verdict"] == "correct"
+        # Scan events emitted during this turn for a correct student_attempt.
+        # events.last would point to a tutor event (tutor_gave/concept_seen/cap_violation)
+        # added after the student_attempt, so we scan all new events instead.
+        new_events = conversation.tutor_state.trace_for(question.id).events.drop(events_before)
+        if new_events.any? { |e| e["type"] == "student_attempt" && e["verdict"] == "correct" }
           turns_without_correct = 0
         else
           turns_without_correct += 1

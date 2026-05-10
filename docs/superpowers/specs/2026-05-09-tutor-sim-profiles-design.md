@@ -211,6 +211,8 @@ turns_without_correct = 0
   end
 
   # 2. Envoi normal au tuteur
+  # Snapshot trace length AVANT ProcessMessage
+  events_before = conversation.tutor_state.trace_for(question.id).events.length
   transcript << { "role" => "user", "content" => cleaned }
   result = Tutor::ProcessMessage.call(
     conversation:  conversation,
@@ -220,11 +222,11 @@ turns_without_correct = 0
   )
 
   # 3. Mise à jour du compteur "turns sans correct"
-  conversation.reload
-  trace = conversation.tutor_state.trace_for(question.id)
-  last_event = trace.events.last
-  if last_event&.dig("type") == "student_attempt" &&
-     last_event["verdict"] == "correct"
+  # Snapshot AVANT ProcessMessage : on scanne les events ajoutés CE TOUR pour
+  # trouver le student_attempt verdict=correct (events.last pointe sur un event
+  # tuteur ajouté après, ex: tutor_gave / concept_seen).
+  new_events = conversation.tutor_state.trace_for(question.id).events.drop(events_before)
+  if new_events.any? { |e| e["type"] == "student_attempt" && e["verdict"] == "correct" }
     turns_without_correct = 0
   else
     turns_without_correct += 1

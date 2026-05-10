@@ -131,6 +131,45 @@ RSpec.describe TutorSimulation::Runner do
       ENV.delete("SKIP_JUDGE")
     end
 
+    it "ne déclenche pas viewed_correction quand le profil collaboratif fournit la bonne réponse" do
+      # Build an answer with structured_correction so ClassifyAttempt can find a match.
+      question.answer.update!(structured_correction: {
+        "final_answers" => [ { "name" => "X", "value" => "42" } ]
+      })
+
+      collab_client = instance_double(AiClientFactory)
+      # Le profil collaboratif a un threshold de 8 tours. Avec 4 tours dont la réponse "42"
+      # qui matche, le compteur reset, donc viewed_correction ne se déclenche pas.
+      allow(collab_client).to receive(:call).and_return(
+        "je tente la formule",
+        "42 si je calcule bien",       # ← match → verdict=correct → reset compteur
+        "et je vérifie",
+        "j'ai fini"
+      )
+      allow(collab_client).to receive(:instance_variable_get).with(:@provider).and_return(:openrouter)
+      allow(collab_client).to receive(:instance_variable_get).with(:@model).and_return("openai/gpt-4o-mini")
+
+      runner = described_class.new(
+        subject:        exam_subject,
+        profiles:       [ "collaboratif" ],
+        max_turns:      4,
+        api_key:        "or-test",
+        tutor_model:    "openai/gpt-4o-mini",
+        student_client: collab_client,
+        judge_client:   judge_client,
+        output_dir:     Dir.mktmpdir
+      )
+      ENV["SKIP_JUDGE"] = "1"
+
+      allow(Tutor::RecordEvent).to receive(:call).and_call_original
+      runner.run
+
+      expect(Tutor::RecordEvent).not_to have_received(:call)
+        .with(hash_including(type: "viewed_correction", source: "code"))
+    ensure
+      ENV.delete("SKIP_JUDGE")
+    end
+
     it "n'appelle jamais viewed_correction sur le profil autonome" do
       runner = described_class.new(
         subject:        exam_subject,
