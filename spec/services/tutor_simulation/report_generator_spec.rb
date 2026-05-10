@@ -200,5 +200,11 @@ RSpec.describe TutorSimulation::ReportGenerator do
       expect(md).not_to match(/Taux aide proactive.*WARN/)
       expect(md).not_to match(/Taux consultation correction.*WARN/)
     end
+
+    it "n'ajoute pas WARN pour un profil non listé (ex: eleve_moyen)" do
+      # Le fixture simulation_data top-level utilise profile: "eleve_moyen", absent de PER_PROFILE_THRESHOLDS.
+      md = described_class.new(simulation_data).to_markdown
+      expect(md).not_to include("⚠ WARN")
+    end
   end
 end

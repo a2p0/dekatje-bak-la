@@ -4,22 +4,22 @@ module TutorSimulation
     # markdown report — not enforced by CI. Calibrate from baseline runs.
     PER_PROFILE_THRESHOLDS = {
       "autonome" => {
-        proactive_help_rate:               { op: :<=, value: 0.20 },
-        mean_help_steps_before_resolution: { op: :>=, value: 0.5 },
-        correction_view_rate:              { op: :==, value: 0.0 }
-      },
+        proactive_help_rate:               { op: :<=, value: 0.20 }.freeze,
+        mean_help_steps_before_resolution: { op: :>=, value: 0.5 }.freeze,
+        correction_view_rate:              { op: :==, value: 0.0 }.freeze
+      }.freeze,
       "collaboratif" => {
-        proactive_help_rate:               { op: :<=, value: 0.30 },
-        mean_help_steps_before_resolution: { op: :>=, value: 1.5 },
-        correct_attempts_after_help_rate:  { op: :>=, value: 0.60 },
-        correction_view_rate:              { op: :<=, value: 0.20 }
-      },
+        proactive_help_rate:               { op: :<=, value: 0.30 }.freeze,
+        mean_help_steps_before_resolution: { op: :>=, value: 1.5 }.freeze,
+        correct_attempts_after_help_rate:  { op: :>=, value: 0.60 }.freeze,
+        correction_view_rate:              { op: :<=, value: 0.20 }.freeze
+      }.freeze,
       "passif" => {
-        proactive_help_rate:               { op: :<=, value: 0.50 },
-        mean_help_steps_before_resolution: { op: :>=, value: 1.0 },
-        correct_attempts_after_help_rate:  { op: :>=, value: 0.40 },
-        correction_view_rate:              { op: :>=, value: 0.66 }
-      }
+        proactive_help_rate:               { op: :<=, value: 0.50 }.freeze,
+        mean_help_steps_before_resolution: { op: :>=, value: 1.0 }.freeze,
+        correct_attempts_after_help_rate:  { op: :>=, value: 0.40 }.freeze,
+        correction_view_rate:              { op: :>=, value: 0.66 }.freeze
+      }.freeze
     }.freeze
 
     def initialize(simulation_data)
@@ -101,6 +101,8 @@ module TutorSimulation
       when :<= then value <= threshold[:value]
       when :>= then value >= threshold[:value]
       when :== then value == threshold[:value]
+      else
+        raise ArgumentError, "Unknown threshold op: #{threshold[:op].inspect}"
       end
 
       passes ? value.to_s : "#{value} ⚠ WARN"
