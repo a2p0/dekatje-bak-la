@@ -11,9 +11,10 @@ namespace :tutor do
 
     Optional env:
       TURNS               Max conversation turns per question (default: 5)
-      PROFILES            Comma-separated profiles (default: collaboratif)
-                          Available: collaboratif
-                          (autonome and passif deferred to PR 063)
+      PROFILES            Comma-separated profiles (default: autonome,collaboratif,passif)
+                          Available: autonome, collaboratif, passif
+                          NOTE: depuis 063, le default est 3 profils (×3 coût LLM).
+                          Pour un smoke test rapide : PROFILES=collaboratif
       QUESTIONS           Comma-separated question numbers to limit the run
                           (e.g. "1.1,1.2"). Default: all questions of the subject.
       TUTOR_MODEL         OpenRouter model id for the tutor
