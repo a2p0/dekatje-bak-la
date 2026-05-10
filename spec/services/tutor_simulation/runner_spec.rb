@@ -90,6 +90,71 @@ RSpec.describe TutorSimulation::Runner do
     expect(profile_result[:evaluation]["non_divulgation"]["score"]).to eq(5)
   end
 
+  describe "viewed_correction emission via ProfileBehavior" do
+    let(:passif_student_client) do
+      instance_double(AiClientFactory)
+    end
+
+    before do
+      # Profil passif : 3 réponses "je sais pas" pour atteindre le seuil de 3 tours.
+      allow(passif_student_client).to receive(:call).and_return(
+        "je sais pas",
+        "donne-moi un indice",
+        "toujours pas"
+      )
+      allow(passif_student_client).to receive(:instance_variable_get).with(:@provider).and_return(:openrouter)
+      allow(passif_student_client).to receive(:instance_variable_get).with(:@model).and_return("openai/gpt-4o-mini")
+    end
+
+    it "déclenche RecordEvent viewed_correction sur le profil passif après 3 tours sans correct" do
+      runner = described_class.new(
+        subject:        exam_subject,
+        profiles:       [ "passif" ],
+        max_turns:      5,
+        api_key:        "or-test",
+        tutor_model:    "openai/gpt-4o-mini",
+        student_client: passif_student_client,
+        judge_client:   judge_client,
+        output_dir:     Dir.mktmpdir
+      )
+      ENV["SKIP_JUDGE"] = "1"
+
+      # Use spy pattern: allow all calls through, then assert on viewed_correction specifically
+      allow(Tutor::RecordEvent).to receive(:call).and_call_original
+
+      runner.run
+
+      expect(Tutor::RecordEvent).to have_received(:call)
+        .with(hash_including(type: "viewed_correction", source: "code"))
+        .at_least(:once)
+    ensure
+      ENV.delete("SKIP_JUDGE")
+    end
+
+    it "n'appelle jamais viewed_correction sur le profil autonome" do
+      runner = described_class.new(
+        subject:        exam_subject,
+        profiles:       [ "autonome" ],
+        max_turns:      5,
+        api_key:        "or-test",
+        tutor_model:    "openai/gpt-4o-mini",
+        student_client: passif_student_client,  # même script "je sais pas" mais autonome ignore
+        judge_client:   judge_client,
+        output_dir:     Dir.mktmpdir
+      )
+      ENV["SKIP_JUDGE"] = "1"
+
+      allow(Tutor::RecordEvent).to receive(:call).and_call_original
+
+      runner.run
+
+      expect(Tutor::RecordEvent).not_to have_received(:call)
+        .with(hash_including(type: "viewed_correction"))
+    ensure
+      ENV.delete("SKIP_JUDGE")
+    end
+  end
+
   describe "SKIP_JUDGE guard" do
     let(:runner) do
       described_class.new(

@@ -90,26 +90,48 @@ module TutorSimulation
     end
 
     def simulate_profile(question, profile, classroom)
-      simulator = StudentSimulator.new(profile: profile, client: @student_client)
+      simulator   = StudentSimulator.new(profile: profile, client: @student_client)
+      behavior    = ProfileBehavior.for(profile)
       sim_student = build_sim_student(profile, classroom)
       conversation = build_conversation(sim_student)
 
       configure_ruby_llm
 
-      transcript = []
+      transcript            = []
+      turns_without_correct = 0
 
       @max_turns.times do |turn|
-        student_message = simulator.respond(
+        raw_student = simulator.respond(
           question_label:       question.label,
           conversation_history: transcript,
           turn:                 turn + 1
         )
-        transcript << { "role" => "user", "content" => student_message }
+        cleaned = behavior.strip_view_tag(raw_student)
         print "    [#{turn + 1}/#{@max_turns}] élève ✓ "
+
+        if behavior.should_view_correction?(
+             student_message:       raw_student,
+             turns_without_correct: turns_without_correct
+           )
+          Tutor::RecordEvent.call(
+            conversation: conversation,
+            question_id:  question.id,
+            type:         "viewed_correction",
+            source:       "code"
+          )
+          transcript << {
+            "role"    => "user",
+            "content" => cleaned.presence || "Je vais voir la correction."
+          }
+          puts "abandon — viewed_correction émis"
+          break
+        end
+
+        transcript << { "role" => "user", "content" => cleaned }
 
         result = Tutor::ProcessMessage.call(
           conversation:  conversation,
-          student_input: student_message,
+          student_input: cleaned,
           question:      question,
           access_code:   nil
         )
@@ -124,6 +146,14 @@ module TutorSimulation
         last_assistant = conversation.messages.where(role: :assistant).order(:created_at).last
         transcript << { "role" => "assistant", "content" => last_assistant&.content.to_s }
         puts "tuteur ✓"
+
+        trace      = conversation.tutor_state.trace_for(question.id)
+        last_event = trace.events.last
+        if last_event&.dig("type") == "student_attempt" && last_event["verdict"] == "correct"
+          turns_without_correct = 0
+        else
+          turns_without_correct += 1
+        end
       end
 
       conversation.reload
