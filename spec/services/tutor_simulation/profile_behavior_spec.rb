@@ -52,6 +52,12 @@ RSpec.describe TutorSimulation::ProfileBehavior do
           behavior.should_view_correction?(student_message: "j'abandonne [VOIR_CORRECTION]", turns_without_correct: 2)
         ).to be(true)
       end
+
+      it "retourne false si student_message est nil" do
+        expect(
+          behavior.should_view_correction?(student_message: nil, turns_without_correct: 0)
+        ).to be(false)
+      end
     end
 
     context "profil passif" do
@@ -92,6 +98,10 @@ RSpec.describe TutorSimulation::ProfileBehavior do
       expect(
         behavior.strip_view_tag("[VOIR_CORRECTION] ras-le-bol [VOIR_CORRECTION]")
       ).to eq("ras-le-bol")
+    end
+
+    it "retourne chaîne vide si message nil" do
+      expect(behavior.strip_view_tag(nil)).to eq("")
     end
   end
 end

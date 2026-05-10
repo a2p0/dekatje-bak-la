@@ -29,8 +29,7 @@ module TutorSimulation
     end
 
     def initialize(profile)
-      @profile = profile.to_sym
-      @config  = BEHAVIORS.fetch(@profile)
+      @config = BEHAVIORS.fetch(profile.to_sym)
     end
 
     def should_view_correction?(student_message:, turns_without_correct:)
