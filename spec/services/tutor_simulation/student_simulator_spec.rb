@@ -14,6 +14,21 @@ RSpec.describe TutorSimulation::StudentSimulator do
     it "raises on unknown profile" do
       expect { described_class.new(profile: :inexistant, client: client) }.to raise_error(ArgumentError, /Unknown profile/)
     end
+
+    it "exposes the autonome profile" do
+      simulator = described_class.new(profile: :autonome, client: client)
+      expect(simulator.profile_label).to eq("Élève autonome")
+    end
+
+    it "exposes the passif profile" do
+      simulator = described_class.new(profile: :passif, client: client)
+      expect(simulator.profile_label).to eq("Élève passif")
+    end
+
+    it "exposes the collaboratif profile (regression)" do
+      simulator = described_class.new(profile: :collaboratif, client: client)
+      expect(simulator.profile_label).to eq("Élève collaboratif")
+    end
   end
 
   describe "#respond" do
