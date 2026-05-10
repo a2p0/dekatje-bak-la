@@ -1,5 +1,27 @@
 module TutorSimulation
   class ReportGenerator
+    # Per-profile indicative thresholds. Used only for WARN flags in the
+    # markdown report — not enforced by CI. Calibrate from baseline runs.
+    PER_PROFILE_THRESHOLDS = {
+      "autonome" => {
+        proactive_help_rate:               { op: :<=, value: 0.20 },
+        mean_help_steps_before_resolution: { op: :>=, value: 0.5 },
+        correction_view_rate:              { op: :==, value: 0.0 }
+      },
+      "collaboratif" => {
+        proactive_help_rate:               { op: :<=, value: 0.30 },
+        mean_help_steps_before_resolution: { op: :>=, value: 1.5 },
+        correct_attempts_after_help_rate:  { op: :>=, value: 0.60 },
+        correction_view_rate:              { op: :<=, value: 0.20 }
+      },
+      "passif" => {
+        proactive_help_rate:               { op: :<=, value: 0.50 },
+        mean_help_steps_before_resolution: { op: :>=, value: 1.0 },
+        correct_attempts_after_help_rate:  { op: :>=, value: 0.40 },
+        correction_view_rate:              { op: :>=, value: 0.66 }
+      }
+    }.freeze
+
     def initialize(simulation_data)
       @data = simulation_data
     end
@@ -31,7 +53,7 @@ module TutorSimulation
           lines << "### Profil : #{profile_result[:profile_label]}"
           lines << ""
 
-          render_structural(lines, profile_result[:structural_metrics])
+          render_structural(lines, profile_result[:structural_metrics], profile_result[:profile])
           render_qualitative(lines, profile_result[:evaluation])
           render_transcript(lines, profile_result[:transcript])
           lines << ""
@@ -46,26 +68,42 @@ module TutorSimulation
 
     private
 
-    def render_structural(lines, metrics)
+    def render_structural(lines, metrics, profile = nil)
       return unless metrics
 
       lines << "**Métriques structurelles** (calculées sur la conversation persistée)"
       lines << ""
       lines << "| Métrique | Valeur |"
       lines << "|---|---|"
-      lines << "| Taux de résolution (cible ≥0.7) | #{format_value(metrics[:resolution_rate])} |"
+      lines << "| Taux de résolution (cible ≥0.7) | #{format_metric(metrics, :resolution_rate, profile)} |"
       lines << "| Violations CAP (cible = 0) | #{format_value(metrics[:cap_violations])} |"
-      lines << "| Étapes d'aide avant résolution | #{format_value(metrics[:mean_help_steps_before_resolution])} |"
-      lines << "| Taux aide proactive | #{format_value(metrics[:proactive_help_rate])} |"
-      lines << "| Taux tentatives correctes après aide | #{format_value(metrics[:correct_attempts_after_help_rate])} |"
+      lines << "| Étapes d'aide avant résolution | #{format_metric(metrics, :mean_help_steps_before_resolution, profile)} |"
+      lines << "| Taux aide proactive | #{format_metric(metrics, :proactive_help_rate, profile)} |"
+      lines << "| Taux tentatives correctes après aide | #{format_metric(metrics, :correct_attempts_after_help_rate, profile)} |"
       lines << "| Tentatives par question | #{format_value(metrics[:attempts_per_question])} |"
-      lines << "| Taux consultation correction | #{format_value(metrics[:correction_view_rate])} |"
+      lines << "| Taux consultation correction | #{format_metric(metrics, :correction_view_rate, profile)} |"
       lines << "| Tours moyens avant résolution | #{format_value(metrics[:mean_turns_to_resolution])} |"
       lines << ""
     end
 
     def format_value(value)
       value.nil? ? "—" : value
+    end
+
+    def format_metric(metrics, key, profile)
+      value = metrics[key]
+      return "—" if value.nil?
+
+      threshold = PER_PROFILE_THRESHOLDS.dig(profile.to_s, key)
+      return value.to_s if threshold.nil?
+
+      passes = case threshold[:op]
+      when :<= then value <= threshold[:value]
+      when :>= then value >= threshold[:value]
+      when :== then value == threshold[:value]
+      end
+
+      passes ? value.to_s : "#{value} ⚠ WARN"
     end
 
     def render_qualitative(lines, evaluation)

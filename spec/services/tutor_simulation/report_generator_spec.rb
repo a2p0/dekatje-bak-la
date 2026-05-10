@@ -136,4 +136,69 @@ RSpec.describe TutorSimulation::ReportGenerator do
       expect(md).to match(/Taux de résolution.*0\.8/m)
     end
   end
+
+  describe "#to_markdown — drapeaux WARN par profil" do
+    let(:simulation_data_warn) do
+      {
+        subject_id:       1,
+        subject_title:    "Test",
+        timestamp:        "2026-05-09T10:00:00+00:00",
+        max_turns:        8,
+        tutor_provider:   "openrouter",
+        tutor_model:      "openai/gpt-4o-mini",
+        student_provider: "openrouter",
+        student_model:    "openai/gpt-4o-mini",
+        judge_provider:   "openrouter",
+        judge_model:      "anthropic/claude-sonnet-4",
+        results: [
+          {
+            question_id:     42,
+            question_number: "1.1",
+            question_label:  "Calculer",
+            points:          2.0,
+            answer_type:     "calculation",
+            correction:      "56,73 l",
+            profiles: [
+              {
+                profile:       "autonome",
+                profile_label: "Élève autonome",
+                transcript:    [],
+                structural_metrics: {
+                  resolution_rate:                   1.0,
+                  cap_violations:                    0,
+                  mean_help_steps_before_resolution: 1.0,
+                  proactive_help_rate:               0.40,  # > 0.20 → WARN
+                  correct_attempts_after_help_rate:  0.50,
+                  attempts_per_question:             3.0,
+                  correction_view_rate:              0.50,  # > 0 → WARN (autonome doit être 0)
+                  mean_turns_to_resolution:          4.0
+                },
+                evaluation: { "skipped" => true }
+              }
+            ]
+          }
+        ]
+      }
+    end
+
+    it "affiche ⚠ WARN sur proactive_help_rate quand > seuil indicatif autonome (0.20)" do
+      md = described_class.new(simulation_data_warn).to_markdown
+      expect(md).to match(/Taux aide proactive.*0\.4.*⚠ WARN/)
+    end
+
+    it "affiche ⚠ WARN sur correction_view_rate quand > 0 pour autonome" do
+      md = described_class.new(simulation_data_warn).to_markdown
+      expect(md).to match(/Taux consultation correction.*0\.5.*⚠ WARN/)
+    end
+
+    it "n'affiche pas ⚠ WARN si la métrique respecte le seuil indicatif" do
+      ok_data = simulation_data_warn.deep_dup
+      ok_data[:results][0][:profiles][0][:structural_metrics][:proactive_help_rate]   = 0.10
+      ok_data[:results][0][:profiles][0][:structural_metrics][:correction_view_rate] = 0.0
+
+      md = described_class.new(ok_data).to_markdown
+      expect(md).not_to match(/Taux aide proactive.*WARN/)
+      expect(md).not_to match(/Taux consultation correction.*WARN/)
+    end
+  end
 end
