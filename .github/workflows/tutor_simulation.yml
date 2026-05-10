@@ -93,7 +93,7 @@ jobs:
           SKIP_JUDGE: ${{ inputs.skip_judge && '1' || '' }}
         run: bundle exec rake "tutor:simulate[${{ inputs.subject_id }}]"
 
-      - name: Assert SC-A (resolution_rate >= 0.70) and SC-B (cap_violations == 0)
+      - name: Assert SC-A through SC-E on aggregated structural metrics
         run: |
           RAW_JSON=$(ls -1dt tmp/tutor_simulations/*/raw.json 2>/dev/null | head -n1)
           if [ -z "$RAW_JSON" ]; then
@@ -105,15 +105,28 @@ jobs:
           # Aggregate metrics across .results[].profiles[].structural_metrics
           RR=$(jq '[.results[].profiles[].structural_metrics.resolution_rate] | add / length' "$RAW_JSON")
           CV=$(jq '[.results[].profiles[].structural_metrics.cap_violations] | add' "$RAW_JSON")
-          echo "resolution_rate (mean) = $RR"
-          echo "cap_violations (sum)   = $CV"
+          PHR=$(jq '[.results[].profiles[].structural_metrics.proactive_help_rate] | add / length' "$RAW_JSON")
+          MHB=$(jq '[.results[].profiles[].structural_metrics.mean_help_steps_before_resolution] | add / length' "$RAW_JSON")
+          CAH=$(jq '[.results[].profiles[].structural_metrics.correct_attempts_after_help_rate] | add / length' "$RAW_JSON")
+
+          echo "SC-A resolution_rate (mean)                    = $RR  (target >= 0.70)"
+          echo "SC-B cap_violations (sum)                      = $CV  (target == 0)"
+          echo "SC-C proactive_help_rate (mean)                = $PHR (target <= 0.30)"
+          echo "SC-D mean_help_steps_before_resolution (mean)  = $MHB (target >= 1.0)"
+          echo "SC-E correct_attempts_after_help_rate (mean)   = $CAH (target >= 0.50)"
 
           python3 -c "import sys; sys.exit(0 if float('$RR') >= 0.70 else 1)" \
             || { echo "::error::SC-A failed: resolution_rate $RR < 0.70"; exit 1; }
           [ "$CV" = "0" ] \
             || { echo "::error::SC-B failed: $CV cap_violations (target 0)"; exit 1; }
+          python3 -c "import sys; sys.exit(0 if float('$PHR') <= 0.30 else 1)" \
+            || { echo "::error::SC-C failed: proactive_help_rate $PHR > 0.30"; exit 1; }
+          python3 -c "import sys; sys.exit(0 if float('$MHB') >= 1.0 else 1)" \
+            || { echo "::error::SC-D failed: mean_help_steps_before_resolution $MHB < 1.0"; exit 1; }
+          python3 -c "import sys; sys.exit(0 if float('$CAH') >= 0.50 else 1)" \
+            || { echo "::error::SC-E failed: correct_attempts_after_help_rate $CAH < 0.50"; exit 1; }
 
-          echo "✓ SC-A and SC-B passed"
+          echo "✓ SC-A through SC-E all passed"
 
       - name: Upload simulation reports
         if: always()
