@@ -53,8 +53,12 @@ RSpec.describe "Story 064-US4: Navigation Parties popover en desktop", type: :fe
     sidebar = find("aside[data-sidebar-target='drawer']", visible: :all)
     expect(sidebar[:class]).to include("-translate-x-full")
 
-    # Click Parties button in the navbar
-    find("nav[aria-label='Navigation élève'] button", text: "Parties").click
+    # Click Parties button in the navbar (use execute_script in case the
+    # navbar element is considered non-visible by Capybara even at desktop
+    # viewport — Tailwind lg:flex doesn't always satisfy Selenium's
+    # visibility heuristic with `hidden` as base class).
+    parties_button = find("nav[aria-label='Navigation élève'] button", text: "Parties", visible: :all)
+    page.execute_script("arguments[0].click()", parties_button)
     sleep 0.3
 
     # Sidebar is now visible

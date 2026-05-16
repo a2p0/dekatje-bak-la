@@ -53,13 +53,16 @@ RSpec.describe "Story 064-US2: Correction en desktop", type: :feature do
     login_as_student(student, classroom)
     visit_question_page
     click_button "Voir la correction"
+    # The correction button uses a Turbo Frame so only the inner frame
+    # re-renders. The DT viewer (computed at initial page load) needs a
+    # full page reload to see the data hint banner.
+    visit_question_page
 
-    # The DT viewer aside (right column) should now show the data hint banner
     dt_viewer = find("aside[aria-label='Document technique']", visible: :all)
     banner = dt_viewer.find("[data-064-data-hint-banner]", visible: :all)
-    expect(banner).to have_text("Donnée utile")
-    expect(banner).to have_text("DT1")
-    expect(banner).to have_text("tableau Consommation moyenne")
+    expect(banner).to have_text("Donnée utile", visible: :all)
+    expect(banner).to have_text("DT1", visible: :all)
+    expect(banner).to have_text("tableau Consommation moyenne", visible: :all)
   end
 
   scenario "avant correction, le DT viewer ne montre pas le bandeau 'Donnée utile'" do

@@ -144,7 +144,11 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
 
     expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
 
-    # Desktop-only banner stays hidden in mobile viewport
+    # Reload so DT viewer re-evaluates show_data_hint (turbo frame doesn't
+    # re-render the outer DT viewer). Banner is desktop-only via parent
+    # `hidden lg:flex` aside, so it must stay non-visible in mobile.
+    visit_question(q1)
+
     banner = first("[data-064-data-hint-banner]", visible: false)
     if banner
       expect(banner).not_to be_visible

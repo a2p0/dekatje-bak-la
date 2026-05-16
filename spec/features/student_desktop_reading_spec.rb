@@ -54,7 +54,7 @@ RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
     visit_question(question_with_dt)
 
     nav = find("nav[aria-label='Navigation élève']", visible: :all)
-    expect(nav).to have_text("DekatjeBakLa")
+    expect(nav).to have_text("DekatjeBakLa", visible: :all)
     expect(nav).to have_button("Parties", visible: :all)
     expect(nav).to have_button("Tibo", visible: :all)
   end
@@ -64,8 +64,8 @@ RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
     visit_question(question_with_dt)
 
     breadcrumb = find("[data-064-breadcrumb]", visible: :all)
-    expect(breadcrumb).to have_text("Partie 1")
-    expect(breadcrumb).to have_text("Q1.1")
+    expect(breadcrumb).to have_text("Partie 1", visible: :all)
+    expect(breadcrumb).to have_text("Q1.1", visible: :all)
   end
 
   scenario "la colonne droite affiche un viewer DT avec iframe et bandeau références" do
@@ -74,8 +74,8 @@ RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
 
     dt_viewer = find("aside[aria-label='Document technique']", visible: :all)
     expect(dt_viewer).to have_selector("iframe[title*='Document Technique']", visible: :all)
-    expect(dt_viewer).to have_text("DT1")
-    expect(dt_viewer).to have_text("DT2")
+    expect(dt_viewer).to have_text("DT1", visible: :all)
+    expect(dt_viewer).to have_text("DT2", visible: :all)
   end
 
   scenario "sans dt_references, la colonne droite affiche un état neutre" do
@@ -83,7 +83,7 @@ RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
     visit_question(question_without_dt)
 
     dt_viewer = find("aside[aria-label='Document technique']", visible: :all)
-    expect(dt_viewer).to have_text("Aucun document technique")
+    expect(dt_viewer).to have_text("Aucun document technique", visible: :all)
     expect(dt_viewer).not_to have_selector("iframe", visible: :all)
   end
 end
