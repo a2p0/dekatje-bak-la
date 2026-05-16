@@ -149,10 +149,10 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     # `hidden lg:flex` aside, so it must stay non-visible in mobile.
     visit_question(q1)
 
-    banner = first("[data-064-data-hint-banner]", visible: false)
-    if banner
-      expect(banner).not_to be_visible
-    end
+    # The banner may not render at all (q1 has no dt_references in this
+    # spec setup) — that's fine, "non-visible" includes "not present".
+    banners = all("[data-064-data-hint-banner]", visible: :all)
+    banners.each { |b| expect(b).not_to be_visible }
 
     page.driver.browser.manage.window.resize_to(1400, 900)
   end

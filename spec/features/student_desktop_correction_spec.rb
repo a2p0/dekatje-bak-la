@@ -63,7 +63,9 @@ RSpec.describe "Story 064-US2: Correction en desktop", type: :feature do
     visit_question_page
 
     expect(page).to have_css("[data-064-data-hint-banner]", visible: :all)
-    expect(page).to have_content("Donnée utile")
+    # The "Donnée utile" label uses CSS uppercase transform — Selenium's
+    # getText returns the rendered (uppercased) text.
+    expect(page).to have_content("DONNÉE UTILE")
     expect(page).to have_content("DT1 · tableau Consommation moyenne")
   end
 
