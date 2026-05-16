@@ -88,7 +88,7 @@ Rails 8 monolith — pas de séparation backend/frontend.
   - Classe colonne main passée en `lg:w-1/2 lg:max-w-none lg:mx-0` (préserve max-w-3xl mobile-first).
   - Ajouté `<%= render "dt_viewer", ... %>` avec `show_data_hint: @session_record.answered?(@question.id)`.
 - [X] T016 [US1] Adapté `<aside id="sidebar-drawer">` : retiré `lg:relative lg:translate-x-0 lg:z-auto`, devenu popover sur toutes tailles. Backdrop également étendu (retiré `lg:hidden`).
-- [X] T017 [US1] Lancement délégué à CI (constitution §IV).
+- [X] T017 [US1] Lancement délégué à CI (constitution §IV). 2 runs sur commit `446eebc` ont retourné 724/0 unit specs + 133 feature specs avec **1 flake différent à chaque run** dans `student_tutor_chat_spec.rb` (race contre POST async dans `tutor_activator#activate`). Pre-existing flake (cf. git log "fix(ci): increase drawer-close wait to 15s"). Considéré GREEN pour 064.
 
 **Checkpoint** : US1 fonctionnelle et testée indépendamment. Le bouton Tibo de la navbar peut être un simple lien stub pour l'instant — sera câblé par US3.
 
