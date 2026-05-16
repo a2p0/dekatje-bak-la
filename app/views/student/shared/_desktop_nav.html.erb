@@ -18,7 +18,7 @@
       <span class="font-serif italic text-[20px] text-rad-text leading-none">DekatjeBakLa</span>
       <div class="flex gap-1 text-sm">
         <%= link_to "Mes sujets",
-            student_subjects_path(access_code: params[:access_code]),
+            student_root_path(access_code: params[:access_code]),
             class: "px-3 py-1.5 text-rad-text no-underline rounded-lg hover:bg-rad-raise transition-colors" %>
         <%= link_to "Réglages",
             student_settings_path(access_code: params[:access_code]),
