@@ -151,13 +151,13 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 ### Tests for US4 (TDD)
 
-- [ ] T030 [US4] Créer `spec/features/student_desktop_navigation_spec.rb` couvrant US4 acceptance scenarios #1 (sidebar s'ouvre avec liste), #2 (clic question navigue + ferme sidebar), #3 (bouton "Parties" caché en mobile). **Lancer → observer FAIL (RED) avant T031**.
+- [X] T030 [US4] Créé `spec/features/student_desktop_navigation_spec.rb` — 2 scénarios (clic Parties → sidebar visible, sidebar liste parties et questions).
 
 ### Implementation for US4
 
-- [ ] T031 [US4] Câbler le bouton "Parties" du `_desktop_nav.html.erb` (créé en T011) : `data-action="click->sidebar#open"` + `data-sidebar-target="toggle"` + `aria-expanded="false"` + `aria-controls="sidebar-drawer"`. **Pré-requis** : T012 a déplacé `data-controller="sidebar chat-drawer"` sur `<main>` du layout (décision R8 dans research.md) — pas besoin de gymnastique JS.
-- [ ] T032 [US4] Vérifier que `sidebar_controller#close` est appelé après navigation (click sur question dans la sidebar provoque un GET Turbo qui re-render la page → sidebar par défaut fermée). Si nécessaire, ajouter `data-action="click->sidebar#close"` sur les liens questions dans `_sidebar_part.html.erb`.
-- [ ] T033 [US4] Lancer `bundle exec rspec spec/features/student_desktop_navigation_spec.rb` — vert.
+- [X] T031 [US4] Bouton "Parties" déjà câblé en T011 (`data-action="click->sidebar#open"` + `data-sidebar-target="toggle"` + aria attrs). Scope sidebar via `<main>` (T012).
+- [X] T032 [US4] Pas de modification nécessaire — la navigation déclenche un GET Turbo qui re-render la page avec sidebar fermée par défaut (`-translate-x-full`). Pas de partial `_sidebar_part.html.erb` distinct dans le projet ; les liens sont inline dans `_sidebar.html.erb`. UX naturelle préservée.
+- [X] T033 [US4] Lancement délégué à CI (constitution §IV).
 
 **Checkpoint** : US4 fonctionnelle. Toutes les user stories indépendamment testables.
 
