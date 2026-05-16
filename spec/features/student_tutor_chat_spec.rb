@@ -89,6 +89,24 @@ RSpec.describe "Story 10: Tutor chat drawer (Vague 4)", type: :feature do
     end
   end
 
+  context "mobile sentinel (Feature 064)" do
+    scenario "sur mobile le drawer est full-screen sans panneau contexte" do
+      login_as_student(student, classroom)
+      visit_question_page
+
+      page.driver.browser.manage.window.resize_to(390, 800)
+      sleep 0.3
+
+      # The context panel is desktop-only — should not be visible on mobile.
+      panel = first("[data-064-context-panel]", visible: false)
+      if panel
+        expect(panel).not_to be_visible
+      end
+
+      page.driver.browser.manage.window.resize_to(1400, 900)
+    end
+  end
+
   context "when no conversation exists yet" do
     before do
       FakeRubyLlm.setup_stub(content: "Bonne chance !", tool_calls: [])

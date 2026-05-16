@@ -23,7 +23,10 @@
      aria-modal="true"
      aria-label="Tutorat IA"
      aria-hidden="true"
-     class="fixed top-0 right-0 bottom-0 w-full lg:w-[420px] bg-rad-bg border-l border-rad-rule z-50 translate-x-full transition-transform duration-200 ease-in-out flex flex-col">
+     class="fixed top-0 right-0 bottom-0 w-full lg:w-[60vw] lg:max-w-[900px] bg-rad-bg border-l border-rad-rule z-50 translate-x-full transition-transform duration-200 ease-in-out flex flex-col lg:flex-row">
+
+  <%# Chat pane (full width on mobile, 60% on desktop) %>
+  <div data-064-chat-pane class="flex-1 flex flex-col lg:basis-3/5 min-h-0">
 
   <%# Header — "espace Tibo" %>
   <div class="bg-rad-warm shrink-0">
@@ -124,4 +127,13 @@
       </button>
     </div>
   </div>
+  </div><%# /chat pane %>
+
+  <%# Context pane (desktop only, 40%) — Feature 064 US3 %>
+  <aside class="hidden lg:flex lg:flex-col lg:basis-2/5 border-l border-rad-rule bg-rad-paper">
+    <%= render "student/conversations/context_panel",
+        question: question,
+        part:     question.part,
+        subject:  question.part.subject %>
+  </aside>
 </div>

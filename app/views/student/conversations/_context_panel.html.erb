@@ -1,0 +1,46 @@
+<%#
+  Tutor drawer context panel — Feature 064 US3.
+  Locals expected:
+    - question (Question)
+    - part (Part)
+    - subject (Subject)
+  Renders the question reminder + part objective inside the desktop
+  drawer's right pane (40% width). Hidden on mobile via the parent
+  <aside class="hidden lg:flex ...">.
+%>
+<div data-064-context-panel class="flex flex-col gap-4 p-5 overflow-y-auto h-full">
+  <%# Question reminder %>
+  <div class="bg-rad-paper border border-rad-rule rounded-2xl p-4">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="w-6 h-6 rounded-md bg-rad-red text-rad-cream flex items-center justify-center font-serif text-[12px] font-medium flex-shrink-0">
+        Q<%= question.number %>
+      </span>
+      <span class="text-[10.5px] tracking-[0.16em] uppercase font-bold text-rad-muted">Question</span>
+    </div>
+    <p class="font-serif text-[15px] text-rad-text leading-[1.45] m-0"><%= question.label %></p>
+  </div>
+
+  <%# Part objective %>
+  <div class="bg-rad-paper border border-rad-rule rounded-2xl p-4">
+    <div class="text-[10.5px] tracking-[0.16em] uppercase font-bold text-rad-muted mb-2">
+      Partie <%= part.number %>
+      <% if part.section_type.present? %>
+        · <%= part.section_type == "specific" ? "Spécifique" : "Commune" %>
+      <% end %>
+    </div>
+    <p class="font-serif text-[15px] text-rad-text leading-[1.4] mb-3"><%= part.title %></p>
+    <% if part.objective_text.present? %>
+      <div class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold mb-1">Objectif</div>
+      <p class="text-[13px] text-rad-text leading-[1.5] m-0"><%= part.objective_text %></p>
+    <% end %>
+  </div>
+
+  <%# Subject presentation (if present) %>
+  <% presentation = subject.respond_to?(:specific_presentation) ? subject.specific_presentation : nil %>
+  <% if presentation.present? %>
+    <div class="bg-rad-paper border border-rad-rule rounded-2xl p-4">
+      <div class="text-[10.5px] tracking-[0.14em] uppercase text-rad-muted font-bold mb-2">Mise en situation</div>
+      <p class="text-[13px] text-rad-muted leading-[1.55] m-0"><%= presentation %></p>
+    </div>
+  <% end %>
+</div>

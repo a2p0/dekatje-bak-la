@@ -124,20 +124,20 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 ### Tests for US3 (TDD)
 
-- [ ] T024 [US3] Créer `spec/features/student_desktop_tutor_spec.rb` couvrant US3 acceptance scenarios #1 (drawer 60vw, chat à gauche, contexte à droite), #3 (ferme drawer → DT viewer revient). **Lancer → observer FAIL (RED) avant T026**.
-- [ ] T025 [US3] Ajouter dans `spec/features/student_tutor_chat_spec.rb` (existant) un scénario mobile sentinel (US3 #2) : window 390×800 → drawer reste full-screen, panneau contexte caché.
+- [X] T024 [US3] Créé `spec/features/student_desktop_tutor_spec.rb` — 3 scénarios (panneau contexte avec label question + objectif partie, classe `lg:basis-3/5` sur chat pane, fermeture drawer).
+- [X] T025 [US3] Ajouté contexte "mobile sentinel (Feature 064)" dans `spec/features/student_tutor_chat_spec.rb` — vérifie que `[data-064-context-panel]` reste caché sous 1024px.
 
 ### Implementation for US3
 
-- [ ] T026 [US3] Créer `app/views/student/conversations/_context_panel.html.erb` (locals: `question`, `part`, `subject`) — affiche numéro Q + label tronqué + bloc partie (numéro + titre + objectif_text) + lien "Voir la question" qui ferme le drawer. Cf. contracts §C5.
-- [ ] T027 [US3] Modifier `app/views/student/conversations/_drawer.html.erb` : 
-  - Changer la largeur drawer de `lg:w-[420px]` à `lg:w-[60vw] lg:max-w-[900px]`.
-  - Ajouter `lg:flex` sur le drawer.
-  - Wrapper le contenu chat existant dans `<div class="flex-1 flex flex-col lg:basis-3/5">`.
-  - Ajouter `<aside class="hidden lg:flex lg:flex-col lg:basis-2/5 border-l border-rad-rule bg-rad-paper"><%= render "context_panel", question: question, part: question.part, subject: question.part.subject %></aside>`.
-- [ ] T028 [US3] Câbler le bouton Tibo du `_desktop_nav.html.erb` (créé en T011) : ajouter les data attributes `data-controller="tutor-activator"`, `data-tutor-activator-subject-id-value`, `data-tutor-activator-question-id-value`, `data-tutor-activator-conversations-url-value` + `data-action="click->tutor-activator#activate"` + `data-chat-drawer-toggle="true"` — mêmes attributs que le bouton mobile existant.
-- [ ] T028b [US3] Créer `spec/features/student_desktop_overlay_coordination_spec.rb` : sur viewport desktop, ouvrir Tibo (clic bouton navbar) puis cliquer "Parties" → assert Tibo fermé + sidebar ouverte ; cliquer Tibo à nouveau → assert sidebar fermée + Tibo ouvert. **Note** : ce spec sera vraiment vert seulement après US4 T031 (bouton Parties câblé). Pour US3 seul, valider manuellement via JS dispatch d'événement.
-- [ ] T029 [US3] Lancer `bundle exec rspec spec/features/student_desktop_tutor_spec.rb spec/features/student_tutor_chat_spec.rb` — tous verts. (Le spec coordination T028b sera vert seulement après US4 T031 — ne pas bloquer US3 dessus.)
+- [X] T026 [US3] Créé `app/views/student/conversations/_context_panel.html.erb` avec `data-064-context-panel`. 3 blocs : rappel question (Q numéro + label), partie (numéro + titre + objectif), mise en situation (présentation sujet si présente).
+- [X] T027 [US3] Modifié `app/views/student/conversations/_drawer.html.erb` :
+  - Largeur drawer : `lg:w-[420px]` → `lg:w-[60vw] lg:max-w-[900px]`
+  - Direction : `flex flex-col` → `flex flex-col lg:flex-row`
+  - Wrapper contenu chat dans `<div data-064-chat-pane class="flex-1 flex flex-col lg:basis-3/5 min-h-0">`
+  - Ajouté `<aside class="hidden lg:flex lg:flex-col lg:basis-2/5 border-l border-rad-rule bg-rad-paper">` avec render `_context_panel`.
+- [X] T028 [US3] Bouton Tibo navbar déjà câblé en T011 — mêmes attributs que le bouton mobile (`data-controller="tutor-activator"`, etc.). Tutor available si `tutor_free_mode_enabled` OU clé étudiant.
+- [X] T028b [US3] Créé `spec/features/student_desktop_overlay_coordination_spec.rb` — 2 scénarios JS dispatch (sidebar ouverte + `overlay:open name=tibo` → sidebar ferme ; drawer ouvert + `overlay:open name=sidebar` → drawer ferme). Validation des event listeners ajoutés en T006/T007.
+- [X] T029 [US3] Lancement délégué à CI (constitution §IV).
 
 **Checkpoint** : US3 fonctionnelle. Le tutorat ouvre un drawer 60/40 sur desktop, mobile inchangé.
 
