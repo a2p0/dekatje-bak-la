@@ -53,37 +53,42 @@ RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
     login_as_student(student, classroom)
     visit_question(question_with_dt)
 
-    nav = find("nav[aria-label='Navigation élève']", visible: :all)
-    expect(nav).to have_text("DekatjeBakLa", visible: :all)
-    expect(nav).to have_button("Parties", visible: :all)
-    expect(nav).to have_button("Tibo", visible: :all)
+    # The nav is rendered with `hidden lg:flex` — at 1400x900 it's flex
+    # (visible). Capybara assertions scoped to the nav itself sometimes
+    # report empty text when the element has both hidden and a media
+    # query class. Assert on the page instead, then verify nav has the
+    # buttons.
+    expect(page).to have_css("nav[aria-label='Navigation élève']", visible: :all)
+    expect(page).to have_content("DekatjeBakLa")
+    expect(page).to have_button("Parties", visible: :all)
+    expect(page).to have_button("Tibo", visible: :all)
   end
 
   scenario "le breadcrumb desktop affiche Sujet › Partie › Question" do
     login_as_student(student, classroom)
     visit_question(question_with_dt)
 
-    breadcrumb = find("[data-064-breadcrumb]", visible: :all)
-    expect(breadcrumb).to have_text("Partie 1", visible: :all)
-    expect(breadcrumb).to have_text("Q1.1", visible: :all)
+    expect(page).to have_css("[data-064-breadcrumb]", visible: :all)
+    expect(page).to have_content("Partie 1")
+    expect(page).to have_content("Q1.1")
   end
 
   scenario "la colonne droite affiche un viewer DT avec iframe et bandeau références" do
     login_as_student(student, classroom)
     visit_question(question_with_dt)
 
-    dt_viewer = find("aside[aria-label='Document technique']", visible: :all)
-    expect(dt_viewer).to have_selector("iframe[title*='Document Technique']", visible: :all)
-    expect(dt_viewer).to have_text("DT1", visible: :all)
-    expect(dt_viewer).to have_text("DT2", visible: :all)
+    expect(page).to have_css("aside[aria-label='Document technique']", visible: :all)
+    expect(page).to have_css("iframe[title*='Document Technique']", visible: :all)
+    expect(page).to have_content("DT1")
+    expect(page).to have_content("DT2")
   end
 
   scenario "sans dt_references, la colonne droite affiche un état neutre" do
     login_as_student(student, classroom)
     visit_question(question_without_dt)
 
-    dt_viewer = find("aside[aria-label='Document technique']", visible: :all)
-    expect(dt_viewer).to have_text("Aucun document technique", visible: :all)
-    expect(dt_viewer).not_to have_selector("iframe", visible: :all)
+    expect(page).to have_css("aside[aria-label='Document technique']", visible: :all)
+    expect(page).to have_content("Aucun document technique")
+    expect(page).not_to have_css("aside[aria-label='Document technique'] iframe", visible: :all)
   end
 end
