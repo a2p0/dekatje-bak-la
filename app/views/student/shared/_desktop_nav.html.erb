@@ -1,0 +1,66 @@
+<%#
+  Desktop top navbar — Feature 064.
+  Hidden under lg (mobile uses the existing compact header and bottom bar).
+  Buttons "Parties" and "Tibo" rely on sidebar / chat-drawer controllers mounted on <main>.
+%>
+<nav class="hidden lg:flex lg:flex-col bg-rad-paper border-b border-rad-rule"
+     aria-label="Navigation élève">
+  <%# Stripes martiniquaises (5px) %>
+  <div class="flex h-1">
+    <div class="flex-1 bg-rad-red"></div>
+    <div class="flex-1 bg-rad-yellow"></div>
+    <div class="flex-1 bg-rad-teal"></div>
+  </div>
+
+  <div class="flex items-center justify-between px-8 h-14">
+    <%# Left cluster — logo + nav tabs %>
+    <div class="flex items-center gap-7">
+      <span class="font-serif italic text-[20px] text-rad-text leading-none">DekatjeBakLa</span>
+      <div class="flex gap-1 text-sm">
+        <%= link_to "Mes sujets",
+            student_subjects_path(access_code: params[:access_code]),
+            class: "px-3 py-1.5 text-rad-text no-underline rounded-lg hover:bg-rad-raise transition-colors" %>
+        <%= link_to "Réglages",
+            student_settings_path(access_code: params[:access_code]),
+            class: "px-3 py-1.5 text-rad-muted no-underline rounded-lg hover:bg-rad-raise transition-colors" %>
+      </div>
+    </div>
+
+    <%# Right cluster — Parties, Tibo, avatar %>
+    <div class="flex items-center gap-3">
+      <% if local_assigns[:show_parties_button] != false %>
+        <button type="button"
+                data-action="click->sidebar#open"
+                data-sidebar-target="toggle"
+                aria-label="Ouvrir le menu des parties"
+                aria-expanded="false"
+                aria-controls="sidebar-drawer"
+                class="inline-flex items-center px-4 py-1.5 bg-rad-paper text-rad-text border border-rad-rule rounded-full text-sm font-semibold cursor-pointer hover:bg-rad-raise transition-colors">
+          Parties
+        </button>
+      <% end %>
+
+      <% if local_assigns[:tutor_available] %>
+        <button type="button"
+                data-controller="tutor-activator"
+                data-tutor-activator-subject-id-value="<%= local_assigns[:subject_id] %>"
+                data-tutor-activator-question-id-value="<%= local_assigns[:question_id] %>"
+                data-tutor-activator-conversations-url-value="<%= student_conversations_path(access_code: params[:access_code]) %>"
+                data-action="click->tutor-activator#activate"
+                data-chat-drawer-toggle="true"
+                aria-label="Ouvrir le tutorat IA"
+                aria-expanded="false"
+                aria-controls="tutor-chat-drawer"
+                class="inline-flex items-center gap-2 pl-2 pr-4 py-1.5 bg-rad-ink text-rad-cream border-0 rounded-full text-sm font-semibold cursor-pointer shadow-[0_8px_20px_-8px_rgba(0,0,0,0.35)] hover:opacity-80 transition-opacity">
+          <span class="w-6 h-6 rounded-full bg-rad-red text-rad-cream flex items-center justify-center font-serif italic text-[13px] flex-shrink-0">T</span>
+          Tibo
+        </button>
+      <% end %>
+
+      <%# Avatar — student initial %>
+      <% initial = current_student&.first_name&.first&.upcase || "?" %>
+      <div class="w-9 h-9 rounded-full bg-rad-red text-rad-cream flex items-center justify-center font-serif italic text-base" aria-hidden="true">
+        <%= initial %></div>
+    </div>
+  </div>
+</nav>

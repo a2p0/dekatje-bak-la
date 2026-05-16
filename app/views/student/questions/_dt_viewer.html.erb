@@ -1,0 +1,37 @@
+<%#
+  Desktop DT viewer — Feature 064.
+  Locals expected:
+    - subject (required)
+    - question (required)
+    - show_data_hint (optional, default false) — display the "donnée utile" banner above the iframe.
+  Hidden under lg.
+%>
+<aside class="hidden lg:flex lg:flex-col lg:w-1/2 border-l border-rad-rule bg-rad-paper"
+       aria-label="Document technique">
+  <% references = Array(question.dt_references) | Array(question.dr_references) %>
+  <% has_dt = subject.dt_file.attached? && references.any? %>
+
+  <% if has_dt %>
+    <%# References banner %>
+    <div class="px-4 py-2 border-b border-rad-rule flex flex-wrap gap-2 bg-rad-paper">
+      <% references.each do |ref| %>
+        <span class="text-[11px] font-bold px-2.5 py-1 rounded-[6px] bg-rad-yellow text-rad-ink tracking-[0.04em]"><%= ref %></span>
+      <% end %>
+    </div>
+
+    <%# "Donnée utile" banner (correction mode only) %>
+    <% if local_assigns[:show_data_hint] && (hint = primary_data_hint(question)) %>
+      <%= render "student/questions/data_hint_banner", hint: hint %>
+    <% end %>
+
+    <%# PDF iframe %>
+    <iframe src="<%= rails_blob_url(subject.dt_file) %>"
+            class="flex-1 w-full border-0"
+            title="Document Technique <%= subject.title %>"
+            loading="lazy"></iframe>
+  <% else %>
+    <div class="flex-1 flex items-center justify-center text-rad-muted text-sm px-6 text-center">
+      Aucun document technique pour cette question.
+    </div>
+  <% end %>
+</aside>

@@ -47,7 +47,13 @@
       <% end %>
     </div>
 
-    <main id="main-content">
+    <main id="main-content" data-controller="sidebar chat-drawer">
+      <% if current_student.present? %>
+        <%= render "student/shared/desktop_nav",
+              tutor_available: local_assigns[:tutor_available] || (defined?(@tutor_available) ? @tutor_available : false),
+              subject_id: defined?(@subject) ? @subject&.id : nil,
+              question_id: defined?(@question) ? @question&.id : nil %>
+      <% end %>
       <%= yield %>
     </main>
   </body>

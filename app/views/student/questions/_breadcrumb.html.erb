@@ -1,0 +1,15 @@
+<%#
+  Desktop breadcrumb — Feature 064.
+  Locals expected: subject, part, question.
+  Hidden under lg (mobile uses the compact header).
+%>
+<div data-064-breadcrumb
+     class="hidden lg:flex items-center gap-2 px-8 py-3 bg-rad-bg border-b border-rad-rule text-xs text-rad-muted">
+  <%= link_to subject.title,
+      student_subject_path(access_code: params[:access_code], id: subject.id),
+      class: "text-rad-muted no-underline hover:text-rad-text transition-colors truncate max-w-[40ch]" %>
+  <span aria-hidden="true">›</span>
+  <span>Partie <%= part.number %></span>
+  <span aria-hidden="true">›</span>
+  <span class="font-semibold text-rad-text">Q<%= question.number %></span>
+</div>

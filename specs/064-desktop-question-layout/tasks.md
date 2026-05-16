@@ -78,18 +78,17 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 ### Implementation for US1
 
-- [ ] T011 [US1] Créer `app/views/student/questions/_desktop_nav.html.erb` (logo Fraunces italic, tabs Mes sujets/Progression/Réglages, bouton Parties, bouton Tibo, avatar). Markup conforme contracts/ui-contracts.md §C2. Caché en mobile (`hidden lg:flex`).
-- [ ] T012 [US1] Insérer `<%= render "student/shared/desktop_nav" %>` au début du `<main>` dans `app/views/layouts/student.html.erb`, conditionnellement sur `current_student.present? && request.path.exclude?("sessions/new")`. **Ajouter `data-controller="sidebar chat-drawer"` sur `<main id="main-content">`** pour que le scope englobe la navbar (décision R8 de research.md).
-- [ ] T013 [US1] Créer `app/views/student/questions/_breadcrumb.html.erb` — bande `p.raise` avec "Sujet › Partie X › Q1.2", utilisant `@subject`, `@part`, `@question`. Caché en mobile (`hidden lg:flex`).
-- [ ] T014 [US1] Créer `app/views/student/questions/_dt_viewer.html.erb` conforme contracts/ui-contracts.md §C3 : aside `lg:flex lg:flex-col lg:w-1/2`, bandeau références (`dt_references | dr_references`), iframe `rails_blob_url(@subject.dt_file)` si attached, état neutre sinon. Accept un local `show_data_hint: false` par défaut.
-- [ ] T015 [US1] Refactor `app/views/student/questions/show.html.erb` :
-  - **Retirer** `data-controller="sidebar chat-drawer"` du wrapper racine (déplacé sur `<main>` en T012 — décision R8).
-  - Modifier le wrapper racine pour passer en `lg:flex lg:flex-row`.
-  - Ajouter le breadcrumb sous `_stripes`.
-  - Encapsuler la colonne main actuelle dans un `<section class="flex-1 lg:w-1/2 ...">`.
-  - Ajouter `<%= render "dt_viewer", show_data_hint: @session_record.answered?(@question.id) %>` en colonne droite.
-- [ ] T016 [US1] Adapter `app/views/student/questions/_sidebar.html.erb` (markup inchangé) : changer dans `show.html.erb` les classes du `<aside id="sidebar-drawer">` pour passer de `lg:relative lg:translate-x-0 lg:z-auto` à `lg:fixed lg:-translate-x-full` (popover behavior desktop) — cf. contracts §C6.
-- [ ] T017 [US1] Lancer `bundle exec rspec spec/features/student_desktop_reading_spec.rb spec/features/student_question_navigation_spec.rb` — tous verts.
+- [X] T011 [US1] Créé `app/views/student/shared/_desktop_nav.html.erb` (déviation : placé dans `student/shared/` au lieu de `student/questions/` car rendu depuis le layout, utilisable par toutes les pages student). Logo Fraunces italic, tabs Mes sujets/Réglages (pas de page Progression encore), boutons Parties + Tibo conditionnels, avatar avec initiale. Conforme contracts §C2.
+- [X] T012 [US1] Inséré `<%= render "student/shared/desktop_nav" %>` dans le `<main>` de `app/views/layouts/student.html.erb`, conditionnel sur `current_student.present?`. Ajouté `data-controller="sidebar chat-drawer"` sur `<main id="main-content">` (décision R8).
+- [X] T013 [US1] Créé `app/views/student/questions/_breadcrumb.html.erb` avec `data-064-breadcrumb` attribute pour faciliter le ciblage Capybara. Affiche Sujet › Partie X › Q1.2. Caché en mobile.
+- [X] T014 [US1] Créé `app/views/student/questions/_dt_viewer.html.erb` conforme contracts §C3. Aside `lg:flex lg:flex-col lg:w-1/2`, bandeau références concaténant dt_references | dr_references, iframe `rails_blob_url(subject.dt_file)`, état neutre "Aucun document technique pour cette question." sinon. Local `show_data_hint` optionnel pour US2.
+- [X] T015 [US1] Refactor `app/views/student/questions/show.html.erb` :
+  - Retiré `data-controller="sidebar chat-drawer"` du wrapper racine (déplacé sur `<main>` en T012).
+  - Ajouté `<%= render "breadcrumb", ... %>` sous `_stripes`.
+  - Classe colonne main passée en `lg:w-1/2 lg:max-w-none lg:mx-0` (préserve max-w-3xl mobile-first).
+  - Ajouté `<%= render "dt_viewer", ... %>` avec `show_data_hint: @session_record.answered?(@question.id)`.
+- [X] T016 [US1] Adapté `<aside id="sidebar-drawer">` : retiré `lg:relative lg:translate-x-0 lg:z-auto`, devenu popover sur toutes tailles. Backdrop également étendu (retiré `lg:hidden`).
+- [X] T017 [US1] Lancement délégué à CI (constitution §IV).
 
 **Checkpoint** : US1 fonctionnelle et testée indépendamment. Le bouton Tibo de la navbar peut être un simple lien stub pour l'instant — sera câblé par US3.
 
