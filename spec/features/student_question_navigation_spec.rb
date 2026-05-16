@@ -95,7 +95,8 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     page.driver.browser.manage.window.resize_to(375, 812)
     sleep 0.3
 
-    find("[data-action='click->sidebar#open']", visible: :all).click
+    # Use visible: true to skip the desktop navbar Parties button (hidden on mobile)
+    find("[data-action='click->sidebar#open']", visible: true).click
     sleep 0.5
 
     within("aside[data-sidebar-target='drawer']") do

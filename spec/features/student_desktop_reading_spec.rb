@@ -1,7 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
-  let(:classroom) { create(:classroom, name: "Terminale SIN 2026") }
+  let(:teacher)   { create(:user, openrouter_api_key: "sk-or-test") }
+  let(:classroom) { create(:classroom, owner: teacher, name: "Terminale SIN 2026", tutor_free_mode_enabled: true) }
   let(:student)   { create(:student, classroom: classroom) }
   let(:subject) do
     create(:subject,
