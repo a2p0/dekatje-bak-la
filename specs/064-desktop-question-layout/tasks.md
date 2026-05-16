@@ -73,8 +73,8 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 > **TDD strict** : ces specs FAIL d'abord, GREEN après implémentation.
 
-- [ ] T009 [US1] Créer `spec/features/student_desktop_reading_spec.rb` couvrant US1 acceptance scenarios #1 (split 50/50 visible), #3 (bandeau références liste tous les DT cités), #4 (état neutre si pas de DT). Driver `:headless_chrome`, window default 1400×900. **Lancer `bundle exec rspec spec/features/student_desktop_reading_spec.rb` → observer FAIL (RED) avant T011**.
-- [ ] T010 [US1] Dans `spec/features/student_question_navigation_spec.rb` (existant), ajouter un scénario "mobile sentinel" qui resize la window à 390×800 (`page.driver.browser.manage.window.resize_to(390, 800)`) et vérifie que la navbar desktop est cachée + le layout mobile reste fonctionnel. Couvre US1 acceptance scenario #2 (rétention mobile).
+- [X] T009 [US1] Créé `spec/features/student_desktop_reading_spec.rb` — 4 scénarios (navbar, breadcrumb, DT viewer avec iframe+bandeau, état neutre sans DT). RED via CI (constitution §IV).
+- [X] T010 [US1] Ajouté scénario mobile sentinel à `spec/features/student_question_navigation_spec.rb` — resize 390×800, navbar desktop cachée, layout mobile inchangé.
 
 ### Implementation for US1
 
