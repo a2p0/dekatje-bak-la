@@ -28,24 +28,24 @@
 
 <%= render "student/subjects/stripes" %>
 
-<div data-controller="sidebar chat-drawer"
-     class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0 bg-rad-bg">
+<%= render "breadcrumb", subject: @subject, part: @part, question: @question %>
 
-  <%# Backdrop (mobile only) %>
+<div class="flex min-h-[calc(100vh-57px)] pb-20 lg:pb-0 bg-rad-bg">
+
+  <%# Backdrop (covers both mobile and desktop popover) %>
   <div data-sidebar-target="backdrop"
        data-action="click->sidebar#close"
-       class="hidden fixed inset-0 bg-black/50 z-[var(--z-backdrop)] lg:hidden">
+       class="hidden fixed inset-0 bg-black/50 z-[var(--z-backdrop)]">
   </div>
 
-  <%# Sidebar / Drawer — Radical light %>
+  <%# Sidebar / Drawer — popover on both mobile and desktop (Feature 064) %>
   <aside id="sidebar-drawer"
          data-sidebar-target="drawer"
          data-controller="focus-trap"
          data-action="focus-trap:close->sidebar#close"
          aria-label="Navigation du sujet"
          class="w-[260px] bg-rad-paper border-r border-rad-rule flex-shrink-0 overflow-y-auto
-                fixed top-0 left-0 bottom-0 z-[var(--z-sidebar)] -translate-x-full transition-transform duration-200
-                lg:relative lg:translate-x-0 lg:z-auto">
+                fixed top-0 left-0 bottom-0 z-[var(--z-sidebar)] -translate-x-full transition-transform duration-200">
     <%= render "student/questions/sidebar",
         subject: @subject,
         current_part: @part,
@@ -56,8 +56,8 @@
         access_code: params[:access_code] %>
   </aside>
 
-  <%# Main content %>
-  <div class="flex-1 px-4 py-5 max-w-3xl mx-auto w-full">
+  <%# Main content (left column on desktop, full width on mobile) %>
+  <div class="flex-1 lg:w-1/2 lg:max-w-none lg:mx-0 px-4 py-5 max-w-3xl mx-auto w-full">
 
     <%# Compact header: ← | exam label + subject title | ≡ %>
     <div class="flex items-center justify-between mb-3">
@@ -202,6 +202,12 @@
       <% end %>
     </div>
   </div>
+
+  <%# DT viewer (right column on desktop, hidden on mobile) %>
+  <%= render "dt_viewer",
+      subject: @subject,
+      question: @question,
+      show_data_hint: @session_record.answered?(@question.id) %>
 
   <%# Mobile bottom bar (hidden on lg+) %>
   <div class="lg:hidden fixed bottom-0 left-0 right-0 z-[var(--z-bottom-bar)] bg-rad-bg border-t border-rad-rule px-4 py-3 flex items-center gap-3">

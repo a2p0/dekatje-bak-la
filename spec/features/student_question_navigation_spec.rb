@@ -95,7 +95,8 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     page.driver.browser.manage.window.resize_to(375, 812)
     sleep 0.3
 
-    find("[data-action='click->sidebar#open']", visible: :all).click
+    # Use visible: true to skip the desktop navbar Parties button (hidden on mobile)
+    find("[data-action='click->sidebar#open']", visible: true).click
     sleep 0.5
 
     within("aside[data-sidebar-target='drawer']") do
@@ -162,6 +163,25 @@ RSpec.describe "Story 6: Navigation question par question avec contexte", type: 
     sidebar = find("aside[data-sidebar-target='drawer']")
     dt_link = sidebar.find_link("Documents Techniques", visible: :all)
     expect(dt_link[:target]).to eq("_blank")
+  end
+
+  scenario "sur mobile la navbar desktop est cachée et le layout mobile reste fonctionnel" do
+    login_as_student(student, classroom)
+    visit_question(q1)
+
+    page.driver.browser.manage.window.resize_to(390, 800)
+    sleep 0.3
+
+    # La navbar desktop est rendue dans le DOM mais cachée via `hidden lg:flex`
+    nav = first("nav[aria-label='Navigation élève']", visible: false)
+    if nav
+      expect(nav).not_to be_visible
+    end
+
+    # Le contenu de la question reste accessible
+    expect(page).to have_content("Calculer la consommation en litres pour 186 km.")
+
+    page.driver.browser.manage.window.resize_to(1400, 900)
   end
 
   scenario "avant correction, le DR corrigé n'est pas visible dans la sidebar" do

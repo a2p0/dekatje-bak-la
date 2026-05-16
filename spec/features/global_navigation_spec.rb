@@ -110,9 +110,10 @@ RSpec.describe "Story 10: Navigation globale et pages essentielles", type: :feat
       id: question.id
     )
 
-    # On desktop viewport (1400px), sidebar is always visible (lg:translate-x-0)
-    within("aside") do
-      expect(page).to have_link(href: /settings/)
+    # Settings link is reachable via the new desktop navbar (Feature 064) or
+    # via the sidebar popover. Scope to the sidebar aside specifically.
+    within("aside[aria-label='Navigation du sujet']") do
+      expect(page).to have_link(href: /settings/, visible: :all)
     end
   end
 end

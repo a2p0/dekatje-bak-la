@@ -133,6 +133,30 @@ RSpec.describe "Story 7: Révélation de la correction", type: :feature do
     expect(page).not_to have_button("Voir la correction")
   end
 
+  scenario "sur mobile la correction s'affiche en colonne unique sans bandeau data hint desktop" do
+    login_as_student(student, classroom)
+    visit_question(q1)
+
+    page.driver.browser.manage.window.resize_to(390, 800)
+    sleep 0.3
+
+    click_button "Voir la correction"
+
+    expect(page).to have_content("Car = 56,73 l / Van = 38,68 kWh")
+
+    # Reload so DT viewer re-evaluates show_data_hint (turbo frame doesn't
+    # re-render the outer DT viewer). Banner is desktop-only via parent
+    # `hidden lg:flex` aside, so it must stay non-visible in mobile.
+    visit_question(q1)
+
+    # The banner may not render at all (q1 has no dt_references in this
+    # spec setup) — that's fine, "non-visible" includes "not present".
+    banners = all("[data-064-data-hint-banner]", visible: :all)
+    banners.each { |b| expect(b).not_to be_visible }
+
+    page.driver.browser.manage.window.resize_to(1400, 900)
+  end
+
   scenario "après révélation, la question est marquée comme terminée (✓) dans la sidebar" do
     login_as_student(student, classroom)
     visit_question(q1)

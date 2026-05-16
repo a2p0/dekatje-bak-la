@@ -43,7 +43,9 @@ RSpec.describe "Story 8: Configuration clé API élève", type: :feature do
   scenario "l'élève accède aux réglages via le lien ≡ dans la liste des sujets" do
     login_as_student(student, classroom)
 
-    find("a[href*='settings']").click
+    # The ≡ icon lives in the subjects#index header (the new desktop navbar
+    # also has a Réglages link — Feature 064 — so we target the ≡ icon by text)
+    find("a", text: "≡").click
 
     expect(page).to have_content("Réglages")
     expect(page).to have_css("select[name='student[api_provider]']")

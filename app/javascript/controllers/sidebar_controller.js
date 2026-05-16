@@ -5,6 +5,14 @@ export default class extends Controller {
 
   connect() {
     this.previouslyFocused = null
+    this._overlayHandler = (e) => {
+      if (e.detail?.name && e.detail.name !== "sidebar") this.close()
+    }
+    window.addEventListener("overlay:open", this._overlayHandler)
+  }
+
+  disconnect() {
+    window.removeEventListener("overlay:open", this._overlayHandler)
   }
 
   open() {
@@ -14,6 +22,8 @@ export default class extends Controller {
     this.backdropTarget.classList.remove("hidden")
     this.updateToggles(true)
 
+    window.dispatchEvent(new CustomEvent("overlay:open", { detail: { name: "sidebar" } }))
+
     // Auto-focus first focusable element in the drawer
     const firstFocusable = this.drawerTarget.querySelector(
       'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -22,10 +32,15 @@ export default class extends Controller {
   }
 
   close() {
+    const wasOpen = this.drawerTarget.classList.contains("translate-x-0")
     this.drawerTarget.classList.add("-translate-x-full")
     this.drawerTarget.classList.remove("translate-x-0")
     this.backdropTarget.classList.add("hidden")
     this.updateToggles(false)
+
+    if (wasOpen) {
+      window.dispatchEvent(new CustomEvent("overlay:close", { detail: { name: "sidebar" } }))
+    }
 
     // Restore focus to the element that opened the drawer
     if (this.previouslyFocused && typeof this.previouslyFocused.focus === "function") {

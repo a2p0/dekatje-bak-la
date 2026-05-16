@@ -50,4 +50,60 @@ RSpec.describe Student::DataHintsHelper, type: :helper do
       expect(helper.hint_badge_color("enonce")).to eq(:slate)
     end
   end
+
+  describe "#primary_data_hint" do
+    let(:question) { instance_double("Question") }
+    let(:answer) { instance_double("Answer") }
+
+    it "returns nil when the question has no answer" do
+      allow(question).to receive(:answer).and_return(nil)
+      expect(helper.primary_data_hint(question)).to be_nil
+    end
+
+    it "returns nil when data_hints is blank" do
+      allow(question).to receive(:answer).and_return(answer)
+      allow(answer).to receive(:data_hints).and_return([])
+      expect(helper.primary_data_hint(question)).to be_nil
+    end
+
+    it "returns nil when data_hints is nil" do
+      allow(question).to receive(:answer).and_return(answer)
+      allow(answer).to receive(:data_hints).and_return(nil)
+      expect(helper.primary_data_hint(question)).to be_nil
+    end
+
+    it "returns the first hint when present" do
+      hint = { "source" => "DT1", "location" => "ligne Consommation" }
+      allow(question).to receive(:answer).and_return(answer)
+      allow(answer).to receive(:data_hints).and_return([ hint, { "source" => "DT2" } ])
+      expect(helper.primary_data_hint(question)).to eq(hint)
+    end
+  end
+
+  describe "#data_hint_caption" do
+    it "returns nil when hint is not a hash" do
+      expect(helper.data_hint_caption(nil)).to be_nil
+      expect(helper.data_hint_caption("string")).to be_nil
+    end
+
+    it "returns 'source · location' when both are present" do
+      hint = { "source" => "DT1", "location" => "ligne Consommation" }
+      expect(helper.data_hint_caption(hint)).to eq("DT1 · ligne Consommation")
+    end
+
+    it "returns only the location when source is blank" do
+      hint = { "source" => "", "location" => "ligne Consommation" }
+      expect(helper.data_hint_caption(hint)).to eq("ligne Consommation")
+    end
+
+    it "returns only the source when location is blank" do
+      hint = { "source" => "DT1", "location" => nil }
+      expect(helper.data_hint_caption(hint)).to eq("DT1")
+    end
+
+    it "returns nil when both source and location are blank" do
+      hint = { "source" => "", "location" => "" }
+      expect(helper.data_hint_caption(hint)).to be_nil
+    end
+  end
 end

@@ -1,0 +1,18 @@
+<%#
+  "Donnée utile" banner — Feature 064 (US2 correction desktop).
+  Locals expected:
+    - hint (Hash with "source" and "location" keys)
+  Rendered inside _dt_viewer.html.erb when correction is revealed.
+  Hidden in mobile (the dt_viewer aside is already `hidden lg:flex`).
+%>
+<% caption = data_hint_caption(hint) %>
+<% if caption.present? %>
+  <div data-064-data-hint-banner
+       class="px-4 py-3 border-b border-rad-rule bg-rad-yellow/15 flex items-start gap-3">
+    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-rad-yellow text-rad-ink flex items-center justify-center font-serif italic text-[13px] font-medium" aria-hidden="true">i</span>
+    <div class="flex-1 min-w-0">
+      <div class="text-[10.5px] tracking-[0.16em] uppercase font-bold text-rad-muted mb-1">Donnée utile</div>
+      <div class="text-[13px] text-rad-text leading-[1.4]"><%= caption %></div>
+    </div>
+  </div>
+<% end %>
