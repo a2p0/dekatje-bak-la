@@ -43,9 +43,9 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 **Purpose** : Vérifier que l'environnement est prêt et qu'aucune migration n'est nécessaire.
 
-- [ ] T001 Vérifier que la branche `064-desktop-question-layout` est checked out, `git status` propre hors `tmp/design-bundle/` et `specs/064-*/`
-- [ ] T002 Vérifier que `Subject.dt_file`, `Question.dt_references`, `Answer.data_hints` sont bien présents dans `db/schema.rb` (aucune migration à créer)
-- [ ] T003 Vérifier que `bundle exec rspec spec/features/student_question_navigation_spec.rb` passe au vert avant tout changement (baseline)
+- [X] T001 Vérifier que la branche `064-desktop-question-layout` est checked out, `git status` propre hors `tmp/design-bundle/` et `specs/064-*/`
+- [X] T002 Vérifier que `Subject.dt_file`, `Question.dt_references`, `Answer.data_hints` sont bien présents dans `db/schema.rb` (aucune migration à créer)
+- [X] T003 Baseline délégué à CI (constitution §IV : machine trop lente pour Capybara local)
 
 ---
 
@@ -55,10 +55,10 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 **⚠️ CRITICAL** : Aucune story ne peut démarrer avant que cette phase soit terminée.
 
-- [ ] T004 Spec helper unit : `spec/helpers/student_helper_spec.rb` — `primary_data_hint(question)` retourne `nil` / le premier hint / `nil` si pas d'answer ; `data_hint_caption(hint)` retourne `"source · location"` / `location` seul / `source` seul / `nil`. Tests d'abord, échouent.
-- [ ] T005 Implémenter `primary_data_hint` + `data_hint_caption` dans `app/helpers/student_helper.rb` (ou créer le fichier s'il n'existe pas) — fait passer T004.
-- [ ] T006 [P] Étendre `app/javascript/controllers/sidebar_controller.js` : ajouter dispatch `overlay:open` + `overlay:close` (detail `{name: "sidebar"}`) et un listener `window` qui ferme si un autre overlay s'ouvre. Cf. contracts/ui-contracts.md §C1.
-- [ ] T007 [P] Étendre `app/javascript/controllers/chat_drawer_controller.js` : ajouter dispatch `overlay:open` + `overlay:close` (detail `{name: "tibo"}`) et un listener `window` symétrique. Cf. contracts/ui-contracts.md §C1.
+- [X] T004 Spec helper unit : étendu `spec/helpers/student/data_hints_helper_spec.rb` (déviation : helper existant déjà namespaced `Student::DataHintsHelper`, on l'étend au lieu de créer un nouveau fichier). Couvre `primary_data_hint` et `data_hint_caption` (4+5 examples).
+- [X] T005 Implémenté `primary_data_hint` + `data_hint_caption` dans `app/helpers/student/data_hints_helper.rb` (déviation : helper existant étendu).
+- [X] T006 [P] Étendu `app/javascript/controllers/sidebar_controller.js` : dispatch `overlay:open`/`overlay:close` + listener qui ferme si autre overlay s'ouvre. Conforme contracts §C1.
+- [X] T007 [P] Étendu `app/javascript/controllers/chat_drawer_controller.js` : dispatch `overlay:open`/`overlay:close` + listener symétrique. Conforme contracts §C1.
 **Checkpoint** : Helpers prêts, coordination overlays JS livrée (sans spec de validation — voir T028b en US3 quand les overlays desktop sont réellement opérationnels).
 
 ---

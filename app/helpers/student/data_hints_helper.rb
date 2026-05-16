@@ -17,4 +17,25 @@ module Student::DataHintsHelper
     else :slate
     end
   end
+
+  def primary_data_hint(question)
+    return nil unless question&.answer
+
+    hints = question.answer.data_hints
+    return nil if hints.blank?
+
+    hints.first
+  end
+
+  def data_hint_caption(hint)
+    return nil unless hint.is_a?(Hash)
+
+    source = hint["source"].presence
+    location = hint["location"].presence
+    return nil if source.blank? && location.blank?
+    return location if source.blank?
+    return source if location.blank?
+
+    "#{source} · #{location}"
+  end
 end
