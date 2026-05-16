@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Story 064-US3: Tutorat Tibo en desktop", type: :feature do
+  before(:each) do
+    page.driver.browser.manage.window.resize_to(1400, 900)
+  end
+
   let(:teacher)   { create(:user, openrouter_api_key: "sk-or-test") }
   let(:classroom) { create(:classroom, owner: teacher, name: "Terminale SIN 2026", tutor_free_mode_enabled: true) }
   let(:student) do

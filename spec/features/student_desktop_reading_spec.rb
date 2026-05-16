@@ -1,6 +1,12 @@
 require "rails_helper"
 
 RSpec.describe "Story 064-US1: Lecture question en desktop", type: :feature do
+  before(:each) do
+    # Force desktop viewport — headless Chrome's --window-size flag is not
+    # always reliable; resize_to guarantees lg: breakpoint kicks in.
+    page.driver.browser.manage.window.resize_to(1400, 900)
+  end
+
   let(:teacher)   { create(:user, openrouter_api_key: "sk-or-test") }
   let(:classroom) { create(:classroom, owner: teacher, name: "Terminale SIN 2026", tutor_free_mode_enabled: true) }
   let(:student)   { create(:student, classroom: classroom) }

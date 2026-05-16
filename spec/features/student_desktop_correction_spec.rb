@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Story 064-US2: Correction en desktop", type: :feature do
+  before(:each) do
+    page.driver.browser.manage.window.resize_to(1400, 900)
+  end
+
   let(:classroom) { create(:classroom, name: "Terminale SIN 2026") }
   let(:student)   { create(:student, classroom: classroom) }
   let(:subject) do
