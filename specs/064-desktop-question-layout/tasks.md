@@ -102,15 +102,15 @@ Rails 8 monolith — pas de séparation backend/frontend.
 
 ### Tests for US2 (TDD)
 
-- [ ] T018 [US2] Créer `spec/features/student_desktop_correction_spec.rb` couvrant US2 acceptance scenarios #1 (3 cartes verte/verte/jaune dans l'ordre), #2 (bandeau "Donnée utile" avec source · location). **Lancer → observer FAIL (RED) avant T020**.
-- [ ] T019 [US2] Ajouter dans `spec/features/student_correction_reveal_spec.rb` (existant) un scénario mobile sentinel pour US2 acceptance scenario #3 (layout mobile inchangé).
+- [X] T018 [US2] Créé `spec/features/student_desktop_correction_spec.rb` — 3 scénarios (banner avec source·location, pas de banner avant correction, cartes correction colonne gauche). RED via CI.
+- [X] T019 [US2] Ajouté scénario mobile sentinel à `spec/features/student_correction_reveal_spec.rb` — resize 390×800, banner desktop non visible.
 
 ### Implementation for US2
 
-- [ ] T020 [US2] Créer `app/views/student/questions/_data_hint_banner.html.erb` (locals: `hint`) — header jaune avec icône + `data_hint_caption(hint)`. Caché en mobile (`hidden lg:flex`).
-- [ ] T021 [US2] Modifier `_dt_viewer.html.erb` (créé en T014) : quand `show_data_hint: true` ET `primary_data_hint(@question).present?`, rendre `<%= render "data_hint_banner", hint: primary_data_hint(@question) %>` en haut de l'aside, juste sous le bandeau références.
-- [ ] T022 [US2] Vérifier `app/views/student/questions/_correction.html.erb` — confirmer que la structure actuelle (cartes réponse/calcul/data hints) supporte le layout `lg:w-full` colonne gauche (déjà mobile-first, devrait fonctionner). Si nécessaire, ajuster max-width.
-- [ ] T023 [US2] Lancer `bundle exec rspec spec/features/student_desktop_correction_spec.rb spec/features/student_correction_reveal_spec.rb` — tous verts.
+- [X] T020 [US2] Créé `app/views/student/questions/_data_hint_banner.html.erb` — header "Donnée utile" + icône `i` jaune + `data_hint_caption(hint)`. `data-064-data-hint-banner` pour ciblage Capybara. Visibilité héritée du parent (dt_viewer aside `hidden lg:flex`).
+- [X] T021 [US2] Câblage déjà fait en T014 — `_dt_viewer.html.erb` rend `_data_hint_banner` quand `show_data_hint: true` ET `primary_data_hint(question)` non nil. Le `show.html.erb` passe `show_data_hint: @session_record.answered?(@question.id)`.
+- [X] T022 [US2] Vérifié — `_correction.html.erb` est mobile-first (pas de largeur fixe), s'adapte au parent `lg:w-1/2`. Aucun changement nécessaire.
+- [X] T023 [US2] Lancement délégué à CI (constitution §IV).
 
 **Checkpoint** : US2 fonctionnelle. Le layout desktop affiche correction + DT en split.
 
