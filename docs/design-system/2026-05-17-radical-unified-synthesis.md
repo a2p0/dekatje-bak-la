@@ -430,9 +430,9 @@ Ordre de dépendance : B0 indépendant. B1 prérequis pour tout le reste. B2 pr�
 
 ## 8. Questions ouvertes à trancher avec le user
 
-1. **Dark mode teacher** : le bundle ne couvre PAS explicitement le dark mode teacher (les tweaks `dark` sont prévus dans `teacher/shared.jsx:2` mais la sobriété teacher rend l'usage discutable). Question : on active `.dark` côté teacher avec les mêmes overrides que côté élève, ou on reste light-only pour les enseignants ?
+1. **Dark mode teacher** : ✅ **TRANCHÉ 2026-05-17** — dark mode teacher **activé**, palette complète (le bundle l'anticipe). Validation visuelle des ~10 écrans teacher en dark à prévoir lors de B5.
 
-2. **`data-audience` ou layout séparé ?** : recommandation §3.3 propose un attribut `data-audience` pour activer la variante teacher. Alternative : conserver les deux layouts existants (`student.html.erb` / `teacher.html.erb`) et y mettre le `data-audience`. Préférence ?
+2. **`data-audience` ou layout séparé ?** : ✅ **TRANCHÉ 2026-05-17** — **Option A retenue** : conserver `teacher.html.erb` et `student.html.erb` existants, ajouter `<body data-audience="teacher|student">`. Migration minimale, rétrocompatible. Refacto en layout unique (Option B) reportée post-B5 si besoin.
 
 3. **`BottomBarComponent` orphelin** : drop ou recâbler ? Le bundle propose un usage clair (`student-flows.jsx`) mais l'app actuelle utilise une bottom-bar ad-hoc dans `student/questions/show.html.erb`. Si on garde une bottom-bar globale élève, à quoi sert celle de la page question ?
 
