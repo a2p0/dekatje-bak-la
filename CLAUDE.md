@@ -361,6 +361,8 @@ SECRET_KEY_BASE            # rails secret
 - PostgreSQL — champs existants : `classrooms.specialty` (string), `subjects.specialty` (integer enum), `parts.section_type` (integer enum), `parts.specialty` (integer enum) (051-navigation-polish)
 - Ruby 3.3+ / Rails 8.1.3 + Hotwire (Turbo Streams), ActiveStorage, Sidekiq, Devise (teacher auth), RSpec + FactoryBot + Capybara (052-upload-first-subject)
 - PostgreSQL via Neon (subjects.exam_session_id already nullable in schema), ActiveStorage for PDFs (052-upload-first-subject)
+- Ruby 3.3+, Rails 8.1.3, Tailwind CSS v4 + `tailwindcss-rails` (déjà intégré), ViewComponent (existant), Capybara + Selenium pour test SC-003 (065-design-tokens-2-layers)
+- N/A (refacto CSS pure + 1 controller stateless) (065-design-tokens-2-layers)
 
 ## Recent Changes
 - 001-bac-training-app: Added Ruby 3.3+, Rails 8.1 + Devise, Sidekiq, pdf-reader, Faraday, Turbo Streams, Stimulus, ActiveStorage
