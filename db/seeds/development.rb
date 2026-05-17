@@ -103,14 +103,17 @@ unless subject.correction_pdf.attached?
   puts "  PDF corrigé attaché"
 end
 
-# Persist extraction data
-unless exam_session.common_parts.any?
+# Persist extraction data — idempotent: re-runs if Subject has no parts
+# (recovers from a previously-interrupted seed that left an orphan Subject).
+if subject.all_parts.empty?
   PersistExtractedData.call(subject: subject, data: data)
 
   Question.where(part: subject.all_parts).update_all(status: Question.statuses[:validated])
   subject.update_column(:status, Subject.statuses[:published])
 
   puts "  Extraction persistée: #{Question.where(part: subject.all_parts).count} questions (publiées)"
+else
+  puts "  Extraction déjà présente (#{Question.where(part: subject.all_parts).count} questions) — skip"
 end
 
 # Create ExtractionJob record
