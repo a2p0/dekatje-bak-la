@@ -6,7 +6,9 @@ require "rails_helper"
 #
 # This is a static artifact test (loads the compiled CSS file produced
 # by `bin/rails tailwindcss:build`). No browser needed.
-RSpec.describe "Compiled CSS — design tokens contract", :compiled_css do
+RSpec.describe "Compiled CSS — design tokens contract" do
+  include CssTokenReader
+
   let(:css) { read_compiled_css }
 
   describe "19 semantic tokens (set minimum garanti, FR-003)" do
@@ -60,18 +62,18 @@ RSpec.describe "Compiled CSS — design tokens contract", :compiled_css do
   end
 
   describe "6 audience × mode mapping blocks" do
-    %w[
-      body[data-audience="student"]
-      body[data-audience="teacher"]
-      body[data-audience="public"]
-      html.dark\ body[data-audience="student"]
-      html.dark\ body[data-audience="teacher"]
-      html.dark\ body[data-audience="public"]
-    ].each do |selector|
-      it "contains selector #{selector.tr('\\', '')}" do
-        # Normalize selector for matching (CSS may compress whitespace)
-        normalized = selector.tr('\\', '')
-        expect(css).to match(/#{Regexp.escape(normalized)}/)
+    # Note: Tailwind v4 compiles `[data-audience="x"]` to `[data-audience=x]`
+    # (strips quotes), so we match the unquoted form in the compiled output.
+    {
+      "student (light)" => /body\[data-audience=student\]/,
+      "teacher (light)" => /body\[data-audience=teacher\]/,
+      "public (light)"  => /body\[data-audience=public\]/,
+      "student (dark)"  => /html\.dark\s+body\[data-audience=student\]/,
+      "teacher (dark)"  => /html\.dark\s+body\[data-audience=teacher\]/,
+      "public (dark)"   => /html\.dark\s+body\[data-audience=public\]/
+    }.each do |label, regex|
+      it "contains mapping selector for #{label}" do
+        expect(css).to match(regex)
       end
     end
   end
