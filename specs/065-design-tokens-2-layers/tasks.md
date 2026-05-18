@@ -119,11 +119,11 @@ description: "Task breakdown for B1 design tokens 2 layers"
 
 ### Tests for User Story 3
 
-- [ ] T025 [US3] Écrire `spec/lib/css_compiled_aliases_spec.rb` : charge le CSS compilé via helper T005, vérifie présence des 12 aliases `--color-rad-bg`, `--color-rad-paper`, `--color-rad-raise`, `--color-rad-text`, `--color-rad-muted`, `--color-rad-rule`, `--color-rad-red`, `--color-rad-yellow`, `--color-rad-teal`, `--color-rad-green`, `--color-rad-ink`, `--color-rad-cream`, `--color-rad-warm`. **Note** : ce spec doit passer dès T011/T012 (les aliases existent encore dans le bloc `@theme`), donc l'écrire en mode "regression guard" plus que TDD strict.
+- [X] T025 [US3] Écrire `spec/lib/css_compiled_aliases_spec.rb` : charge le CSS compilé via helper T005, vérifie présence des 12 aliases `--color-rad-bg`, `--color-rad-paper`, `--color-rad-raise`, `--color-rad-text`, `--color-rad-muted`, `--color-rad-rule`, `--color-rad-red`, `--color-rad-yellow`, `--color-rad-teal`, `--color-rad-green`, `--color-rad-ink`, `--color-rad-cream`, `--color-rad-warm`. **Note** : ce spec doit passer dès T011/T012 (les aliases existent encore dans le bloc `@theme`), donc l'écrire en mode "regression guard" plus que TDD strict.
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Dans `app/assets/tailwind/application.css`, transformer les **12 tokens `--color-rad-*` actuels** en aliases pointant vers les nouvelles couches selon `data-model.md` §3 :
+- [X] T026 [US3] Dans `app/assets/tailwind/application.css`, transformer les **12 tokens `--color-rad-*` actuels** en aliases pointant vers les nouvelles couches selon `data-model.md` §3 :
   - `--color-rad-bg → var(--color-surface-sunken)`
   - `--color-rad-paper → var(--color-surface)`
   - `--color-rad-raise → var(--color-surface-raised)`
@@ -138,8 +138,8 @@ description: "Task breakdown for B1 design tokens 2 layers"
   - `--color-rad-cream → var(--rad-prim-cream)`
   - `--color-rad-warm → var(--rad-prim-warm)`
   Les anciennes définitions hex dans `@theme` sont supprimées (remplacées par les aliases). Les anciennes overrides dans `.dark` (déjà migré en T011) sont supprimées : les aliases résolvent automatiquement.
-- [ ] T027 [US3] Lancer la suite de tests Capybara existante en local (au moins un sous-ensemble rapide pour vérification, vu la lenteur dev) : `bundle exec rspec spec/features/teacher/classroom_management_spec.rb spec/features/student/student_login_spec.rb`. **Doit passer**. La validation complète passera en CI.
-- [ ] T028 [US3] Lancer T025 et vérifier qu'il passe (12 aliases présents).
+- [X] T027 [US3] Lancer la suite de tests Capybara existante en local (au moins un sous-ensemble rapide pour vérification, vu la lenteur dev) : `bundle exec rspec spec/features/teacher/classroom_management_spec.rb spec/features/student/student_login_spec.rb`. **Doit passer**. La validation complète passera en CI.
+- [X] T028 [US3] Lancer T025 et vérifier qu'il passe (12 aliases présents).
 
 **Checkpoint US3** : aucune régression sur les tests existants, les 12 aliases sont préservés et fonctionnels.
 
