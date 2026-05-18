@@ -32,9 +32,9 @@ description: "Task breakdown for B1 design tokens 2 layers"
 
 **Purpose** : préparer l'environnement et vérifier les outils prérequis avant tout code.
 
-- [ ] T001 Vérifier la présence d'ImageMagick (`magick compare --version`) sur la machine dev. Si absent : `sudo dnf install ImageMagick`. Documenter dans `specs/065-design-tokens-2-layers/notes.md` (créer si absent) la version installée. Utile pour validation SC-001.
-- [ ] T002 Capturer les **screenshots de référence "avant B1"** sur 3 écrans (login élève `/`, classroom teacher index `/teacher/classrooms`, drawer Tibo ouvert depuis `/student/questions/<id>`). Sauvegarder dans `tmp/b1-baseline-screenshots/` (gitignoré). Procédure : démarrer `bin/dev`, login compte teacher seed + élève seed, navigation manuelle, capture via DevTools ou screenshot OS. Documenter la procédure dans `notes.md`.
-- [ ] T003 [P] Mesurer le **poids CSS de référence "avant B1"** : `bin/rails tailwindcss:build`, puis `wc -c app/assets/builds/tailwind.css` (brut) et `gzip -c app/assets/builds/tailwind.css | wc -c` (gzippé). Reporter dans `notes.md`. Utile pour validation SC-007.
+- [X] T001 Vérifier la présence d'ImageMagick (`magick compare --version`) sur la machine dev. Si absent : `sudo dnf install ImageMagick`. Documenter dans `specs/065-design-tokens-2-layers/notes.md` (créer si absent) la version installée. Utile pour validation SC-001.
+- [X] T002 Capturer les **screenshots de référence "avant B1"** sur 3 écrans (login élève `/`, classroom teacher index `/teacher/classrooms`, drawer Tibo ouvert depuis `/student/questions/<id>`). Sauvegarder dans `tmp/b1-baseline-screenshots/` (gitignoré). Procédure : démarrer `bin/dev`, login compte teacher seed + élève seed, navigation manuelle, capture via DevTools ou screenshot OS. Documenter la procédure dans `notes.md`.
+- [X] T003 [P] Mesurer le **poids CSS de référence "avant B1"** : `bin/rails tailwindcss:build`, puis `wc -c app/assets/builds/tailwind.css` (brut) et `gzip -c app/assets/builds/tailwind.css | wc -c` (gzippé). Reporter dans `notes.md`. Utile pour validation SC-007.
 
 **Checkpoint** : baseline visuelle + métrique CSS prêtes. ImageMagick installé.
 
@@ -46,8 +46,8 @@ description: "Task breakdown for B1 design tokens 2 layers"
 
 **⚠️ CRITICAL** : pas de US sans cette phase.
 
-- [ ] T004 [P] Créer le helper `spec/support/hex_to_rgb.rb` exposant `hex_to_rgb("#127566") → "rgb(18, 117, 102)"` (utilisé par les specs SC-003 pour comparer une couleur Selenium à une primitive Radical). Inclure les valeurs des 13 primitives en constante. Charger via `spec/rails_helper.rb` si pas déjà via `Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }`.
-- [ ] T005 [P] Créer le helper `spec/support/css_token_reader.rb` exposant `read_compiled_css → String` (charge `app/assets/builds/tailwind.css` après s'être assuré qu'il existe ; lance `bin/rails tailwindcss:build` si fichier absent). Utilisé par le spec FR-014.
+- [X] T004 [P] Créer le helper `spec/support/hex_to_rgb.rb` exposant `hex_to_rgb("#127566") → "rgb(18, 117, 102)"` (utilisé par les specs SC-003 pour comparer une couleur Selenium à une primitive Radical). Inclure les valeurs des 13 primitives en constante. Charger via `spec/rails_helper.rb` si pas déjà via `Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }`.
+- [X] T005 [P] Créer le helper `spec/support/css_token_reader.rb` exposant `read_compiled_css → String` (charge `app/assets/builds/tailwind.css` après s'être assuré qu'il existe ; lance `bin/rails tailwindcss:build` si fichier absent). Utilisé par le spec FR-014.
 
 **Checkpoint** : helpers partagés disponibles. Toutes les US peuvent maintenant écrire leurs tests.
 
