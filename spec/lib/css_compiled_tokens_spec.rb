@@ -63,14 +63,15 @@ RSpec.describe "Compiled CSS — design tokens contract" do
 
   describe "6 audience × mode mapping blocks" do
     # Note: Tailwind v4 compiles `[data-audience="x"]` to `[data-audience=x]`
-    # (strips quotes), so we match the unquoted form in the compiled output.
+    # (strips quotes). Selector is NOT body-scoped so wrapper divs can
+    # demo multiple audiences side-by-side (see CSS comment).
     {
-      "student (light)" => /body\[data-audience=student\]/,
-      "teacher (light)" => /body\[data-audience=teacher\]/,
-      "public (light)"  => /body\[data-audience=public\]/,
-      "student (dark)"  => /html\.dark\s+body\[data-audience=student\]/,
-      "teacher (dark)"  => /html\.dark\s+body\[data-audience=teacher\]/,
-      "public (dark)"   => /html\.dark\s+body\[data-audience=public\]/
+      "student (light)" => /\[data-audience=student\]/,
+      "teacher (light)" => /\[data-audience=teacher\]/,
+      "public (light)"  => /\[data-audience=public\]/,
+      "student (dark)"  => /html\.dark\s+\[data-audience=student\]/,
+      "teacher (dark)"  => /html\.dark\s+\[data-audience=teacher\]/,
+      "public (dark)"   => /html\.dark\s+\[data-audience=public\]/
     }.each do |label, regex|
       it "contains mapping selector for #{label}" do
         expect(css).to match(regex)

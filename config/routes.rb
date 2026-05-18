@@ -25,6 +25,10 @@ Rails.application.routes.draw do
       resource :extraction,  only: [ :create ], module: "subjects"
       resource :assignment,  only: [ :edit, :update ], module: "subjects"
     end
+
+    # B1 design system preview — Storybook-light, gated by teacher auth.
+    # See specs/065-design-tokens-2-layers/contracts/design-tokens.md.
+    get "design-system/preview", to: "design_system#preview", as: :design_system_preview
   end
 
   get "mentions-legales",            to: "pages#legal",   as: :legal

@@ -19,9 +19,12 @@
    2. SEMANTIC (--color-*) — usage roles consumed by views/components.
       Default values = student-light (preserves current rendering when no
       data-audience is present).
-   3. AUDIENCE × MODE MAPPINGS — body[data-audience="X"] (light) and
-      html.dark body[data-audience="X"] (dark) re-bind semantic tokens to
+   3. AUDIENCE × MODE MAPPINGS — [data-audience="X"] (light) and
+      html.dark [data-audience="X"] (dark) re-bind semantic tokens to
       primitives for each combination (student/teacher/public × light/dark).
+      Selector intentionally NOT body-scoped: layouts set the attribute
+      on <body> (FR-006/011-013), but the demo page can use wrapper divs
+      to render multiple audiences side-by-side for testing/preview.
    4. LEGACY ALIASES (--color-rad-*) — kept for backward compatibility with
       existing views/components. They now resolve through the new layers.
    ========================================================================= */
@@ -127,7 +130,7 @@
 
 /* --- Light mode mappings (per audience) --- */
 
-body[data-audience="student"] {
+[data-audience="student"] {
   /* Student-light = identical to @theme defaults (preserves current rendering).
      Explicitly redeclared so it's discoverable and to keep parity with the
      other audience blocks. */
@@ -168,7 +171,7 @@ body[data-audience="student"] {
   --color-rad-warm:   var(--rad-prim-warm);
 }
 
-body[data-audience="teacher"] {
+[data-audience="teacher"] {
   /* Teacher-light = Radical sober: same palette, accent = sea-teal (not red),
      font = Plus Jakarta Sans (handled separately via font utilities).
      Surfaces/texts/rules/states stay identical to student (universal). */
@@ -209,7 +212,7 @@ body[data-audience="teacher"] {
   --color-rad-warm:   var(--rad-prim-warm);
 }
 
-body[data-audience="public"] {
+[data-audience="public"] {
   /* Public-light = identical to current public rendering (= student-light).
      Explicit block per spec FR-013 and clarification Q1. */
   --color-surface:              var(--rad-prim-paper);
@@ -252,7 +255,7 @@ body[data-audience="public"] {
    Its responsibility is fully delegated to these three audience-scoped
    blocks. See research.md Q2 for the cascade analysis. */
 
-html.dark body[data-audience="student"] {
+html.dark [data-audience="student"] {
   --color-surface:              var(--rad-prim-paper-dark);
   --color-surface-raised:       var(--rad-prim-raise-dark);
   --color-surface-sunken:       var(--rad-prim-paper-dark);
@@ -289,7 +292,7 @@ html.dark body[data-audience="student"] {
   --color-rad-warm:   var(--rad-prim-warm-dark);
 }
 
-html.dark body[data-audience="teacher"] {
+html.dark [data-audience="teacher"] {
   --color-surface:              var(--rad-prim-paper-dark);
   --color-surface-raised:       var(--rad-prim-raise-dark);
   --color-surface-sunken:       var(--rad-prim-paper-dark);
@@ -325,7 +328,7 @@ html.dark body[data-audience="teacher"] {
   --color-rad-warm:   var(--rad-prim-warm-dark);
 }
 
-html.dark body[data-audience="public"] {
+html.dark [data-audience="public"] {
   /* This block REPLACES the legacy `.dark { ... }` block (T011 migration).
      Hex values are STRICTLY identical to the original to guarantee SC-001
      on public dark pages. */
