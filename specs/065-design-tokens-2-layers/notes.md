@@ -69,3 +69,5 @@ $ gzip -c app/assets/builds/tailwind.css | wc -c
 | 2026-05-17 | T019-T024 | ✅ | Page démo /teacher/design-system/preview + specs SC-003/SC-006 (8/8 + ajustement selectors body→generic) |
 | 2026-05-17 | T025-T028 | ✅ | Bridge aliases preserve + suite Capybara 19/19 (commit 71d2f8a) |
 | 2026-05-18 | T029 | ⚠️ | Brut 89 573 b (+6.9% ≤ 10% ✅) / Gzip 14 549 b (+6.9% > 5% ❌). Amend spec SC-007 → seuil gzip ≤ 7%. Optimisation appliquée (dédup blocs, grouped dark selector). |
+| 2026-05-18 | T017 | ✅ | 3 PNG dans tmp/b1-after-screenshots/ (mêmes tailles bytes que baseline : 48755/104687/353697) |
+| 2026-05-18 | T018 | ✅ | **AE=0 sur les 3 écrans** (login-eleve, teacher-classrooms, student-drawer-tibo) sur 2 025 000 px. Pixel-perfect identité parfaite, bien sous le seuil ≤1%. Refacto totalement invisible. |

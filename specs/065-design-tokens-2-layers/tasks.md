@@ -81,8 +81,8 @@ description: "Task breakdown for B1 design tokens 2 layers"
 - [X] T014 [P] [US1] Ajouter `data-audience="teacher"` sur la balise `<body>` de `app/views/layouts/teacher.html.erb` (FR-012).
 - [X] T015 [P] [US1] Ajouter `data-audience="public"` sur la balise `<body>` de `app/views/layouts/application.html.erb` (FR-013).
 - [X] T016 [US1] Lancer `bin/rails tailwindcss:build` et **vérifier que les specs T006 et T007 passent maintenant**. Si l'un échoue : ajuster T008-T015 et relancer.
-- [ ] T017 [US1] Capturer les **screenshots "après B1"** sur les 3 mêmes écrans qu'à T002 (même procédure, même browser, même taille viewport). Sauvegarder dans `tmp/b1-after-screenshots/`.
-- [ ] T018 [US1] Exécuter le **diff visuel** pour chacun des 3 écrans : `magick compare -metric AE -fuzz 2% tmp/b1-baseline-screenshots/<screen>.png tmp/b1-after-screenshots/<screen>.png /tmp/diff-<screen>.png`. Reporter le nombre AE dans `notes.md` pour chaque écran. **Critère de passage** : AE ≤ 1 % du nombre total de pixels de l'image (ex: pour 1920×1080 ≈ 2 073 600 px, AE max = 20 736). Si dépassé, investiguer (probablement un mapping primitive incorrect).
+- [X] T017 [US1] Capturer les **screenshots "après B1"** sur les 3 mêmes écrans qu'à T002 (même procédure, même browser, même taille viewport). Sauvegarder dans `tmp/b1-after-screenshots/`.
+- [X] T018 [US1] Exécuter le **diff visuel** pour chacun des 3 écrans : `magick compare -metric AE -fuzz 2% tmp/b1-baseline-screenshots/<screen>.png tmp/b1-after-screenshots/<screen>.png /tmp/diff-<screen>.png`. Reporter le nombre AE dans `notes.md` pour chaque écran. **Critère de passage** : AE ≤ 1 % du nombre total de pixels de l'image (ex: pour 1920×1080 ≈ 2 073 600 px, AE max = 20 736). Si dépassé, investiguer (probablement un mapping primitive incorrect).
 
 **Checkpoint US1** : la migration tokens est invisible, l'attribut `data-audience` est présent sur les 3 layouts, les 19 sémantiques existent dans le CSS compilé, les 3 diffs visuels sont sous le seuil. **MVP fonctionnel**.
 
