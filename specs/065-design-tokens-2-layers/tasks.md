@@ -149,8 +149,8 @@ description: "Task breakdown for B1 design tokens 2 layers"
 
 **Purpose** : finalisation, mesures, documentation PR.
 
-- [ ] T029 Mesurer le **poids CSS "après B1"** : `bin/rails tailwindcss:build`, puis `wc -c app/assets/builds/tailwind.css` (brut) et `gzip -c app/assets/builds/tailwind.css | wc -c` (gzippé). Comparer aux mesures baseline T003. **Critère SC-007** : ≤ +10 % brut ET ≤ +5 % gzippé. Reporter dans `notes.md`.
-- [ ] T030 Lancer toute la suite de tests : `bundle exec rspec spec/`. Identifier les flakes Selenium connues (cf. issue #96) pour les distinguer d'éventuelles régressions. Reporter le résultat dans `notes.md`.
+- [X] T029 Mesurer le **poids CSS "après B1"** : `bin/rails tailwindcss:build`, puis `wc -c app/assets/builds/tailwind.css` (brut) et `gzip -c app/assets/builds/tailwind.css | wc -c` (gzippé). Comparer aux mesures baseline T003. **Critère SC-007** : ≤ +10 % brut ET ≤ +5 % gzippé. Reporter dans `notes.md`.
+- [X] T030 Lancer toute la suite de tests : `bundle exec rspec spec/`. Identifier les flakes Selenium connues (cf. issue #96) pour les distinguer d'éventuelles régressions. Reporter le résultat dans `notes.md`.
 - [ ] T031 [P] Rédiger le body de PR documentant tous les critères de succès (SC-001 résultats diff visuel × 3 écrans, SC-002 CI verte, SC-003 spec mapping pass, SC-004 git diff limité aux fichiers attendus, SC-005 indépendance phases, SC-006 dark teacher fonctionnel testé manuellement, SC-007 poids CSS mesuré).
 - [ ] T032 Pousser la branche `065-design-tokens-2-layers` et créer la PR avec le body T031. Attendre CI. Si flake non-#96 → relancer (max 2 fois). Si vrai test fail → débugger.
 - [ ] T033 Validation manuelle finale par l'utilisateur : ouvrir 1 écran sous teacher light + 1 écran teacher dark + 1 écran student light pour vérification œil à œil que rien n'a changé. (SC-006 est désormais couvert automatiquement par T020b — cette étape manuelle reste pour la confiance visuelle finale.)

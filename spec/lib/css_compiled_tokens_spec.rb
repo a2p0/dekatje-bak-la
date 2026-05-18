@@ -61,17 +61,24 @@ RSpec.describe "Compiled CSS — design tokens contract" do
     end
   end
 
-  describe "6 audience × mode mapping blocks" do
-    # Note: Tailwind v4 compiles `[data-audience="x"]` to `[data-audience=x]`
-    # (strips quotes). Selector is NOT body-scoped so wrapper divs can
-    # demo multiple audiences side-by-side (see CSS comment).
+  describe "audience × mode mapping coverage" do
+    # Tailwind v4 strips quotes: `[data-audience="x"]` → `[data-audience=x]`.
+    # Selectors are NOT body-scoped so wrapper divs can demo multiple
+    # audiences side-by-side (see CSS comment).
+    #
+    # Light overrides are per-audience (student/teacher/public must each
+    # be addressable explicitly). Dark mode uses a generic selector
+    # `html.dark [data-audience]` for the universal palette (the
+    # teacher block then overrides accents). So we verify:
+    #   - light: explicit per-audience selectors exist
+    #   - dark : at minimum a generic [data-audience] block + the
+    #            teacher-specific accent swap block.
     {
-      "student (light)" => /\[data-audience=student\]/,
-      "teacher (light)" => /\[data-audience=teacher\]/,
-      "public (light)"  => /\[data-audience=public\]/,
-      "student (dark)"  => /html\.dark\s+\[data-audience=student\]/,
-      "teacher (dark)"  => /html\.dark\s+\[data-audience=teacher\]/,
-      "public (dark)"   => /html\.dark\s+\[data-audience=public\]/
+      "light/student" => /\[data-audience=student\]/,
+      "light/teacher" => /\[data-audience=teacher\]/,
+      "light/public"  => /\[data-audience=public\]/,
+      "dark/universal"        => /html\.dark\s+\[data-audience\]/,
+      "dark/teacher (swap)"   => /html\.dark\s+\[data-audience=teacher\]/
     }.each do |label, regex|
       it "contains mapping selector for #{label}" do
         expect(css).to match(regex)

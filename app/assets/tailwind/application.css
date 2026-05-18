@@ -128,126 +128,22 @@
    Layer 3 — AUDIENCE × MODE MAPPINGS
    ========================================================================= */
 
-/* --- Light mode mappings (per audience) --- */
-
-[data-audience="student"] {
-  /* Student-light = identical to @theme defaults (preserves current rendering).
-     Explicitly redeclared so it's discoverable and to keep parity with the
-     other audience blocks. */
-  --color-surface:              var(--rad-prim-paper);
-  --color-surface-raised:       var(--rad-prim-raise);
-  --color-surface-sunken:       var(--rad-prim-cream);
-  --color-on-surface:           var(--rad-prim-ink);
-  --color-on-surface-muted:     var(--rad-prim-muted-light);
-  --color-rule:                 var(--rad-prim-rule-light);
-  --color-rule-strong:          var(--rad-prim-muted-light);
-  --color-accent-primary:       var(--rad-prim-balisier-red);
-  --color-on-accent-primary:    var(--rad-prim-cream);
-  --color-accent-secondary:     var(--rad-prim-sea-teal);
-  --color-on-accent-secondary:  var(--rad-prim-cream);
-  --color-success:              var(--rad-prim-grass-green);
-  --color-on-success:           var(--rad-prim-cream);
-  --color-warning:              var(--rad-prim-sun-yellow);
-  --color-on-warning:           var(--rad-prim-ink);
-  --color-danger:               var(--rad-prim-balisier-red);
-  --color-on-danger:            var(--rad-prim-cream);
-  --color-info:                 var(--rad-prim-sea-teal);
-  --color-on-info:              var(--rad-prim-cream);
-
-  /* Legacy aliases (already inherited from :root via @theme; redeclared
-     here for explicitness and audience-symmetry). */
-  --color-rad-bg:     var(--color-surface-sunken);
-  --color-rad-paper:  var(--color-surface);
-  --color-rad-raise:  var(--color-surface-raised);
-  --color-rad-text:   var(--color-on-surface);
-  --color-rad-muted:  var(--color-on-surface-muted);
-  --color-rad-rule:   var(--color-rule);
-  --color-rad-red:    var(--rad-prim-balisier-red);
-  --color-rad-yellow: var(--rad-prim-sun-yellow);
-  --color-rad-teal:   var(--rad-prim-sea-teal);
-  --color-rad-green:  var(--rad-prim-grass-green);
-  --color-rad-ink:    var(--rad-prim-ink);
-  --color-rad-cream:  var(--rad-prim-cream);
-  --color-rad-warm:   var(--rad-prim-warm);
-}
+/* --- Light mode mappings (per audience) ---
+   Only the differences from @theme defaults are declared.
+   - teacher: swap accents (red↔teal)
+   - student/public: restore default accents (counter-override when nested
+     inside a teacher wrapper, e.g. on the design-system preview page).
+   Surfaces/texts/rules/states are universal across audiences. */
 
 [data-audience="teacher"] {
-  /* Teacher-light = Radical sober: same palette, accent = sea-teal (not red),
-     font = Plus Jakarta Sans (handled separately via font utilities).
-     Surfaces/texts/rules/states stay identical to student (universal). */
-  --color-surface:              var(--rad-prim-paper);
-  --color-surface-raised:       var(--rad-prim-raise);
-  --color-surface-sunken:       var(--rad-prim-cream);
-  --color-on-surface:           var(--rad-prim-ink);
-  --color-on-surface-muted:     var(--rad-prim-muted-light);
-  --color-rule:                 var(--rad-prim-rule-light);
-  --color-rule-strong:          var(--rad-prim-muted-light);
-  --color-accent-primary:       var(--rad-prim-sea-teal);       /* swap */
-  --color-on-accent-primary:    var(--rad-prim-cream);
-  --color-accent-secondary:     var(--rad-prim-balisier-red);   /* swap */
-  --color-on-accent-secondary:  var(--rad-prim-cream);
-  --color-success:              var(--rad-prim-grass-green);
-  --color-on-success:           var(--rad-prim-cream);
-  --color-warning:              var(--rad-prim-sun-yellow);
-  --color-on-warning:           var(--rad-prim-ink);
-  --color-danger:               var(--rad-prim-balisier-red);
-  --color-on-danger:            var(--rad-prim-cream);
-  --color-info:                 var(--rad-prim-sea-teal);
-  --color-on-info:              var(--rad-prim-cream);
-
-  /* Legacy aliases — kept unchanged (teacher views still rely on raw rad
-     colors today; B5 will retire them). */
-  --color-rad-bg:     var(--color-surface-sunken);
-  --color-rad-paper:  var(--color-surface);
-  --color-rad-raise:  var(--color-surface-raised);
-  --color-rad-text:   var(--color-on-surface);
-  --color-rad-muted:  var(--color-on-surface-muted);
-  --color-rad-rule:   var(--color-rule);
-  --color-rad-red:    var(--rad-prim-balisier-red);
-  --color-rad-yellow: var(--rad-prim-sun-yellow);
-  --color-rad-teal:   var(--rad-prim-sea-teal);
-  --color-rad-green:  var(--rad-prim-grass-green);
-  --color-rad-ink:    var(--rad-prim-ink);
-  --color-rad-cream:  var(--rad-prim-cream);
-  --color-rad-warm:   var(--rad-prim-warm);
+  --color-accent-primary:       var(--rad-prim-sea-teal);       /* swap red→teal */
+  --color-accent-secondary:     var(--rad-prim-balisier-red);   /* swap teal→red */
 }
 
+[data-audience="student"],
 [data-audience="public"] {
-  /* Public-light = identical to current public rendering (= student-light).
-     Explicit block per spec FR-013 and clarification Q1. */
-  --color-surface:              var(--rad-prim-paper);
-  --color-surface-raised:       var(--rad-prim-raise);
-  --color-surface-sunken:       var(--rad-prim-cream);
-  --color-on-surface:           var(--rad-prim-ink);
-  --color-on-surface-muted:     var(--rad-prim-muted-light);
-  --color-rule:                 var(--rad-prim-rule-light);
-  --color-rule-strong:          var(--rad-prim-muted-light);
-  --color-accent-primary:       var(--rad-prim-balisier-red);
-  --color-on-accent-primary:    var(--rad-prim-cream);
-  --color-accent-secondary:     var(--rad-prim-sea-teal);
-  --color-on-accent-secondary:  var(--rad-prim-cream);
-  --color-success:              var(--rad-prim-grass-green);
-  --color-on-success:           var(--rad-prim-cream);
-  --color-warning:              var(--rad-prim-sun-yellow);
-  --color-on-warning:           var(--rad-prim-ink);
-  --color-danger:               var(--rad-prim-balisier-red);
-  --color-on-danger:            var(--rad-prim-cream);
-  --color-info:                 var(--rad-prim-sea-teal);
-  --color-on-info:              var(--rad-prim-cream);
-
-  --color-rad-bg:     var(--color-surface-sunken);
-  --color-rad-paper:  var(--color-surface);
-  --color-rad-raise:  var(--color-surface-raised);
-  --color-rad-text:   var(--color-on-surface);
-  --color-rad-muted:  var(--color-on-surface-muted);
-  --color-rad-rule:   var(--color-rule);
-  --color-rad-red:    var(--rad-prim-balisier-red);
-  --color-rad-yellow: var(--rad-prim-sun-yellow);
-  --color-rad-teal:   var(--rad-prim-sea-teal);
-  --color-rad-green:  var(--rad-prim-grass-green);
-  --color-rad-ink:    var(--rad-prim-ink);
-  --color-rad-cream:  var(--rad-prim-cream);
-  --color-rad-warm:   var(--rad-prim-warm);
+  --color-accent-primary:       var(--rad-prim-balisier-red);   /* restore default */
+  --color-accent-secondary:     var(--rad-prim-sea-teal);       /* restore default */
 }
 
 /* --- Dark mode mappings (per audience) ---
@@ -255,7 +151,19 @@
    Its responsibility is fully delegated to these three audience-scoped
    blocks. See research.md Q2 for the cascade analysis. */
 
-html.dark [data-audience="student"] {
+/* Shared dark overrides for student & public (identical mapping).
+   Teacher has its own block below with accent-primary/secondary swap.
+   Role-based aliases (--color-rad-bg, paper, raise, text, muted, rule)
+   inherit automatically via the semantic tokens they reference, so
+   they're NOT redeclared here. Only color-based aliases (red, yellow,
+   teal, green, ink, warm) need explicit dark overrides since they
+   point to light primitives in @theme. */
+
+/* Universal dark overrides (same for all audiences). The accent-primary
+   value here is the student/public default; the teacher block below
+   re-swaps it. Specificity is identical, so the audience-specific
+   block wins by source order. */
+html.dark [data-audience] {
   --color-surface:              var(--rad-prim-paper-dark);
   --color-surface-raised:       var(--rad-prim-raise-dark);
   --color-surface-sunken:       var(--rad-prim-paper-dark);
@@ -264,109 +172,30 @@ html.dark [data-audience="student"] {
   --color-rule:                 var(--rad-prim-rule-dark);
   --color-rule-strong:          var(--rad-prim-muted-dark);
   --color-accent-primary:       var(--rad-prim-balisier-red-dark);
-  --color-on-accent-primary:    var(--rad-prim-cream);
   --color-accent-secondary:     var(--rad-prim-sea-teal-dark);
   --color-on-accent-secondary:  var(--rad-prim-ink-dark);
   --color-success:              var(--rad-prim-grass-green-dark);
   --color-on-success:           var(--rad-prim-ink-dark);
   --color-warning:              var(--rad-prim-sun-yellow-dark);
-  --color-on-warning:           var(--rad-prim-ink);
   --color-danger:               var(--rad-prim-balisier-red-dark);
-  --color-on-danger:            var(--rad-prim-cream);
   --color-info:                 var(--rad-prim-sea-teal-dark);
   --color-on-info:              var(--rad-prim-ink-dark);
 
-  /* Legacy aliases (dark equivalents to original .dark block values) */
+  /* Color-based legacy aliases (dark variants of primitives). */
   --color-rad-bg:     #0f2f33;
-  --color-rad-paper:  var(--rad-prim-paper-dark);
-  --color-rad-raise:  var(--rad-prim-raise-dark);
-  --color-rad-text:   var(--rad-prim-ink-dark);
-  --color-rad-muted:  var(--rad-prim-muted-dark);
-  --color-rad-rule:   var(--rad-prim-rule-dark);
   --color-rad-red:    var(--rad-prim-balisier-red-dark);
   --color-rad-yellow: var(--rad-prim-sun-yellow-dark);
   --color-rad-teal:   var(--rad-prim-sea-teal-dark);
   --color-rad-green:  var(--rad-prim-grass-green-dark);
   --color-rad-ink:    var(--rad-prim-ink-dark);
-  --color-rad-cream:  var(--rad-prim-cream);
   --color-rad-warm:   var(--rad-prim-warm-dark);
 }
 
+/* Teacher-dark — swap accents (overrides the universal block above). */
 html.dark [data-audience="teacher"] {
-  --color-surface:              var(--rad-prim-paper-dark);
-  --color-surface-raised:       var(--rad-prim-raise-dark);
-  --color-surface-sunken:       var(--rad-prim-paper-dark);
-  --color-on-surface:           var(--rad-prim-ink-dark);
-  --color-on-surface-muted:     var(--rad-prim-muted-dark);
-  --color-rule:                 var(--rad-prim-rule-dark);
-  --color-rule-strong:          var(--rad-prim-muted-dark);
-  --color-accent-primary:       var(--rad-prim-sea-teal-dark);       /* swap */
+  --color-accent-primary:       var(--rad-prim-sea-teal-dark);
   --color-on-accent-primary:    var(--rad-prim-ink-dark);
-  --color-accent-secondary:     var(--rad-prim-balisier-red-dark);   /* swap */
-  --color-on-accent-secondary:  var(--rad-prim-cream);
-  --color-success:              var(--rad-prim-grass-green-dark);
-  --color-on-success:           var(--rad-prim-ink-dark);
-  --color-warning:              var(--rad-prim-sun-yellow-dark);
-  --color-on-warning:           var(--rad-prim-ink);
-  --color-danger:               var(--rad-prim-balisier-red-dark);
-  --color-on-danger:            var(--rad-prim-cream);
-  --color-info:                 var(--rad-prim-sea-teal-dark);
-  --color-on-info:              var(--rad-prim-ink-dark);
-
-  --color-rad-bg:     #0f2f33;
-  --color-rad-paper:  var(--rad-prim-paper-dark);
-  --color-rad-raise:  var(--rad-prim-raise-dark);
-  --color-rad-text:   var(--rad-prim-ink-dark);
-  --color-rad-muted:  var(--rad-prim-muted-dark);
-  --color-rad-rule:   var(--rad-prim-rule-dark);
-  --color-rad-red:    var(--rad-prim-balisier-red-dark);
-  --color-rad-yellow: var(--rad-prim-sun-yellow-dark);
-  --color-rad-teal:   var(--rad-prim-sea-teal-dark);
-  --color-rad-green:  var(--rad-prim-grass-green-dark);
-  --color-rad-ink:    var(--rad-prim-ink-dark);
-  --color-rad-cream:  var(--rad-prim-cream);
-  --color-rad-warm:   var(--rad-prim-warm-dark);
-}
-
-html.dark [data-audience="public"] {
-  /* This block REPLACES the legacy `.dark { ... }` block (T011 migration).
-     Hex values are STRICTLY identical to the original to guarantee SC-001
-     on public dark pages. */
-  --color-surface:              var(--rad-prim-paper-dark);
-  --color-surface-raised:       var(--rad-prim-raise-dark);
-  --color-surface-sunken:       var(--rad-prim-paper-dark);
-  --color-on-surface:           var(--rad-prim-ink-dark);
-  --color-on-surface-muted:     var(--rad-prim-muted-dark);
-  --color-rule:                 var(--rad-prim-rule-dark);
-  --color-rule-strong:          var(--rad-prim-muted-dark);
-  --color-accent-primary:       var(--rad-prim-balisier-red-dark);
-  --color-on-accent-primary:    var(--rad-prim-cream);
-  --color-accent-secondary:     var(--rad-prim-sea-teal-dark);
-  --color-on-accent-secondary:  var(--rad-prim-ink-dark);
-  --color-success:              var(--rad-prim-grass-green-dark);
-  --color-on-success:           var(--rad-prim-ink-dark);
-  --color-warning:              var(--rad-prim-sun-yellow-dark);
-  --color-on-warning:           var(--rad-prim-ink);
-  --color-danger:               var(--rad-prim-balisier-red-dark);
-  --color-on-danger:            var(--rad-prim-cream);
-  --color-info:                 var(--rad-prim-sea-teal-dark);
-  --color-on-info:              var(--rad-prim-ink-dark);
-
-  /* Legacy aliases — same hex as the legacy `.dark { ... }` block.
-     Values frozen to preserve current rendering of public dark pages. */
-  --color-rad-bg:     #0f2f33;
-  --color-rad-paper:  var(--rad-prim-paper-dark);
-  --color-rad-raise:  var(--rad-prim-raise-dark);
-  --color-rad-text:   var(--rad-prim-ink-dark);
-  --color-rad-muted:  var(--rad-prim-muted-dark);
-  --color-rad-rule:   var(--rad-prim-rule-dark);
-  --color-rad-red:    var(--rad-prim-balisier-red-dark);
-  --color-rad-yellow: var(--rad-prim-sun-yellow-dark);
-  --color-rad-teal:   var(--rad-prim-sea-teal-dark);
-  --color-rad-green:  var(--rad-prim-grass-green-dark);
-  --color-rad-ink:    var(--rad-prim-ink-dark);
-  --color-rad-cream:  var(--rad-prim-cream);
-  --color-rad-warm:   var(--rad-prim-warm-dark);
+  --color-accent-secondary:     var(--rad-prim-balisier-red-dark);
 }
 
 /* Fallback for pages with neither data-audience nor an explicit mapping

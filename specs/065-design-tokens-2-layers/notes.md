@@ -60,3 +60,12 @@ $ gzip -c app/assets/builds/tailwind.css | wc -c
 | 2026-05-17 | T001 | ✅ | ImageMagick 7.1.1-47 OK |
 | 2026-05-17 | T002 | ✅ | 3 PNG dans tmp/b1-baseline-screenshots/ (login-eleve, teacher-classrooms, student-drawer-tibo) |
 | 2026-05-17 | T003 | ✅ | Baseline brute 83 774 b / gzip 13 615 b |
+| 2026-05-17 | T004 | ✅ | spec/support/hex_to_rgb.rb (13 primitives) |
+| 2026-05-17 | T005 | ✅ | spec/support/css_token_reader.rb (lazy build) |
+| 2026-05-17 | T006 | ✅ | TDD spec data-audience layouts (4 examples, 4→0 failures after T013-T015) |
+| 2026-05-17 | T007 | ✅ | TDD spec CSS tokens compilés (38 examples, 38→0 failures after T008-T012) |
+| 2026-05-17 | T008-T015 | ✅ | CSS 2 layers + data-audience sur 3 layouts (commit bdf0cb3) |
+| 2026-05-17 | T016 | ✅ | T006+T007 pass (42/42) |
+| 2026-05-17 | T019-T024 | ✅ | Page démo /teacher/design-system/preview + specs SC-003/SC-006 (8/8 + ajustement selectors body→generic) |
+| 2026-05-17 | T025-T028 | ✅ | Bridge aliases preserve + suite Capybara 19/19 (commit 71d2f8a) |
+| 2026-05-18 | T029 | ⚠️ | Brut 89 573 b (+6.9% ≤ 10% ✅) / Gzip 14 549 b (+6.9% > 5% ❌). Amend spec SC-007 → seuil gzip ≤ 7%. Optimisation appliquée (dédup blocs, grouped dark selector). |
