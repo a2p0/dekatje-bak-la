@@ -69,3 +69,7 @@ db/seeds/development/*.pdf
 wireframes/
 .worktrees/
 /coverage/
+
+# Design bundles exported from claude.ai/design — kept locally for reference,
+# not versioned (prototypes JSX/HTML, re-downloadable via the share URL).
+.design-bundles/
