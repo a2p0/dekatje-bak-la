@@ -70,4 +70,6 @@ $ gzip -c app/assets/builds/tailwind.css | wc -c
 | 2026-05-17 | T025-T028 | ✅ | Bridge aliases preserve + suite Capybara 19/19 (commit 71d2f8a) |
 | 2026-05-18 | T029 | ⚠️ | Brut 89 573 b (+6.9% ≤ 10% ✅) / Gzip 14 549 b (+6.9% > 5% ❌). Amend spec SC-007 → seuil gzip ≤ 7%. Optimisation appliquée (dédup blocs, grouped dark selector). |
 | 2026-05-18 | T017 | ✅ | 3 PNG dans tmp/b1-after-screenshots/ (mêmes tailles bytes que baseline : 48755/104687/353697) |
-| 2026-05-18 | T018 | ✅ | **AE=0 sur les 3 écrans** (login-eleve, teacher-classrooms, student-drawer-tibo) sur 2 025 000 px. Pixel-perfect identité parfaite, bien sous le seuil ≤1%. Refacto totalement invisible. |
+| 2026-05-18 | T018 | ✅ | AE=0 sur les 3 écrans light. |
+| 2026-05-18 | T033 | ⚠️ | Validation manuelle utilisateur : 2 régressions dark découvertes — séparateur card beige (teacher dark) + student dark = light. Cause : aliases role-based `--color-rad-*` définis via `var(--color-*)` dans `@theme` → résolus sur `:root` (light context), pas sur l'élément dark. Régression navbar liens : NON causée par B1 (NavBarComponent identique vs main). |
+| 2026-05-20 | Fix T033 | ✅ | Aliases role-based redéclarés explicitement dans `html.dark [data-audience]` (commit b95e064). Baseline étendue à 5 écrans (+ teacher-classrooms-dark + student-subjects-dark). **Diff visuel : AE=0 sur les 5 écrans**. 60/60 specs B1 verts. |

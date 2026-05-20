@@ -153,7 +153,7 @@ description: "Task breakdown for B1 design tokens 2 layers"
 - [X] T030 Lancer toute la suite de tests : `bundle exec rspec spec/`. Identifier les flakes Selenium connues (cf. issue #96) pour les distinguer d'éventuelles régressions. Reporter le résultat dans `notes.md`.
 - [X] T031 [P] Rédiger le body de PR documentant tous les critères de succès (SC-001 résultats diff visuel × 3 écrans, SC-002 CI verte, SC-003 spec mapping pass, SC-004 git diff limité aux fichiers attendus, SC-005 indépendance phases, SC-006 dark teacher fonctionnel testé manuellement, SC-007 poids CSS mesuré).
 - [X] T032 Pousser la branche `065-design-tokens-2-layers` et créer la PR avec le body T031. Attendre CI. Si flake non-#96 → relancer (max 2 fois). Si vrai test fail → débugger.
-- [ ] T033 Validation manuelle finale par l'utilisateur : ouvrir 1 écran sous teacher light + 1 écran teacher dark + 1 écran student light pour vérification œil à œil que rien n'a changé. (SC-006 est désormais couvert automatiquement par T020b — cette étape manuelle reste pour la confiance visuelle finale.)
+- [X] T033 Validation manuelle finale par l'utilisateur : ouvrir 1 écran sous teacher light + 1 écran teacher dark + 1 écran student light pour vérification œil à œil que rien n'a changé. (SC-006 est désormais couvert automatiquement par T020b — cette étape manuelle reste pour la confiance visuelle finale.) **Résultat : 2 régressions dark découvertes et corrigées (commit b95e064) ; baseline étendue à 5 écrans ; AE=0 sur les 5 après fix.**
 
 **Checkpoint final** : PR ouverte, CI verte, mesures reportées, validation manuelle OK. Prêt pour merge.
 
