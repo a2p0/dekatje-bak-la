@@ -1,0 +1,127 @@
+<% content_for(:title, "Design system preview — DekatjeBakLa") %>
+
+<%# Tailwind v4 purge — classes dynamiquement générées ci-dessous.
+    Listées en clair pour que le scanner les détecte:
+    bg-surface bg-surface-raised bg-surface-sunken
+    bg-on-surface bg-on-surface-muted
+    bg-rule bg-rule-strong
+    bg-accent-primary bg-on-accent-primary
+    bg-accent-secondary bg-on-accent-secondary
+    bg-success bg-on-success bg-warning bg-on-warning
+    bg-danger bg-on-danger bg-info bg-on-info
+%>
+
+<%
+  # 19 semantic tokens (FR-003 guaranteed minimum) grouped for display.
+  token_groups = [
+    {
+      title: "Surfaces",
+      tokens: [
+        { role: "surface",        purpose: "Background principal (cards, drawers, modales)" },
+        { role: "surface-raised", purpose: "Élément élevé (chat bubble, sticky header interne)" },
+        { role: "surface-sunken", purpose: "Background page sous les cards (canvas)" }
+      ]
+    },
+    {
+      title: "Textes",
+      tokens: [
+        { role: "on-surface",        purpose: "Texte principal sur surface" },
+        { role: "on-surface-muted",  purpose: "Texte secondaire (sous-titres, captions)" }
+      ]
+    },
+    {
+      title: "Rules / borders",
+      tokens: [
+        { role: "rule",         purpose: "Bordure douce (dividers, séparateurs)" },
+        { role: "rule-strong",  purpose: "Bordure marquée (inputs, focus rings)" }
+      ]
+    },
+    {
+      title: "Brand accents",
+      tokens: [
+        { role: "accent-primary",       purpose: "CTA primaire (bouton principal, lien actif)" },
+        { role: "on-accent-primary",    purpose: "Texte/icône SUR accent-primary" },
+        { role: "accent-secondary",     purpose: "CTA secondaire, badges informatifs" },
+        { role: "on-accent-secondary",  purpose: "Texte/icône SUR accent-secondary" }
+      ]
+    },
+    {
+      title: "États sémantiques",
+      tokens: [
+        { role: "success",     purpose: "Validation positive" },
+        { role: "on-success",  purpose: "Texte SUR success" },
+        { role: "warning",     purpose: "Avertissement non-bloquant" },
+        { role: "on-warning",  purpose: "Texte SUR warning" },
+        { role: "danger",      purpose: "Action destructive, erreur" },
+        { role: "on-danger",   purpose: "Texte SUR danger" },
+        { role: "info",        purpose: "Information neutre" },
+        { role: "on-info",     purpose: "Texte SUR info" }
+      ]
+    }
+  ]
+  audiences = %w[student teacher public]
+%>
+
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-10">
+  <header class="space-y-2">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Design system preview</h1>
+    <p class="text-sm text-slate-600 dark:text-slate-400 max-w-3xl">
+      Aperçu live des 19 tokens sémantiques garantis par
+      <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">B1</code>,
+      rendus sous chaque audience (<code>student</code> · <code>teacher</code> · <code>public</code>).
+      Sert de Storybook-light pour les phases B2-B7 et de fixture aux specs SC-003/SC-006.
+    </p>
+    <p class="text-xs text-slate-500 dark:text-slate-400">
+      Pour basculer le mode clair/sombre : toggle <code>.dark</code> sur <code>&lt;html&gt;</code>
+      (devtools ou bouton thème global). Le mapping s'adapte automatiquement.
+    </p>
+  </header>
+
+  <% audiences.each do |audience| %>
+    <section data-audience="<%= audience %>" class="space-y-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-surface text-on-surface p-6">
+      <h2 class="text-xl font-semibold text-on-surface">
+        Audience: <span class="font-mono text-accent-primary"><%= audience %></span>
+      </h2>
+
+      <% token_groups.each do |group| %>
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-on-surface-muted">
+            <%= group[:title] %>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <% group[:tokens].each do |token| %>
+              <div class="flex items-center gap-3 p-3 rounded border border-rule bg-surface-raised">
+                <%
+                  # Probe id includes the audience so the SC-003/SC-006
+                  # specs can target each one unambiguously, e.g.
+                  # `#probe-accent-primary-teacher`. Using a single global
+                  # id and relying on the descendant selector
+                  # `[data-audience="teacher"] #probe-accent-primary`
+                  # breaks because <body data-audience="teacher"> is ALSO
+                  # an ancestor of every wrapper, so the selector would
+                  # match the FIRST probe in DOM order (student's), not
+                  # the one inside the teacher wrapper.
+                  probe_id = "probe-#{token[:role]}-#{audience}"
+                %>
+                <div
+                  id="<%= probe_id %>"
+                  class="w-12 h-12 rounded shrink-0 bg-<%= token[:role] %> border border-rule"
+                  aria-label="<%= token[:role] %> swatch"
+                ></div>
+                <div class="min-w-0 flex-1">
+                  <code class="block text-xs font-mono text-on-surface">--color-<%= token[:role] %></code>
+                  <p class="text-xs text-on-surface-muted truncate"><%= token[:purpose] %></p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
+  <footer class="text-xs text-slate-500 dark:text-slate-400 pt-4 border-t border-slate-200 dark:border-slate-700">
+    Aliases legacy <code>--color-rad-*</code> conservés pour rétrocompat (cf. B1 spec §FR-009).
+    Migration progressive vers les sémantiques en B4 (student) / B5 (teacher).
+  </footer>
+</div>
