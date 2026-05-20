@@ -162,7 +162,17 @@
 /* Universal dark overrides (same for all audiences). The accent-primary
    value here is the student/public default; the teacher block below
    re-swaps it. Specificity is identical, so the audience-specific
-   block wins by source order. */
+   block wins by source order.
+
+   IMPORTANT: legacy `--color-rad-*` aliases must be redeclared explicitly
+   here, NOT inherited via `var()` from the @theme defaults. Reason: CSS
+   custom property values containing `var()` are resolved at the element
+   where the property is DECLARED, not where it is READ. The @theme block
+   declares them on :root (light context), so the var() would resolve to
+   the light primitive even when the property is read from a dark-mode
+   body. Inlining the dark primitive references here ensures correct
+   cascade. (Discovered via T033 — student dark + teacher card separator
+   were rendering with light values without these explicit overrides.) */
 html.dark [data-audience] {
   --color-surface:              var(--rad-prim-paper-dark);
   --color-surface-raised:       var(--rad-prim-raise-dark);
@@ -181,8 +191,15 @@ html.dark [data-audience] {
   --color-info:                 var(--rad-prim-sea-teal-dark);
   --color-on-info:              var(--rad-prim-ink-dark);
 
-  /* Color-based legacy aliases (dark variants of primitives). */
+  /* Role-based legacy aliases — redeclared (see comment above). */
   --color-rad-bg:     #0f2f33;
+  --color-rad-paper:  var(--rad-prim-paper-dark);
+  --color-rad-raise:  var(--rad-prim-raise-dark);
+  --color-rad-text:   var(--rad-prim-ink-dark);
+  --color-rad-muted:  var(--rad-prim-muted-dark);
+  --color-rad-rule:   var(--rad-prim-rule-dark);
+
+  /* Color-based legacy aliases (dark variants of primitives). */
   --color-rad-red:    var(--rad-prim-balisier-red-dark);
   --color-rad-yellow: var(--rad-prim-sun-yellow-dark);
   --color-rad-teal:   var(--rad-prim-sea-teal-dark);
