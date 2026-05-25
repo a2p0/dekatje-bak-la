@@ -132,7 +132,7 @@ BadgeComponent.new(
 - `:primary` → `bg-accent-primary/10 text-accent-primary border border-accent-primary/20`
 - `:secondary` → analogue
 - `:warning`, `:success`, `:neutral` → analogue
-- `:specialty_sin/itec/ec` → couleurs métier (mapping à confirmer par grep des sites d'appel actuels : aujourd'hui certaines vues passent `:rad_yellow` pour SIN, par exemple)
+- `:specialty_sin/itec/ec` → couleurs métier. Mapping concret à figer pendant l'implémentation par grep des sites d'appel actuels : si une vue passe aujourd'hui `BadgeComponent.new(color: :rad_yellow, label: "SIN")`, la nouvelle variante `:specialty_sin` doit rendre les mêmes classes que `:rad_yellow` legacy. Sinon, choisir un mapping cohérent avec le bundle `teacher/shared.jsx:73-91` (`Badge color={specialtyColor(c.specialty)}`).
 
 **API d'init** : préservée à l'identique (`color:`, `label:`).
 
@@ -178,7 +178,7 @@ Localisation : `spec/components/{button,badge,card}_component_spec.rb`. Couvertu
 **`button_component_spec.rb`** (~12 specs) :
 - 5 variantes sémantiques × rendu de la classe token attendue (`bg-accent-primary`, etc.)
 - 2 aliases legacy × pixel-perfect baseline (string literal du rendu d'avant)
-- 1 spec par taille (sm/md/lg) × rendu classes padding+text attendues
+- 1 spec par taille (sm/md/lg) × rendu classes padding+text attendues (regression guards — tailles inchangées vs existant mais garde contre dérive future)
 - 1 spec `disabled: true` → rendu `aria-disabled="true" opacity-60`
 - 1 spec `loading: true` → rendu `aria-busy="true"` + span spinner présent
 - 1 spec focus-visible → rendu ring `accent-secondary` + offset 2px
@@ -226,6 +226,8 @@ Pas de changement de pipeline. La suite RSpec complète s'exécute. Pas de spec 
 - Closing : après B5 (reskin teacher) quand le dernier site d'appel aura été migré ou supprimé
 
 Chaque alias dans le code aura un commentaire `# DEPRECATED — see #<ISSUE_NUMBER>`.
+
+Note : `<ISSUE_NUMBER>` est un placeholder à substituer pendant l'implémentation (l'issue est créée dans la même PR, son numéro inséré dans le code une fois connu).
 
 ---
 
