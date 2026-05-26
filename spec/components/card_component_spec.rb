@@ -79,11 +79,18 @@ RSpec.describe CardComponent, type: :component do
       expect(page).to have_css("div.bg-surface.border.border-rule.rounded-2xl")
     end
 
-    it ":elevated renders bg-surface-raised + shadow-sm" do
+    it ":elevated renders bg-surface-raised + border-rule + shadow-sm" do
       render_inline(described_class.new(variant: :elevated)) do |c|
         c.with_body { "x" }
       end
-      expect(page).to have_css("div.bg-surface-raised.shadow-sm")
+      expect(page).to have_css("div.bg-surface-raised.border.border-rule.shadow-sm")
+    end
+
+    it ":hero with accent :secondary renders bg-accent-secondary + text-on-accent-secondary" do
+      render_inline(described_class.new(variant: :hero, accent: :secondary)) do |c|
+        c.with_body { "x" }
+      end
+      expect(page).to have_css("div.bg-accent-secondary.text-on-accent-secondary")
     end
 
     it ":hero with accent :success renders bg-success + text-on-success" do
@@ -120,14 +127,28 @@ RSpec.describe CardComponent, type: :component do
       end
       expect(page).to have_css("div.bg-danger.text-on-danger")
     end
+
+    it "for variant :outlined with accent :primary, footer uses border-accent-primary/30 opacity" do
+      render_inline(described_class.new(variant: :outlined, accent: :primary)) do |c|
+        c.with_body { "body" }
+        c.with_footer { "footer" }
+      end
+      footer_classes = page.find("div.border-t", text: "footer")[:class]
+      # Tailwind opacity modifier `/30` in interpolation is fragile to refactor — lock it.
+      expect(footer_classes).to include("border-accent-primary/30")
+    end
   end
 
-  describe "deprecated legacy variants (pixel-perfect baseline)" do
-    it ":rad renders the original bg-rad-paper classes" do
+  describe "deprecated legacy variants (smoke check)" do
+    # Not strictly pixel-perfect — these assert the distinctive classes so a
+    # variant rename or partial deletion would be caught. Full-string equality
+    # would be more robust but brittle to whitespace/order changes from
+    # `class_names`. Visual regression in B5 cleanup will catch deeper drift.
+    it ":rad renders bg-rad-paper + overflow-hidden + border-rad-rule" do
       render_inline(described_class.new(variant: :rad)) do |c|
         c.with_body { "x" }
       end
-      expect(page).to have_css("div.bg-rad-paper.border.border-rad-rule.rounded-2xl")
+      expect(page).to have_css("div.bg-rad-paper.overflow-hidden.border.border-rad-rule.rounded-2xl")
     end
 
     it ":glow renders the original indigo glow classes" do
@@ -150,6 +171,11 @@ RSpec.describe CardComponent, type: :component do
       expect(page).to have_css("div.bg-white")
       html = page.native.to_html
       expect(html).to include("dark:border-slate-700")
+      # Contract guard: unknown variants must NOT fall through to the new
+      # semantic :default (bg-surface/border-rule). They route to the legacy
+      # pixel-perfect else branch — preserve until B4/B5 migration.
+      expect(page).not_to have_css("div.bg-surface")
+      expect(page).not_to have_css("div.border-rule")
     end
   end
 
