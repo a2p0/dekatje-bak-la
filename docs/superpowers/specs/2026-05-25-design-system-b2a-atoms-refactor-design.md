@@ -157,7 +157,7 @@ BadgeComponent.new(
 CardComponent.new(
   variant: :default | :elevated | :hero | :outlined
          | :rad (DEPRECATED) | :glow (DEPRECATED),
-  accent: nil | :primary | :secondary | :warning | :success
+  accent: nil | :primary | :secondary | :warning | :success | :danger
 )
 ```
 
