@@ -131,6 +131,27 @@ RSpec.describe ButtonComponent, type: :component do
       expect(html).to include("focus-visible:ring-accent-secondary")
       expect(html).to include("focus-visible:ring-offset-2")
     end
+
+    it "focus-visible ring-offset-2 is NOT added to legacy variants (SC-2 pixel-perfect)" do
+      # Legacy :primary buttons pre-B2a had no ring-offset; adding it would be
+      # a tiny visual delta on keyboard focus, violating SC-2 strict.
+      render_inline(described_class.new(variant: :primary))
+      html = page.native.to_html
+      expect(html).not_to include("focus-visible:ring-offset-2")
+      # ring-indigo-500 from LEGACY_PRIMARY_CLASSES remains.
+      expect(html).to include("focus-visible:ring-indigo-500")
+    end
+  end
+
+  describe "html_options :class merge" do
+    it "appends caller-provided class: from html_options to the computed CSS" do
+      render_inline(described_class.new(variant: :rad_primary, class: "w-full custom-x"))
+      html = page.native.to_html
+      expect(html).to include("w-full")
+      expect(html).to include("custom-x")
+      # Native button class is still present (not overwritten).
+      expect(html).to include("bg-accent-primary")
+    end
   end
 
   describe "structural props" do

@@ -10,6 +10,8 @@
 
 **Spec source:** `docs/superpowers/specs/2026-05-25-design-system-b2a-atoms-refactor-design.md`
 
+**DEPRECATED removal tracking:** [issue #109](https://github.com/a2p0/dekatje-bak-la/issues/109) — to be closed after B5 (teacher reskin).
+
 > ⚠️ **Token mapping correction 2026-05-26** (post-Task 3 code review)
 >
 > Le plan ci-dessous référence par endroits des tokens qui n'existent pas dans la couche sémantique B1 (`app/assets/tailwind/application.css`) :

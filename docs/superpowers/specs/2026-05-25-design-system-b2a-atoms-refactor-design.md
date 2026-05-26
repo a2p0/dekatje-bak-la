@@ -4,6 +4,7 @@
 **Branche cible** : `066-design-system-b2a-atoms-refactor`
 **Phase** : B2a — première sous-feature de B2 (Atomes refondus)
 **Prérequis** : B1 (PR #102, tokens 2 couches `--color-*` + `data-audience` livrés)
+**DEPRECATED removal tracking** : [issue #109](https://github.com/a2p0/dekatje-bak-la/issues/109)
 
 ---
 

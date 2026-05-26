@@ -50,10 +50,18 @@ class ButtonComponent < ViewComponent::Base
     @html_options = html_options
   end
 
+  SEMANTIC_VARIANTS = %i[rad_primary secondary rad_ghost danger ink].freeze
+  private_constant :SEMANTIC_VARIANTS
+
   def call
+    semantic = SEMANTIC_VARIANTS.include?(@variant)
+
     css = class_names(
       "inline-flex items-center justify-center font-semibold transition-all",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+      "focus-visible:outline-none focus-visible:ring-2",
+      # focus-visible:ring-offset-2 is a new a11y addition; restrict to semantic
+      # variants to preserve SC-2 pixel-perfect on the 36 legacy call sites.
+      semantic ? "focus-visible:ring-offset-2" : nil,
       "cursor-pointer disabled:cursor-not-allowed",
       # gap-2 applies only when the spinner is rendered alongside content — keeps
       # legacy single-child buttons pixel-identical.
@@ -61,10 +69,12 @@ class ButtonComponent < ViewComponent::Base
       VARIANTS[@variant],
       SIZES[@size],
       @pill ? "rounded-full" : "rounded-lg",
-      @disabled || @loading ? "opacity-60 cursor-not-allowed" : nil
+      @disabled || @loading ? "opacity-60 cursor-not-allowed" : nil,
+      # Caller-provided extra classes from html_options, if any.
+      @html_options[:class]
     )
 
-    extra_attrs = @html_options.dup
+    extra_attrs = @html_options.except(:class).dup
     extra_attrs[:"aria-disabled"] = "true" if @disabled
     extra_attrs[:"aria-busy"]     = "true" if @loading
     # loading buttons are also disabled to prevent double-submit.
