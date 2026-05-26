@@ -32,4 +32,21 @@ RSpec.describe CardComponent, type: :component do
     expect(page).to have_text("Content only")
     expect(page).not_to have_css("div.border-t")
   end
+
+  describe "footer inherits variant tokens (bugfix audit P1 #6)" do
+    it "for variant :hero with accent :success, footer border uses accent-success (not rad-rule)" do
+      render_inline(described_class.new(variant: :hero, accent: :success)) do |card|
+        card.with_body { "body" }
+        card.with_footer { "footer" }
+      end
+
+      footer_div = page.find("div.border-t", text: "footer")
+      footer_classes = footer_div[:class]
+
+      # Le bug actuel : footer rend "border-t border-rad-rule" en dur
+      # Cible : il doit utiliser un token cohérent avec la variant hero (ex: accent-success ou un on-accent border)
+      expect(footer_classes).not_to include("border-rad-rule")
+      expect(footer_classes).to include("border-accent-success").or include("border-on-accent")
+    end
+  end
 end
