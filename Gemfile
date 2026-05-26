@@ -79,9 +79,12 @@ group :development, :test do
   gem "faker"
 end
 
-group :test do
+group :development, :test do
   gem "capybara"
   gem "selenium-webdriver"
+end
+
+group :test do
   gem "webmock"
   gem "simplecov", require: false
 end
