@@ -12,12 +12,18 @@ class ButtonComponent < ViewComponent::Base
   # call sites passing variant: :ghost.
   LEGACY_GHOST_CLASSES = "border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-slate-400 disabled:opacity-60".freeze
 
+  private_constant :LEGACY_PRIMARY_CLASSES, :LEGACY_GHOST_CLASSES
+
   VARIANTS = {
-    # Nouvelles variantes sémantiques (cibles B5) — tokens B1 réels
+    # Nouvelles variantes sémantiques (cibles B5) — tokens B1 réels.
+    # Post-B5 cleanup (issue #109) will rename :rad_primary → :primary,
+    # :rad_ghost → :ghost once the legacy aliases below are removed.
     rad_primary: "bg-accent-primary text-on-accent-primary hover:bg-accent-primary/90 focus-visible:ring-accent-secondary",
     secondary:   "bg-transparent border border-on-surface text-on-surface hover:bg-surface-raised focus-visible:ring-accent-secondary",
     rad_ghost:   "bg-transparent text-on-surface-muted hover:bg-surface-raised focus-visible:ring-accent-secondary",
     danger:      "bg-danger text-on-danger hover:bg-danger/90 focus-visible:ring-accent-secondary",
+    # Forward-declared for B5 — not yet consumed in any view.
+    # Pixel-validate before first use; semantic inversion = bg uses the text token, text uses the surface token.
     ink:         "bg-on-surface text-surface hover:bg-on-surface/90 focus-visible:ring-accent-secondary",
 
     # DEPRECATED — see #109 — preserved pixel-perfect for zero regression
@@ -46,9 +52,12 @@ class ButtonComponent < ViewComponent::Base
 
   def call
     css = class_names(
-      "inline-flex items-center justify-center gap-2 font-semibold transition-all",
+      "inline-flex items-center justify-center font-semibold transition-all",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
       "cursor-pointer disabled:cursor-not-allowed",
+      # gap-2 applies only when the spinner is rendered alongside content — keeps
+      # legacy single-child buttons pixel-identical.
+      @loading ? "gap-2" : nil,
       VARIANTS[@variant],
       SIZES[@size],
       @pill ? "rounded-full" : "rounded-lg",
@@ -58,6 +67,7 @@ class ButtonComponent < ViewComponent::Base
     extra_attrs = @html_options.dup
     extra_attrs[:"aria-disabled"] = "true" if @disabled
     extra_attrs[:"aria-busy"]     = "true" if @loading
+    # loading buttons are also disabled to prevent double-submit.
     extra_attrs[:disabled]        = true   if @disabled || @loading
 
     inner = if @loading
@@ -67,9 +77,17 @@ class ButtonComponent < ViewComponent::Base
       content
     end
 
-    if @href
+    # An anchor with disabled: true is rendered without an href — strips both
+    # the invalid HTML disabled attr AND the live href, so the link is truly
+    # inert (clickable disabled <a> with href is a real UX/accessibility bug).
+    if @href && !@disabled && !@loading
       extra_attrs.delete(:disabled)
       content_tag(:a, inner, href: @href, class: css, **extra_attrs)
+    elsif @href
+      extra_attrs.delete(:disabled)
+      extra_attrs[:role] = "link"
+      extra_attrs[:tabindex] = "-1"
+      content_tag(:a, inner, class: css, **extra_attrs)
     else
       content_tag(:button, inner, class: css, **extra_attrs)
     end

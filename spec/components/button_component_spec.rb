@@ -139,6 +139,20 @@ RSpec.describe ButtonComponent, type: :component do
       expect(page).to have_css("a[href='/foo']")
     end
 
+    it ":href + disabled: true renders an inert <a> WITHOUT href (true disabled link)" do
+      render_inline(described_class.new(variant: :rad_primary, href: "/foo", disabled: true)) { "link" }
+      # The <a> must NOT carry href (otherwise the disabled link is still clickable).
+      expect(page).not_to have_css("a[href='/foo']")
+      # ARIA + tabindex enforce semantic inertness for screen readers + keyboard.
+      expect(page).to have_css("a[aria-disabled='true'][tabindex='-1']")
+    end
+
+    it ":href + loading: true renders an inert <a> WITHOUT href" do
+      render_inline(described_class.new(variant: :rad_primary, href: "/foo", loading: true)) { "link" }
+      expect(page).not_to have_css("a[href='/foo']")
+      expect(page).to have_css("a[aria-busy='true'][tabindex='-1']")
+    end
+
     it ":pill renders rounded-full" do
       render_inline(described_class.new(variant: :rad_primary, pill: true))
       expect(page).to have_css("button.rounded-full")
