@@ -33,7 +33,7 @@ Refondre `ButtonComponent`, `BadgeComponent`, `CardComponent` pour exposer une A
 - Refonte des classes Tailwind de `ButtonComponent`, `BadgeComponent`, `CardComponent` pour consommer les tokens sémantiques (`accent-primary`, `surface`, `on-accent`, `rule`, etc.)
 - Nouvelles variantes sémantiques exposées par API publique :
   - Button : `:primary`, `:secondary`, `:ghost`, `:danger`, `:ink`
-  - Badge : `:primary`, `:secondary`, `:warning`, `:success`, `:neutral`, `:specialty_sin`, `:specialty_itec`, `:specialty_ec`
+  - Badge : `:primary`, `:secondary`, `:warning`, `:success`, `:neutral`, `:specialty_sin`, `:specialty_itec`, `:specialty_ee`
   - Card : `variant: :default | :elevated | :hero | :outlined` + `accent: :primary | :secondary | :warning | :success`
 - Conservation pixel-perfect des anciennes variantes en aliases marqués `# DEPRECATED`
   - Button : `:gradient` (= rendu indigo gradient actuel), `:success` (= rendu emerald actuel)
@@ -129,7 +129,7 @@ ButtonComponent.new(
 ```ruby
 BadgeComponent.new(
   color: :primary | :secondary | :warning | :success | :neutral
-       | :specialty_sin | :specialty_itec | :specialty_ec
+       | :specialty_sin | :specialty_itec | :specialty_ee
        | :indigo (DEPRECATED) | :emerald (DEPRECATED) | :amber (DEPRECATED)
        | :blue (DEPRECATED) | :slate (DEPRECATED) | :rose (DEPRECATED)
        | :rad_teal (DEPRECATED) | :rad_red (DEPRECATED)

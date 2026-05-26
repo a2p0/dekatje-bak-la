@@ -69,11 +69,18 @@ RSpec.describe BadgeComponent, type: :component do
       expect(html).to include("text-warning")
     end
 
-    it ":specialty_ec renders accent-primary tokens" do
-      render_inline(described_class.new(color: :specialty_ec, label: "EC"))
+    it ":specialty_ee renders accent-primary tokens (aligned with Subject#specialty enum :EE)" do
+      render_inline(described_class.new(color: :specialty_ee, label: "EE"))
       html = page.native.to_html
       expect(html).to include("bg-accent-primary/10")
       expect(html).to include("text-accent-primary")
+    end
+
+    it ":specialty_ac renders neutral tokens" do
+      render_inline(described_class.new(color: :specialty_ac, label: "AC"))
+      html = page.native.to_html
+      expect(html).to include("bg-rule/40")
+      expect(html).to include("text-on-surface-muted")
     end
   end
 
@@ -106,7 +113,7 @@ RSpec.describe BadgeComponent, type: :component do
       text-text-muted text-text-primary
     ].freeze
 
-    %i[primary secondary warning success neutral specialty_sin specialty_itec specialty_ec].each do |color|
+    %i[primary secondary warning success neutral specialty_sin specialty_itec specialty_ee specialty_ac].each do |color|
       it "color :#{color} does not reference undefined B1 tokens" do
         render_inline(described_class.new(color: color, label: "x"))
         html = page.native.to_html

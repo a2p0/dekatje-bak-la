@@ -10,9 +10,12 @@ class BadgeComponent < ViewComponent::Base
     warning:        "bg-warning/10 text-warning border border-warning/20",
     success:        "bg-success/10 text-success border border-success/20",
     neutral:        "bg-rule/40 text-on-surface-muted border border-rule",
+    # Specialty variants map to the model enum keys (Subject/Part/Student#specialty: SIN, ITEC, EE, AC).
+    # Pattern-driven dispatch from views: `BadgeComponent.new(color: :"specialty_#{subject.specialty.downcase}", …)`.
     specialty_sin:  "bg-accent-secondary/10 text-accent-secondary border border-accent-secondary/20",
     specialty_itec: "bg-warning/10 text-warning border border-warning/20",
-    specialty_ec:   "bg-accent-primary/10 text-accent-primary border border-accent-primary/20",
+    specialty_ee:   "bg-accent-primary/10 text-accent-primary border border-accent-primary/20",
+    specialty_ac:   "bg-rule/40 text-on-surface-muted border border-rule",
 
     # DEPRECATED — see #109 — preserved pixel-perfect for zero visual regression on existing 10 call sites
     indigo:     "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400",
