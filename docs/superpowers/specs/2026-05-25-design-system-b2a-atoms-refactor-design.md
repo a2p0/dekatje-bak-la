@@ -97,11 +97,21 @@ ButtonComponent.new(
 ```
 
 **Tokens sémantiques utilisés (nouvelles variantes)** :
-- `:primary` → `bg-accent-primary text-on-accent`
-- `:secondary` → `border border-text-primary text-text-primary bg-transparent`
-- `:ghost` → `bg-transparent text-text-muted`
-- `:danger` → `bg-accent-danger text-on-accent`
-- `:ink` → `bg-surface-inverse text-on-inverse`
+
+> ⚠️ **Mapping corrigé 2026-05-26**. Les noms originalement écrits dans ce spec
+> (`accent-warning`, `accent-success`, `text-primary`, `text-muted`,
+> `surface-elevated`, `surface-inverse`, `on-inverse`, `on-accent` sans suffixe)
+> n'existaient pas dans B1. Tokens B1 réels disponibles :
+> `surface`, `surface-raised`, `surface-sunken`, `on-surface`,
+> `on-surface-muted`, `rule`, `rule-strong`, `accent-primary`,
+> `on-accent-primary`, `accent-secondary`, `on-accent-secondary`,
+> `success`, `warning`, `danger`, `info` + leurs `on-*`.
+
+- `:primary` → `bg-accent-primary text-on-accent-primary`
+- `:secondary` → `bg-transparent border border-on-surface text-on-surface`
+- `:ghost` → `bg-transparent text-on-surface-muted`
+- `:danger` → `bg-danger text-on-danger`
+- `:ink` → `bg-on-surface text-surface` (inversion sémantique : `on-surface` = ink/cream selon thème devient le fond, `surface` devient le texte)
 
 **Tailles** : inchangées de l'existant (sm/md/lg padding+text).
 
@@ -128,10 +138,12 @@ BadgeComponent.new(
 )
 ```
 
-**Tokens sémantiques utilisés** (pattern bg @ 10% + text + border @ 20%) :
+**Tokens sémantiques utilisés** (pattern bg @ 10% + text + border @ 20%, mapping corrigé 2026-05-26 vers tokens B1 réels) :
 - `:primary` → `bg-accent-primary/10 text-accent-primary border border-accent-primary/20`
-- `:secondary` → analogue
-- `:warning`, `:success`, `:neutral` → analogue
+- `:secondary` → `bg-accent-secondary/10 text-accent-secondary border border-accent-secondary/20`
+- `:warning` → `bg-warning/10 text-warning border border-warning/20`
+- `:success` → `bg-success/10 text-success border border-success/20`
+- `:neutral` → `bg-rule/40 text-on-surface-muted border border-rule`
 - `:specialty_sin/itec/ec` → couleurs métier. Mapping concret à figer pendant l'implémentation par grep des sites d'appel actuels : si une vue passe aujourd'hui `BadgeComponent.new(color: :rad_yellow, label: "SIN")`, la nouvelle variante `:specialty_sin` doit rendre les mêmes classes que `:rad_yellow` legacy. Sinon, choisir un mapping cohérent avec le bundle `teacher/shared.jsx:73-91` (`Badge color={specialtyColor(c.specialty)}`).
 
 **API d'init** : préservée à l'identique (`color:`, `label:`).
@@ -149,11 +161,11 @@ CardComponent.new(
 )
 ```
 
-**Variantes** :
+**Variantes** (mapping corrigé 2026-05-26 vers tokens B1 réels) :
 - `:default` → `bg-surface border border-rule rounded-2xl`
-- `:elevated` → `bg-surface-elevated border border-rule shadow-sm rounded-2xl`
-- `:hero` → `bg-accent-{accent} text-on-accent rounded-2xl` (pattern madras optionnel via override CSS)
-- `:outlined` → `bg-transparent border-l-4 border-accent-{accent} rounded-2xl`
+- `:elevated` → `bg-surface-raised border border-rule shadow-sm rounded-2xl`
+- `:hero` → `bg-{accent_bg} text-{accent_on} rounded-2xl` où accent map à : primary→`accent-primary/on-accent-primary`, secondary→`accent-secondary/on-accent-secondary`, success→`success/on-success`, warning→`warning/on-warning`, danger→`danger/on-danger`
+- `:outlined` → `bg-transparent border-l-4 border-{accent_bg} rounded-2xl` (même mapping)
 
 **Slots** : `header`, `body`, `footer` — inchangés.
 

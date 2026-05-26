@@ -10,6 +10,20 @@
 
 **Spec source:** `docs/superpowers/specs/2026-05-25-design-system-b2a-atoms-refactor-design.md`
 
+> ⚠️ **Token mapping correction 2026-05-26** (post-Task 3 code review)
+>
+> Le plan ci-dessous référence par endroits des tokens qui n'existent pas dans la couche sémantique B1 (`app/assets/tailwind/application.css`) :
+>
+> - `accent-warning`, `accent-success`, `accent-danger` (n'existent pas — utiliser **`warning`**, **`success`**, **`danger`**)
+> - `on-accent` sans suffixe (n'existe pas — utiliser **`on-accent-primary`** / **`on-accent-secondary`** / **`on-success`** / etc. selon le bg)
+> - `surface-elevated` (n'existe pas — utiliser **`surface-raised`**)
+> - `text-text-primary`, `text-primary`, `text-muted`, `border-text-primary` (n'existent pas — utiliser **`text-on-surface`** / **`text-on-surface-muted`** / **`border-on-surface`**)
+> - `surface-inverse`, `on-inverse` (n'existent pas — utiliser **`bg-on-surface text-surface`** = inversion sémantique)
+>
+> **Tokens B1 réels** disponibles dans `application.css` : `surface`, `surface-raised`, `surface-sunken`, `on-surface`, `on-surface-muted`, `rule`, `rule-strong`, `accent-primary`, `on-accent-primary`, `accent-secondary`, `on-accent-secondary`, `success`/`warning`/`danger`/`info` + leurs `on-*`.
+>
+> Les snippets de code dans Tasks 4-6 ci-dessous doivent être **adaptés mentalement** avec ces substitutions avant exécution. Le spec a été patché pour refléter le mapping correct ; il fait foi en cas de conflit avec le plan.
+
 ---
 
 ## File Structure
