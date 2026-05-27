@@ -210,4 +210,59 @@ RSpec.describe FieldComponent, type: :component do
       expect(page).to have_css("label input[type='file'][accept='application/pdf']", visible: :all)
     end
   end
+
+  describe "options passthrough" do
+    it "forwards :placeholder from options to a :text input" do
+      render_inline(described_class.new(
+        form: form, attribute: :name, label: "Nom", type: :text,
+        options: { placeholder: "Ex: Terminale SIN" }
+      ))
+      expect(page).to have_css("input[placeholder='Ex: Terminale SIN']")
+    end
+
+    it "forwards :required from options" do
+      render_inline(described_class.new(
+        form: form, attribute: :name, label: "Nom", type: :text,
+        options: { required: true }
+      ))
+      expect(page).to have_css("input[required]")
+    end
+  end
+
+  describe "init validation" do
+    it "raises ArgumentError for an unknown type" do
+      expect {
+        described_class.new(form: form, attribute: :name, label: "X", type: :unsupported)
+      }.to raise_error(ArgumentError, /unknown type/)
+    end
+  end
+
+  describe "B1 token contract — no dead spec tokens leak in" do
+    UNDEFINED_TOKENS = %w[
+      accent-warning accent-success accent-danger
+      surface-elevated surface-inverse on-inverse
+      text-text-primary text-text-muted border-text-primary
+    ].freeze
+
+    %i[text textarea file file_dropzone checkbox].each do |type|
+      it "type :#{type} does not reference undefined B1 tokens" do
+        render_inline(described_class.new(form: form, attribute: :name, label: "X", type: type))
+        html = page.native.to_html
+        UNDEFINED_TOKENS.each do |bad|
+          expect(html).not_to include(bad), "FieldComponent type=#{type} rendered undefined token '#{bad}'"
+        end
+      end
+    end
+
+    it "type :select does not reference undefined B1 tokens" do
+      render_inline(described_class.new(
+        form: form, attribute: :specialty, label: "X", type: :select,
+        collection: [ [ "A", "a" ] ]
+      ))
+      html = page.native.to_html
+      UNDEFINED_TOKENS.each do |bad|
+        expect(html).not_to include(bad), "FieldComponent type=select rendered undefined token '#{bad}'"
+      end
+    end
+  end
 end
