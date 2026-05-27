@@ -142,4 +142,24 @@ RSpec.describe FieldComponent, type: :component do
       expect(page).to have_css("input[accept='application/pdf']")
     end
   end
+
+  describe ":checkbox type" do
+    it "renders <input type='checkbox'> inside an inline <label>" do
+      render_inline(described_class.new(form: form, attribute: :accepted, label: "J'accepte", type: :checkbox))
+      expect(page).to have_css("label.flex.items-center input[type='checkbox'][name='user[accepted]']")
+      expect(page).to have_css("label", text: "J'accepte")
+    end
+
+    it "applies accent-accent-primary on the checkbox" do
+      render_inline(described_class.new(form: form, attribute: :accepted, label: "X", type: :checkbox))
+      html = page.native.to_html
+      expect(html).to include("accent-accent-primary")
+    end
+
+    it "shows the error message below when form.object has errors" do
+      model.errors.add(:accepted, "obligatoire")
+      render_inline(described_class.new(form: form, attribute: :accepted, label: "X", type: :checkbox))
+      expect(page).to have_css("p.text-danger", text: "obligatoire")
+    end
+  end
 end

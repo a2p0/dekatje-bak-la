@@ -1,22 +1,29 @@
 <div class="mb-4">
-  <%= @form.label @attribute, @label, class: label_classes %>
+  <% if @type == :checkbox %>
+    <label class="flex items-center gap-2 text-sm font-medium text-on-surface cursor-pointer">
+      <%= @form.check_box @attribute, **@options.merge(class: "accent-accent-primary h-4 w-4 rounded #{@options[:class]}".strip) %>
+      <span><%= @label %></span>
+    </label>
+  <% else %>
+    <%= @form.label @attribute, @label, class: label_classes %>
 
-  <% case @type %>
-  <% when :text %>
-    <%= @form.text_field @attribute, **merged_options %>
-  <% when :textarea %>
-    <%= @form.text_area @attribute, **merged_options %>
-  <% when :select %>
-    <%= @form.select @attribute, @collection, select_options, **select_html_options %>
-  <% when :file %>
-    <%= @form.file_field @attribute, **merged_options(extra_class: file_input_classes) %>
+    <% case @type %>
+    <% when :text %>
+      <%= @form.text_field @attribute, **merged_options %>
+    <% when :textarea %>
+      <%= @form.text_area @attribute, **merged_options %>
+    <% when :select %>
+      <%= @form.select @attribute, @collection, select_options, **select_html_options %>
+    <% when :file %>
+      <%= @form.file_field @attribute, **merged_options(extra_class: file_input_classes) %>
+    <% end %>
   <% end %>
 
   <% error_messages.each do |msg| %>
     <p class="text-danger text-xs mt-1 font-semibold"><%= msg %></p>
   <% end %>
 
-  <% if @hint %>
+  <% if @hint && @type != :checkbox %>
     <p class="text-on-surface-muted text-xs mt-1"><%= @hint %></p>
   <% end %>
 </div>
