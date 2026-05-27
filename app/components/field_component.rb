@@ -7,7 +7,10 @@ class FieldComponent < ViewComponent::Base
   # Adoption: zero consumers in B2b — see roadmap B5 for view migration away
   # from the DEPRECATED partial app/views/teacher/shared/_field.html.erb.
 
-  SUPPORTED_TYPES = %i[text textarea].freeze
+  SUPPORTED_TYPES = %i[text textarea select].freeze
+
+  # Keys routed to form.select's options hash (not html_options).
+  SELECT_OPTION_KEYS = %i[prompt include_blank selected disabled].freeze
 
   # Tailwind classes applied to the label element.
   LABEL_CLASSES = "block text-sm font-semibold text-on-surface mb-1".freeze
@@ -34,6 +37,8 @@ class FieldComponent < ViewComponent::Base
       raise ArgumentError,
             "FieldComponent: unknown type :#{@type} (supported: #{SUPPORTED_TYPES.inspect})"
     end
+
+    raise ArgumentError, "FieldComponent: :select requires a collection" if @type == :select && @collection.nil?
   end
 
   def error?
@@ -60,5 +65,17 @@ class FieldComponent < ViewComponent::Base
     user_class = @options[:class]
     merged_class = [ extra_class, user_class ].compact.join(" ")
     @options.merge(class: merged_class)
+  end
+
+  # form.select takes (method, choices, options, html_options). We split the
+  # unified `options:` hash: keys in SELECT_OPTION_KEYS go to options, the rest
+  # (class, data-*, id, etc.) go to html_options.
+  def select_options
+    @options.slice(*SELECT_OPTION_KEYS)
+  end
+
+  def select_html_options
+    base = merged_options(extra_class: input_classes)
+    base.except(*SELECT_OPTION_KEYS)
   end
 end

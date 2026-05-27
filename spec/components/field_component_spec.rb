@@ -93,4 +93,35 @@ RSpec.describe FieldComponent, type: :component do
       expect(page).to have_css("p.text-danger", text: "trop long")
     end
   end
+
+  describe ":select type" do
+    let(:options_list) { [ [ "SIN", "SIN" ], [ "ITEC", "ITEC" ], [ "EE", "EE" ] ] }
+
+    it "renders a <select> with the collection options" do
+      render_inline(described_class.new(
+        form: form, attribute: :specialty, label: "Spécialité",
+        type: :select, collection: options_list
+      ))
+      expect(page).to have_css("select[name='user[specialty]']")
+      expect(page).to have_css("option[value='SIN']", text: "SIN")
+      expect(page).to have_css("option[value='ITEC']", text: "ITEC")
+      expect(page).to have_css("option[value='EE']", text: "EE")
+    end
+
+    it "applies B1 semantic classes on the select" do
+      render_inline(described_class.new(
+        form: form, attribute: :specialty, label: "Spé",
+        type: :select, collection: options_list
+      ))
+      html = page.native.to_html
+      expect(html).to include("bg-surface")
+      expect(html).to include("border-rule")
+    end
+
+    it "raises ArgumentError when collection is missing" do
+      expect {
+        described_class.new(form: form, attribute: :specialty, label: "Spé", type: :select)
+      }.to raise_error(ArgumentError, /collection/)
+    end
+  end
 end
