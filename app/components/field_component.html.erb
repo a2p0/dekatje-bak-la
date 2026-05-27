@@ -1,5 +1,29 @@
 <div class="mb-4">
-  <% if @type == :checkbox %>
+  <% if @type == :file_dropzone %>
+    <%# Dropzone: <label> is the clickable area, file input is sr-only inside.
+        Clicking anywhere in the wrapper opens the file picker via HTML semantics.
+        We render the <label> by hand (not via form.label block) because the
+        form-builder's block-label helper renders inner content outside the
+        label tag in this ViewComponent context. %>
+    <label for="<%= "#{@form.object_name}_#{@attribute}" %>" class="w-full p-5 rounded-lg border-2 border-dashed border-rule bg-surface-raised flex flex-col items-center gap-2 cursor-pointer">
+      <div class="w-9 h-9 rounded-lg bg-accent-secondary/15 flex items-center justify-center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             class="text-accent-secondary">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="text-center">
+        <div class="text-sm font-semibold text-accent-secondary">Déposer un fichier</div>
+        <% if @hint %>
+          <div class="text-xs text-on-surface-muted"><%= @hint %></div>
+        <% end %>
+      </div>
+      <%= @form.file_field @attribute, **@options.merge(class: "sr-only") %>
+    </label>
+  <% elsif @type == :checkbox %>
     <label class="flex items-center gap-2 text-sm font-medium text-on-surface cursor-pointer">
       <%= @form.check_box @attribute, **@options.merge(class: "accent-accent-primary h-4 w-4 rounded #{@options[:class]}".strip) %>
       <span><%= @label %></span>
@@ -23,7 +47,7 @@
     <p class="text-danger text-xs mt-1 font-semibold"><%= msg %></p>
   <% end %>
 
-  <% if @hint && @type != :checkbox %>
+  <% if @hint && @type != :file_dropzone && @type != :checkbox %>
     <p class="text-on-surface-muted text-xs mt-1"><%= @hint %></p>
   <% end %>
 </div>

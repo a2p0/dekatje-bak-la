@@ -7,7 +7,7 @@ class FieldComponent < ViewComponent::Base
   # Adoption: zero consumers in B2b — see roadmap B5 for view migration away
   # from the DEPRECATED partial app/views/teacher/shared/_field.html.erb.
 
-  SUPPORTED_TYPES = %i[text textarea select file checkbox].freeze
+  SUPPORTED_TYPES = %i[text textarea select file file_dropzone checkbox].freeze
 
   # Keys routed to form.select's options hash (not html_options).
   SELECT_OPTION_KEYS = %i[prompt include_blank selected disabled].freeze

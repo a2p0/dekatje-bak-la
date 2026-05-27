@@ -174,4 +174,40 @@ RSpec.describe FieldComponent, type: :component do
       expect(page).not_to have_text("ne sera pas rendu")
     end
   end
+
+  describe ":file_dropzone type" do
+    it "renders a <label> wrapper with dashed border and the sr-only file input inside" do
+      render_inline(described_class.new(form: form, attribute: :pdf, label: "PDF", type: :file_dropzone))
+      # The <label> wrapper is the clickable area.
+      expect(page).to have_css("label.border-dashed.border-rule.bg-surface-raised")
+      # The actual file input is inside, marked sr-only.
+      expect(page).to have_css("label input[type='file'].sr-only", visible: :all)
+    end
+
+    it "shows the fixed 'Déposer un fichier' text in accent-secondary" do
+      render_inline(described_class.new(form: form, attribute: :pdf, label: "PDF", type: :file_dropzone))
+      expect(page).to have_css("div.text-accent-secondary.font-semibold", text: "Déposer un fichier")
+    end
+
+    it "shows the hint as the secondary line when provided" do
+      render_inline(described_class.new(
+        form: form, attribute: :pdf, label: "PDF", type: :file_dropzone,
+        hint: "PDF uniquement · max 20 Mo"
+      ))
+      expect(page).to have_css("div.text-on-surface-muted", text: "PDF uniquement · max 20 Mo")
+    end
+
+    it "embeds an SVG upload icon" do
+      render_inline(described_class.new(form: form, attribute: :pdf, label: "PDF", type: :file_dropzone))
+      expect(page).to have_css("label svg", visible: :all)
+    end
+
+    it "forwards :accept from options to the file input" do
+      render_inline(described_class.new(
+        form: form, attribute: :pdf, label: "PDF", type: :file_dropzone,
+        options: { accept: "application/pdf" }
+      ))
+      expect(page).to have_css("label input[type='file'][accept='application/pdf']", visible: :all)
+    end
+  end
 end
