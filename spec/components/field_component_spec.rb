@@ -161,5 +161,17 @@ RSpec.describe FieldComponent, type: :component do
       render_inline(described_class.new(form: form, attribute: :accepted, label: "X", type: :checkbox))
       expect(page).to have_css("p.text-danger", text: "obligatoire")
     end
+
+    it "silently suppresses the hint paragraph (label is inline next to checkbox)" do
+      # Deliberate UX choice: the label sits inline with the checkbox so a hint
+      # paragraph would be visually redundant. Lock this behavior so a future
+      # refactor doesn't accidentally re-render the hint.
+      render_inline(described_class.new(
+        form: form, attribute: :accepted, label: "X", type: :checkbox,
+        hint: "ne sera pas rendu"
+      ))
+      expect(page).not_to have_css("p.text-on-surface-muted")
+      expect(page).not_to have_text("ne sera pas rendu")
+    end
   end
 end
