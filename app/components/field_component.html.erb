@@ -1,0 +1,16 @@
+<div class="mb-4">
+  <%= form.label attribute, label, class: "block text-sm font-semibold text-on-surface mb-1" %>
+
+  <% case type %>
+  <% when :text %>
+    <%= form.text_field attribute, **merged_options %>
+  <% end %>
+
+  <% error_messages.each do |msg| %>
+    <p class="text-danger text-xs mt-1 font-semibold"><%= msg %></p>
+  <% end %>
+
+  <% if hint && !has_error? %>
+    <p class="text-on-surface-muted text-xs mt-1"><%= hint %></p>
+  <% end %>
+</div>
