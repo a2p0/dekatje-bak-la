@@ -7,7 +7,7 @@ class FieldComponent < ViewComponent::Base
   # Adoption: zero consumers in B2b — see roadmap B5 for view migration away
   # from the DEPRECATED partial app/views/teacher/shared/_field.html.erb.
 
-  SUPPORTED_TYPES = %i[text textarea select].freeze
+  SUPPORTED_TYPES = %i[text textarea select file].freeze
 
   # Keys routed to form.select's options hash (not html_options).
   SELECT_OPTION_KEYS = %i[prompt include_blank selected disabled].freeze
@@ -22,6 +22,14 @@ class FieldComponent < ViewComponent::Base
                        "focus:outline-none focus:ring-2 focus:ring-accent-secondary " \
                        "focus:border-accent-primary " \
                        "disabled:opacity-60 disabled:cursor-not-allowed".freeze
+
+  # Tailwind classes for the native file input. The file:* prefix styles the
+  # browser's built-in "Choose file" button.
+  FILE_INPUT_CLASSES = "w-full text-sm text-on-surface " \
+                       "file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 " \
+                       "file:text-sm file:font-semibold " \
+                       "file:bg-accent-secondary/15 file:text-accent-secondary " \
+                       "hover:file:bg-accent-secondary/25".freeze
 
   def initialize(form:, attribute:, label:, type: :text, hint: nil,
                  collection: nil, options: {})
@@ -58,6 +66,11 @@ class FieldComponent < ViewComponent::Base
   def input_classes
     extra = error? ? " border-danger" : ""
     BASE_INPUT_CLASSES + extra
+  end
+
+  def file_input_classes
+    extra = error? ? " border-danger" : ""
+    FILE_INPUT_CLASSES + extra
   end
 
   # Merge user-supplied options with our class string. User classes win on conflict.

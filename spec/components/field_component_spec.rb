@@ -124,4 +124,22 @@ RSpec.describe FieldComponent, type: :component do
       }.to raise_error(ArgumentError, /collection/)
     end
   end
+
+  describe ":file type" do
+    it "renders an <input type='file'> with file:-prefixed Tailwind classes for the button look" do
+      render_inline(described_class.new(form: form, attribute: :pdf, label: "PDF", type: :file))
+      expect(page).to have_css("input[type='file'][name='user[pdf]']")
+      html = page.native.to_html
+      expect(html).to include("file:bg-accent-secondary/15")
+      expect(html).to include("file:text-accent-secondary")
+    end
+
+    it "forwards :accept from options" do
+      render_inline(described_class.new(
+        form: form, attribute: :pdf, label: "PDF", type: :file,
+        options: { accept: "application/pdf" }
+      ))
+      expect(page).to have_css("input[accept='application/pdf']")
+    end
+  end
 end

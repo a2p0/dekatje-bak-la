@@ -8,6 +8,8 @@
     <%= @form.text_area @attribute, **merged_options %>
   <% when :select %>
     <%= @form.select @attribute, @collection, select_options, **select_html_options %>
+  <% when :file %>
+    <%= @form.file_field @attribute, **merged_options(extra_class: file_input_classes) %>
   <% end %>
 
   <% error_messages.each do |msg| %>
