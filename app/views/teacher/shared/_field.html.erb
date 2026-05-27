@@ -1,14 +1,26 @@
 <%#
-  Partial centralisé pour les champs de formulaire enseignant.
+  DEPRECATED — see #109
 
-  Locals :
-    f          — form builder Rails (obligatoire)
-    field      — Symbol, nom du champ (obligatoire)
-    label_text — String, texte du label (obligatoire)
-    type       — Symbol : :text, :textarea, :file, :select, :checkbox (défaut :text)
-    options    — Hash, options supplémentaires passées au helper Rails (défaut {})
-    hint       — String, texte d'aide sous le champ (optionnel)
-    collection — Array de [label, value] pour :select (obligatoire si type == :select)
+  This partial is kept until B5 (teacher reskin) migrates the 4 calling views
+  to FieldComponent:
+    - app/views/teacher/classrooms/new.html.erb
+    - app/views/teacher/classrooms/edit.html.erb
+    - app/views/teacher/subjects/new.html.erb
+    - app/views/teacher/questions/_question_form.html.erb
+
+  New code should use FieldComponent:
+    <%%= render FieldComponent.new(form: f, attribute: :name, label: "Nom", type: :text) %%>
+
+  Tracked: https://github.com/a2p0/dekatje-bak-la/issues/109
+
+  ## Original locals (preserved, no behavior change in B2b)
+  f          — form builder Rails (obligatoire)
+  field      — Symbol, nom du champ (obligatoire)
+  label_text — String, texte du label (obligatoire)
+  type       — Symbol : :text, :textarea, :file, :select, :checkbox (défaut :text)
+  options    — Hash, options supplémentaires (défaut {})
+  hint       — String optionnel
+  collection — Array [label, value] pour :select
 %>
 <% type ||= :text; options ||= {}; hint ||= nil; collection ||= nil %>
 
