@@ -7,6 +7,7 @@ class StripesComponent < ViewComponent::Base
   #   stripe 2 → warning          (yellow, global state token — identical across audiences)
   #   stripe 3 → accent-secondary (teal on student, red on teacher)
   #   stripe 4 → on-surface       (ink in light, cream in dark)
+  # 5px is the Radical brand spec — intentionally an arbitrary value (not a token; this is the only usage).
   def call
     content_tag(:div, class: "flex h-[5px] flex-shrink-0", "aria-hidden": "true") do
       safe_join([
