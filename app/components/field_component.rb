@@ -1,12 +1,16 @@
 class FieldComponent < ViewComponent::Base
   # Form-builder-aware input wrapper with label, hint, and error rendering.
-  # Six supported types: :text, :textarea, :file, :file_dropzone, :select, :checkbox.
+  # Currently supports :text only — Tasks 4-8 extend SUPPORTED_TYPES with
+  # :textarea, :file, :file_dropzone, :select, :checkbox.
   # All inputs consume B1 semantic tokens (no hardcoded Tailwind color utilities).
   #
   # Adoption: zero consumers in B2b — see roadmap B5 for view migration away
   # from the DEPRECATED partial app/views/teacher/shared/_field.html.erb.
 
-  SUPPORTED_TYPES = %i[text textarea file file_dropzone select checkbox].freeze
+  SUPPORTED_TYPES = %i[text].freeze
+
+  # Tailwind classes applied to the label element.
+  LABEL_CLASSES = "block text-sm font-semibold text-on-surface mb-1".freeze
 
   # Tailwind classes applied to text/textarea/select/file/checkbox inputs.
   # :file_dropzone uses a different markup (label wrapper) so does not use this.
@@ -26,22 +30,28 @@ class FieldComponent < ViewComponent::Base
     @collection = collection
     @options    = options
 
-    raise ArgumentError, "FieldComponent: unknown type :#{@type}" unless SUPPORTED_TYPES.include?(@type)
-    raise ArgumentError, "FieldComponent: :select requires a collection" if @type == :select && @collection.nil?
+    unless SUPPORTED_TYPES.include?(@type)
+      raise ArgumentError,
+            "FieldComponent: unknown type :#{@type} (supported: #{SUPPORTED_TYPES.inspect})"
+    end
   end
 
-  def has_error?
+  def error?
     @form.object.respond_to?(:errors) && @form.object.errors[@attribute].any?
   end
 
   def error_messages
-    return [] unless has_error?
+    return [] unless @form.object.respond_to?(:errors)
 
     @form.object.errors[@attribute]
   end
 
+  def label_classes
+    LABEL_CLASSES
+  end
+
   def input_classes
-    extra = has_error? ? " border-danger" : ""
+    extra = error? ? " border-danger" : ""
     BASE_INPUT_CLASSES + extra
   end
 
@@ -51,6 +61,4 @@ class FieldComponent < ViewComponent::Base
     merged_class = [ extra_class, user_class ].compact.join(" ")
     @options.merge(class: merged_class)
   end
-
-  attr_reader :form, :attribute, :label, :type, :hint, :collection, :options
 end

@@ -59,5 +59,12 @@ RSpec.describe FieldComponent, type: :component do
       expect(html).to include("border-danger")
       expect(page).to have_css("p.text-danger", text: "ne peut pas être vide")
     end
+
+    it "renders hint AND error simultaneously when both are present" do
+      model.errors.add(:name, "ne peut pas être vide")
+      render_inline(described_class.new(form: form, attribute: :name, label: "Nom", hint: "Max 50 caractères"))
+      expect(page).to have_css("p.text-danger", text: "ne peut pas être vide")
+      expect(page).to have_css("p.text-on-surface-muted", text: "Max 50 caractères")
+    end
   end
 end
