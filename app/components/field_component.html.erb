@@ -4,6 +4,8 @@
   <% case @type %>
   <% when :text %>
     <%= @form.text_field @attribute, **merged_options %>
+  <% when :textarea %>
+    <%= @form.text_area @attribute, **merged_options %>
   <% end %>
 
   <% error_messages.each do |msg| %>

@@ -67,4 +67,30 @@ RSpec.describe FieldComponent, type: :component do
       expect(page).to have_css("p.text-on-surface-muted", text: "Max 50 caractères")
     end
   end
+
+  describe ":textarea type" do
+    it "renders a <textarea> with B1 semantic classes" do
+      render_inline(described_class.new(form: form, attribute: :bio, label: "Biographie", type: :textarea))
+      expect(page).to have_css("textarea[name='user[bio]']")
+      html = page.native.to_html
+      expect(html).to include("bg-surface")
+      expect(html).to include("border-rule")
+    end
+
+    it "forwards :rows from options to the textarea" do
+      render_inline(described_class.new(
+        form: form, attribute: :bio, label: "Bio", type: :textarea,
+        options: { rows: 6 }
+      ))
+      expect(page).to have_css("textarea[rows='6']")
+    end
+
+    it "applies error border + message when form.object has errors" do
+      model.errors.add(:bio, "trop long")
+      render_inline(described_class.new(form: form, attribute: :bio, label: "Bio", type: :textarea))
+      html = page.native.to_html
+      expect(html).to include("border-danger")
+      expect(page).to have_css("p.text-danger", text: "trop long")
+    end
+  end
 end

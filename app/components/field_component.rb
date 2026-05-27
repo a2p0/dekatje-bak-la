@@ -7,7 +7,7 @@ class FieldComponent < ViewComponent::Base
   # Adoption: zero consumers in B2b — see roadmap B5 for view migration away
   # from the DEPRECATED partial app/views/teacher/shared/_field.html.erb.
 
-  SUPPORTED_TYPES = %i[text].freeze
+  SUPPORTED_TYPES = %i[text textarea].freeze
 
   # Tailwind classes applied to the label element.
   LABEL_CLASSES = "block text-sm font-semibold text-on-surface mb-1".freeze
