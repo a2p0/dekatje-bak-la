@@ -59,13 +59,11 @@ RSpec.describe NavBarComponent, type: :component do
       expect(rendered).to include("text-on-surface-muted")
     end
 
-    UNDEFINED_TOKENS = %w[
+    %w[
       accent-warning accent-success accent-danger on-accent
       surface-elevated surface-inverse on-inverse
       text-text-primary text-text-muted
-    ].freeze
-
-    UNDEFINED_TOKENS.each do |token|
+    ].each do |token|
       it "does NOT use undefined token `#{token}`" do
         expect(rendered).not_to include(token)
       end
