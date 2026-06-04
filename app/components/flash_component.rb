@@ -1,7 +1,7 @@
 class FlashComponent < ViewComponent::Base
   TYPES = {
-    notice: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/20",
-    alert:  "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/20"
+    notice: "bg-success/10 text-success border-success/20",
+    alert:  "bg-danger/10 text-danger border-danger/20"
   }.freeze
 
   def initialize(type:, message:)
