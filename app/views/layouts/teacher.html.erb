@@ -21,20 +21,20 @@
     </script>
   </head>
 
-  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen"
+  <body class="bg-surface text-on-surface min-h-screen"
         data-controller="theme"
         data-audience="teacher">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:m-2">Aller au contenu</a>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-accent-primary focus:text-on-accent-primary focus:rounded-lg focus:m-2">Aller au contenu</a>
     <%= render(NavBarComponent.new) do |nav|
-      nav.with_brand { link_to "DekatjeBakLa", teacher_root_path, class: "text-base font-semibold text-slate-800 dark:text-slate-200 no-underline" }
+      nav.with_brand { link_to "DekatjeBakLa", teacher_root_path, class: "text-base font-semibold no-underline" }
       nav.with_link(href: teacher_root_path, label: "Mes classes")
       nav.with_link(href: teacher_subjects_path, label: "Mes sujets")
       nav.with_actions do
         render(ThemeToggleComponent.new) +
         link_to("Mon profil", edit_user_registration_path,
-          class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200") +
+          class: "text-sm text-on-surface-muted hover:text-on-surface") +
         link_to("Déconnexion", destroy_user_session_path, data: { turbo_method: :delete },
-          class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200")
+          class: "text-sm text-on-surface-muted hover:text-on-surface")
       end
     end %>
 
